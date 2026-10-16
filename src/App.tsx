@@ -172,7 +172,7 @@ export default function App(){
       setLoadingLive(true);
       const { data, error } = await supabase.from('viagens_motoristas').select('*').in('status', ['disponivel','em_viagem','a_caminho']).limit(50);
       if (!error && data) {
-        // adapta campos: destino_atual -> destino, lugares -> lugares
+        // adapta campos: destino_atual - destino, lugares - lugares
         setLiveViaturas(data.map((d:any)=>({ ...d, destino: d.destino_atual, motoristaTel: d.telefone || '84 000 0000', rota: d.provincia + ' - ' + d.destino_atual, preco: 500 })));
       } else {
         console.log('Erro supabase ou sem dados, usando fallback', error);
@@ -719,7 +719,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
        </select>
        <div className="grid grid-cols-2 gap-2 mt-2">
         <button type="button" onClick={()=>setClausulaAtiva(c=>Math.max(1,c-1))} disabled={clausulaAtiva===1} className="min-h-10 rounded-lg border font-bold text-xs disabled:opacity-40">Anterior</button>
-        <button type="button" onClick={()=>setClausulaAtiva(c=>Math.min(11,c+1))} disabled={clausulaAtiva===11} className="min-h-10 rounded-lg bg-[#1e2f4a] text-white font-bold text-xs disabled:opacity-40">PrAÂ³xima </button>
+        <button type="button" onClick={()=>setClausulaAtiva(c=>Math.min(11,c+1))} disabled={clausulaAtiva===11} className="min-h-10 rounded-lg bg-[#1e2f4a] text-white font-bold text-xs disabled:opacity-40">PrAxima </button>
        </div>
        <button type="button" onClick={()=>setMostrarPreviewMobile(v=>!v)} className="w-full min-h-10 mt-2 rounded-lg border-2 border-[#1e2f4a] text-[#1e2f4a] font-bold text-xs">{mostrarPreviewMobile?'Ocultar preview do contrato':'Ver preview do contrato'}</button>
       </div>
@@ -893,10 +893,10 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like</span></div>
                 <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>2 - QTD total 23</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>Ocasional (sem conta)</span></div><div className="flex justify-between items-center mt-2"><span className="text-white/50">CobranAÂ§a actual?</span><div className="h-5 w-9 bg-white/20 rounded-full relative"><div className="h-4 w-4 bg-white rounded-full absolute top-0.5 left-0.5"></div></div></div></div>
                 <button className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento DEMO</button>
-                <div className="text-[8px] text-white/40 text-center mt-2">Fluxo mais curto - telefone obrigatAÂ³rio - QTD - artigo - Nome, nAÂ£o pagamento - IVA ao selecionar activo</div>
+                <div className="text-[8px] text-white/40 text-center mt-2">Fluxo mais curto - telefone obrigatArio - QTD - artigo - Nome, nAÂ£o pagamento - IVA ao selecionar activo</div>
               </div>
-              <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">O QUE MUDOU V2.0 LIMPO</div><div className="mt-2 space-y-1 text-[8px] text-[#475569]"><div>- Removidas abas 5 e 10 - sAÂ³ 7. Faturacao e 11. Painel</div><div>- Partilha integrada no 7 - botAÂµes num sAÂ³ lugar, mantAÂ©m mostra NAÂºmero detectado: +258 84 123 4567*</div><div>- WhatsApp botAÂ£o: Partilhar PDF no WhatsApp abre acima com PDF + nota</div><div>- 35% menos custo: "Loja: Saco Cimento 50kg - CMPOR - 850 MT..." - 7% total</div><div>- PKV-FM-N-20: gerado tudo em background - "A guardar pagamentos" vs sAÂ³ cobranAÂ§a activa</div></div></div>
-              <div className="bg-[#fefce8] rounded-[12px] border border-[#fde68a] p-3"><div className="font-bold text-[9px]">Nota rAÂ¡pida</div><div className="text-[8px] text-[#854d0e] mt-1">MudanAÂ§as sAÂ£o sAÂ³ de interface, lAÂ³gica de negAÂ³cio, nome opcional, IVA global, N fim, produtos memorizados, pagamento mesmo BN Ã¢â‚¬â€ MantAÂ©m memAÂ³ria de cada cliente</div></div>
+              <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">O QUE MUDOU V2.0 LIMPO</div><div className="mt-2 space-y-1 text-[8px] text-[#475569]"><div>- Removidas abas 5 e 10 - sA 7. Faturacao e 11. Painel</div><div>- Partilha integrada no 7 - botAÂµes num sA lugar, mantAÂ©m mostra NAÂºmero detectado: +258 84 123 4567*</div><div>- WhatsApp botAÂ£o: Partilhar PDF no WhatsApp abre acima com PDF + nota</div><div>- 35% menos custo: "Loja: Saco Cimento 50kg - CMPOR - 850 MT..." - 7% total</div><div>- PKV-FM-N-20: gerado tudo em background - "A guardar pagamentos" vs sA cobranAÂ§a activa</div></div></div>
+              <div className="bg-[#fefce8] rounded-[12px] border border-[#fde68a] p-3"><div className="font-bold text-[9px]">Nota rAÂ¡pida</div><div className="text-[8px] text-[#854d0e] mt-1">MudanAÂ§as sAÂ£o sA de interface, lAgica de negAcio, nome opcional, IVA global, N fim, produtos memorizados, pagamento mesmo BN Ã¢â‚¬â€ MantAÂ©m memAria de cada cliente</div></div>
             </div>
           </div>
         </section>
@@ -922,7 +922,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
           {mostrarResultados && (
             <div className="mt-6 bg-[#dc2626] rounded-[14px] p-4 text-white border-2 border-red-800 shadow-xl">
               <div className="flex justify-between items-center">
-                <h3 className="font-black text-[14px]"> {carrosEncontrados.length} CARROS MAIS PROXIMOS PARA {destinoV.toUpperCase()} -> {destinoDistritoV.toUpperCase()}</h3>
+                <h3 className="font-black text-[14px]"> {carrosEncontrados.length} CARROS MAIS PROXIMOS PARA {destinoV.toUpperCase()} PARA {destinoDistritoV.toUpperCase()}</h3>
                 <button onClick={()=>setMostrarResultados(false)} className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-[10px] font-bold">X Fechar</button>
               </div>
               <p className="text-[10px] opacity-90 mt-1"> De: {origemV} ({origemDistritoV}) | Para: {destinoV} ({destinoDistritoV}) | GPS ativo | Passageiro preencheu form primeiro</p>
@@ -937,7 +937,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div className="text-[10px] mt-2 space-y-1">
                       <div> Matricula: {carro.matricula} | {carro.lugares} lugares | {carro.cargaKg}kg carga</div>
                       <div className="font-black text-[#dc2626] text-[13px]">Chega em {carro.tempoChegada} - a {carro.distancia?.toFixed(1)}km</div>
-                      <div className="text-[#475569]">Rota: {carro.origem || origemV} ({carro.origemDistrito || origemDistritoV}) -> {carro.destino} ({carro.destinoDistrito || destinoDistritoV})</div>
+                      <div className="text-[#475569]">Rota: {carro.origem || origemV} ({carro.origemDistrito || origemDistritoV}) PARA {carro.destino} ({carro.destinoDistrito || destinoDistritoV})</div>
                       <div> Motorista: {carro.motorista} - {carro.tel || carro.motoristaTel} | {carro.preco}MT</div>
                     </div>
                     <button onClick={()=>{setViagemSel(carro); setMostrarFormPass(true);}} className="mt-3 w-full h-8 bg-[#dc2626] hover:bg-[#b91c1c] text-white rounded-full text-[10px] font-black">RESERVAR - {carro.preco || 500}MT - Chega em {carro.tempoChegada}</button>
@@ -980,7 +980,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-5 h-10 rounded-full text-[11px] font-black shadow ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>
                     {modoTempoReal ? ' AO VIVO NACIONAL LIGADO - VER CARROS' : ' VER CARROS AO VIVO NO MAPA (PASSAGEIRO)'}
                   </button>
-                  {modoTempoReal && <span className="text-[9px] text-[#0c4a6e] font-bold">Passageiro vendo {liveFiltradas.length} carros prAÂ³ximos em {origemV} -> {destinoV} | Atualiza 3s</span>}
+                  {modoTempoReal && <span className="text-[9px] text-[#0c4a6e] font-bold">Passageiro vendo {liveFiltradas.length} carros proximos em {origemV} PARA {destinoV} | Atualiza 3s</span>}
                   <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Nacional: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula</span>
                 </div>
 
@@ -1031,7 +1031,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-4 h-8 rounded-full text-[10px] font-black ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-white border text-[#0ea5e9]'}`}>
                       {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'Ã¢â€”â€¹ VER CARROS AO VIVO NO MAPA (NACIONAL)'}
                     </button>
-                    {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros prAÂ³ximos em {origemV} -> {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
+                    {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros proximos em {origemV} PARA {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
                     <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provAÂ­ncias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, ZambAÂ©zia, Nampula, Cabo Delgado, Niassa</span>
                   </div>
 
@@ -1076,7 +1076,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                             </div>
                           </div>
                         ))}
-                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prAÂ³ximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provAÂ­ncias: {liveViaturas.length} carros no paAÂ­s.</div>}
+                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo proximosximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provAÂ­ncias: {liveViaturas.length} carros no paAÂ­s.</div>}
                       </div>
                     </div>
                   )}
