@@ -1,0 +1,26 @@
+# CONTRATA-MZ - PASTA FINAL UNICA - APAGA O RESTO
+
+## Esta é a única pasta que deves usar!
+Apaga todas as outras pastas contrata-mz antigas.
+
+### PASSOS:
+
+1. Esta pasta já tem o App.tsx com sistema nacional tempo real + Supabase ligado
+
+2. Edita o ficheiro .env e coloca tuas chaves reais:
+   - Vai em supabase.com > Project Settings > API
+   - Copia Project URL e anon key
+
+3. No terminal, dentro desta pasta:
+   npm install
+   npm run dev
+
+4. Abre http://localhost:5173
+   - Clica VIAGENS > Pesquisar viagens > VER CARROS AO VIVO
+
+5. Para colocar no ar:
+   git init (se ainda não)
+   vercel --prod
+   E no Vercel > Settings > Environment Variables adiciona as mesmas 2 chaves do .env
+
+BUILD 100% - CLÁUSULAS 4-10 MANTIDAS
