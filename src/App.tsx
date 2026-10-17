@@ -156,7 +156,7 @@ export default function App(){
  const totalFat = baseFat + ivaFat;
  const catsFat = ["Todos","Cimento","Bloco","Tinta","Ferro","Cobertura","Inertes","Tubo PVC","Fechadura"];
  // ===== FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO - NAO ALTERA NADA ANTERIOR =====
- const [viagensTab, setViagensTab] = useState<'overview'|'viajar'|'encomenda'|'minhas'|'area'>('overview');
+ const [viagensTab, setViagensTab] = useState<'overview'|'viajar'|'encomenda'|'minhas'|'area'>('viajar');
 
   // ===== SISTEMA NACIONAL TEMPO REAL - TODAS PROVINCIAS - ADICIONADO App_20 - NAO ALTERA O RESTO =====
   const [modoTempoReal, setModoTempoReal] = useState(false);
