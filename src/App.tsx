@@ -909,86 +909,89 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">Integrado como Faturacao - mesmo padrao</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">Transporte passageiros + encomendas</span></div>
             <div className="flex gap-1.5 flex-wrap">
-              <button onClick={()=>setViagensTab('viajar')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='viajar'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Pesquisar viagens</button>
+                            <button onClick={()=>setViagensTab('viajar')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='viajar'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Pesquisar viagens</button>
               <button onClick={()=>setViagensTab('encomenda')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='encomenda'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Enviar encomenda</button>
               <button onClick={()=>setViagensTab('minhas')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='minhas'?'bg-[#1e2f4a] text-white':'bg-white border'}`}>Minhas reservas</button>
               <button onClick={()=>setViagensTab('area')} className={`px-4 h-7 rounded-full text-[9px] font-black ${viagensTab==='area'?'bg-[#facc15] text-black ring-2 ring-[#1e2f4a]':'bg-[#fef9c3] border text-black'}`}>AREA TRANSPORTADOR</button>
             </div>
           </div>
 
-{viagensTab==='viajar' && (
+{viagensTab==='overview_DISABLED' && (
+        <div className="space-y-3">
+          <div className="bg-green-600 rounded-[12px] py-2 px-4 text-white font-bold text-center text-[12px]">Previsao de Chegada</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-white rounded-[12px] border p-3"><div className="text-[9px] text-[#94a3b8]">Viagens hoje</div><div className="font-black text-[18px]">{viagensMock.length}</div></div>
+            <div className="bg-white rounded-[12px] border p-3"><div className="text-[9px] text-[#94a3b8]">Transportadores</div><div className="font-black text-[18px]">12</div></div>
+            <div className="bg-white rounded-[12px] border p-3"><div className="text-[9px] text-[#94a3b8]">Minhas reservas</div><div className="font-black text-[18px]">{reservas.length}</div></div>
+            <div className="bg-white rounded-[12px] border p-3"><div className="text-[9px] text-[#94a3b8]">Encomendas</div><div className="font-black text-[18px]">{encomendas.length}</div></div>
+          </div>
+          <div className="bg-white rounded-[12px] border-2 border-[#0ea5e9] p-4">
+            <div className="flex flex-wrap gap-2 items-center">
+              <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-5 h-10 rounded-full text-[11px] font-black shadow ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2':'bg-[#0ea5e9] text-white'}`}>
+                {modoTempoReal ? 'AO VIVO NACIONAL LIGADO - VER CARROS' : 'VER CARROS AO VIVO NO MAPA (PASSAGEIRO)'}
+              </button>
+              <button onClick={()=>{setViagensTab('viajar'); localizarMaisProximo();}} className="px-5 h-10 rounded-full text-[11px] font-black bg-green-600 text-white">Mais Proximo</button>
+              <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Nacional: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viagensTab==='viajar' && (
         <div className="space-y-3">
           <div className="bg-green-600 rounded-[12px] py-2 px-4 text-white font-bold text-center text-[12px] shadow">Previsao de Chegada</div>
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 items-start">
             <div className="bg-white rounded-[12px] border p-4 lg:sticky lg:top-[80px]">
-              <div className="font-black text-[12px]">Pesquisar Viagens - NACIONAL, TODAS PROVINCIAS</div>
+              <div className="font-black text-[12px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</div>
               <div className="flex gap-2 mt-3">
                 <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`flex-1 h-9 rounded-full text-[9px] font-black px-2 ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>
                   {modoTempoReal ? 'AO VIVO NACIONAL LIGADO' : 'VER CARROS AO VIVO NO MAPA (NACIONAL)'}
                 </button>
                 <button onClick={()=>localizarMaisProximo()} className="flex-1 h-9 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full text-[9px] px-2 shadow">Mais Proximo</button>
               </div>
+              {modoTempoReal && <div className="mt-2 text-[8px] text-[#0c4a6e] font-bold">Passageiro vendo {liveFiltradas.length} carros proximos em {origemV} PARA {destinoV} | Atualiza 3s</div>}
+              <div className="mt-2 text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full inline-block">Todas provincias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Cabo Delgado, Niassa</div>
               <div className="mt-4 space-y-3">
-                <div><label className="text-[8px] font-bold text-[#64748b]">PROVINCIA ORIGEM</label><select value={origemV} onChange={e=>setOrigemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option></select></div>
-                <div><label className="text-[8px] font-bold text-[#64748b]">PROVINCIA DESTINO</label><select value={destinoV} onChange={e=>setDestinoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Sofala</option><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option></select></div>
-                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold text-[#64748b]">DISTRITO ORIGEM</label><select value={origemDistritoV} onChange={e=>setOrigemDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Matola</option><option>Maputo</option><option>Xai-Xai</option><option>Beira</option></select></div><div><label className="text-[8px] font-bold text-[#64748b]">DISTRITO DESTINO</label><select value={destinoDistritoV} onChange={e=>setDestinoDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Beira</option><option>Matola</option><option>Maputo</option><option>Xai-Xai</option></select></div></div>
-                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold text-[#64748b]">DATA VIAGEM</label><input type="date" value={dataViagemV||''} onChange={e=>setDataViagemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1" /></div><div><label className="text-[8px] font-bold text-[#64748b]">TIPO</label><select className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Todos</option><option>Bus</option><option>Mini-bus</option></select></div></div>
+                <div className="text-[9px] font-bold text-[#64748b]">Pesquisa normal (lista fixa) - mantida como antes</div>
+                <div><label className="text-[8px] font-bold">PROVINCIA ORIGEM</label><select value={origemV} onChange={e=>setOrigemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Cabo Delgado</option><option>Niassa</option></select></div>
+                <div><label className="text-[8px] font-bold">PROVINCIA DESTINO</label><select value={destinoV} onChange={e=>setDestinoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Sofala</option><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Cabo Delgado</option><option>Niassa</option></select></div>
+                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">DISTRITO ORIGEM</label><select value={origemDistritoV} onChange={e=>setOrigemDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Matola</option><option>Maputo</option><option>Xai-Xai</option><option>Beira</option></select></div><div><label className="text-[8px] font-bold">DISTRITO DESTINO</label><select value={destinoDistritoV} onChange={e=>setDestinoDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Beira</option><option>Matola</option><option>Maputo</option><option>Xai-Xai</option></select></div></div>
+                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataViagemV||''} onChange={e=>setDataViagemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1" /></div><div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza</option></select></div></div>
                 <button onClick={()=>localizarMaisProximo()} className="w-full h-10 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-black rounded-full text-[11px] mt-2">PESQUISAR VIAGENS</button>
-                <div className="bg-[#0f172a] rounded-[10px] p-3 text-white mt-3">
-                  <div className="text-[8px] font-bold">Dica de embarque</div>
-                  <div className="text-[8px] opacity-70 mt-1">O sistema funciona offline: Crie o ponto, embarque e continue ate ver o carro mais proximo no mapa.</div>
-                </div>
               </div>
             </div>
             <div className="space-y-3">
-              <div className="bg-white rounded-[12px] border p-3">
-                <div className="flex justify-between items-center">
-                  <div className="font-black text-[10px]">{(carrosEncontrados.length || 6)} cursos encontrados PARA {origemV.toUpperCase()} - {destinoV.toUpperCase()} - {destinoDistritoV.toUpperCase()}</div>
-                  <div className="flex gap-1"><span className="text-[7px] px-2 py-1 bg-[#e0f2fe] rounded-full">Cursos Ativos</span><span className="text-[7px] px-2 py-1 bg-[#fef9c3] rounded-full">2 Destaques</span></div>
-                </div>
-                <div className="mt-3 h-[120px] bg-[#e0f2fe] rounded-[10px] relative overflow-hidden border">
-                  <svg className="w-full h-full" viewBox="0 0 400 100">
-                    <path d="M 40 60 Q 100 20 180 50 T 320 60" fill="none" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="6 6" />
-                    <circle cx="40" cy="60" r="6" fill="#1e2f4a" /><circle cx="180" cy="50" r="6" fill="#facc15" /><circle cx="320" cy="60" r="6" fill="#22c55e" />
-                    <text x="20" y="80" fontSize="7" fill="#1e2f4a">Maputo</text><text x="160" y="35" fontSize="7" fill="#1e2f4a">Xai-Xai</text><text x="300" y="80" fontSize="7" fill="#1e2f4a">Beira</text>
-                  </svg>
-                  <div className="absolute bottom-1 left-2 text-[7px] text-[#0c4a6e]">AO VIVO no Mapa - Rota</div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {(carrosEncontrados.length>0?carrosEncontrados:viagensMock.slice(0,6)).map((c, idx)=>(
-                  <div key={c.id || idx} className="bg-white rounded-[12px] border p-3 flex justify-between items-start hover:shadow-md transition-shadow">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-black text-[11px]">{c.transp || c.nome || 'Nagi Invest'} - {c.viatura || c.carro || 'Minibus'}</span>
-                        <span className="text-[7px] px-1.5 py-0.5 bg-[#fef9c3] rounded-full">VERIFICADO 4.8</span>
-                        <span className="text-[7px] px-1.5 py-0.5 bg-[#e0f2fe] rounded-full">{c.lugares || 15} lugares</span>
-                      </div>
-                      <div className="text-[9px] text-[#64748b] mt-1">Rota: {c.origem || origemV} PARA {c.destino || destinoV} | Matricula: {c.matricula || 'ABC-123'} | Motorista: {c.motorista || 'Joao'}</div>
-                      <div className="flex gap-2 mt-2">
-                        <button onClick={()=>{setViagemSel(c); setMostrarFormPass(true);}} className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button>
-                        <button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button>
-                      </div>
-                    </div>
-                    <div className="text-right ml-2">
-                      <div className="font-black text-[#0ea5e9] text-[13px]">{c.preco || 2500} MT</div>
-                      <div className="text-[7px] text-[#94a3b8]">{c.tempoChegada || '2h 30m'}</div>
-                      <div className="text-[7px] mt-1 px-1.5 py-0.5 bg-[#dcfce7] text-[#166534] rounded-full">{c.distancia?.toFixed ? c.distancia.toFixed(0) : '450'}km</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
               {mostrarResultados && (
                 <div className="bg-[#dc2626] rounded-[14px] p-4 text-white border-2 border-red-800 shadow-xl">
-                  <div className="flex justify-between items-center"><h3 className="font-black text-[13px]">{carrosEncontrados.length} CARROS MAIS PROXIMOS PARA {destinoV.toUpperCase()}</h3><button onClick={()=>setMostrarResultados(false)} className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-[10px] font-bold">X Fechar</button></div>
-                  <p className="text-[10px] opacity-90 mt-1">De: {origemV} ({origemDistritoV}) | Para: {destinoV} ({destinoDistritoV}) | GPS ativo</p>
+                  <div className="flex justify-between items-center"><h3 className="font-black text-[13px]">{carrosEncontrados.length} CARROS MAIS PROXIMOS PARA {destinoV.toUpperCase()} PARA {destinoDistritoV.toUpperCase()}</h3><button onClick={()=>setMostrarResultados(false)} className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-[10px] font-bold">X Fechar</button></div>
+                  <p className="text-[10px] opacity-90 mt-1">De: {origemV} ({origemDistritoV}) | Para: {destinoV} ({destinoDistritoV}) | GPS ativo | Passageiro preencheu form primeiro</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                    {carrosEncontrados.map((carro:any)=>(
+                      <div key={carro.id} className="bg-white text-black rounded-[12px] p-3 shadow-md">
+                        <div className="flex justify-between items-start"><span className="font-black text-[11px]">{carro.transp || carro.nome} - {carro.viatura || carro.carro || carro.marca}</span><span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[9px] font-black">{carro.distancia?.toFixed(1)}km</span></div>
+                        <div className="text-[10px] mt-2 space-y-1"><div>Matricula: {carro.matricula} | {carro.lugares} lugares | {carro.cargaKg}kg carga</div><div className="font-black text-[#dc2626] text-[12px]">Chega em {carro.tempoChegada} - a {carro.distancia?.toFixed(1)}km</div><div className="text-[#475569]">Rota: {carro.origem || origemV} ({carro.origemDistrito || origemDistritoV}) PARA {carro.destino} ({carro.destinoDistrito || destinoDistritoV})</div><div>Motorista: {carro.motorista} - {carro.tel || carro.motoristaTel} | {carro.preco}MT</div></div>
+                        <button onClick={()=>{setViagemSel(carro); setMostrarFormPass(true);}} className="mt-3 w-full h-8 bg-[#dc2626] hover:bg-[#b91c1c] text-white rounded-full text-[10px] font-black">RESERVAR - {carro.preco || 500}MT - Chega em {carro.tempoChegada}</button>
+                      </div>
+                    ))}
+                  </div>
+                  {carrosEncontrados.length===0 && (<div className="mt-4 bg-white/10 rounded-[10px] p-4 text-center text-[11px]">Nenhum carro para {destinoV} hoje. Tente outra data. Central: 84 053 2899</div>)}
                 </div>
               )}
+              <div className="bg-white rounded-[12px] border p-3">
+                <div className="font-black text-[11px]">Todos carros - filtro ao lado atualiza aqui</div>
+                <div className="mt-3 space-y-2">
+                  {carrosEncontrados.length>0 ? carrosEncontrados.map((c:any)=>(
+                    <div key={c.id} className="border rounded-[10px] p-3 flex justify-between items-center">
+                      <div><div className="font-bold text-[11px]">Transportador - {c.transp || c.nome} - {c.viatura || c.carro} - {c.matricula} - {c.lugares} lugares - {c.cargaKg}kg</div><div className="text-[9px] text-[#64748b]">Maputo Provincia (Matola) - Sofala (Beira) | {c.tempoChegada} | Motorista: {c.motorista}</div></div>
+                      <div className="text-right"><div className="font-black text-[#0ea5e9] text-[12px]">{c.preco} MT</div><button className="mt-1 px-3 py-1 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">Reservar lugar</button></div>
+                    </div>
+                  )) : (<div className="text-center text-[10px] text-[#64748b] py-6">Clique em Pesquisar para ver carros - {viagensMock.length} viagens hoje</div>)}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
-
 
           {viagensTab==='area' && (
             <div className="space-y-3">
