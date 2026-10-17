@@ -1,4 +1,3 @@
-// FIX BUILD c93ed59 -> FORCADO 2026-10-17 13:48 - REMOVE </div> EXTRA LINHA 221 - READY VERDE
 
 // @ts-nocheck
 // HIBRIDO 100% CORRETO - MANTEM RESTO SEM ALTERAR EM NADA, TRABALHA APENAS VIAGENS COM DETALHES COMPLETOS
@@ -219,6 +218,7 @@ export default function App() {
               <div className="text-[8px] text-[#64748b] text-center mt-1.5">Mantem resto sem alterar - como na Foto 4 (contrata-imod37cze)</div>
             </div>
           </div>
+        </main>
       )}
 
       {tab==='facturacao' && (
