@@ -916,45 +916,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
               <button onClick={()=>setViagensTab('area')} className={`px-4 h-7 rounded-full text-[9px] font-black ${viagensTab==='area'?'bg-[#facc15] text-black ring-2 ring-[#1e2f4a]':'bg-[#fef9c3] border text-black'}`}>AREA TRANSPORTADOR</button>
             </div>
           </div>
-          <button onClick={()=>localizarMaisProximo()} className="mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full shadow-lg">Previsao de Chegada</button>
 
-          {/* ===== PARTE VERMELHA - SO APARECE DEPOIS DE CLICAR ===== */}
-          {mostrarResultados && (
-            <div className="mt-6 bg-[#dc2626] rounded-[14px] p-4 text-white border-2 border-red-800 shadow-xl">
-              <div className="flex justify-between items-center">
-                <h3 className="font-black text-[14px]"> {carrosEncontrados.length} CARROS MAIS PROXIMOS PARA {destinoV.toUpperCase()} PARA {destinoDistritoV.toUpperCase()}</h3>
-                <button onClick={()=>setMostrarResultados(false)} className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-[10px] font-bold">X Fechar</button>
-              </div>
-              <p className="text-[10px] opacity-90 mt-1"> De: {origemV} ({origemDistritoV}) | Para: {destinoV} ({destinoDistritoV}) | GPS ativo | Passageiro preencheu form primeiro</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-                {carrosEncontrados.map((carro:any)=>(
-                  <div key={carro.id} className="bg-white text-black rounded-[12px] p-3 shadow-md hover:shadow-lg transition-shadow">
-                    <div className="flex justify-between items-start">
-                      <span className="font-black text-[11px]">{carro.transp || carro.nome} - {carro.viatura || carro.carro || carro.marca}</span>
-                      <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[9px] font-black">{carro.distancia?.toFixed(1)}km</span>
-                    </div>
-                    <div className="text-[10px] mt-2 space-y-1">
-                      <div> Matricula: {carro.matricula} | {carro.lugares} lugares | {carro.cargaKg}kg carga</div>
-                      <div className="font-black text-[#dc2626] text-[13px]">Chega em {carro.tempoChegada} - a {carro.distancia?.toFixed(1)}km</div>
-                      <div className="text-[#475569]">Rota: {carro.origem || origemV} ({carro.origemDistrito || origemDistritoV}) PARA {carro.destino} ({carro.destinoDistrito || destinoDistritoV})</div>
-                      <div> Motorista: {carro.motorista} - {carro.tel || carro.motoristaTel} | {carro.preco}MT</div>
-                    </div>
-                    <button onClick={()=>{setViagemSel(carro); setMostrarFormPass(true);}} className="mt-3 w-full h-8 bg-[#dc2626] hover:bg-[#b91c1c] text-white rounded-full text-[10px] font-black">RESERVAR - {carro.preco || 500}MT - Chega em {carro.tempoChegada}</button>
-                  </div>
-                ))}
-              </div>
-
-              {carrosEncontrados.length===0 && (
-                <div className="mt-4 bg-white/10 rounded-[10px] p-4 text-center text-[11px]">Nenhum carro para {destinoV} hoje. Tente outra data. Central: 84 053 2899</div>
-              )}
-              
-              <div className="mt-3 text-[8px] opacity-60 text-center">Calculo: Tempo = DistAÂ¢ncia / 80km/h * 1.15 (paragens MoAÂ§ambique). Ex: 50km=43min | 224km Maputo-Xai-Xai=3h13min | 470km Maputo-Inhambane=6h45min | 975km Maputo-Beira=14h01min</div>
-            </div>
-          )}
-
-
-      {viagensTab==='overview' && (
+{viagensTab==='overview' && (
         <div className="space-y-3">
           <div className="bg-green-600 rounded-[12px] py-2 px-4 text-white font-bold text-center text-[12px]">Previsao de Chegada</div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
