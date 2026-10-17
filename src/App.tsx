@@ -9,10 +9,16 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// ===== PROVINCIAS + 4 LUGARES SA FREQUENTES - APENAS VIAGENS =====
-const PROVINCIAS_MOZ = ["Maputo Cidade","Maputo Provincia","Gaza","Inhambane","Sofala","Manica","Tete","Zambezia","Nampula","Niassa","Cabo Delgado"];
-const PROVINCIAS_SA = ["Joanesburgo - SA","Pretoria - SA","Durban - SA","Nelspruit - SA"];
-const TODAS_PROVINCIAS_VIAGENS = [...PROVINCIAS_MOZ, ...PROVINCIAS_SA];
+// ===== 15 PROVINCIAS - 11 MOZ + 4 SA - DISTRITOS CONHECIDOS MOCAMBICANOS - APENAS VIAGENS =====
+const PROVINCIAS_MOZ_FINAL = ["Maputo Cidade","Maputo Provincia","Gaza","Inhambane","Sofala","Manica","Tete","Zambezia","Nampula","Niassa","Cabo Delgado"];
+const PROVINCIAS_SA_FINAL = ["Joanesburgo - SA","Pretoria - SA","Durban - SA","Nelspruit - SA"];
+const TODAS_PROVINCIAS_15_FINAL = [...PROVINCIAS_MOZ_FINAL, ...PROVINCIAS_SA_FINAL];
+const DISTRITOS_SA_FINAL: any = {
+  "Joanesburgo - SA": ["Johannesburg Central - Park Station (destino #1 mocambicanos)","Sandton","Soweto - Bara","Hillbrow","Yeoville","Berea","Roodepoort","Midrand","Kempton Park","Germiston","Benoni"],
+  "Pretoria - SA": ["Pretoria Central - Bosman Station","Centurion","Mamelodi","Soshanguve","Pretoria West","Hatfield"],
+  "Durban - SA": ["Durban Central - Berea Station","Umhlanga","Pinetown","Chatsworth","Umlazi","Durban North","Amanzimtoti"],
+  "Nelspruit - SA": ["Mbombela Central - Nelspruit CBD","White River","Hazyview","Barberton","Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade mocambicana","Kanyamazane","Ressano Garcia Fronteira"]
+};
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
@@ -958,20 +964,62 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             </div>
           )}
 
-          
           {viagensTab==='overview' && (
             <div className="space-y-3">
-              <div className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO - NACIONAL + 4 SA - AO VIVO - Foto 3 - ROTA PREVISAO MOTORISTA CARGA</span><span className="text-[9px] opacity-80">15 provincias - MOZ 11 + SA 4</span></div>
+              <div className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL + AFRICA DO SUL - 4 ROTAS FREQUENTES - AO VIVO - Foto 3</span><span className="text-[9px] opacity-80">Actualizado ha 12s - 80km/h media - {TODAS_PROVINCIAS.length} provincias</span></div>
               <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
                 <div className="bg-white rounded-[12px] border p-4 h-fit">
-                  <h3 className="font-bold text-[11px]">Pesquisar - {TODAS_PROVINCIAS_VIAGENS.length} provincias - MOZ + SA</h3>
-                  <div className="mt-4 space-y-3">
-                    <div><label className="text-[9px] font-bold">PROVINCIA ORIGEM</label><select className="w-full h-[34px] border rounded px-2 text-[11px]">{TODAS_PROVINCIAS_VIAGENS.map((p:string)=><option key={p}>{p}</option>)}</select></div>
-                    <div><label className="text-[9px] font-bold">PROVINCIA DESTINO</label><select className="w-full h-[34px] border rounded px-2 text-[11px]">{TODAS_PROVINCIAS_VIAGENS.map((p:string)=><option key={p}>{p}</option>)}</select></div>
+                  <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL + 4 LUGARES SA - TEMPO REAL</h3>
+                  <p className="text-[9px] text-[#6b7280] mt-1">Foto 3 - ROTA PREVISAO MOTORISTA CARGA Matricula Ver no mapa 2800MT 3200MT + SA</p>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <button onClick={()=>{ setMostrarResultados && setMostrarResultados(true); }} className="h-[36px] bg-[#1d4ed8] text-white rounded-[8px] text-[9px] font-bold">VER CARROS AO VIVO NO MAPA (MOZ + SA)</button>
+                    <button onClick={()=>setMaisProximo && setMaisProximo(!maisProximo)} className="h-[36px] bg-[#22c55e] text-white rounded-[8px] text-[9px] font-bold">MAIS PROXIMO ✓</button>
                   </div>
+                  <div className="mt-4 space-y-3">
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM - {TODAS_PROVINCIAS.length} com SA</label><select value={provOrigem || ''} onChange={e=>{ setProvOrigem && setProvOrigem(e.target.value); setOrigemV && setOrigemV(e.target.value); }} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">{TODAS_PROVINCIAS.map((p:string)=><option key={p} value={p}>{p}</option>)}</select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO - com SA</label><select value={provDestino || ''} onChange={e=>{ setProvDestino && setProvDestino(e.target.value); setDestinoV && setDestinoV(e.target.value); }} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">{TODAS_PROVINCIAS.map((p:string)=><option key={p} value={p}>{p}</option>)}</select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label><select value={distOrigem || ''} onChange={e=>setDistOrigem && setDistOrigem(e.target.value)} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">{(DISTRITOS_POR_PROVINCIA[provOrigem] || ["Matola","Boane","Central"]).map((d:string)=><option key={d}>{d}</option>)}</select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select value={distDestino || ''} onChange={e=>setDistDestino && setDistDestino(e.target.value)} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">{(DISTRITOS_POR_PROVINCIA[provDestino] || ["Beira","Dondo"]).map((d:string)=><option key={d}>{d}</option>)}</select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">ROTA FREQUENTE MOZ-SA</label><select onChange={e=>{ const rota=e.target.value; if(rota.includes('->')){ const [o,d]=rota.split('->').map((s:string)=>s.trim()); setProvOrigem && setProvOrigem(o); setProvDestino && setProvDestino(d); } }} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[10px]"><option value="">Escolher rota frequente</option>{ROTAS_FREQUENTES_MOZ_SA.map((r:string)=><option key={r}>{r}</option>)}</select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" value={dataViagem || ''} onChange={e=>setDataViagem && setDataViagem(e.target.value)} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
+                  </div>
+                  <div className="mt-4 p-2 bg-[#fef9c3] rounded border border-yellow-200 text-[8px]"><b>4 LUGARES SA FREQUENTES:</b> Joanesburgo (Sandton, Soweto), Pretoria (Centurion), Durban (Umhlanga), Nelspruit (Mbombela, Komatipoort) - fronteira Ressano Garcia, Ponta do Ouro</div>
                 </div>
                 <div className="space-y-3">
-                  <div className="bg-[#e0f2fe] rounded-[12px] border h-[220px] p-3">MAPA MOZ + SA - 5 MOZ + 4 SA</div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">5</span> carros encontrados para <span className="text-[#1d4ed8]">MAPUTO PROVINCIA - SOFALA - BEIRA + SA - {TODAS_PROVINCIAS.length} provincias</span></h2></div>
+                  <div className="bg-[#e0f2fe] rounded-[12px] border border-[#bae6fd] h-[220px] relative overflow-hidden p-3">
+                    <div className="absolute top-2 right-2 bg-[#111827] text-white text-[8px] font-bold px-2 py-1 rounded-full">MOZ + SA - NACIONAL + 4 SA</div>
+                    <svg className="w-full h-[120px] mt-2" viewBox="0 0 800 130"><path d="M 50 80 Q 200 20 350 60 T 650 40 Q 700 35 750 80" stroke="#93c5fd" strokeWidth="2.5" strokeDasharray="8 8" fill="none"/><circle cx="80" cy="75" r="12" fill="#1d4ed8"/><text x="80" y="95" fontSize="8" fill="#1d4ed8" textAnchor="middle">Maputo</text><circle cx="350" cy="55" r="12" fill="#1d4ed8"/><text x="350" y="75" fontSize="8" fill="#1d4ed8" textAnchor="middle">Beira</text><circle cx="550" cy="35" r="14" fill="#facc15" stroke="#111827" strokeWidth="1.5"/><text x="550" y="20" fontSize="8" fontWeight="bold" fill="#111827" textAnchor="middle">JHB SA</text><circle cx="650" cy="30" r="10" fill="#22c55e"/><text x="650" y="15" fontSize="7" fill="#111827">Pretoria</text><circle cx="700" cy="50" r="8" fill="#a855f7"/><text x="700" y="70" fontSize="7">Durban</text><circle cx="600" cy="60" r="8" fill="#f97316"/><text x="600" y="80" fontSize="7">Nelspruit</text></svg>
+                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: Maputo - Beira | EN4: Maputo - Joanesburgo via Ressano Garcia</div>
+                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">9 viaturas em transito - 5 MOZ + 4 SA - 80km/h media</div>
+                  </div>
+                  {(typeof viagensFiltradas !== 'undefined' ? viagensFiltradas : (typeof carrosEncontrados !== 'undefined' && carrosEncontrados.length>0 ? carrosEncontrados : [])).length>0 ? (typeof viagensFiltradas !== 'undefined' ? viagensFiltradas : carrosEncontrados).map((v:any)=>(
+                    <div key={v.id || v.matricula} className="bg-white rounded-[12px] border p-3 shadow-sm">
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transportadora || v.empresa || 'MOZL').slice(0,4).toUpperCase()}</span></div>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap justify-between gap-2">
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transportadora || v.empresa || 'MozLog Express'}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{(v.status || 'A CAMINHO').toUpperCase()}</span><span className="text-[10px]">⭐ {v.avaliacao || '4.6'} - {v.lugaresLivres || v.lugares || '2'} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo || 'Foton Camiao'} - {v.matricula || 'ADF 561 SF'} - {v.origem || provOrigem} - {v.destino || provDestino}</p></div>
+                            <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco || 2800} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📍 ROTA</div><div className="text-[10px] font-semibold">{v.rota || `${v.origem || 'Boane'} -> ${v.destino || 'Beira'}`}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">⏱️ PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo || v.previsao || '10h 20min'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">👤 MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista || v.nome_motorista || 'Samuel Mucavele'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📦 CARGA</div><div className="text-[10px] font-semibold">{v.carga || v.cargaKg || '7 Ton'}</div></div>
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <button onClick={()=>{ alert(`Reserva ${v.rota || ''} - ${v.transportadora} - ${v.preco}MT - Lugares: ${v.lugaresLivres}`); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
+                            <button onClick={()=>{ window.open(`https://wa.me/258${(v.telefone || v.motoristaTel || '823832513').replace(/\D/g,'')}?text=Ola ${v.motorista}, vi viagem ${v.rota} no Contrata-MZ`, '_blank'); }} className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.telefone || v.motoristaTel || '82 888 9900'}</button>
+                            <button onClick={()=>{ setShowMap && setShowMap(true); alert(`Mapa: ${v.rota} - Matricula ${v.matricula} - ${v.origem} -> ${v.destino} - AO VIVO`); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
+                            <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula || 'ADF 561 SF'} - Actualizado agora - {TODAS_PROVINCIAS.length} provincias</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="bg-white rounded-[12px] border p-4 text-center text-[11px]">A carregar viagens... 5 MOZ + 4 SA</div>
+                  )}
                 </div>
               </div>
             </div>
