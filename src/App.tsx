@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Clock, Truck, Users, Package, Search, Navigation, Fuel, Timer, ChevronDown, Filter, Map, Crosshair, Phone, Star } from 'lucide-react';
+// lucide-react removido para build estavel - usando texto
 
 type Viagem = {
   id: number;
@@ -234,14 +234,14 @@ export default function App() {
       <div className="bg-[#16a34a] text-white">
         <div className="max-w-[1440px] mx-auto px-4 lg:px-6 h-[36px] flex items-center justify-between">
           <div className="flex items-center gap-3 text-[12px] font-semibold tracking-[0.02em]">
-            <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center"><Clock size={12} /></div>
+            <div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center"></div>
             PREVISÃO DE CHEGADA — NACIONAL • TODAS PROVÍNCIAS
             <span className="hidden sm:inline-flex items-center gap-1.5 bg-black/15 px-2.5 py-1 rounded-full text-[10px]">
               <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> AO VIVO
             </span>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-[11px] opacity-90">
-            <Timer size={12} /> Actualizado há 12s
+            ⏱️ Actualizado há 12s
           </div>
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function App() {
                   <h2 className="text-[13px] font-bold tracking-[-0.01em] leading-tight">Pesquisar viagens — NACIONAL<br/>TODAS PROVÍNCIAS — TEMPO REAL</h2>
                   <p className="text-[11px] text-[#6b7280] mt-1">Passageiro filtra à esquerda, resultados à direita</p>
                 </div>
-                <Filter size={14} className="text-[#9ca3af] mt-1" />
+                
               </div>
 
               {/* KEY BUTTONS - Blue next to Green */}
@@ -268,14 +268,14 @@ export default function App() {
                   onClick={() => setShowMap(!showMap)}
                   className={`h-[44px] rounded-[10px] text-[11px] font-bold tracking-[0.02em] leading-[13px] flex items-center justify-center gap-1.5 px-2 transition-all ${showMap ? 'bg-[#1d4ed8] text-white shadow-[0_2px_8px_rgba(29,78,216,0.3)]' : 'bg-[#dbeafe] text-[#1d4ed8] border border-[#bfdbfe]'}`}
                 >
-                  <Map size={14} />
+                  
                   VER CARROS<br/>AO VIVO NO MAPA<br/>(NACIONAL)
                 </button>
                 <button 
                   onClick={() => setMaisProximo(!maisProximo)}
                   className={`h-[44px] rounded-[10px] text-[11px] font-bold tracking-[0.02em] flex items-center justify-center gap-1.5 transition-all ${maisProximo ? 'bg-[#16a34a] text-white shadow-[0_2px_8px_rgba(22,163,74,0.3)]' : 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'}`}
                 >
-                  <Crosshair size={14} />
+                  
                   {maisProximo ? 'MAIS PRÓXIMO ✓' : 'MAIS PRÓXIMO'}
                 </button>
               </div>
@@ -299,7 +299,7 @@ export default function App() {
                     >
                       {f.options.map(o => <option key={o}>{o}</option>)}
                     </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] pointer-events-none" />
+                    
                   </div>
                 </div>
               ))}
@@ -327,11 +327,11 @@ export default function App() {
                 onClick={() => { setPesquisado(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="w-full h-[48px] bg-[#1d4ed8] hover:bg-[#1e40af] text-white rounded-[10px] font-bold text-[13px] tracking-[0.02em] flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(29,78,216,0.25)] transition-all active:scale-[0.98]"
               >
-                <Search size={16} /> PESQUISAR VIAGENS
+                 PESQUISAR VIAGENS
               </button>
 
               <div className="flex items-center gap-2 text-[11px] text-[#6b7280] bg-[#f9fafb] rounded-[8px] px-3 py-2">
-                <div className="w-5 h-5 rounded-full bg-[#e5e7eb] flex items-center justify-center"><Navigation size={10} /></div>
+                <div className="w-5 h-5 rounded-full bg-[#e5e7eb] flex items-center justify-center"></div>
                 Filtros aplicam-se instantaneamente à direita
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <span className="text-[11px] text-[#6b7280] hidden sm:block">Ordenar: {maisProximo ? 'Mais próximo' : 'Padrão'}</span>
               <button onClick={() => setShowMap(!showMap)} className="text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#e5e7eb] bg-white hover:bg-[#f9fafb] flex items-center gap-1">
-                <Map size={12} /> {showMap ? 'Ocultar mapa' : 'Ver no mapa'}
+                🗺️ {showMap ? 'Ocultar mapa' : 'Ver no mapa'}
               </button>
             </div>
           </div>
@@ -373,7 +373,7 @@ export default function App() {
                 {viagensFiltradas.slice(0,4).map((v,i) => (
                   <div key={v.id} className="absolute" style={{ left: `${18 + i*19}%`, top: `${30 + (i%2)*35}%` }}>
                     <div className={`w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white ${v.status==='embarque' ? 'bg-emerald-500' : v.status==='pronto' ? 'bg-amber-500' : 'bg-[#1d4ed8]'} animate-[bounce_2s_infinite]`} style={{ animationDelay: `${i*0.3}s` }}>
-                      <Truck size={14} />
+                      
                     </div>
                     <div className="mt-1 bg-black text-white text-[9px] px-1.5 py-0.5 rounded-full mono whitespace-nowrap">{v.matricula}</div>
                   </div>
@@ -384,7 +384,7 @@ export default function App() {
                 <div className="absolute top-3 right-3 bg-[#111827] text-white text-[10px] px-2.5 py-1 rounded-full font-bold">NACIONAL</div>
               </div>
               <div className="px-4 py-2.5 flex items-center justify-between bg-[#f9fafb] text-[11px]">
-                <span className="text-[#6b7280] flex items-center gap-1.5"><Fuel size={12} /> Clica num carro no mapa para ver detalhes</span>
+                <span className="text-[#6b7280] flex items-center gap-1.5"> Clica num carro no mapa para ver detalhes</span>
                 <span className="font-semibold text-[#1d4ed8]">5 viaturas em trânsito</span>
               </div>
             </div>
@@ -412,7 +412,7 @@ export default function App() {
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${v.status==='a_caminho' ? 'bg-[#dbeafe] text-[#1d4ed8]' : v.status==='pronto' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
                             {v.status==='a_caminho' ? 'A CAMINHO' : v.status==='pronto' ? 'PRONTO P/ SAÍDA' : 'EMBARQUE'}
                           </span>
-                          <span className="flex items-center gap-0.5 text-[11px]"><Star size={12} className="fill-amber-400 text-amber-400" /> {v.avaliacao}</span>
+                          <span className="flex items-center gap-0.5 text-[11px]">⭐ {v.avaliacao}</span>
                         </div>
                         <p className="text-[12px] text-[#6b7280] mt-0.5">{v.tipo} • {v.matricula} • <span className="text-[#111827] font-medium">{v.lugaresLivres} livres</span> de {v.lugares}</p>
                       </div>
@@ -425,19 +425,19 @@ export default function App() {
                     {/* Details grid */}
                     <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2">
                       <div className="bg-[#f9fafb] rounded-[8px] px-2.5 py-2">
-                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1"><MapPin size={10} /> ROTA</div>
+                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1">📍 ROTA</div>
                         <div className="text-[12px] font-semibold mt-0.5 truncate">{v.rota}</div>
                       </div>
                       <div className="bg-[#f9fafb] rounded-[8px] px-2.5 py-2">
-                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1"><Clock size={10} /> PREVISÃO</div>
-                        <div className="text-[12px] font-semibold mt-0.5 flex items-center gap-1"><Timer size={12} className="text-[#16a34a]" /> {v.tempo}</div>
+                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1">🕒 PREVISÃO</div>
+                        <div className="text-[12px] font-semibold mt-0.5 flex items-center gap-1">⏱️ {v.tempo}</div>
                       </div>
                       <div className="bg-[#f9fafb] rounded-[8px] px-2.5 py-2">
-                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1"><Users size={10} /> MOTORISTA</div>
+                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1">👥 MOTORISTA</div>
                         <div className="text-[12px] font-semibold mt-0.5 truncate">{v.motorista}</div>
                       </div>
                       <div className="bg-[#f9fafb] rounded-[8px] px-2.5 py-2">
-                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1"><Package size={10} /> CARGA</div>
+                        <div className="text-[10px] font-bold tracking-[0.06em] text-[#9ca3af] flex items-center gap-1">📦 CARGA</div>
                         <div className="text-[12px] font-semibold mt-0.5">{v.carga}</div>
                       </div>
                     </div>
@@ -448,10 +448,10 @@ export default function App() {
                         Reservar lugar
                       </button>
                       <button className="h-[36px] px-3 bg-white border border-[#e5e7eb] hover:bg-[#f9fafb] rounded-[8px] text-[12px] font-semibold flex items-center gap-1.5">
-                        <Phone size={12} /> {v.telefone}
+                        📞 {v.telefone}
                       </button>
                       <button className="h-[36px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[8px] text-[11px] font-bold flex items-center gap-1">
-                        <Map size={12} /> Ver no mapa
+                        🗺️ Ver no mapa
                       </button>
                       <span className="ml-auto text-[10px] text-[#9ca3af] hidden md:block">Matrícula: {v.matricula} • Actualizado agora</span>
                     </div>
