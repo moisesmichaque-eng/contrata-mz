@@ -3,10 +3,18 @@
 import { useState, useMemo, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// ===== SUPABASE CLIENT - CONTRATA-MZ VIAGENS NACIONAL =====
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// ===== SUPABASE CLIENT - FIX BLANK - SAFE =====
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+let supabase: any = null;
+try {
+  if(supabaseUrl && supabaseUrl.includes('supabase.co') && supabaseKey && supabaseKey.length > 20){
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+} catch(e){
+  console.log('Supabase desativado para evitar tela branca - usando dados locais');
+  supabase = null;
+}
 
 import AdminPanel from './AdminPanel';
 
@@ -166,7 +174,7 @@ export default function App(){
   useEffect(()=>{
     async function fetchLive() {
       setLoadingLive(true);
-      const { data, error } = await supabase.from('viagens_motoristas').select('*').in('status', ['disponivel','em_viagem','a_caminho']).limit(50);
+      if(!supabase){ setLoadingLive(false); return; } const { data, error } = await supabase.from('viagens_motoristas').select('*').in('status', ['disponivel','em_viagem','a_caminho']).limit(50);
       if (!error && data) {
         // adapta campos: destino_atual -> destino, lugares -> lugares
         setLiveViaturas(data.map((d:any)=>({ ...d, destino: d.destino_atual, motoristaTel: d.telefone || '84 000 0000', rota: d.provincia + ' - ' + d.destino_atual, preco: 500 })));
