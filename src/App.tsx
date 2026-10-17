@@ -939,123 +939,105 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
 
       
       {viagensTab==='viajar' && (
-        <div className="space-y-3">
-          <div className="bg-green-600 rounded-[12px] py-2 px-4 text-white font-bold text-center text-[12px] shadow">Previsao de Chegada</div>
-          <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 items-start">
-            <div className="bg-white rounded-[12px] border p-4 lg:sticky lg:top-[80px]">
-              <div className="font-black text-[12px]">Pesquisar Viagens - NACIONAL, TODAS PROVINCIAS</div>
-              <div className="flex gap-2 mt-3">
-                <button onClick={()=>setModoTempoReal(!modoTempoReal)} className="flex-1 h-9 rounded-full text-[9px] font-black px-2 bg-[#0ea5e9] text-white hover:bg-[#0284c7]">
-                  VER CARROS AO VIVO NO MAPA (NACIONAL)
-                </button>
-                <button onClick={()=>localizarMaisProximo()} className="flex-1 h-9 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full text-[9px] px-2 shadow">Mais Proximo</button>
+        <div className="max-w-[1200px] mx-auto p-2 sm:p-3">
+          <div className="bg-white rounded-[12px] border p-2 mb-3 flex flex-wrap justify-between items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 bg-[#0ea5e9] text-white grid place-items-center rounded text-[10px] font-black">FV</div>
+              <span className="font-black text-[11px]">Facilita Viagens</span>
+              <span className="text-[7px] px-2 py-0.5 bg-[#e0f2fe] rounded-full border">Integrado como faturacao - mesmo padrao</span>
+            </div>
+            <div className="flex gap-1.5">
+              <span className="px-3 h-6 grid place-items-center rounded-full bg-[#0ea5e9] text-white text-[8px] font-bold">Pesquisar viagens</span>
+              <button onClick={()=>setViagensTab('encomenda')} className="px-3 h-6 grid place-items-center rounded-full bg-white border text-[8px]">Enviar encomenda</button>
+              <button onClick={()=>setViagensTab('minhas')} className="px-3 h-6 grid place-items-center rounded-full bg-white border text-[8px]">Minhas reservas</button>
+              <button onClick={()=>setViagensTab('area')} className="px-3 h-6 grid place-items-center rounded-full bg-[#fef9c3] border text-black text-[8px] font-black">AREA TRANSPORTADOR</button>
+            </div>
+          </div>
+
+          <div className="bg-green-600 rounded-[10px] py-2 text-center text-white font-bold text-[11px] mb-3">Previsao de Chegada</div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-3 items-start">
+            {/* ESQUERDA - FORMULARIO EXISTENTE MANTIDO */}
+            <div className="bg-white rounded-[12px] border p-3">
+              <div className="font-black text-[10px]">Pesquisar Viagens - NACIONAL, TODAS PROVINCIAS</div>
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <button onClick={localizarMaisProximo} className="h-8 bg-[#0ea5e9] text-white rounded-full text-[8px] font-black">VER CARROS AO VIVO NO MAPA</button>
+                <button onClick={localizarMaisProximo} className="h-8 bg-[#dcfce7] text-[#166534] border border-[#86efac] rounded-full text-[8px] font-black">MAIS PROXIMO</button>
               </div>
-              <div className="mt-4 space-y-3">
-                <div><label className="text-[8px] font-bold text-[#64748b]">PROVINCIA ORIGEM</label><select value={origemV} onChange={e=>setOrigemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option></select></div>
-                <div><label className="text-[8px] font-bold text-[#64748b]">PROVINCIA DESTINO</label><select value={destinoV} onChange={e=>setDestinoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Sofala</option><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Gaza</option><option>Inhambane</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option></select></div>
-                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold text-[#64748b]">DISTRITO ORIGEM</label><select value={origemDistritoV} onChange={e=>setOrigemDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Matola</option><option>Maputo</option><option>Xai-Xai</option><option>Beira</option></select></div><div><label className="text-[8px] font-bold text-[#64748b]">DISTRITO DESTINO</label><select value={destinoDistritoV} onChange={e=>setDestinoDistritoV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Beira</option><option>Matola</option><option>Maputo</option><option>Xai-Xai</option></select></div></div>
-                <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold text-[#64748b]">DATA VIAGEM</label><input type="date" value={dataViagemV||''} onChange={e=>setDataViagemV(e.target.value)} className="w-full h-9 border rounded px-2 text-[10px] mt-1" /></div><div><label className="text-[8px] font-bold text-[#64748b]">TIPO</label><select className="w-full h-9 border rounded px-2 text-[10px] mt-1"><option>Todos</option><option>Bus</option><option>Mini-bus</option></select></div></div>
-                <button onClick={()=>localizarMaisProximo()} className="w-full h-10 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-black rounded-full text-[11px] mt-2">PESQUISAR VIAGENS</button>
-                <div className="bg-[#0f172a] rounded-[10px] p-3 text-white mt-3">
+              <div className="mt-3 space-y-2.5">
+                <div><label className="text-[7px] font-bold text-[#94a3b8]">PROVINCIA ORIGEM</label><select value={origemV} onChange={e=>setOrigemV(e.target.value)} className="w-full h-8 border rounded text-[10px] px-2 mt-1">{Object.keys(centrosProvincias).map(p=><option key={p}>{p}</option>)}</select></div>
+                <div><label className="text-[7px] font-bold text-[#94a3b8]">PROVINCIA DESTINO</label><select value={destinoV} onChange={e=>setDestinoV(e.target.value)} className="w-full h-8 border rounded text-[10px] px-2 mt-1">{Object.keys(centrosProvincias).map(p=><option key={p}>{p}</option>)}</select></div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><label className="text-[7px] font-bold text-[#94a3b8]">DISTRITO ORIGEM</label><select value={distritoO} onChange={e=>setDistritoO(e.target.value)} className="w-full h-8 border rounded text-[10px] px-2 mt-1"><option>Matola</option><option>Maputo</option><option>Beira</option></select></div>
+                  <div><label className="text-[7px] font-bold text-[#94a3b8]">DISTRITO DESTINO</label><select value={distritoD} onChange={e=>setDistritoD(e.target.value)} className="w-full h-8 border rounded text-[10px] px-2 mt-1"><option>Beira</option><option>Matola</option><option>Maputo</option></select></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><label className="text-[7px] font-bold text-[#94a3b8]">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-8 border rounded text-[10px] px-2 mt-1" /></div>
+                  <div><label className="text-[7px] font-bold text-[#94a3b8]">PROVINCIA FILTRO</label><select className="w-full h-8 border rounded text-[10px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option></select></div>
+                </div>
+                <div className="grid grid-cols-3 gap-1">
+                  <select className="h-7 border rounded text-[8px] px-1"><option>Todos</option><option>Bus</option></select>
+                  <select className="h-7 border rounded text-[8px] px-1"><option>Bus</option></select>
+                  <select className="h-7 border rounded text-[8px] px-1"><option>Cancel</option></select>
+                </div>
+                <button onClick={filtrarViagens} className="w-full h-9 bg-[#0ea5e9] text-white rounded-full font-black text-[10px]">PESQUISAR VIAGENS</button>
+                <div className="bg-[#0f172a] rounded-[10px] p-3 text-white">
                   <div className="text-[8px] font-bold">Guia de embarque</div>
-                  <div className="text-[8px] opacity-70 mt-1">Offline: Crie o ponto, embarque e veja o carro mais proximo no mapa.</div>
+                  <div className="text-[7px] opacity-70 mt-1">O sistema funciona offline: Crie o ponto, embarque e veja o carro mais proximo no mapa.</div>
                 </div>
               </div>
             </div>
+
+            {/* DIREITA - MAPA + CARDS ESTILO PROTOTIPO */}
             <div className="space-y-3">
               <div className="bg-white rounded-[12px] border p-3">
-                <div className="flex justify-between items-center flex-wrap gap-2">
-                  <div className="font-black text-[10px]">6 cursos encontrados PARA MAPUTO PROVINCIA - SOFALA - BEIRA</div>
-                  <div className="flex gap-1"><span className="text-[7px] px-2 py-1 bg-[#e0f2fe] rounded-full border">Cursos Ativos</span><span className="text-[7px] px-2 py-1 bg-[#fef9c3] rounded-full">Destaques</span></div>
+                <div className="flex justify-between items-center">
+                  <div className="font-black text-[10px]">6 cursos encontrados PARA {(origemV||'MAPUTO PROVINCIA').toUpperCase()} - {(destinoV||'SOFALA').toUpperCase()} - {(distritoD||'BEIRA').toUpperCase()}</div>
+                  <div className="flex gap-1">
+                    <span className="text-[7px] px-2 py-1 bg-[#e0f2fe] rounded-full">Cursos Partilh</span>
+                    <span className="text-[7px] px-2 py-1 bg-[#fef9c3] rounded-full">Duplicar</span>
+                  </div>
                 </div>
-                <div className="mt-3 h-[130px] bg-[#e0f2fe] rounded-[10px] relative overflow-hidden border flex items-center justify-center">
-                  <div className="absolute left-[10%] top-[60%] w-3 h-3 bg-[#1e2f4a] rounded-full"></div>
-                  <div className="absolute left-[40%] top-[40%] w-3 h-3 bg-[#facc15] rounded-full"></div>
-                  <div className="absolute right-[15%] top-[55%] w-3 h-3 bg-[#22c55e] rounded-full"></div>
-                  <div className="absolute left-[10%] right-[15%] top-[60%] h-[2px] bg-[#0ea5e9] border-t-2 border-dashed border-[#0ea5e9] opacity-60"></div>
-                  <div className="absolute left-[10%] bottom-1 text-[8px] font-bold text-[#0c4a6e]">Maputo</div>
-                  <div className="absolute left-[40%] top-[25%] text-[8px] font-bold text-[#0c4a6e]">Xai-Xai</div>
-                  <div className="absolute right-[10%] bottom-1 text-[8px] font-bold text-[#0c4a6e]">Beira</div>
-                  <div className="text-[8px] text-[#0c4a6e] opacity-60">AO VIVO no Mapa - Rota pontilhada</div>
+                <div className="mt-3 h-[140px] bg-[#f0f9ff] rounded-[10px] border relative overflow-hidden">
+                  <div className="absolute top-[50%] left-[5%] right-[5%] h-[2px] border-t-2 border-dashed border-[#94a3b8]"></div>
+                  <div className="absolute left-[10%] top-[45%]"><div className="w-3 h-3 bg-[#1e2f4a] rounded-full border-2 border-white shadow"></div><div className="mt-1 text-[7px] font-black bg-black text-white px-1.5 py-0.5 rounded">R-101</div></div>
+                  <div className="absolute left-[35%] top-[35%]"><div className="w-3 h-3 bg-[#0ea5e9] rounded-full border-2 border-white shadow"></div><div className="mt-1 text-[7px] font-black bg-black text-white px-1.5 py-0.5 rounded">R-101</div></div>
+                  <div className="absolute left-[55%] top-[55%]"><div className="w-4 h-4 bg-[#facc15] rounded-full border-2 border-white shadow grid place-items-center text-[8px]">●</div><div className="mt-1 text-[7px] font-black bg-black text-white px-1.5 py-0.5 rounded">R-101</div></div>
+                  <div className="absolute right-[25%] top-[30%]"><div className="w-3 h-3 bg-[#22c55e] rounded-full border-2 border-white shadow"></div><div className="mt-1 text-[7px] font-black bg-black text-white px-1.5 py-0.5 rounded">R-101</div></div>
+                  <div className="absolute right-[10%] top-[45%]"><div className="w-3 h-3 bg-[#ef4444] rounded-full border-2 border-white shadow"></div><div className="mt-1 text-[7px] font-black bg-black text-white px-1.5 py-0.5 rounded">R-101</div></div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="bg-white rounded-[12px] border p-3 flex justify-between items-start">
-                  <div><div className="font-black text-[11px]">Nagi Invest - Minibus - 15 lugares</div><div className="text-[9px] text-[#64748b] mt-1">Maputo Provincia - Sofala - Beira | Motorista: Joao 84 123 4567</div><div className="flex gap-2 mt-2"><button className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button><button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button></div></div>
-                  <div className="text-right"><div className="font-black text-[#0ea5e9] text-[13px]">2500 MT</div><div className="text-[7px] text-[#94a3b8]">2h 30m</div></div>
-                </div>
-                <div className="bg-white rounded-[12px] border p-3 flex justify-between items-start">
-                  <div><div className="font-black text-[11px]">Maning Transporte - Bus - 30 lugares</div><div className="text-[9px] text-[#64748b] mt-1">Matola - Beira | Motorista: Carlos 82 987 6543</div><div className="flex gap-2 mt-2"><button className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button><button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button></div></div>
-                  <div className="text-right"><div className="font-black text-[#0ea5e9] text-[13px]">1800 MT</div><div className="text-[7px] text-[#94a3b8]">5h 10m</div></div>
-                </div>
-                <div className="bg-white rounded-[12px] border p-3 flex justify-between items-start">
-                  <div><div className="font-black text-[11px]">SSG Viagens - Minibus - 15 lugares</div><div className="text-[9px] text-[#64748b] mt-1">Maputo - Beira | 75 min</div><div className="flex gap-2 mt-2"><button className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button><button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button></div></div>
-                  <div className="text-right"><div className="font-black text-[#0ea5e9] text-[13px]">3500 MT</div><div className="text-[7px] text-[#94a3b8]">3h 00m</div></div>
-                </div>
-                <div className="bg-white rounded-[12px] border p-3 flex justify-between items-start">
-                  <div><div className="font-black text-[11px]">Trans Marrupa - Bus - 45 lugares</div><div className="text-[9px] text-[#64748b] mt-1">Matola - Chinde | 100 lugares</div><div className="flex gap-2 mt-2"><button className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button><button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button></div></div>
-                  <div className="text-right"><div className="font-black text-[#0ea5e9] text-[13px]">1500 MT</div><div className="text-[7px] text-[#94a3b8]">800 Kg</div></div>
-                </div>
-                <div className="bg-white rounded-[12px] border p-3 flex justify-between items-start">
-                  <div><div className="font-black text-[11px]">Matola Express - Mini - 15 lugares</div><div className="text-[9px] text-[#64748b] mt-1">Beira - Matola | Servico Premium</div><div className="flex gap-2 mt-2"><button className="px-3 h-7 bg-[#1e2f4a] text-white rounded-full text-[8px] font-black">Reservar lugar</button><button className="px-3 h-7 bg-white border rounded-full text-[8px]">Ver no mapa</button></div></div>
-                  <div className="text-right"><div className="font-black text-[#0ea5e9] text-[13px]">2600 MT</div><div className="text-[7px] text-[#94a3b8]">Premium</div></div>
-                </div>
+
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  {id:1, emp:'Nagi Invest', tipo:'COMUM', est:'4.5', rota:'Maputo - Beira', placa:'AE-123-MC', tel:'82 213 4047', preco:'2500 MT', dur:'3.5 Horas'},
+                  {id:2, emp:'Maning Transporte', tipo:'PREMIUM', est:'4.8', rota:'Matola - Beira', placa:'AH-456-MP', tel:'84 991 4052', preco:'1800 MT', dur:'5h 10m'},
+                  {id:3, emp:'SSG Viagens', tipo:'STANDARD', est:'4.7', rota:'Maputo - Beira', placa:'AB-789-MC', tel:'82 123 4567', preco:'3500 MT', dur:'75 min'},
+                  {id:4, emp:'Trans Marrupa', tipo:'EXECUTIVO', est:'4.9', rota:'Matola - Chinde', placa:'AC-321-MP', tel:'84 123 4567', preco:'1500 MT', dur:'100 km'},
+                  {id:5, emp:'Matola Express', tipo:'EXPRESS', est:'4.6', rota:'Beira - Matola', placa:'AD-654-MP', tel:'82 998 7766', preco:'2600 MT', dur:'100-20h'},
+                ].map(v=>(
+                  <div key={v.id} className="bg-white rounded-[12px] border p-3 flex justify-between items-center">
+                    <div className="flex gap-3 items-center">
+                      <div className="h-10 w-10 bg-[#0f172a] rounded-[8px] grid place-items-center text-white text-[10px] font-black">{v.emp.slice(0,2).toUpperCase()}</div>
+                      <div>
+                        <div className="flex items-center gap-2"><span className="font-black text-[10px]">{v.emp}</span><span className="text-[6px] px-1.5 py-0.5 rounded bg-[#f1f5f9] border">{v.tipo}</span><span className="text-[7px]">⭐ {v.est}</span></div>
+                        <div className="text-[8px] text-[#64748b] mt-0.5">{v.rota} • {v.placa} • {v.tel}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-black bg-[#fef9c3] px-2 py-1 rounded-full">{v.preco}</span>
+                      <span className="text-[7px] text-[#64748b]">{v.dur}</span>
+                      <button className="h-7 px-3 bg-[#0ea5e9] text-white rounded-full text-[8px] font-black">Reservar lugar</button>
+                      <button className="h-7 px-3 bg-white border rounded-full text-[8px]">Ver no mapa</button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      )}
-
-
-      {viagensTab==='area' && (
-            <div className="space-y-3">
-              {!transportadorLogado ? (
-                <div className="max-w-[900px] mx-auto">
-                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white text-center"><h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro</h2><p className="text-[10px] opacity-70">Transportador entra aqui para cadastro e ao fazer login vai para o campo dele e poderia editar o seu perfil, adicionar viaturas - perfil com mais informacao</p></div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-                    <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[12px] mb-3">Ja e transportador? Entrar</div><input value={transportadorLoginForm.username} onChange={(e:any)=>setTransportadorLoginForm({...transportadorLoginForm,username:e.target.value})} placeholder="Username" className="w-full h-9 border rounded text-[11px] px-2" /><input type="password" value={transportadorLoginForm.password} onChange={(e:any)=>setTransportadorLoginForm({...transportadorLoginForm,password:e.target.value})} placeholder="Password" className="w-full h-9 border rounded text-[11px] px-2 mt-2" /><button onClick={()=>{ if(transportadorLoginForm.username===transportadorPerfil.username && transportadorLoginForm.password===transportadorPerfil.password){ setTransportadorLogado(true); } else { alert('Credenciais invalidas. Use username e password criados pelo transportador.'); } }} className="w-full h-10 bg-[#1e2f4a] text-white rounded text-[11px] font-black mt-2">Entrar - Area Transportador</button></div>
-                    <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[12px] mb-3">Cadastrar transportador - Perfil com mais informacao - com username e password obrigatorio</div><div className="space-y-2"><input value={transportadorPerfil.nomeEmpresa} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,nomeEmpresa:e.target.value})} placeholder="Nome empresa *" className="w-full h-8 border rounded text-[10px] px-2" /><div className="grid grid-cols-2 gap-2"><input value={transportadorPerfil.responsavel} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,responsavel:e.target.value})} placeholder="Responsavel *" className="w-full h-8 border rounded text-[10px] px-2" /><input value={transportadorPerfil.tel} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,tel:e.target.value})} placeholder="Telefone * +258 84 123 4567" className="w-full h-8 border rounded text-[10px] px-2" /></div><div className="grid grid-cols-2 gap-2"><input value={transportadorPerfil.email} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,email:e.target.value})} placeholder="Email" className="w-full h-8 border rounded text-[10px] px-2" /><input value={transportadorPerfil.nuit} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,nuit:e.target.value})} placeholder="NUIT" className="w-full h-8 border rounded text-[10px] px-2" /></div><input value={transportadorPerfil.provincia} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,provincia:e.target.value})} placeholder="Provincia - Maputo Provincia" className="w-full h-8 border rounded text-[10px] px-2" /><input value={transportadorPerfil.rotas} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,rotas:e.target.value})} placeholder="Rotas - ex: Maputo - Beira, Maputo - Johannesburg, Xai-Xai - South Africa" className="w-full h-8 border rounded text-[10px] px-2" /><div className="grid grid-cols-2 gap-2"><input value={transportadorPerfil.username} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,username:e.target.value})} placeholder="Username * - criar username - obrigatorio" className="w-full h-8 border rounded text-[10px] px-2 bg-[#fef9c3] border-[#facc15]" /><input type="password" value={transportadorPerfil.password} onChange={(e:any)=>setTransportadorPerfil({...transportadorPerfil,password:e.target.value})} placeholder="Password * - criar password - obrigatorio" className="w-full h-8 border rounded text-[10px] px-2 bg-[#fef9c3] border-[#facc15]" /></div><button onClick={()=>{ if(!transportadorPerfil.username||!transportadorPerfil.password){alert('Username e password obrigatorios - como pediste'); return;} const saved = JSON.parse(localStorage.getItem('transportadores')||'[]'); const filtered = saved.filter((t:any)=>t.username!==transportadorPerfil.username); filtered.unshift(transportadorPerfil); localStorage.setItem('transportadores', JSON.stringify(filtered)); setTransportadorLogado(true); }} className="w-full h-10 bg-[#facc15] text-black rounded text-[11px] font-black">Cadastrar - com username e password</button></div></div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="bg-[#1e2f4a] rounded-[12px] p-4 text-white flex justify-between items-center"><div><div className="font-black text-[12px]">Area Transportador - {transportadorPerfil.nomeEmpresa} - Painel</div><div className="text-[9px] opacity-70">{transportadorPerfil.responsavel} | {transportadorPerfil.tel} | {transportadorPerfil.provincia} | Rotas: {transportadorPerfil.rotas}</div></div><button onClick={()=>setTransportadorLogado(false)} className="px-3 h-8 rounded-full bg-white/10 text-white text-[9px]">Sair</button></div>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    <div className="lg:col-span-2 space-y-3">
-                      <div className="bg-white rounded-[12px] border p-4">
-                        <div className="flex justify-between items-center"><div><div className="font-black text-[12px]">Minha Frota - Gestao centralizada - {viaturas.length} Viaturas - 1 conta gere varias viaturas</div><div className="text-[8px] text-[#64748b]">Dentro da Area Transportador privada - {transportadorPerfil.nomeEmpresa}</div></div><button onClick={()=>{ const req = { id: Date.now(), type: 'add_viatura', transportador: transportadorPerfil.username || transportadorPerfil.nomeEmpresa, createdAt: new Date().toISOString(), status: 'pending' }; const pending = JSON.parse(localStorage.getItem('viaturaRequests')||'[]'); pending.push(req); localStorage.setItem('viaturaRequests', JSON.stringify(pending)); alert('Pedido de adicionamento de viatura enviado ao administrador.'); }} className="px-4 h-8 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar viatura</button></div>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">{viaturas.map((v:any)=><div key={v.id} className="border rounded-[10px] p-3 bg-white"><div className="flex justify-between"><div className="font-black text-[10px]">{v.marca}</div><span className="text-[7px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">{v.estado}</span></div><div className="text-[8px] text-[#475569] mt-1">Matricula: {v.matricula} | Lugares: {v.lugares}<br/>AC: {v.ac?'Sim':'Nao'} | Bagagem: {v.bagagem?'Sim':'Nao'} | Encomendas: {v.encomendas?'Sim':'Nao'} | {v.cargaKg}kg<br/>Rota: {v.rota}</div><div className="flex gap-1 mt-2"><button onClick={()=>{setFormViatura(v); setEditandoViaturaId(v.id);}} className="flex-1 h-7 bg-[#f1f5f9] rounded-full text-[8px] font-bold">Editar</button><button onClick={()=>setViaturas(viaturas.filter((x:any)=>x.id!==v.id))} className="px-3 h-7 bg-[#f1f5f9] rounded-full text-[8px]">Remover</button><button onClick={()=>setViaturas(viaturas.map((x:any)=>x.id===v.id?{...x,activa:!x.activa}:x))} className={`px-3 h-7 rounded-full text-[8px] font-bold ${v.activa?'bg-[#22c55e] text-white':'bg-[#facc15] text-black'}`}>{v.activa?'Activa':'Activar para operacao'}</button></div></div>)}</div>
-                      </div>
-                      <div className="bg-white rounded-[12px] border-2 border-[#facc15] p-4">
-                        <div className="font-black text-[12px] mb-3">Editar viatura - circulado laranja imagem - Tipo, Marca, Matricula, Lugares, Ano, Cor, Carga kg, Rota</div>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                          <div><label className="text-[8px] font-bold">Tipo *</label><select value={formViatura.tipo} onChange={e=>setFormViatura({...formViatura,tipo:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1"><option>Minibus / Chapa</option><option>Toyota Coaster 25 lugares</option><option>Toyota Hiace 15 lugares</option><option>Toyota hiace quantum</option><option>Bus 50 lugares</option></select></div>
-                          <div><label className="text-[8px] font-bold">Marca e modelo *</label><input value={formViatura.marca} onChange={e=>setFormViatura({...formViatura,marca:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="Toyota Coaster 25 lugares" /></div>
-                          <div><label className="text-[8px] font-bold">Matricula *</label><input value={formViatura.matricula} onChange={e=>setFormViatura({...formViatura,matricula:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="ACD 456 MC" /></div>
-                          <div><label className="text-[8px] font-bold">Lugares *</label><input type="number" value={formViatura.lugares} onChange={e=>setFormViatura({...formViatura,lugares:Number(e.target.value)})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="25" /></div>
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 mt-2">
-                          <div><label className="text-[8px] font-bold">Ano</label><input value={formViatura.ano} onChange={e=>setFormViatura({...formViatura,ano:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="2021" /></div>
-                          <div><label className="text-[8px] font-bold">Cor</label><input value={formViatura.cor} onChange={e=>setFormViatura({...formViatura,cor:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="Azul" /></div>
-                          <div><label className="text-[8px] font-bold">Carga kg *</label><input type="number" value={formViatura.cargaKg} onChange={e=>setFormViatura({...formViatura,cargaKg:Number(e.target.value)})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="500" /></div>
-                          <div><label className="text-[8px] font-bold">Rota</label><input value={formViatura.rota} onChange={e=>setFormViatura({...formViatura,rota:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="Maputo - Beira" /></div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 mt-2"><div className="flex items-center gap-1"><input type="checkbox" checked={formViatura.ac} onChange={e=>setFormViatura({...formViatura,ac:e.target.checked})} /><label className="text-[8px] font-bold">AC</label></div><div className="flex items-center gap-1"><input type="checkbox" checked={formViatura.bagagem} onChange={e=>setFormViatura({...formViatura,bagagem:e.target.checked})} /><label className="text-[8px] font-bold">Bagagem</label></div><div className="flex items-center gap-1"><input type="checkbox" checked={formViatura.encomendas} onChange={e=>setFormViatura({...formViatura,encomendas:e.target.checked})} /><label className="text-[8px] font-bold">Encomendas</label></div></div>
-                        <div className="mt-3 bg-[#f8fafc] border rounded-[8px] p-3">
-                          <div className="font-bold text-[9px]">JANELA COM LISTA DE LOCALIDADE/DISTRITO/PARAGEM E VALOR - precos variam por destino real</div>
-                          <div className="grid grid-cols-3 gap-2 mt-2"><input value={formParagem.local} onChange={(e:any)=>setFormParagem({...formParagem,local:e.target.value})} placeholder="Nome paragem - ex: Xai-Xai, Park Station, Cidade da Beira" className="h-8 border rounded text-[9px] px-2 col-span-2" /><input type="number" value={formParagem.preco} onChange={(e:any)=>setFormParagem({...formParagem,preco:Number(e.target.value)})} placeholder="Valor MT" className="h-8 border rounded text-[9px] px-2" /></div>
-                          <button onClick={()=>{if(!formParagem.local||!formParagem.preco)return; setParagensTemp([...paragensTemp,{local:formParagem.local, preco:formParagem.preco}]); setFormParagem({local:'', preco:0} as any);}} className="mt-2 h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">+ Adicionar paragem com preco</button>
-                          <div className="mt-2 space-y-1 max-h-[80px] overflow-auto">{paragensTemp.map((p:any,i:number)=><div key={i} className="flex justify-between border rounded p-1 text-[8px]"><span>{p.local} - {p.preco} MT</span><button onClick={()=>setParagensTemp(paragensTemp.filter((_:any,idx:number)=>idx!==i))} className="text-red-400">X</button></div>)}</div>
-                        </div>
-                        <div className="flex gap-2 mt-3"><button onClick={()=>{if(!formViatura.matricula){alert('Matricula * obrigatoria'); return;} if(editandoViaturaId){setViaturas(viaturas.map((v:any)=>v.id===editandoViaturaId?{...v, ...formViatura, paragens:paragensTemp}:v)); setEditandoViaturaId(null);} else {const nova={id:'v'+Date.now(), ...formViatura, activa:false, paragens:paragensTemp}; setViaturas([...viaturas,nova]);} setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'2021', cor:'', cargaKg:500, rota:'', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any); setParagensTemp([]);}} className="flex-1 h-9 bg-[#facc15] text-black rounded-[6px] text-[10px] font-black">Guardar</button><button onClick={()=>{setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'', cor:'', cargaKg:500, rota:''} as any); setEditandoViaturaId(null);}} className="px-4 h-9 border rounded-[6px] text-[10px]">Cancelar</button></div>
-                      </div>
-                    </div>
-                    <div className="space-y-3"><div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[10px]">Perfil Transportador - Com mais informacao - Amarelo</div><div className="mt-2 space-y-1 text-[9px]"><div><b>Empresa:</b> {transportadorPerfil.nomeEmpresa}</div><div><b>Responsavel:</b> {transportadorPerfil.responsavel}</div><div><b>Tel:</b> {transportadorPerfil.tel}</div><div><b>Provincia:</b> {transportadorPerfil.provincia}</div><div><b>Rotas:</b> {transportadorPerfil.rotas}</div><div><b>Viaturas:</b> {viaturas.length} / 15</div></div></div></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+    
+        )}
 
           {viagensTab==='encomenda' && (
             <div className="bg-white rounded-[12px] border p-4">
