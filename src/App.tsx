@@ -181,7 +181,7 @@ export default function App(){
     }
     fetchLive();
 
-    // subscreve tempo real - qualquer carro que mexer no paAÂ­s aparece
+    // subscreve tempo real - qualquer carro que mexer no paA­s aparece
     const channel = supabase.channel('viagens_nacional')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'viagens_motoristas' }, (payload:any) => {
         if (payload.eventType === 'INSERT') {
@@ -198,7 +198,7 @@ export default function App(){
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Fallback simulado se Supabase vazio (para nAÂ£o ficar mapa vazio)
+  // Fallback simulado se Supabase vazio (para nA£o ficar mapa vazio)
   useEffect(()=>{
     if(liveViaturas.length===0 && !loadingLive){
       // se depois de 3s ainda vazio, usa dados de exemplo locais
@@ -891,12 +891,12 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             <div className="w-full lg:w-[300px] lg:min-w-[300px] space-y-3">
               <div className="bg-[#111827] rounded-[12px] p-4 text-white">
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like</span></div>
-                <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>2 - QTD total 23</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>Ocasional (sem conta)</span></div><div className="flex justify-between items-center mt-2"><span className="text-white/50">CobranAÂ§a actual?</span><div className="h-5 w-9 bg-white/20 rounded-full relative"><div className="h-4 w-4 bg-white rounded-full absolute top-0.5 left-0.5"></div></div></div></div>
+                <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>2 - QTD total 23</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>Ocasional (sem conta)</span></div><div className="flex justify-between items-center mt-2"><span className="text-white/50">CobranA§a actual?</span><div className="h-5 w-9 bg-white/20 rounded-full relative"><div className="h-4 w-4 bg-white rounded-full absolute top-0.5 left-0.5"></div></div></div></div>
                 <button className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento DEMO</button>
-                <div className="text-[8px] text-white/40 text-center mt-2">Fluxo mais curto - telefone obrigatArio - QTD - artigo - Nome, nAÂ£o pagamento - IVA ao selecionar activo</div>
+                <div className="text-[8px] text-white/40 text-center mt-2">Fluxo mais curto - telefone obrigatArio - QTD - artigo - Nome, nA£o pagamento - IVA ao selecionar activo</div>
               </div>
-              <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">O QUE MUDOU V2.0 LIMPO</div><div className="mt-2 space-y-1 text-[8px] text-[#475569]"><div>- Removidas abas 5 e 10 - sA 7. Faturacao e 11. Painel</div><div>- Partilha integrada no 7 - botAÂµes num sA lugar, mantAÂ©m mostra NAÂºmero detectado: +258 84 123 4567*</div><div>- WhatsApp botAÂ£o: Partilhar PDF no WhatsApp abre acima com PDF + nota</div><div>- 35% menos custo: "Loja: Saco Cimento 50kg - CMPOR - 850 MT..." - 7% total</div><div>- PKV-FM-N-20: gerado tudo em background - "A guardar pagamentos" vs sA cobranAÂ§a activa</div></div></div>
-              <div className="bg-[#fefce8] rounded-[12px] border border-[#fde68a] p-3"><div className="font-bold text-[9px]">Nota rAÂ¡pida</div><div className="text-[8px] text-[#854d0e] mt-1">MudanAÂ§as sAÂ£o sA de interface, lAgica de negAcio, nome opcional, IVA global, N fim, produtos memorizados, pagamento mesmo BN Ã¢â‚¬â€ MantAÂ©m memAria de cada cliente</div></div>
+              <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">O QUE MUDOU V2.0 LIMPO</div><div className="mt-2 space-y-1 text-[8px] text-[#475569]"><div>- Removidas abas 5 e 10 - sA 7. Faturacao e 11. Painel</div><div>- Partilha integrada no 7 - botAµes num sA lugar, mantA©m mostra NAºmero detectado: +258 84 123 4567*</div><div>- WhatsApp botA£o: Partilhar PDF no WhatsApp abre acima com PDF + nota</div><div>- 35% menos custo: "Loja: Saco Cimento 50kg - CMPOR - 850 MT..." - 7% total</div><div>- PKV-FM-N-20: gerado tudo em background - "A guardar pagamentos" vs sA cobranA§a activa</div></div></div>
+              <div className="bg-[#fefce8] rounded-[12px] border border-[#fde68a] p-3"><div className="font-bold text-[9px]">Nota rA¡pida</div><div className="text-[8px] text-[#854d0e] mt-1">MudanA§as sA£o sA de interface, lAgica de negAcio, nome opcional, IVA global, N fim, produtos memorizados, pagamento mesmo BN â€” MantA©m memAria de cada cliente</div></div>
             </div>
           </div>
         </section>
