@@ -218,7 +218,6 @@ export default function App() {
               <div className="text-[8px] text-[#64748b] text-center mt-1.5">Mantem resto sem alterar - como na Foto 4 (contrata-imod37cze)</div>
             </div>
           </div>
-        </div>
       )}
 
       {tab==='facturacao' && (
