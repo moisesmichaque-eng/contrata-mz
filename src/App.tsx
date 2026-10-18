@@ -1006,9 +1006,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
             <div className="flex gap-1.5 flex-wrap">
               <button onClick={()=>setViagensTab('overview')} className="px-3 h-7 rounded-full text-[9px] font-bold bg-[#1e2f4a] text-white">Encontrar Transporte</button>
-              {/* Pesquisar viagens removido */}
-              <button onClick={()=>setViagensTab('encomenda')} className="px-3 h-7 rounded-full text-[9px] font-bold bg-white border">Enviar encomenda</button>
-              <button onClick={()=>setViagensTab('minhas')} className="px-3 h-7 rounded-full text-[9px] font-bold bg-white border">Minhas reservas</button>
+              <button onClick={()=>setViagensTab('viajar')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='viajar'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Pesquisar viagens</button>
+              <button onClick={()=>setViagensTab('encomenda')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='encomenda'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Enviar encomenda</button>
+              <button onClick={()=>setViagensTab('minhas')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='minhas'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Minhas reservas</button>
               <button onClick={()=>setViagensTab('area')} className="px-4 h-7 rounded-full text-[9px] font-black bg-[#facc15] text-black border">AREA TRANSPORTADOR</button>
             </div>
           </div>
@@ -1018,10 +1018,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             <div className="space-y-3">
               <div id="mapaOverview" className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media - Filtro reflete a direita</span></div>
 
-              <div className="relative bg-sky-100 border-2 border-blue-700 rounded-xl h-64 overflow-hidden">
-                <div className="absolute top-2 left-2 bg-white border-2 border-blue-700 rounded-full px-3 py-1 text-[10px] font-black z-10">Mapa Tempo Real {filtradosOverview.length} carros Clique no ponto amarelo</div>
-                <div className="absolute top-2 right-2 bg-black text-white rounded-full px-3 py-1 text-[8px] font-bold z-10">NACIONAL {filtradosOverview.length} carros Maputo Sofala</div>
-                <svg className="absolute inset-0 w-full h-full" style={{zIndex:1}}><path d="M 10% 50% Q 30% 30% 50% 50% T 90% 40%" stroke="#94a3b8" strokeWidth="2" strokeDasharray="8 8" fill="none" opacity="0.6" /></svg>
+              <div className="relative bg-sky-100 border-2 border-blue-700 rounded-xl h-64 overflow-hidden mb-4">
+                <div className="absolute top-2 left-2 bg-white border-2 border-blue-700 rounded-full px-3 py-1 text-[10px] font-black z-10">Mapa Tempo Real {filtradosOverview.length} carros Clique no ponto igual Yango</div>
+                <div className="absolute top-2 right-2 bg-black text-white rounded-full px-3 py-1 text-[8px] font-bold z-10">NACIONAL {filtradosOverview.length} carros</div>
                 {filtradosOverview.map((v:any, idx:number)=>{
                   const leftPos = 10 + (idx*22) % 80;
                   const topPos = 25 + (idx*18) % 50;
@@ -1030,26 +1029,21 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
                       <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
                         <div className="text-[12px]">➤</div>
-                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black shadow-xl" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700 shadow-lg"}>
-                          {focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}
-                        </div>
-                        <div className={v.estado==='A CAMINHO' ? "mt-1 w-4 h-4 rounded-full bg-yellow-400 border-2 border-white" : "mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"}></div>
+                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
+                        <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
                       </button>
                       {focada && mostrarPopupMapa && (
-                        <div className="absolute top-[-130px] left-1/2 bg-white border-2 border-black rounded-xl shadow-2xl p-3 w-72 z-50" style={{transform:'translateX(-50%)'}}>
-                          <button onClick={()=>setMostrarPopupMapa(false)} className="absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full text-[12px]">X</button>
+                        <div className="absolute top-[-140px] left-1/2 bg-white border-2 border-black rounded-xl shadow-2xl p-3 w-72 z-50" style={{transform:'translateX(-50%)'}}>
+                          <button onClick={()=>setMostrarPopupMapa(false)} className="absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full">X</button>
                           <div className="font-black text-[11px]">{v.marca || 'NAGI'} {v.motorista || 'Nagi Invest'} {v.matricula}</div>
-                          <div className="text-[9px] text-gray-600 mt-1">{v.origem || provOrigemF} para {v.destino || provDestinoF} {v.preco || 2500} MT {v.lugares || 25} lugares</div>
-                          <div className="text-[8px] text-gray-500">Motorista {v.motorista || 'Carlos Matsinhe'} Carga {v.carga || '500'} Ton</div>
-                          <div className="flex gap-1 mt-2"><button onClick={()=>{setViagemSel(v); setMostrarFormPass(true); setMostrarPopupMapa(false);}} className="flex-1 h-8 bg-slate-800 text-white rounded-full text-[9px] font-bold">Reservar lugar neste carro</button><a href={'tel:'+(v.motoristaTel||'841234567')} className="h-8 px-3 bg-green-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center">84 123 4567</a></div>
-                          <div className="text-[6px] mt-2 text-gray-400">Clique no ponto {idx+1} corresponde a viatura {v.matricula} Seta indica direcao</div>
+                          <div className="text-[9px]">{v.origem || 'Maputo'} para {v.destino || 'Sofala'} {v.preco || 2500} MT</div>
+                          <div className="flex gap-1 mt-2"><button onClick={()=>{setViagemSel(v); setMostrarFormPass(true);}} className="flex-1 h-8 bg-slate-800 text-white rounded-full text-[9px]">Reservar neste carro</button></div>
                         </div>
                       )}
                     </div>
                   )
                 })}
-                <div className="absolute bottom-2 left-2 bg-white border rounded-lg p-2 text-[8px] z-10"><div className="font-black">Clique no pontinho amarelo verde</div><div>Popup mostra matricula contacto Yango</div></div>
-                <div className="absolute bottom-2 right-2 bg-black text-white text-[7px] px-2 py-1 rounded z-10">Focado {viaturaFocadaMapa ? viaturaFocadaMapa.matricula : 'nenhum'}</div>
+                <div className="absolute bottom-2 left-2 bg-white border rounded p-2 text-[8px]">Clique no ponto para ver matricula</div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
@@ -1082,26 +1076,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para - CLIQUE NO PONTO PARA VER DETALHES <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
-                  {mostrarMapaOverview && (
-                  <div className="bg-[#e0f2fe] rounded-[12px] border border-[#bae6fd] h-[200px] relative overflow-hidden p-3">
-                    <div className="absolute top-2 right-2 bg-[#111827] text-white text-[8px] font-bold px-2 py-1 rounded-full">NACIONAL - {filtradosOverview.length} carros - {provOrigemF} para {provDestinoF}</div>
-                    <svg className="w-full h-[100px] mt-2" viewBox="0 0 800 110">
-                      <path d="M 50 70 Q 200 15 350 50 T 650 35 Q 700 30 750 70" stroke="#93c5fd" strokeWidth="2.5" strokeDasharray="8 8" fill="none"/>
-                      {filtradosOverview.map((v:any, i:number)=>{
-                        const x = 80 + (i * 110) % 600;
-                        const y = 30 + (i % 3)*25;
-                        const cor = v.id===carroFocadoMapa?'#facc15': v.status==='A CAMINHO'?'#1d4ed8':'#22c55e';
-                        return React.createElement("g", {key:v.id}, 
-                          React.createElement("circle", {cx:x, cy:y, r: v.id===carroFocadoMapa?16:12, fill:cor, stroke:"white", strokeWidth:2}),
-                          React.createElement("text", {x:x, y:y+4, textAnchor:"middle", fontSize:"8", fill:"white", fontWeight:"bold"}, v.id.toString().slice(-1))
-                        )
-                      })}
-                    </svg>
-                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: {provOrigemF} - {provDestinoF} | Focado: {carroFocadoMapa||'nenhum'} - Dinamico pelo filtro</div>
-                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">{filtradosOverview.length} viaturas em transito - 80km/h media</div>
-                  </div>
-                  )}
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  
 
                   {filtradosOverview.map((v:any)=>(
                     <div key={v.id} className={`bg-white rounded-[12px] border p-3 shadow-sm ${carroFocadoMapa===v.id?'ring-2 ring-[#facc15] border-[#facc15]':''}`}>
