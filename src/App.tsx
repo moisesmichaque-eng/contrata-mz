@@ -1,3 +1,4 @@
+// V10 FIX BRANCO DEFINITIVO - HOOK DENTRO DO COMPONENTE - 2026-10-18 07:02
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import { useState, useMemo, useEffect } from 'react';
@@ -8,26 +9,6 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.s
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
-// FOTO 3 VIRA REAL - FILTRO SEGURO - USA useState JA EXISTENTE - NAO QUEBRA
-const [provOrigemF, setProvOrigemF] = useState("Maputo Provincia");
-const [provDestinoF, setProvDestinoF] = useState("Sofala");
-const [distOrigemF, setDistOrigemF] = useState("Matola");
-const [distDestinoF, setDistDestinoF] = useState("Beira");
-const [dataViagemF, setDataViagemF] = useState("2026-10-17");
-
-const totalFiltradoReal = useMemo(() => {
-  if (provDestinoF.toLowerCase().includes("gaza")) return 1;
-  if (provDestinoF.toLowerCase().includes("joanesburgo") || provDestinoF.toLowerCase().includes("johannesburg")) return 1;
-  if (provDestinoF.toLowerCase().includes("nampula")) return 1;
-  if (provDestinoF.toLowerCase().includes("nelspruit") || provDestinoF.toLowerCase().includes("komatipoort")) return 1;
-  if (provDestinoF.toLowerCase().includes("sofala") && distDestinoF.toLowerCase().includes("beira")) return 5;
-  return 5;
-}, [provOrigemF, provDestinoF, distOrigemF, distDestinoF]);
-
-const handleReservarRealFinal = (empresa: string, rota: string, preco: number) => {
-  alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + empresa + "\nRota: " + rota + "\nPreço: " + preco + " MT\n\nMotorista vai contactar você!");
-};
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
@@ -119,6 +100,25 @@ const MODELO_TAREFAS: any = {
 const CLAUSULAS = [ { id:1, titulo:"Dados das partes", short:"Quem contrata e quem faz" }, { id:2, titulo:"Objeto e tarefas", short:"O que sera feito" }, { id:3, titulo:"Horario e local", short:"Quando e onde" }, { id:4, titulo:"Salario e pagamento", short:"Quanto e como paga" }, { id:5, titulo:"Alimentacao e alojamento", short:"Beneficios" }, { id:6, titulo:"Folgas e ferias", short:"Descanso legal" }, { id:7, titulo:"Periodo experimental", short:"Teste inicial" }, { id:8, titulo:"Deveres do trabalhador", short:"Obrigacoes" }, { id:9, titulo:"Deveres do empregador", short:"Obrigacoes" }, { id:10, titulo:"Anexos (antes validade)", short:"Fotos e provas" }, { id:11, titulo:"Validade e assinaturas", short:"Assina no WhatsApp - PDF final partilhavel" }, ];
 
 export default function App(){
+
+  // FOTO 3 VIRA REAL - DENTRO DO COMPONENTE - NAO QUEBRA - AMARELO INTACTO
+  const [provOrigemF, setProvOrigemF] = useState("Maputo Provincia");
+  const [provDestinoF, setProvDestinoF] = useState("Sofala");
+  const [distOrigemF, setDistOrigemF] = useState("Matola");
+  const [distDestinoF, setDistDestinoF] = useState("Beira");
+  const [dataViagemF, setDataViagemF] = useState("2026-10-17");
+
+  const totalFiltradoReal = useMemo(() => {
+    const pd = provDestinoF.toLowerCase();
+    if (pd.includes("gaza")) return 1;
+    if (pd.includes("joanesburgo") || pd.includes("johannesburg")) return 1;
+    if (pd.includes("nampula")) return 1;
+    if (pd.includes("nelspruit") || pd.includes("komatipoort")) return 1;
+    if (pd.includes("sofala")) return 5;
+    return 5;
+  }, [provDestinoF]);
+
+
  const [tab,setTab]=useState("encontrar");
  const [contratoSel,setContratoSel]=useState(1);
  const [clausulaAtiva,setClausulaAtiva]=useState(4);
