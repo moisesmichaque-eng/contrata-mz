@@ -8,37 +8,6 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.s
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
-// ===== FILTRO REAL - ESQUERDA REFLETE DIREITA - FOTO 3 VIRA REAL =====
-const [provOrigem, setProvOrigem] = React.useState("Maputo Provincia");
-const [provDestino, setProvDestino] = React.useState("Sofala");
-const [distOrigem, setDistOrigem] = React.useState("Matola");
-const [distDestino, setDistDestino] = React.useState("Beira");
-const [dataViagem, setDataViagem] = React.useState("");
-
-// Base de viagens reais - filtra conforme esquerda
-const baseViagens = [
-  { id: 1, empresa: "MozLog Express", sigla: "MOZL", tipo: "Foton Camiao - ADF 561 SF", rota: "Boane -> Beira", origemProv: "Maputo Provincia", destinoProv: "Sofala", origemDist: "Matola", destinoDist: "Beira", previsao: "10h 20min", motorista: "Samuel Mucavele", carga: "7 Ton", preco: 2800, status: "A CAMINHO", aval: "4.6 - 2 livres", tel: "82 888 9900", matricula: "ADF 561 SF" },
-  { id: 2, empresa: "ESSE Viagens", sigla: "ESSE", tipo: "Coaster Luxo - AHN 442 MP", rota: "Maputo -> Beira", origemProv: "Maputo Cidade", destinoProv: "Sofala", origemDist: "Maputo", destinoDist: "Beira", previsao: "8h 30min", motorista: "Carlos Nhampossa", carga: "Passageiros", preco: 3200, status: "EMBARQUE", aval: "4.9 - 12 livres", tel: "84 123 4567", matricula: "AHN 442 MP" },
-  { id: 3, empresa: "Nagi Invest", sigla: "NAGI", tipo: "Toyota Coaster", rota: "Matola -> Xai-Xai", origemProv: "Maputo Provincia", destinoProv: "Gaza", origemDist: "Matola", destinoDist: "Xai-Xai", previsao: "3h 15min", motorista: "Jose Matsinhe", carga: "5 Ton", preco: 2500, status: "A CAMINHO", aval: "4.7 - 5 livres", tel: "82 111 2222", matricula: "ABG 123 MP" },
-  { id: 4, empresa: "Maning Transporte", sigla: "MAN", tipo: "Mini Bus", rota: "Beira -> Nampula", origemProv: "Sofala", destinoProv: "Nampula", origemDist: "Beira", destinoDist: "Nampula", previsao: "12h 00min", motorista: "Fernando Chissano", carga: "3 Ton", preco: 1800, status: "DISPONIVEL", aval: "4.5 - 8 livres", tel: "82 333 4444", matricula: "AAB 987 MP" },
-  { id: 5, empresa: "MozLink SA", sigla: "SA", tipo: "Bus Executivo - Park Station", rota: "Maputo -> Johannesburg Park Station", origemProv: "Maputo Cidade", destinoProv: "Joanesburgo - SA", origemDist: "Maputo", destinoDist: "Johannesburg Central - Park Station", previsao: "9h 00min", motorista: "David Mabunda", carga: "Passageiros", preco: 3500, status: "A CAMINHO", aval: "4.8 - 3 livres", tel: "82 555 6666", matricula: "SA 001 GP" },
-  { id: 6, empresa: "Trans Komatipoort", sigla: "KOMP", tipo: "Coaster Fronteira", rota: "Maputo -> Komatipoort", origemProv: "Maputo Provincia", destinoProv: "Nelspruit - SA", origemDist: "Matola", destinoDist: "Komatipoort - Fronteira", previsao: "2h 30min", motorista: "Alberto Zandamela", carga: "Encomendas", preco: 1500, status: "A CAMINHO", aval: "4.6 - 6 livres", tel: "82 777 8888", matricula: "KMP 456" },
-];
-
-const viagensFiltradasReal = React.useMemo(() => {
-  let f = baseViagens;
-  if (provOrigem && provOrigem !== "Todas") f = f.filter(v => v.origemProv === provOrigem || provOrigem.includes(v.origemProv) || v.origemProv.includes(provOrigem));
-  if (provDestino && provDestino !== "Todas") f = f.filter(v => v.destinoProv === provDestino || provDestino.includes(v.destinoProv) || v.destinoProv.includes(provDestino));
-  if (distOrigem && distOrigem !== "") f = f.filter(v => v.origemDist.toLowerCase().includes(distOrigem.toLowerCase()) || distOrigem === "Matola");
-  if (distDestino && distDestino !== "") f = f.filter(v => v.destinoDist.toLowerCase().includes(distDestino.toLowerCase()) || distDestino === "Beira");
-  return f.length > 0 ? f : baseViagens.slice(0,5);
-}, [provOrigem, provDestino, distOrigem, distDestino, dataViagem]);
-
-// Funcao reservar lugar real
-const reservarLugarReal = (viagem: any) => {
-  alert(`✅ Reserva confirmada!\n\n${viagem.empresa}\n${viagem.rota}\n${viagem.preco} MT\nMotorista: ${viagem.motorista}\nTel: ${viagem.tel}\n\nEntraremos em contacto!`);
-};
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
@@ -964,9 +933,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Sofala</option><option>Maputo Provincia</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Matola</option><option>Boane</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Beira</option><option>Dondo</option></select></div>
-                                        <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label>
-            <input type="date" onChange={(e)=>setDataViagem(e.target.value)} value={dataViagem} className="w-full p-2 border rounded-lg text-sm" />
-            </div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" defaultValue="2026-10-17" /></div>
                   </div>
                 </div>
                 <div className="space-y-3">
