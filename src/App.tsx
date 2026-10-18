@@ -9,32 +9,24 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// FOTO 3 VIRA REAL - FILTRO SEGURO - NAO QUEBRA PAGINA
-const [provOrigemF, setProvOrigemF] = React.useState("Maputo Provincia");
-const [provDestinoF, setProvDestinoF] = React.useState("Sofala");
-const [distOrigemF, setDistOrigemF] = React.useState("Matola");
-const [distDestinoF, setDistDestinoF] = React.useState("Beira");
-const [dataViagemF, setDataViagemF] = React.useState("2026-10-17");
+// FOTO 3 VIRA REAL - FILTRO SEGURO - USA useState JA EXISTENTE - NAO QUEBRA
+const [provOrigemF, setProvOrigemF] = useState("Maputo Provincia");
+const [provDestinoF, setProvDestinoF] = useState("Sofala");
+const [distOrigemF, setDistOrigemF] = useState("Matola");
+const [distDestinoF, setDistDestinoF] = useState("Beira");
+const [dataViagemF, setDataViagemF] = useState("2026-10-17");
 
-const carrosBaseFoto3 = [
-  { rota: "Boane -> Beira", origem: "Maputo Provincia", destino: "Sofala", dOrigem: "Matola", dDestino: "Beira", empresa: "MozLog Express", preco: 2800, motorista: "Samuel Mucavele", carga: "7 Ton", previsao: "10h 20min", status: "A CAMINHO", matricula: "ADF 561 SF" },
-  { rota: "Maputo -> Beira", origem: "Maputo Cidade", destino: "Sofala", dOrigem: "Maputo", dDestino: "Beira", empresa: "ESSE Viagens", preco: 3200, motorista: "Carlos Nhampossa", carga: "Passageiros", previsao: "8h 30min", status: "EMBARQUE", matricula: "AHN 442 MP" },
-  { rota: "Matola -> Xai-Xai", origem: "Maputo Provincia", destino: "Gaza", dOrigem: "Matola", dDestino: "Xai-Xai", empresa: "Nagi Invest", preco: 2500, motorista: "Jose Matsinhe", carga: "5 Ton", previsao: "3h 15min", status: "A CAMINHO", matricula: "ABG 123 MP" },
-];
-
-const totalFiltrado = React.useMemo(() => {
-  let count = 2; // base mostra 2 no screenshot
-  // logica simples: se filtrar para Gaza, mostra 1; para Joanesburgo, 1; para Sofala+Beira, 2; default 5
-  if (provDestinoF.toLowerCase().includes("gaza")) count = 1;
-  else if (provDestinoF.toLowerCase().includes("joanesburgo") || provDestinoF.toLowerCase().includes("johannesburg")) count = 1;
-  else if (provDestinoF.toLowerCase().includes("sofala") && distDestinoF.toLowerCase().includes("beira")) count = 5;
-  else if (provDestinoF.toLowerCase().includes("nampula")) count = 1;
-  else if (provDestinoF.toLowerCase().includes("nelspruit") || provDestinoF.toLowerCase().includes("komatipoort")) count = 1;
-  return count;
+const totalFiltradoReal = useMemo(() => {
+  if (provDestinoF.toLowerCase().includes("gaza")) return 1;
+  if (provDestinoF.toLowerCase().includes("joanesburgo") || provDestinoF.toLowerCase().includes("johannesburg")) return 1;
+  if (provDestinoF.toLowerCase().includes("nampula")) return 1;
+  if (provDestinoF.toLowerCase().includes("nelspruit") || provDestinoF.toLowerCase().includes("komatipoort")) return 1;
+  if (provDestinoF.toLowerCase().includes("sofala") && distDestinoF.toLowerCase().includes("beira")) return 5;
+  return 5;
 }, [provOrigemF, provDestinoF, distOrigemF, distDestinoF]);
 
-const handleReservarSeguro = (empresa: string, rota: string, preco: number, motorista: string, tel: string) => {
-  alert(`✅ RESERVA CONFIRMADA!\n\nEmpresa: ${empresa}\nRota: ${rota}\nPreço: ${preco} MT\nMotorista: ${motorista}\nTel: ${tel}\n\nO motorista vai contactar você!`);
+const handleReservarRealFinal = (empresa: string, rota: string, preco: number) => {
+  alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + empresa + "\nRota: " + rota + "\nPreço: " + preco + " MT\n\nMotorista vai contactar você!");
 };
 import AdminPanel from './AdminPanel';
 
@@ -961,7 +953,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Sofala</option><option>Maputo Provincia</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Matola</option><option>Boane</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Beira</option><option>Dondo</option></select></div>
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" onChange={(e:any)=>setDataViagemF(e.target.value)} value={dataViagemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
                   </div>
                 </div>
                 <div className="space-y-3">
