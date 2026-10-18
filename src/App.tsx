@@ -1058,15 +1058,15 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-4 h-8 rounded-full text-[10px] font-black ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-white border text-[#0ea5e9]'}`}>
                       {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'â—‹ VER CARROS AO VIVO NO MAPA (NACIONAL)'}
                     </button>
-                    {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros prA³ximos em {origemV} -> {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
-                    <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provA­ncias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, ZambA©zia, Nampula, Cabo Delgado, Niassa</span>
+                    {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros proximos em {origemV} para {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
+                    <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provincias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Cabo Delgado, Niassa</span>
                   </div>
 
                   {modoTempoReal && (
                     <div className="mb-3 space-y-2">
                       {/* MAPA NACIONAL SIMULADO */}
                       <div className="relative bg-[#0f172a] rounded-[12px] h-[240px] overflow-hidden border-2 border-[#0ea5e9]">
-                        <div className="absolute top-2 left-2 bg-black/70 text-white text-[7px] px-2 py-1 rounded">MAPA MOA‡AMBIQUE AO VIVO - {origemV} | {liveViaturas.length} carros nacionais</div>
+                        <div className="absolute top-2 left-2 bg-black/70 text-white text-[7px] px-2 py-1 rounded">MAPA MOCAMBIQUE AO VIVO - {origemV} | {liveViaturas.length} carros nacionais</div>
                         <div className="absolute bottom-2 right-2 bg-white text-[7px] px-2 py-1 rounded"> Verde=disponivel  Amarelo=a caminho  Azul=em viagem</div>
                         {/* Linha EN1 */}
                         <div className="absolute left-[20%] top-[15%] w-[60%] h-[70%] border border-dashed border-white/20 rounded"></div>
@@ -1103,7 +1103,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                             </div>
                           </div>
                         ))}
-                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prA³ximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provA­ncias: {liveViaturas.length} carros no paA­s.</div>}
+                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prA³ximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paA­s.</div>}
                       </div>
                     </div>
                   )}
