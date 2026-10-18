@@ -141,46 +141,6 @@ export default function App(){
   const listaDistOrigem = distritosPorProvincia[provOrigemF] || ["Matola","Boane"];
   const listaDistDestino = distritosPorProvincia[provDestinoF] || ["Beira","Xai-Xai"];
 
-  const [mostrarMapaOverview, setMostrarMapaOverview] = useState(true);
-  const [ordenarMaisProximo, setOrdenarMaisProximo] = useState(false);
-  const [carroFocadoMapa, setCarroFocadoMapa] = useState<any>(null);
-  const [segundosAtualizacao, setSegundosAtualizacao] = useState(12);
-
-  useEffect(()=>{
-    const iv = setInterval(()=> setSegundosAtualizacao(s=> s+1), 1000);
-    return ()=> clearInterval(iv);
-  },[]);
-
-
-
-  const todosCarrosOverview = useMemo(()=>{
-    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
-      id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
-      lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
-      rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
-      destino: (vt.rota||'').split(' - ')[1]||'Sofala', destinoDistrito: 'Beira',
-      tempo: '10h', motorista: vt.motorista||transportadorPerfil.responsavel||'Motorista', tel: vt.tel||transportadorPerfil.tel||'84 123 4567',
-      preco: vt.paragens?.[0]?.preco||vt.cargaKg*10||2500, rating:4.7, status:'Activa', livres: vt.lugares, activa:true, data: 'Hoje'
-    }));
-    return [...viagensMock, ...extras];
-  }, [viagensMock, viaturas, transportadorPerfil]);
-
-  const filtradosOverview = useMemo(()=>{
-    let lista = todosCarrosOverview.filter((v:any)=>{
-      const okProvOrig = provOrigemF ? (v.origem||'').toLowerCase().includes(provOrigemF.toLowerCase()) || provOrigemF==='Maputo Provincia' : true;
-      const okProvDest = provDestinoF ? (v.destino||'').toLowerCase().includes(provDestinoF.toLowerCase()) || provDestinoF==='Sofala' || (v.destino||'').toLowerCase().includes('beira') : true;
-      const okDistOrig = distOrigemF ? (v.origemDistrito||'').toLowerCase().includes(distOrigemF.toLowerCase()) || (v.origem||'').toLowerCase().includes(distOrigemF.toLowerCase()) : true;
-      const okDistDest = distDestinoF ? (v.destinoDistrito||'').toLowerCase().includes(distDestinoF.toLowerCase()) || (v.destino||'').toLowerCase().includes(distDestinoF.toLowerCase()) : true;
-      const okData = dataViagemF ? true : true;
-      return okProvOrig && okProvDest && okDistOrig && okDistDest && okData;
-    });
-    if(ordenarMaisProximo){
-      lista = [...lista].sort((a:any,b:any)=> (a.preco||0)-(b.preco||0));
-    }
-    return lista;
-  }, [todosCarrosOverview, provOrigemF, provDestinoF, distOrigemF, distDestinoF, dataViagemF, ordenarMaisProximo]);
-
-
   const carrosFiltradosFoto3 = carrosReaisFoto3.filter(function(c){
     if (provDestinoF.indexOf("Gaza") !== -1) { return c.destino.indexOf("Gaza") !== -1; }
     if (provDestinoF.indexOf("Joanesburgo") !== -1) { return c.destino.indexOf("Joanesburgo") !== -1; }
@@ -462,6 +422,44 @@ useEffect(()=>{
      setFilteredViagens(candidate);
    }catch(e){setFilteredViagens([])}
  },[viagensMock, viaturas, transportadorPerfil]);
+
+  // ===== V24 - FIX VISAO GERAL FUNCIONAL - ESTADOS CORRIGIDOS =====
+  const [mostrarMapaOverview, setMostrarMapaOverview] = useState(true);
+  const [ordenarMaisProximo, setOrdenarMaisProximo] = useState(false);
+  const [carroFocadoMapa, setCarroFocadoMapa] = useState<any>(null);
+  const [segundosAtualizacao, setSegundosAtualizacao] = useState(12);
+
+  useEffect(()=>{
+    const iv = setInterval(()=> setSegundosAtualizacao(s=> s+1), 1000);
+    return ()=> clearInterval(iv);
+  },[]);
+
+  const todosCarrosOverview = useMemo(()=>{
+    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
+      id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
+      lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
+      rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
+      destino: (vt.rota||'').split(' - ')[1]||'Sofala', destinoDistrito: 'Beira',
+      tempo: '10h', motorista: vt.motorista||transportadorPerfil.responsavel||'Motorista', tel: vt.tel||transportadorPerfil.tel||'84 123 4567',
+      preco: vt.paragens?.[0]?.preco||vt.cargaKg*10||2500, rating:4.7, status:'Activa', livres: vt.lugares, activa:true, data: 'Hoje'
+    }));
+    return [...viagensMock, ...extras];
+  }, [viagensMock, viaturas, transportadorPerfil]);
+
+  const filtradosOverview = useMemo(()=>{
+    let lista = todosCarrosOverview.filter((v:any)=>{
+      const okProvOrig = provOrigemF ? (v.origem||'').toLowerCase().includes(provOrigemF.toLowerCase()) || provOrigemF==='Maputo Provincia' : true;
+      const okProvDest = provDestinoF ? (v.destino||'').toLowerCase().includes(provDestinoF.toLowerCase()) || provDestinoF==='Sofala' || (v.destino||'').toLowerCase().includes('beira') : true;
+      const okDistOrig = distOrigemF ? (v.origemDistrito||'').toLowerCase().includes(distOrigemF.toLowerCase()) || (v.origem||'').toLowerCase().includes(distOrigemF.toLowerCase()) : true;
+      const okDistDest = distDestinoF ? (v.destinoDistrito||'').toLowerCase().includes(distDestinoF.toLowerCase()) || (v.destino||'').toLowerCase().includes(distDestinoF.toLowerCase()) : true;
+      return okProvOrig && okProvDest && okDistOrig && okDistDest;
+    });
+    if(ordenarMaisProximo){
+      lista = [...lista].sort((a:any,b:any)=> (a.preco||0)-(b.preco||0));
+    }
+    return lista;
+  }, [todosCarrosOverview, provOrigemF, provDestinoF, distOrigemF, distDestinoF, dataViagemF, ordenarMaisProximo]);
+
  const [formViatura, setFormViatura] = useState({tipo:'Minibus / Chapa', marca:'Toyota Coaster 25 lugares', matricula:'', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any);
  const [formParagem, setFormParagem] = useState({local:'', preco:0} as any);
  const [paragensTemp, setParagensTemp] = useState([{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}] as any);
@@ -1016,11 +1014,11 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
           
           {viagensTab==='overview' && (
             <div className="space-y-3">
-              <div className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - Foto 3 - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media</span></div>
+              <div id="mapaOverview" className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media - Filtro reflete a direita</span></div>
               <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
-                <div className="bg-white rounded-[12px] border p-4 h-fit sticky top-2">
+                <div className="bg-white rounded-[12px] border p-4 h-fit lg:sticky lg:top-2">
                   <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</h3>
-                  <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete a direita automaticamente - {filtradosOverview.length} carros - Transporte passageiros + encomendas</p>
+                  <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete automaticamente a direita - {filtradosOverview.length} de {todosCarrosOverview.length} carros</p>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ✓':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
                     <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ✓':'MAIS PROXIMO ✓'}</button>
@@ -1043,7 +1041,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
               {listaDistDestino.map(function(d:any){ return React.createElement("option", {key:d, value:d}, d) })}
             </select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" onChange={function(e:any){setDataViagemF(e.target.value)}} value={dataViagemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
-                    <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira'); setDataViagemF('');}} className="w-full h-8 bg-[#f1f5f9] rounded text-[9px] font-bold">Limpar filtros</button>
+                    <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira'); setDataViagemF('');}} className="w-full h-8 bg-[#f1f5f9] rounded text-[9px] font-bold">Limpar filtros - Mostrar todos</button>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -1058,13 +1056,13 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                         const y = 30 + (i % 3)*25;
                         const cor = v.id===carroFocadoMapa?'#facc15': v.status==='A CAMINHO'?'#1d4ed8':'#22c55e';
                         return React.createElement("g", {key:v.id}, 
-                          React.createElement("circle", {cx:x, cy:y, r: v.id===carroFocadoMapa?16:12, fill:cor, stroke:"white", strokeWidth:2, className:"transition-all"}),
+                          React.createElement("circle", {cx:x, cy:y, r: v.id===carroFocadoMapa?16:12, fill:cor, stroke:"white", strokeWidth:2}),
                           React.createElement("text", {x:x, y:y+4, textAnchor:"middle", fontSize:"8", fill:"white", fontWeight:"bold"}, v.id.toString().slice(-1))
                         )
                       })}
                     </svg>
-                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: {provOrigemF} - {provDestinoF} | Focado: {carroFocadoMapa||'nenhum'}</div>
-                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">{filtradosOverview.length} viaturas em transito - 80km/h media - Clique Ver no mapa para focar</div>
+                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: {provOrigemF} - {provDestinoF} | Focado: {carroFocadoMapa||'nenhum'} - Dinamico pelo filtro</div>
+                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">{filtradosOverview.length} viaturas em transito - 80km/h media</div>
                   </div>
                   )}
 
@@ -1086,7 +1084,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <button onClick={()=>{ setViagemSel(v); setMostrarFormPass(true); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
                             <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.tel||'82 888 9900'}</button>
-                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); document.querySelector('#mapaOverview')?.scrollIntoView({behavior:'smooth'}); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
+                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
                             <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula||v.mat||'ADF 561 SF'} - {v.activa? 'Adicionado por transportador':'Actualizado agora'}</span>
                           </div>
                         </div>
@@ -1096,7 +1094,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   {filtradosOverview.length===0 && (
                     <div className="bg-white border-2 border-dashed rounded-[12px] p-8 text-center">
                       <div className="text-[12px] font-bold">Nenhum carro encontrado para {provOrigemF} - {provDestinoF}</div>
-                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Tente limpar filtros ou verificar {provOrigemF}. Transportadores adicionaram {viaturas.length} viaturas.</div>
+                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {viaturas.length} viaturas.</div>
                       <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira');}} className="mt-3 h-9 px-4 bg-[#1d4ed8] text-white rounded-full text-[10px] font-bold">Mostrar todos</button>
                     </div>
                   )}
@@ -1110,9 +1108,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div className="space-y-2">
                       <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.nome} onChange={e=>setFormPassageiro({...formPassageiro,nome:e.target.value})} placeholder="Nome passageiro *" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.tel} onChange={e=>setFormPassageiro({...formPassageiro,tel:e.target.value})} placeholder="Telefone * 84..." className="h-9 border rounded px-2 text-[11px]" /></div>
                       <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.nomeFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,nomeFamiliar:e.target.value})} placeholder="Nome familiar" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.contactoFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,contactoFamiliar:e.target.value})} placeholder="Contacto familiar" className="h-9 border rounded px-2 text-[11px]" /></div>
-                      <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.localEncontrado} onChange={e=>setFormPassageiro({...formPassageiro,localEncontrado:e.target.value})} placeholder="Local embarque - ex: Junta, Zimpeto" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.destinoCustom} onChange={e=>setFormPassageiro({...formPassageiro,destinoCustom:e.target.value})} placeholder="Destino exato - Beira Cidade" className="h-9 border rounded px-2 text-[11px]" /></div>
-                      <div className="bg-[#f0fdf4] border border-[#22c55e] rounded p-2 text-[9px]"><b>Resumo:</b> {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} | Motorista {viagemSel.motorista||'Samuel'} | Matricula {viagemSel.matricula||'ABX'} | {viagemSel.lugares||15} lugares | {viagemSel.cargaKg||5} Ton carga</div>
-                      <button onClick={()=>{ const nova={id:Date.now(), codigo:'FV'+Date.now().toString().slice(-4), origem: viagemSel.origem||provOrigemF, destino: viagemSel.destino||provDestinoF, destinoReal: formPassageiro.destinoCustom, precoReal: viagemSel.preco||2500, passageiro: formPassageiro, viagem: viagemSel}; setReservas([...reservas, nova]); setMostrarFormPass(false); alert(`Reserva confirmada! Codigo ${nova.codigo} - ${viagemSel.transp} - ${viagemSel.preco} MT - Motorista contacta via ${viagemSel.tel}`); }} className="w-full h-11 bg-[#22c55e] text-white rounded-[8px] font-black text-[12px]">Confirmar Reserva - {viagemSel.preco||2500} MT</button>
+                      <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.localEncontrado} onChange={e=>setFormPassageiro({...formPassageiro,localEncontrado:e.target.value})} placeholder="Local embarque - Junta, Zimpeto" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.destinoCustom} onChange={e=>setFormPassageiro({...formPassageiro,destinoCustom:e.target.value})} placeholder="Destino exato - Beira Cidade" className="h-9 border rounded px-2 text-[11px]" /></div>
+                      <div className="bg-[#f0fdf4] border border-[#22c55e] rounded p-2 text-[9px]"><b>Resumo:</b> {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} | Motorista {viagemSel.motorista||'Samuel'} | Matricula {viagemSel.matricula||'ABX'} | {viagemSel.lugares||15} lugares</div>
+                      <button onClick={()=>{ const nova={id:Date.now(), codigo:'FV'+Date.now().toString().slice(-4), origem: viagemSel.origem||provOrigemF, destino: viagemSel.destino||provDestinoF, destinoReal: formPassageiro.destinoCustom, precoReal: viagemSel.preco||2500, passageiro: formPassageiro, viagem: viagemSel}; setReservas([...reservas, nova]); setMostrarFormPass(false); alert(`Reserva confirmada! Codigo ${nova.codigo} - ${viagemSel.transp} - ${viagemSel.preco} MT`); }} className="w-full h-11 bg-[#22c55e] text-white rounded-[8px] font-black text-[12px]">Confirmar Reserva - {viagemSel.preco||2500} MT</button>
                     </div>
                   </div>
                 </div>
