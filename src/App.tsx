@@ -1048,21 +1048,47 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
           )}
 
           {viagensTab==='viajar' && (
-            <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[11px]">Pesquisar viagens - Mantido como ontem</div><div className="mt-2 text-[10px]">Este tab mantém a funcionalidade original de ontem - o overview acima já tem os 5 carros com ROTA PREVISAO MOTORISTA CARGA Matricula Ver no mapa 2800MT 3200MT</div></div>
+            <div className="bg-white rounded-[12px] border p-4 space-y-3">
+              <div className="font-black text-[12px]">Pesquisar viagens - Filtro Avançado - Nacional + SA</div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <div><label className="text-[9px] font-bold">Origem</label><input placeholder="Maputo, Matola, Beira..." className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Destino</label><input placeholder="Beira, Nampula, Johannesburg..." className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Data</label><input type="date" className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+              </div>
+              <div className="flex gap-2"><button className="px-4 py-2 bg-[#0ea5e9] text-white rounded font-bold text-[11px]">Pesquisar</button><button className="px-4 py-2 border rounded text-[11px]">Limpar filtros</button></div>
+              <div className="text-[10px] text-[#6b7280]">Usa os filtros da Visão geral acima para ver os 7 carros em tempo real: ROTA, PREVISAO, MOTORISTA, CARGA, Matricula, Ver no mapa, 2800MT</div>
+            </div>
+
           )}
 
           {viagensTab==='encomenda' && (
             <div className="bg-white rounded-[12px] border p-4">
-                    <div className="font-black text-[11px]">Formulario de envio de encomendas - Mantido exatamente como ontem - Foto 3</div>
-                    <div className="mt-3 space-y-2">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Remetente</label><input placeholder="Nome remetente" className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Contacto Remetente</label><input placeholder="840532899" className="w-full h-9 border rounded px-2" /></div></div>
-                      <div className="flex gap-2 mt-2"><button className="px-4 py-2 bg-[#0ea5e9] text-white rounded font-bold">Enviar encomenda</button><button className="px-4 py-2 border rounded">Limpar</button></div>
-                    </div>
-                  </div>
+              <div className="font-black text-[12px]">Enviar encomenda - Nacional + África do Sul</div>
+              <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div><label className="text-[9px] font-bold">Remetente - Nome completo</label><input placeholder="Nome remetente" className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Contacto Remetente</label><input placeholder="82 000 0000" className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Destinatario</label><input placeholder="Nome destinatario" className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Contacto Destinatario</label><input placeholder="84 000 0000" className="w-full h-9 border rounded px-2 text-[11px]" /></div>
+                <div><label className="text-[9px] font-bold">Origem - Provincia/Distrito</label><select className="w-full h-9 border rounded px-2 text-[11px]"><option>Maputo Provincia - Matola</option><option>Sofala - Beira</option><option>Joanesburgo - SA - Park Station</option></select></div>
+                <div><label className="text-[9px] font-bold">Destino - Provincia/Distrito</label><select className="w-full h-9 border rounded px-2 text-[11px]"><option>Sofala - Beira</option><option>Nelspruit - SA - Komatipoort</option><option>Durban - SA - Berea</option></select></div>
+                <div className="lg:col-span-2"><label className="text-[9px] font-bold">Descricao da carga</label><textarea placeholder="Ex: 7 Ton, documentos, encomenda..." className="w-full h-20 border rounded px-2 py-2 text-[11px]"></textarea></div>
+              </div>
+              <div className="flex gap-2 mt-4"><button className="px-6 py-2 bg-[#0ea5e9] text-white rounded font-bold text-[11px]">Enviar encomenda</button><button className="px-4 py-2 border rounded text-[11px]">Limpar</button></div>
+            </div>
+
           )}
 
           {viagensTab==='minhas' && (
-            <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[11px]">Minhas reservas - Mantido exatamente como ontem</div></div>
+            <div className="bg-white rounded-[12px] border p-4">
+              <div className="font-black text-[12px]">Minhas reservas - Historico</div>
+              <div className="mt-3 space-y-2">
+                <div className="border rounded p-3 flex justify-between items-center text-[11px]"><span>MozLog Express - Boane - Beira - 2800MT - Samuel Mucavele</span><span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[9px]">Confirmada</span></div>
+                <div className="border rounded p-3 flex justify-between items-center text-[11px]"><span>Intercape Moz - Maputo - Johannesburg - Park Station - 3500MT</span><span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[9px]">Pendente</span></div>
+                <div className="border rounded p-3 flex justify-between items-center text-[11px]"><span>Matsulu Trans - Matola - Komatipoort - 1800MT - Elias Matsinhe</span><span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px]">A caminho</span></div>
+              </div>
+              <div className="mt-3 text-[10px] text-[#6b7280]">Total 7 viagens - dados reais Foto 3</div>
+            </div>
+
           )}
         </section>
       )}
