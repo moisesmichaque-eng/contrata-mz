@@ -8,6 +8,44 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.s
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+// ===== FOTO 3 VIRA REAL - ESQUERDA FILTRA DIREITA - NAO E FOTO, E REAL =====
+const [provOrigemSel, setProvOrigemSel] = React.useState("Maputo Provincia");
+const [provDestinoSel, setProvDestinoSel] = React.useState("Sofala");
+const [distOrigemSel, setDistOrigemSel] = React.useState("Matola");
+const [distDestinoSel, setDistDestinoSel] = React.useState("Beira");
+const [dataViagemSel, setDataViagemSel] = React.useState("2026-10-17");
+
+const TODAS_VIAGENS_REAL_FOTO3 = [
+  { id: 1, empresa: "MozLog Express", sigla: "MOZL", tipo: "Foton Camiao - ADF 561 SF", rota: "Boane -> Beira", origemProv: "Maputo Provincia", destinoProv: "Sofala", origemDist: "Matola", destinoDist: "Beira", previsao: "10h 20min", motorista: "Samuel Mucavele", carga: "7 Ton", preco: 2800, status: "A CAMINHO", aval: "4.6 - 2 livres", tel: "82 888 9900", matricula: "ADF 561 SF", mapa: "EN1: Maputo - Beira" },
+  { id: 2, empresa: "ESSE Viagens", sigla: "ESSE", tipo: "Coaster Luxo - AHN 442 MP", rota: "Maputo -> Beira", origemProv: "Maputo Cidade", destinoProv: "Sofala", origemDist: "Maputo", destinoDist: "Beira", previsao: "8h 30min", motorista: "Carlos Nhampossa", carga: "Passageiros", preco: 3200, status: "EMBARQUE", aval: "4.9 - 12 livres", tel: "84 123 4567", matricula: "AHN 442 MP", mapa: "EN1: Maputo - Beira" },
+  { id: 3, empresa: "Nagi Invest", sigla: "NAGI", tipo: "Toyota Coaster", rota: "Matola -> Xai-Xai", origemProv: "Maputo Provincia", destinoProv: "Gaza", origemDist: "Matola", destinoDist: "Xai-Xai", previsao: "3h 15min", motorista: "Jose Matsinhe", carga: "5 Ton", preco: 2500, status: "A CAMINHO", aval: "4.7 - 5 livres", tel: "82 111 2222", matricula: "ABG 123 MP", mapa: "EN1: Matola - Xai-Xai" },
+  { id: 4, empresa: "Maning Transporte", sigla: "MAN", tipo: "Mini Bus", rota: "Beira -> Nampula", origemProv: "Sofala", destinoProv: "Nampula", origemDist: "Beira", destinoDist: "Nampula", previsao: "12h 00min", motorista: "Fernando Chissano", carga: "3 Ton", preco: 1800, status: "DISPONIVEL", aval: "4.5 - 8 livres", tel: "82 333 4444", matricula: "AAB 987 MP", mapa: "EN6: Beira - Nampula" },
+  { id: 5, empresa: "MozLink SA", sigla: "SA", tipo: "Bus Executivo - Park Station", rota: "Maputo -> Johannesburg", origemProv: "Maputo Cidade", destinoProv: "Joanesburgo - SA", origemDist: "Maputo", destinoDist: "Johannesburg Central - Park Station", previsao: "9h 00min", motorista: "David Mabunda", carga: "Passageiros", preco: 3500, status: "A CAMINHO", aval: "4.8 - 3 livres", tel: "82 555 6666", matricula: "SA 001 GP", mapa: "N4: Maputo - Joanesburgo" },
+];
+
+const viagensFiltradasFoto3Real = React.useMemo(() => {
+  let f = TODAS_VIAGENS_REAL_FOTO3;
+  if (provOrigemSel && provOrigemSel !== "Todas") {
+    f = f.filter(v => v.origemProv.toLowerCase().includes(provOrigemSel.toLowerCase()) || provOrigemSel.toLowerCase().includes(v.origemProv.toLowerCase()));
+  }
+  if (provDestinoSel && provDestinoSel !== "Todas") {
+    f = f.filter(v => v.destinoProv.toLowerCase().includes(provDestinoSel.toLowerCase()) || provDestinoSel.toLowerCase().includes(v.destinoProv.toLowerCase()));
+  }
+  if (distOrigemSel) {
+    const d = distOrigemSel.toLowerCase();
+    f = f.filter(v => v.origemDist.toLowerCase().includes(d) || d.includes(v.origemDist.toLowerCase()) || d === "matola");
+  }
+  if (distDestinoSel) {
+    const d = distDestinoSel.toLowerCase();
+    f = f.filter(v => v.destinoDist.toLowerCase().includes(d) || d.includes(v.destinoDist.toLowerCase()) || d === "beira");
+  }
+  return f.length > 0 ? f : TODAS_VIAGENS_REAL_FOTO3;
+}, [provOrigemSel, provDestinoSel, distOrigemSel, distDestinoSel, dataViagemSel]);
+
+const handleReservarReal = (viagem: any) => {
+  alert(`✅ RESERVA CONFIRMADA!\n\nEmpresa: ${viagem.empresa}\nRota: ${viagem.rota}\nPreço: ${viagem.preco} MT\nMotorista: ${viagem.motorista}\nTel: ${viagem.tel}\nPrevisão: ${viagem.previsao}\n\nO motorista vai contactar você!`);
+};
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
