@@ -141,6 +141,46 @@ export default function App(){
   const listaDistOrigem = distritosPorProvincia[provOrigemF] || ["Matola","Boane"];
   const listaDistDestino = distritosPorProvincia[provDestinoF] || ["Beira","Xai-Xai"];
 
+  const [mostrarMapaOverview, setMostrarMapaOverview] = useState(true);
+  const [ordenarMaisProximo, setOrdenarMaisProximo] = useState(false);
+  const [carroFocadoMapa, setCarroFocadoMapa] = useState<any>(null);
+  const [segundosAtualizacao, setSegundosAtualizacao] = useState(12);
+
+  useEffect(()=>{
+    const iv = setInterval(()=> setSegundosAtualizacao(s=> s+1), 1000);
+    return ()=> clearInterval(iv);
+  },[]);
+
+
+
+  const todosCarrosOverview = useMemo(()=>{
+    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
+      id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
+      lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
+      rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
+      destino: (vt.rota||'').split(' - ')[1]||'Sofala', destinoDistrito: 'Beira',
+      tempo: '10h', motorista: vt.motorista||transportadorPerfil.responsavel||'Motorista', tel: vt.tel||transportadorPerfil.tel||'84 123 4567',
+      preco: vt.paragens?.[0]?.preco||vt.cargaKg*10||2500, rating:4.7, status:'Activa', livres: vt.lugares, activa:true, data: 'Hoje'
+    }));
+    return [...viagensMock, ...extras];
+  }, [viagensMock, viaturas, transportadorPerfil]);
+
+  const filtradosOverview = useMemo(()=>{
+    let lista = todosCarrosOverview.filter((v:any)=>{
+      const okProvOrig = provOrigemF ? (v.origem||'').toLowerCase().includes(provOrigemF.toLowerCase()) || provOrigemF==='Maputo Provincia' : true;
+      const okProvDest = provDestinoF ? (v.destino||'').toLowerCase().includes(provDestinoF.toLowerCase()) || provDestinoF==='Sofala' || (v.destino||'').toLowerCase().includes('beira') : true;
+      const okDistOrig = distOrigemF ? (v.origemDistrito||'').toLowerCase().includes(distOrigemF.toLowerCase()) || (v.origem||'').toLowerCase().includes(distOrigemF.toLowerCase()) : true;
+      const okDistDest = distDestinoF ? (v.destinoDistrito||'').toLowerCase().includes(distDestinoF.toLowerCase()) || (v.destino||'').toLowerCase().includes(distDestinoF.toLowerCase()) : true;
+      const okData = dataViagemF ? true : true;
+      return okProvOrig && okProvDest && okDistOrig && okDistDest && okData;
+    });
+    if(ordenarMaisProximo){
+      lista = [...lista].sort((a:any,b:any)=> (a.preco||0)-(b.preco||0));
+    }
+    return lista;
+  }, [todosCarrosOverview, provOrigemF, provDestinoF, distOrigemF, distDestinoF, dataViagemF, ordenarMaisProximo]);
+
+
   const carrosFiltradosFoto3 = carrosReaisFoto3.filter(function(c){
     if (provDestinoF.indexOf("Gaza") !== -1) { return c.destino.indexOf("Gaza") !== -1; }
     if (provDestinoF.indexOf("Joanesburgo") !== -1) { return c.destino.indexOf("Joanesburgo") !== -1; }
@@ -973,16 +1013,17 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             </div>
           </div>
 
+          
           {viagensTab==='overview' && (
             <div className="space-y-3">
-              <div className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - Foto 3</span><span className="text-[9px] opacity-80">Actualizado ha 12s - 80km/h media</span></div>
+              <div className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - Foto 3 - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media</span></div>
               <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
-                <div className="bg-white rounded-[12px] border p-4 h-fit">
+                <div className="bg-white rounded-[12px] border p-4 h-fit sticky top-2">
                   <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</h3>
-                  <p className="text-[9px] text-[#6b7280] mt-1">Foto 3 - ROTA PREVISAO MOTORISTA CARGA Matricula Ver no mapa 2800MT 3200MT</p>
+                  <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete a direita automaticamente - {filtradosOverview.length} carros - Transporte passageiros + encomendas</p>
                   <div className="grid grid-cols-2 gap-2 mt-3">
-                    <button className="h-[36px] bg-[#1d4ed8] text-white rounded-[8px] text-[9px] font-bold">VER CARROS AO VIVO NO MAPA (NACIONAL)</button>
-                    <button className="h-[36px] bg-[#22c55e] text-white rounded-[8px] text-[9px] font-bold">MAIS PROXIMO ✓</button>
+                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ✓':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
+                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ✓':'MAIS PROXIMO ✓'}</button>
                   </div>
                   <div className="mt-4 space-y-3">
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label>
@@ -1002,51 +1043,83 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
               {listaDistDestino.map(function(d:any){ return React.createElement("option", {key:d, value:d}, d) })}
             </select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" onChange={function(e:any){setDataViagemF(e.target.value)}} value={dataViagemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
+                    <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira'); setDataViagemF('');}} className="w-full h-8 bg-[#f1f5f9] rounded text-[9px] font-bold">Limpar filtros</button>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">5</span> carros encontrados para <span className="text-[#1d4ed8]">MAPUTO PROVINCIA - SOFALA - BEIRA</span></h2></div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  {mostrarMapaOverview && (
                   <div className="bg-[#e0f2fe] rounded-[12px] border border-[#bae6fd] h-[200px] relative overflow-hidden p-3">
-                    <div className="absolute top-2 right-2 bg-[#111827] text-white text-[8px] font-bold px-2 py-1 rounded-full">NACIONAL</div>
-                    <svg className="w-full h-[100px] mt-2" viewBox="0 0 800 110"><path d="M 50 70 Q 200 15 350 50 T 650 35 Q 700 30 750 70" stroke="#93c5fd" strokeWidth="2.5" strokeDasharray="8 8" fill="none"/><circle cx="80" cy="65" r="12" fill="#1d4ed8"/><circle cx="350" cy="45" r="12" fill="#1d4ed8"/><circle cx="550" cy="30" r="10" fill="#facc15"/></svg>
-                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: Maputo - Beira</div>
-                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">5 viaturas em transito - 80km/h media</div>
+                    <div className="absolute top-2 right-2 bg-[#111827] text-white text-[8px] font-bold px-2 py-1 rounded-full">NACIONAL - {filtradosOverview.length} carros - {provOrigemF} para {provDestinoF}</div>
+                    <svg className="w-full h-[100px] mt-2" viewBox="0 0 800 110">
+                      <path d="M 50 70 Q 200 15 350 50 T 650 35 Q 700 30 750 70" stroke="#93c5fd" strokeWidth="2.5" strokeDasharray="8 8" fill="none"/>
+                      {filtradosOverview.map((v:any, i:number)=>{
+                        const x = 80 + (i * 110) % 600;
+                        const y = 30 + (i % 3)*25;
+                        const cor = v.id===carroFocadoMapa?'#facc15': v.status==='A CAMINHO'?'#1d4ed8':'#22c55e';
+                        return React.createElement("g", {key:v.id}, 
+                          React.createElement("circle", {cx:x, cy:y, r: v.id===carroFocadoMapa?16:12, fill:cor, stroke:"white", strokeWidth:2, className:"transition-all"}),
+                          React.createElement("text", {x:x, y:y+4, textAnchor:"middle", fontSize:"8", fill:"white", fontWeight:"bold"}, v.id.toString().slice(-1))
+                        )
+                      })}
+                    </svg>
+                    <div className="absolute bottom-2 left-2 text-[9px] bg-white border px-2 py-1 rounded-full">AO VIVO - EN1: {provOrigemF} - {provDestinoF} | Focado: {carroFocadoMapa||'nenhum'}</div>
+                    <div className="absolute bottom-2 right-2 text-[9px] text-[#1d4ed8]">{filtradosOverview.length} viaturas em transito - 80km/h media - Clique Ver no mapa para focar</div>
                   </div>
-                  {[
-                    {id:1, transp:"MozLog Express", tipo:"Foton Camiao - ADF 561 SF", mat:"ADF 561 SF", lugares:"18 lugares", carga:"7 Ton", rota:"Boane -> Beira", tempo:"10h 20min", motorista:"Samuel Mucavele", tel:"82 888 9900", preco:2800, rating:4.6, status:"A CAMINHO", livres:2},
-                    {id:2, transp:"ESSE Viagens", tipo:"Coaster Luxo - AHN 442 MP", mat:"AHN 442 MP", lugares:"33 lugares", carga:"5 Ton", rota:"Maputo -> Beira", tempo:"11h 45min", motorista:"Armindo Chissano", tel:"82 555 1122", preco:3200, rating:4.9, status:"EMBARQUE", livres:12},
-                    {id:3, transp:"Nagi Invest", tipo:"Toyota Coaster - ACM 234 MP", mat:"ACM 234 MP", lugares:"30 lugares", carga:"3.5 Ton", rota:"Matola -> Beira", tempo:"12h 30min", motorista:"Joao Manhique", tel:"82 123 4567", preco:2500, rating:4.8, status:"A CAMINHO", livres:8},
-                    {id:4, transp:"Maning Transporte", tipo:"Mini-bus Rosa - ABG 901 MP", mat:"ABG 901 MP", lugares:"22 lugares", carga:"1.2 Ton", rota:"Matola -> Beira", tempo:"13h 15min", motorista:"Carlos Tembe", tel:"84 987 6543", preco:1800, rating:4.5, status:"PRONTO P/ SAIDA", livres:3},
-                    {id:5, transp:"Trans Nampula", tipo:"Toyota Hiace - AKL 789 NP", mat:"AKL 789 NP", lugares:"15 lugares", carga:"800 Kg", rota:"Matola -> Dondo", tempo:"14h 00min", motorista:"Felisberto Mausse", tel:"84 333 7788", preco:1500, rating:4.3, status:"A CAMINHO", livres:5},
-                  ].map((v:any)=>(
-                    <div key={v.id} className="bg-white rounded-[12px] border p-3 shadow-sm">
+                  )}
+
+                  {filtradosOverview.map((v:any)=>(
+                    <div key={v.id} className={`bg-white rounded-[12px] border p-3 shadow-sm ${carroFocadoMapa===v.id?'ring-2 ring-[#facc15] border-[#facc15]':''}`}>
                       <div className="flex gap-3">
-                        <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{v.transp.slice(0,4).toUpperCase()}</span></div>
+                        <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
                         <div className="flex-1">
                           <div className="flex flex-wrap justify-between gap-2">
-                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status}</span><span className="text-[10px]">⭐ {v.rating} - {v.livres} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo} - {v.mat}</p></div>
-                            <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📍 ROTA</div><div className="text-[10px] font-semibold">{v.rota}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">⏱️ PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">👤 MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📦 CARGA</div><div className="text-[10px] font-semibold">{v.carga}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📍 ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -> ${v.destino||provDestinoF}`}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">⏱️ PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">👤 MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📦 CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
                           </div>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <button className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
-                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.tel}</button>
-                            <button className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
-                            <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.mat} - Actualizado agora</span>
+                            <button onClick={()=>{ setViagemSel(v); setMostrarFormPass(true); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
+                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.tel||'82 888 9900'}</button>
+                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); document.querySelector('#mapaOverview')?.scrollIntoView({behavior:'smooth'}); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
+                            <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula||v.mat||'ADF 561 SF'} - {v.activa? 'Adicionado por transportador':'Actualizado agora'}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   ))}
+                  {filtradosOverview.length===0 && (
+                    <div className="bg-white border-2 border-dashed rounded-[12px] p-8 text-center">
+                      <div className="text-[12px] font-bold">Nenhum carro encontrado para {provOrigemF} - {provDestinoF}</div>
+                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Tente limpar filtros ou verificar {provOrigemF}. Transportadores adicionaram {viaturas.length} viaturas.</div>
+                      <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira');}} className="mt-3 h-9 px-4 bg-[#1d4ed8] text-white rounded-full text-[10px] font-bold">Mostrar todos</button>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {mostrarFormPass && viagemSel && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+                  <div className="bg-white rounded-[12px] max-w-[500px] w-full max-h-[90vh] overflow-y-auto p-4">
+                    <div className="flex justify-between items-center mb-3"><h3 className="font-black text-[13px]">Reservar lugar - {viagemSel.transp||viagemSel.marca} - {viagemSel.rota||`${viagemSel.origem} -> ${viagemSel.destino}`} - {viagemSel.preco||2500} MT</h3><button onClick={()=>setMostrarFormPass(false)} className="w-7 h-7 bg-[#f1f5f9] rounded-full">X</button></div>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.nome} onChange={e=>setFormPassageiro({...formPassageiro,nome:e.target.value})} placeholder="Nome passageiro *" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.tel} onChange={e=>setFormPassageiro({...formPassageiro,tel:e.target.value})} placeholder="Telefone * 84..." className="h-9 border rounded px-2 text-[11px]" /></div>
+                      <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.nomeFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,nomeFamiliar:e.target.value})} placeholder="Nome familiar" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.contactoFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,contactoFamiliar:e.target.value})} placeholder="Contacto familiar" className="h-9 border rounded px-2 text-[11px]" /></div>
+                      <div className="grid grid-cols-2 gap-2"><input value={formPassageiro.localEncontrado} onChange={e=>setFormPassageiro({...formPassageiro,localEncontrado:e.target.value})} placeholder="Local embarque - ex: Junta, Zimpeto" className="h-9 border rounded px-2 text-[11px]" /><input value={formPassageiro.destinoCustom} onChange={e=>setFormPassageiro({...formPassageiro,destinoCustom:e.target.value})} placeholder="Destino exato - Beira Cidade" className="h-9 border rounded px-2 text-[11px]" /></div>
+                      <div className="bg-[#f0fdf4] border border-[#22c55e] rounded p-2 text-[9px]"><b>Resumo:</b> {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} | Motorista {viagemSel.motorista||'Samuel'} | Matricula {viagemSel.matricula||'ABX'} | {viagemSel.lugares||15} lugares | {viagemSel.cargaKg||5} Ton carga</div>
+                      <button onClick={()=>{ const nova={id:Date.now(), codigo:'FV'+Date.now().toString().slice(-4), origem: viagemSel.origem||provOrigemF, destino: viagemSel.destino||provDestinoF, destinoReal: formPassageiro.destinoCustom, precoReal: viagemSel.preco||2500, passageiro: formPassageiro, viagem: viagemSel}; setReservas([...reservas, nova]); setMostrarFormPass(false); alert(`Reserva confirmada! Codigo ${nova.codigo} - ${viagemSel.transp} - ${viagemSel.preco} MT - Motorista contacta via ${viagemSel.tel}`); }} className="w-full h-11 bg-[#22c55e] text-white rounded-[8px] font-black text-[12px]">Confirmar Reserva - {viagemSel.preco||2500} MT</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
+
 
           {viagensTab==='viajar' && (
             <div className="flex flex-col lg:flex-row gap-3">
