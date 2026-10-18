@@ -1,4 +1,3 @@
-// V10 FIX BRANCO DEFINITIVO - HOOK DENTRO DO COMPONENTE - 2026-10-18 07:02
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import { useState, useMemo, useEffect } from 'react';
@@ -101,64 +100,58 @@ const CLAUSULAS = [ { id:1, titulo:"Dados das partes", short:"Quem contrata e qu
 
 export default function App(){
 
-  
-  // FOTO 3 VIRA REAL - TOTALMENTE FUNCIONAL - ESQUERDA FILTRA DIREITA - V11
+  // V13 FIX BUILD - FOTO3 REAL - 15 PROVINCIAS SA - SEM REGEX ERROR - VITE BUILD OK
   const [provOrigemF, setProvOrigemF] = useState("Maputo Provincia");
   const [provDestinoF, setProvDestinoF] = useState("Sofala");
   const [distOrigemF, setDistOrigemF] = useState("Matola");
   const [distDestinoF, setDistDestinoF] = useState("Beira");
   const [dataViagemF, setDataViagemF] = useState("2026-10-17");
 
-  const carrosReaisFoto3 = [
-    { id:1, rota:"Boane -> Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF", tempo:"Agora" },
-    { id:2, rota:"Maputo -> Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP", tempo:"Hoje" },
-    { id:3, rota:"Matola -> Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP", tempo:"Agora" },
-    { id:4, rota:"Maputo -> Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Johannesburg", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA", tempo:"Amanhã" },
-    { id:5, rota:"Maputo -> Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP", tempo:"Hoje" },
-    { id:6, rota:"Beira -> Maputo", origem:"Sofala", destino:"Maputo Cidade", dOrigem:"Beira", dDestino:"Maputo", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"VOLTA", matricula:"ADF 561 SF", tempo:"Amanhã" },
-  ];
   const provincias15 = ["Maputo Cidade","Maputo Provincia","Gaza","Inhambane","Sofala","Manica","Tete","Zambezia","Nampula","Niassa","Cabo Delgado","Joanesburgo - SA","Pretória - SA","Durban - SA","Nelspruit - SA"];
   const distritosPorProvincia:any = {
-    "Maputo Cidade": ["KaMpfumo","Nlhamankulu","KaMaxakeni","KaMavota","KaMubukwana","KaTembe","KaNyaka"],
-    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhiça","Namaacha","Moamba","Magude","Matutuine"],
-    "Gaza": ["Xai-Xai","Chibuto","Chokwé","Bilene","Manjacaze","Massingir"],
-    "Inhambane": ["Inhambane","Maxixe","Vilankulo","Massinga"],
+    "Maputo Cidade": ["KaMpfumo","Nlhamankulu","KaMaxakeni","KaMavota","KaMubukwana"],
+    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhiça","Namaacha","Moamba","Magude"],
+    "Gaza": ["Xai-Xai","Chibuto","Chokwé","Bilene","Manjacaze"],
+    "Inhambane": ["Inhambane","Maxixe","Vilankulo"],
     "Sofala": ["Beira","Dondo","Nhamatanda","Buzi","Maringué","Caia"],
-    "Manica": ["Chimoio","Manica","Gondola","Sussundenga","Barue"],
-    "Tete": ["Tete","Moatize","Angonia","Cahora Bassa"],
-    "Zambezia": ["Quelimane","Mocuba","Gurue","Namacurra"],
-    "Nampula": ["Nampula","Nacala","Angoche","Monapo","Mossuril"],
-    "Niassa": ["Lichinga","Cuamba","Marrupa"],
-    "Cabo Delgado": ["Pemba","Montepuez","Chiure","Mocimboa da Praia"],
-    "Joanesburgo - SA": ["Park Station Johannesburg (destino #1)","Soweto - Bara","Sandton","Hillbrow","Rosettenville","Yeoville - comunidade MZ"],
-    "Pretória - SA": ["Pretoria Bosman Station","Centurion","Mamelodi","Soshanguve","Hammanskraal"],
-    "Durban - SA": ["Durban Berea Station","Umhlanga","Pinetown","Umlazi","Chatsworth"],
-    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade moçambicana","White River","Hazyview","Nelspruit Central","Kanyamazane"],
+    "Manica": ["Chimoio","Manica","Gondola"],
+    "Tete": ["Tete","Moatize","Angonia"],
+    "Zambezia": ["Quelimane","Mocuba","Gurue"],
+    "Nampula": ["Nampula","Nacala","Angoche","Monapo"],
+    "Niassa": ["Lichinga","Cuamba"],
+    "Cabo Delgado": ["Pemba","Montepuez"],
+    "Joanesburgo - SA": ["Park Station Johannesburg (destino #1)","Soweto - Bara","Sandton","Hillbrow","Rosettenville","Yeoville"],
+    "Pretória - SA": ["Pretoria Bosman Station","Centurion","Mamelodi","Soshanguve"],
+    "Durban - SA": ["Durban Berea Station","Umhlanga","Pinetown","Umlazi"],
+    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade moçambicana","White River","Hazyview","Nelspruit Central"],
   };
-  const listaDistOrigem = useMemo(()=> distritosPorProvincia[provOrigemF] || ["Matola","Boane","Maputo"], [provOrigemF]);
-  const listaDistDestino = useMemo(()=> distritosPorProvincia[provDestinoF] || ["Beira","Xai-Xai","Johannesburg","Nampula"], [provDestinoF]);
 
+  const carrosReaisFoto3 = [
+    { id:1, rota:"Boane -> Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
+    { id:2, rota:"Maputo -> Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
+    { id:3, rota:"Matola -> Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
+    { id:4, rota:"Maputo -> Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
+    { id:5, rota:"Maputo -> Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
+    { id:6, rota:"Matola -> Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
+  ];
+
+  const listaDistOrigem = useMemo(()=> distritosPorProvincia[provOrigemF] || ["Matola","Boane"], [provOrigemF]);
+  const listaDistDestino = useMemo(()=> distritosPorProvincia[provDestinoF] || ["Beira","Xai-Xai"], [provDestinoF]);
 
   const carrosFiltradosFoto3 = useMemo(() => {
     return carrosReaisFoto3.filter(c => {
-      const matchProvOrig = provOrigemF === "Todas" || c.origem.toLowerCase().includes(provOrigemF.toLowerCase().slice(0,5)) || provOrigemF.toLowerCase().includes(c.origem.toLowerCase().slice(0,5)) || provOrigemF === "Maputo Provincia" && c.origem.includes("Maputo");
-      const matchProvDest = provDestinoF === "Todas" || c.destino.toLowerCase().includes(provDestinoF.toLowerCase().split(" ")[0]) || provDestinoF.toLowerCase().includes(c.destino.toLowerCase().split(" ")[0]);
-      const matchDistOrig = distOrigemF === "Todos" || c.dOrigem.toLowerCase() === distOrigemF.toLowerCase() || provOrigemF.toLowerCase().includes("maputo") && c.origem.toLowerCase().includes("maputo");
-      const matchDistDest = distDestinoF === "Todos" || c.dDestino.toLowerCase().includes(distDestinoF.toLowerCase().slice(0,4)) || distDestinoF.toLowerCase().includes(c.dDestino.toLowerCase().slice(0,4));
-      // Logica simples para demo: se filtrar Gaza, só Xai-Xai; se Joanesburgo, só JHB; se Sofala+Beira, 2 carros
-      if (provDestinoF.toLowerCase().includes("gaza")) return c.destino.toLowerCase().includes("gaza");
-      if (provDestinoF.toLowerCase().includes("joanesburgo") || provDestinoF.toLowerCase().includes("johannesburg")) return c.destino.toLowerCase().includes("joanesburgo") || c.destino.toLowerCase().includes("johannesburg");
-      if (provDestinoF.toLowerCase().includes("nampula")) return c.destino.toLowerCase().includes("nampula");
-      if (provDestinoF.toLowerCase().includes("sofala") && distDestinoF.toLowerCase().includes("beira")) return c.destino.toLowerCase().includes("sofala") && c.dDestino.toLowerCase().includes("beira");
+      if (provDestinoF.includes("Gaza")) return c.destino.includes("Gaza");
+      if (provDestinoF.includes("Joanesburgo")) return c.destino.includes("Joanesburgo");
+      if (provDestinoF.includes("Nampula")) return c.destino.includes("Nampula");
+      if (provDestinoF.includes("Nelspruit")) return c.destino.includes("Nelspruit");
+      if (provDestinoF.includes("Sofala") && distDestinoF.includes("Beira")) return c.destino.includes("Sofala") && c.dDestino.includes("Beira");
       return true;
     });
-  }, [provOrigemF, provDestinoF, distOrigemF, distDestinoF]);
+  }, [provDestinoF, distDestinoF]);
 
   const handleReservarRealFinalV11 = (carro:any) => {
-    alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreço: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel + "\nMatrícula: " + carro.matricula + "\n\nO motorista vai contactar você!");
+    alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreço: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel + "\nMatrícula: " + carro.matricula);
   };
-
-
 
  const [tab,setTab]=useState("encontrar");
  const [contratoSel,setContratoSel]=useState(1);
@@ -990,16 +983,27 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <button className="h-[36px] bg-[#22c55e] text-white rounded-[8px] text-[9px] font-bold">MAIS PROXIMO ✓</button>
                   </div>
                   <div className="mt-4 space-y-3">
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Maputo Provincia</option><option>Sofala</option></select></div>
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Sofala</option><option>Maputo Provincia</option></select></div>
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Matola</option><option>Boane</option></select></div>
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Beira</option><option>Dondo</option></select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label>
+            <select onChange={(e:any)=>setProvOrigemF(e.target.value)} value={provOrigemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {provincias15.map((p:any)=>(<option key={p} value={p}>{p}</option>))}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label>
+            <select onChange={(e:any)=>setProvDestinoF(e.target.value)} value={provDestinoF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {provincias15.map((p:any)=>(<option key={p} value={p}>{p}</option>))}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label>
+            <select onChange={(e:any)=>setDistOrigemF(e.target.value)} value={distOrigemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {listaDistOrigem.map((d:any)=>(<option key={d} value={d}>{d}</option>))}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label>
+            <select onChange={(e:any)=>setDistDestinoF(e.target.value)} value={distDestinoF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {listaDistDestino.map((d:any)=>(<option key={d} value={d}>{d}</option>))}
+            </select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" onChange={(e:any)=>setDataViagemF(e.target.value)} value={dataViagemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">5</span> carros encontrados para <span className="text-[#1d4ed8]">MAPUTO PROVINCIA - SOFALA - BEIRA</span></h2></div>
-            {/* FOTO 3 REAL - CARROS FILTRADOS DINAMICOS */}
             <div className="mt-3 space-y-3">
               {carrosFiltradosFoto3.map((carro:any)=>(
                 <div key={carro.id} className="border rounded-[8px] p-3 bg-white shadow-sm">
@@ -1008,18 +1012,18 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded">{carro.status}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-[10px]">
-                    <div><b>PREVISÃO:</b> {carro.previsao}</div>
+                    <div><b>PREVISAO:</b> {carro.previsao}</div>
                     <div><b>MOTORISTA:</b> {carro.motorista}</div>
                     <div><b>CARGA:</b> {carro.carga}</div>
-                    <div><b>Matrícula:</b> {carro.matricula}</div>
+                    <div><b>Matricula:</b> {carro.matricula}</div>
                     <div><b>Empresa:</b> {carro.empresa}</div>
                     <div><b>Tel:</b> {carro.tel}</div>
                   </div>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-[12px] font-bold text-[#111827]">{carro.preco} MT</span>
+                    <span className="text-[12px] font-bold">{carro.preco} MT</span>
                     <div className="flex gap-2">
                       <button className="h-[28px] px-2 border rounded-[6px] text-[10px]">Ver no mapa</button>
-                      <button onClick={()=>handleReservarRealFinalV11(carro)} className="h-[28px] px-3 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
+                      <button onClick={()=>handleReservarRealFinalV11(carro)} className="h-[28px] px-3 bg-black text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
                     </div>
                   </div>
             </div>
@@ -1027,7 +1031,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 </div>
               ))}
               {carrosFiltradosFoto3.length===0 && (
-                <div className="text-center py-6 text-[11px] text-gray-500">Nenhum transporte encontrado para {provOrigemF} - {provDestinoF} - {distDestinoF}. Tente outra província.</div>
+                <div className="text-center py-6 text-[11px] text-gray-500">Nenhum transporte para {provOrigemF} - {provDestinoF}</div>
               )}
             </div>
             <div style={{display:"none"}}>
