@@ -1103,7 +1103,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 </div>
               </div>
 
-                            {mostrarFormPass && viagemSel && (
+                            {mostrarFormPass && viagemSel ? (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
                   <div className="bg-white rounded-[12px] max-w-[900px] w-full max-h-[90vh] overflow-y-auto p-4 border-2 border-[#0ea5e9]">
                     <div className="flex justify-between items-center mb-3"><h3 className="font-black text-[11px]">Reservar {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} - {viagemSel.preco||2500} MT - Escolher lugar/assento - COMO IMAGEM AMARELO E ROXO - Visao Geral Full</h3><button onClick={()=>setMostrarFormPass(false)} className="w-7 h-7 bg-[#f1f5f9] rounded-full">X</button></div>
@@ -1216,7 +1216,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     </div>
                   ))}
                 </div>
-                                {mostrarFormPass && false && (<div></div>)}
+                                {mostrarFormPass && false ? (<div></div>)}
 
               <div className="w-full lg:w-[300px] space-y-3">
                 <div className="bg-[#111827] rounded-[12px] p-4 text-white"><div className="font-bold text-[11px]">Area transportador</div><div className="text-[9px] text-white/50 mt-2">Gerir viagens e viaturas, uma conta gere 15 viaturas. Active viaturas para aparecer na pesquisa. Como na imagem 1 - botao amarelo AREA TRANSPORTADOR no topo direito circulado azul.</div><button onClick={()=>setViagensTab('area')} className="mt-3 w-full h-9 bg-[#facc15] text-black rounded-[8px] text-[10px] font-black">Ir para Area Transportador</button></div>
