@@ -966,7 +966,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Beira</option><option>Dondo</option></select></div>
                                         <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label>
             <input type="date" onChange={(e)=>setDataViagem(e.target.value)} value={dataViagem} className="w-full p-2 border rounded-lg text-sm" />
-            <!-- hidden select removed --></div>
+            </div>
                   </div>
                 </div>
                 <div className="space-y-3">
