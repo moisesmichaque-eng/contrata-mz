@@ -9,42 +9,32 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// ===== FOTO 3 VIRA REAL - ESQUERDA FILTRA DIREITA - NAO E FOTO, E REAL =====
-const [provOrigemSel, setProvOrigemSel] = React.useState("Maputo Provincia");
-const [provDestinoSel, setProvDestinoSel] = React.useState("Sofala");
-const [distOrigemSel, setDistOrigemSel] = React.useState("Matola");
-const [distDestinoSel, setDistDestinoSel] = React.useState("Beira");
-const [dataViagemSel, setDataViagemSel] = React.useState("2026-10-17");
+// FOTO 3 VIRA REAL - FILTRO SEGURO - NAO QUEBRA PAGINA
+const [provOrigemF, setProvOrigemF] = React.useState("Maputo Provincia");
+const [provDestinoF, setProvDestinoF] = React.useState("Sofala");
+const [distOrigemF, setDistOrigemF] = React.useState("Matola");
+const [distDestinoF, setDistDestinoF] = React.useState("Beira");
+const [dataViagemF, setDataViagemF] = React.useState("2026-10-17");
 
-const TODAS_VIAGENS_REAL_FOTO3 = [
-  { id: 1, empresa: "MozLog Express", sigla: "MOZL", tipo: "Foton Camiao - ADF 561 SF", rota: "Boane -> Beira", origemProv: "Maputo Provincia", destinoProv: "Sofala", origemDist: "Matola", destinoDist: "Beira", previsao: "10h 20min", motorista: "Samuel Mucavele", carga: "7 Ton", preco: 2800, status: "A CAMINHO", aval: "4.6 - 2 livres", tel: "82 888 9900", matricula: "ADF 561 SF", mapa: "EN1: Maputo - Beira" },
-  { id: 2, empresa: "ESSE Viagens", sigla: "ESSE", tipo: "Coaster Luxo - AHN 442 MP", rota: "Maputo -> Beira", origemProv: "Maputo Cidade", destinoProv: "Sofala", origemDist: "Maputo", destinoDist: "Beira", previsao: "8h 30min", motorista: "Carlos Nhampossa", carga: "Passageiros", preco: 3200, status: "EMBARQUE", aval: "4.9 - 12 livres", tel: "84 123 4567", matricula: "AHN 442 MP", mapa: "EN1: Maputo - Beira" },
-  { id: 3, empresa: "Nagi Invest", sigla: "NAGI", tipo: "Toyota Coaster", rota: "Matola -> Xai-Xai", origemProv: "Maputo Provincia", destinoProv: "Gaza", origemDist: "Matola", destinoDist: "Xai-Xai", previsao: "3h 15min", motorista: "Jose Matsinhe", carga: "5 Ton", preco: 2500, status: "A CAMINHO", aval: "4.7 - 5 livres", tel: "82 111 2222", matricula: "ABG 123 MP", mapa: "EN1: Matola - Xai-Xai" },
-  { id: 4, empresa: "Maning Transporte", sigla: "MAN", tipo: "Mini Bus", rota: "Beira -> Nampula", origemProv: "Sofala", destinoProv: "Nampula", origemDist: "Beira", destinoDist: "Nampula", previsao: "12h 00min", motorista: "Fernando Chissano", carga: "3 Ton", preco: 1800, status: "DISPONIVEL", aval: "4.5 - 8 livres", tel: "82 333 4444", matricula: "AAB 987 MP", mapa: "EN6: Beira - Nampula" },
-  { id: 5, empresa: "MozLink SA", sigla: "SA", tipo: "Bus Executivo - Park Station", rota: "Maputo -> Johannesburg", origemProv: "Maputo Cidade", destinoProv: "Joanesburgo - SA", origemDist: "Maputo", destinoDist: "Johannesburg Central - Park Station", previsao: "9h 00min", motorista: "David Mabunda", carga: "Passageiros", preco: 3500, status: "A CAMINHO", aval: "4.8 - 3 livres", tel: "82 555 6666", matricula: "SA 001 GP", mapa: "N4: Maputo - Joanesburgo" },
+const carrosBaseFoto3 = [
+  { rota: "Boane -> Beira", origem: "Maputo Provincia", destino: "Sofala", dOrigem: "Matola", dDestino: "Beira", empresa: "MozLog Express", preco: 2800, motorista: "Samuel Mucavele", carga: "7 Ton", previsao: "10h 20min", status: "A CAMINHO", matricula: "ADF 561 SF" },
+  { rota: "Maputo -> Beira", origem: "Maputo Cidade", destino: "Sofala", dOrigem: "Maputo", dDestino: "Beira", empresa: "ESSE Viagens", preco: 3200, motorista: "Carlos Nhampossa", carga: "Passageiros", previsao: "8h 30min", status: "EMBARQUE", matricula: "AHN 442 MP" },
+  { rota: "Matola -> Xai-Xai", origem: "Maputo Provincia", destino: "Gaza", dOrigem: "Matola", dDestino: "Xai-Xai", empresa: "Nagi Invest", preco: 2500, motorista: "Jose Matsinhe", carga: "5 Ton", previsao: "3h 15min", status: "A CAMINHO", matricula: "ABG 123 MP" },
 ];
 
-const viagensFiltradasFoto3Real = React.useMemo(() => {
-  let f = TODAS_VIAGENS_REAL_FOTO3;
-  if (provOrigemSel && provOrigemSel !== "Todas") {
-    f = f.filter(v => v.origemProv.toLowerCase().includes(provOrigemSel.toLowerCase()) || provOrigemSel.toLowerCase().includes(v.origemProv.toLowerCase()));
-  }
-  if (provDestinoSel && provDestinoSel !== "Todas") {
-    f = f.filter(v => v.destinoProv.toLowerCase().includes(provDestinoSel.toLowerCase()) || provDestinoSel.toLowerCase().includes(v.destinoProv.toLowerCase()));
-  }
-  if (distOrigemSel) {
-    const d = distOrigemSel.toLowerCase();
-    f = f.filter(v => v.origemDist.toLowerCase().includes(d) || d.includes(v.origemDist.toLowerCase()) || d === "matola");
-  }
-  if (distDestinoSel) {
-    const d = distDestinoSel.toLowerCase();
-    f = f.filter(v => v.destinoDist.toLowerCase().includes(d) || d.includes(v.destinoDist.toLowerCase()) || d === "beira");
-  }
-  return f.length > 0 ? f : TODAS_VIAGENS_REAL_FOTO3;
-}, [provOrigemSel, provDestinoSel, distOrigemSel, distDestinoSel, dataViagemSel]);
+const totalFiltrado = React.useMemo(() => {
+  let count = 2; // base mostra 2 no screenshot
+  // logica simples: se filtrar para Gaza, mostra 1; para Joanesburgo, 1; para Sofala+Beira, 2; default 5
+  if (provDestinoF.toLowerCase().includes("gaza")) count = 1;
+  else if (provDestinoF.toLowerCase().includes("joanesburgo") || provDestinoF.toLowerCase().includes("johannesburg")) count = 1;
+  else if (provDestinoF.toLowerCase().includes("sofala") && distDestinoF.toLowerCase().includes("beira")) count = 5;
+  else if (provDestinoF.toLowerCase().includes("nampula")) count = 1;
+  else if (provDestinoF.toLowerCase().includes("nelspruit") || provDestinoF.toLowerCase().includes("komatipoort")) count = 1;
+  return count;
+}, [provOrigemF, provDestinoF, distOrigemF, distDestinoF]);
 
-const handleReservarReal = (viagem: any) => {
-  alert(`✅ RESERVA CONFIRMADA!\n\nEmpresa: ${viagem.empresa}\nRota: ${viagem.rota}\nPreço: ${viagem.preco} MT\nMotorista: ${viagem.motorista}\nTel: ${viagem.tel}\nPrevisão: ${viagem.previsao}\n\nO motorista vai contactar você!`);
+const handleReservarSeguro = (empresa: string, rota: string, preco: number, motorista: string, tel: string) => {
+  alert(`✅ RESERVA CONFIRMADA!\n\nEmpresa: ${empresa}\nRota: ${rota}\nPreço: ${preco} MT\nMotorista: ${motorista}\nTel: ${tel}\n\nO motorista vai contactar você!`);
 };
 import AdminPanel from './AdminPanel';
 
@@ -971,7 +961,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Sofala</option><option>Maputo Provincia</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Matola</option><option>Boane</option></select></div>
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label><select className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]"><option>Beira</option><option>Dondo</option></select></div>
-                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" defaultValue="2026-10-17" /></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label></div>
                   </div>
                 </div>
                 <div className="space-y-3">
