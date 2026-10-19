@@ -914,45 +914,38 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         {/* CLAUSULA 10 - ANEXOS - LIMPO */}
         {clausulaAtiva===10 && <div className="space-y-4">
           <div className="font-black text-[13px]">CLAUSULA 10: ANEXOS (ANTES VALIDADE) - Prova legal</div>
-          <div className="text-[10px] text-gray-500">Esquerda seleciona na lista o documento que quer anexar. Direita anexa + logo tipo - Como pediu</div>
+          <div className="text-[10px] text-gray-500">Esquerda seleciona na lista. Direita anexa + logo tipo - Fix tela branca</div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="border-2 border-[#1e2f4a] rounded-xl p-3 bg-[#f8fafc]">
               <div className="font-black text-[11px] mb-2">ESQUERDA - SELECIONA NA LISTA</div>
               <div className="space-y-1.5">
-                {[
-                  {id:'bi_contratante', label:'Foto BI Contratante', desc: formContrato.empNome + ' - BI ' + formContrato.empBI, icon:'🪪'},
-                  {id:'bi_contratado', label:'Foto BI Contratado', desc: formContrato.trabNome + ' - BI ' + formContrato.trabBI, icon:'🪪'},
-                  {id:'foto_local', label:'Foto do local', desc: formContrato.localTrab, icon:'📸'},
-                  {id:'nuit_contratante', label:'NUIT Contratante (opcional)', desc:'NUIT Frente', icon:'📄'},
-                  {id:'nuit_contratado', label:'NUIT Contratado (opcional)', desc:'NUIT Frente', icon:'📄'},
-                  {id:'comprovativo_mpesa', label:'Comprovativo M-Pesa', desc: formContrato.valor + ' MZN - ' + formContrato.formaPag, icon:'💳'},
-                  {id:'foto_obra', label:'Foto obra / local', desc:'Prova antes de começar', icon:'🏗️'},
-                  {id:'cv', label:'CV / Certificado', desc:'Curriculum profissional', icon:'📜'},
-                  {id:'logo_tipo', label:'Logo Tipo / Empresa', desc:'Logo empresa no contrato', icon:'🏢'},
-                  {id:'outro', label:'Outro documento', desc:'Outro comprovativo', icon:'📎'},
-                ].map((doc:any)=>(
-                  <button key={doc.id} onClick={()=>setDocSelecionadoAnexo(doc.id)} className={`w-full text-left p-2.5 rounded-lg border-2 flex items-start gap-2 ${docSelecionadoAnexo===doc.id ? 'bg-[#1e2f4a] text-white border-[#1e2f4a]' : 'bg-white border-[#e2e8f0]'}`}>
-                    <span>{doc.icon}</span>
-                    <div className="flex-1"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) ? '✅' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
-                  </button>
-                ))}
+                <button onClick={()=>setDocSelecionadoAnexo('bi_contratante')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='bi_contratante' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>🪪</span> <b className="text-[11px]">Foto BI Contratante {formContrato?.anexos?.find((a:any)=>a.tipo==='bi_contratante') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('bi_contratado')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='bi_contratado' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>🪪</span> <b className="text-[11px]">Foto BI Contratado {formContrato?.anexos?.find((a:any)=>a.tipo==='bi_contratado') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('foto_local')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='foto_local' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>📸</span> <b className="text-[11px]">Foto do local {formContrato?.anexos?.find((a:any)=>a.tipo==='foto_local') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('nuit_contratante')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='nuit_contratante' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>📄</span> <b className="text-[11px]">NUIT Contratante {formContrato?.anexos?.find((a:any)=>a.tipo==='nuit_contratante') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('nuit_contratado')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='nuit_contratado' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>📄</span> <b className="text-[11px]">NUIT Contratado {formContrato?.anexos?.find((a:any)=>a.tipo==='nuit_contratado') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('comprovativo_mpesa')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='comprovativo_mpesa' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>💳</span> <b className="text-[11px]">Comprovativo M-Pesa {formContrato?.anexos?.find((a:any)=>a.tipo==='comprovativo_mpesa') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('foto_obra')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='foto_obra' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>🏗️</span> <b className="text-[11px]">Foto obra / local {formContrato?.anexos?.find((a:any)=>a.tipo==='foto_obra') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('cv')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='cv' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>📜</span> <b className="text-[11px]">CV / Certificado {formContrato?.anexos?.find((a:any)=>a.tipo==='cv') ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('logo_tipo')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='logo_tipo' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>🏢</span> <b className="text-[11px]">Logo Tipo / Empresa {formContrato?.anexos?.find((a:any)=>a.tipo==='logo_tipo') ? '✅' : ''} {formContrato?.logoData ? '✅' : ''}</b></button>
+                <button onClick={()=>setDocSelecionadoAnexo('outro')} className={`w-full text-left p-2.5 rounded-lg border-2 ${docSelecionadoAnexo==='outro' ? 'bg-[#1e2f4a] text-white' : 'bg-white'}`}><span>📎</span> <b className="text-[11px]">Outro documento {formContrato?.anexos?.find((a:any)=>a.tipo==='outro') ? '✅' : ''}</b></button>
               </div>
-              <div className="mt-3 p-2 bg-white border rounded text-[9px]">Total: {formContrato.anexos.length} ficheiros - BI e NUIT opcional mantido</div>
+              <div className="mt-3 p-2 bg-white border rounded text-[9px]">Total: {formContrato?.anexos?.length || 0} ficheiros - BI e NUIT opcional</div>
             </div>
             <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
               <div className="font-black text-[11px] mb-2">DIREITA - ANEXAR + LOGO TIPO</div>
-              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione à esquerda'}</div>
+              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {(docSelecionadoAnexo || 'nenhum').toUpperCase()}</div>
               <div className="space-y-3">
                 <div>
                   <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo) 🏢</label>
                   <div className="mt-1 flex gap-2">
-                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc]">{formContrato.logoData ? "✅ Logo" : "🏢"}</div>
+                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] text-[10px]">{formContrato?.logoData ? '✅ Logo' : '🏢'}</div>
                     <div className="flex-1">
-                      <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
+                      <input value={formContrato?.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                       <div className="flex gap-1 mt-1">
-                        <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">📎 Anexar Logo</button>
-                        <input id="inputLogoTipo" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name})); r.readAsDataURL(f); }}} />
-                        <span className="text-[9px] text-gray-500">{formContrato.logoData ? '✅ Logo ok' : 'PNG/JPG'}</span>
+                        <button onClick={()=>document.getElementById('inputLogoTipoV51')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">📎 Anexar Logo</button>
+                        <input id="inputLogoTipoV51" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>{ setFormContrato({...formContrato, logoData:r.result, logoTipo: formContrato.logoTipo || f.name}); }; r.readAsDataURL(f); }}} />
+                        <span className="text-[9px] text-gray-500">{formContrato?.logoData ? '✅ Logo ok' : 'PNG/JPG'}</span>
                       </div>
                     </div>
                   </div>
@@ -961,18 +954,18 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione à esquerda'}</label>
                   <div className="mt-1 border-2 border-dashed border-[#25D366] rounded-xl p-4 bg-[#f0fdf4] text-center">
                     <div className="text-[20px]">📎</div>
-                    <div className="text-[11px] font-bold mt-1">Clica para anexar {docSelecionadoAnexo}</div>
-                    <input type="file" accept="image/*,.pdf" className="mt-2 text-[10px]" onChange={e=>{ const file=e.target.files?.[0]; if(!file || !docSelecionadoAnexo) return; const reader=new FileReader(); reader.onload=()=>{ const novo={tipo:docSelecionadoAnexo, nome:file.name, label:docSelecionadoAnexo, data:reader.result, tamanho:file.size}; setFormContrato((prev:any)=>({...prev, anexos:[...prev.anexos.filter((a:any)=>a.tipo!==docSelecionadoAnexo), novo]})); }; reader.readAsDataURL(file); }} />
+                    <div className="text-[11px] font-bold mt-1">Clica para anexar {(docSelecionadoAnexo || '').toUpperCase()}</div>
+                    <input type="file" accept="image/*,.pdf" className="mt-2 text-[10px]" onChange={e=>{ const file=e.target.files?.[0]; if(!file || !docSelecionadoAnexo) return; const reader=new FileReader(); reader.onload=()=>{ const novo={tipo:docSelecionadoAnexo, nome:file.name, label:docSelecionadoAnexo, data:reader.result, tamanho:file.size}; setFormContrato({...formContrato, anexos:[...(formContrato.anexos || []).filter((a:any)=>a.tipo!==docSelecionadoAnexo), novo]}); }; reader.readAsDataURL(file); }} />
                   </div>
                 </div>
                 <div className="space-y-1 max-h-[160px] overflow-y-auto">
-                  {formContrato.anexos.map((anexo:any, idx:number)=>(
+                  {(formContrato?.anexos || []).map((anexo:any, idx:number)=>(
                     <div key={idx} className="flex items-center gap-2 p-2 bg-[#f8fafc] border rounded-lg text-[10px]">
                       <div className="flex-1 truncate"><b>{anexo.tipo}</b> - {anexo.nome}</div>
-                      <button onClick={()=>setFormContrato((prev:any)=>({...prev, anexos: prev.anexos.filter((_:any,i:number)=>i!==idx)}))} className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px]">X</button>
+                      <button onClick={()=>setFormContrato({...formContrato, anexos: (formContrato.anexos || []).filter((_:any,i:number)=>i!==idx)})} className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px]">X</button>
                     </div>
                   ))}
-                  {formContrato.anexos.length===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione à esquerda e anexe à direita. BI e NUIT opcional.</div>}
+                  {(formContrato?.anexos?.length || 0)===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione à esquerda e anexe à direita. BI e NUIT opcional.</div>}
                 </div>
               </div>
             </div>
