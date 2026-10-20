@@ -916,12 +916,19 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         
         {clausulaAtiva===10 && (
           <div className="space-y-3">
-            <div className="bg-[#1e2f4a] text-white rounded-xl p-3 flex justify-between items-center">
-              <div>
-                <div className="font-black text-[12px]">Área Transportador - esse - Painel</div>
-                <div className="text-[9px] opacity-80">Minha frota: 1 conta gere várias viaturas | Maputo, Beira, Nampula, Johannesburg</div>
+            <div className="bg-[#1e2f4a] text-white rounded-xl p-3">
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="font-black text-[12px]">Área Transportador - esse - Painel - PROTÓTIPO NO VERMELHO</div>
+                  <div className="text-[9px] opacity-80">Minha frota: 1 conta gere várias viaturas | Maputo, Beira, Nampula, Johannesburg</div>
+                </div>
+                <button className="bg-white text-[#1e2f4a] text-[9px] font-bold px-2 py-1 rounded-full">Sair</button>
               </div>
-              <button className="bg-white text-[#1e2f4a] text-[9px] font-bold px-2 py-1 rounded-full">Sair</button>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button onClick={()=>setTransportadorTab('viaturas')} className={`h-10 rounded-xl font-black text-[11px] border-2 ${transportadorTab==='viaturas' ? 'bg-[#d4a44a] text-[#1e2f4a] border-[#d4a44a]' : 'bg-white text-[#1e2f4a] border-white'}`}>🚐 Minhas Viaturas ({viaturas.length}) - Rota + Localidades + Valor</button>
+                <button onClick={()=>setTransportadorTab('gestao')} className={`h-10 rounded-xl font-black text-[11px] border-2 ${transportadorTab==='gestao' ? 'bg-[#d4a44a] text-[#1e2f4a] border-[#d4a44a]' : 'bg-white text-[#1e2f4a] border-white'}`}>📊 Gestão - Assentos Amarelo bloqueia + Combustível + Revisão</button>
+              </div>
+              <div className="mt-2 text-[8px] bg-[#d4a44a] text-[#1e2f4a] rounded px-2 py-1 font-bold">↑ PROTÓTIPO COLOCADO AQUI NO VERMELHO - 2 TELAS INTERATIVAS ÚTEIS DONO TRANSPORTE</div>
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-1">
