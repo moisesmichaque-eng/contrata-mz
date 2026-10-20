@@ -14,6 +14,8 @@ import AdminPanel from './AdminPanel';
 const LOGO_ESSE = "data:image/png;base64,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";
 const LOGO_ESSE_DARK = "data:image/png;base64,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";
 
+
+
 const PAISES: any = {
   "Mocambique": ["Maputo Cidade","Matola","Boane","Gaza - Xai-Xai","Inhambane","Sofala - Beira","Nampula","Tete","Zambezia - Quelimane","Cabo Delgado - Pemba"],
   "South Africa": ["Gauteng - Johannesburg","Western Cape - Cape Town","KZN - Durban"],
@@ -154,7 +156,25 @@ export default function App(){
 
  const [tab,setTab]=useState("encontrar");
  const [contratoSel,setContratoSel]=useState(1);
- const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('');
+ const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('')
+  const [transportadorTab, setTransportadorTab] = useState<'viaturas'|'gestao'>('viaturas')
+  const [novaViatura, setNovaViatura] = useState<any>({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''})
+  const [localidadeInput, setLocalidadeInput] = useState('')
+  const [viagemSelecionada, setViagemSelecionada] = useState<any>({id:1, rota:'Maputo - Xai-Xai', data:'2026-10-20', hora:'06:00', viaturaId:1, motorista:'Artur Zimba', origem:'Maputo', destino:'Xai-Xai'})
+  const [assentos, setAssentos] = useState<any[]>(Array.from({length:29}, (_,i)=>({numero:i+1, estado:'livre'})))
+  const [reservasPendentes, setReservasPendentes] = useState<any[]>([
+    {id:1, assento:5, nome:'Joao Mabote', tel:'84 123 4567', mpesa:'PP231020.1234.A12345', valor:1500, estado:'por_aprovar'},
+  ])
+  const [combustivel, setCombustivel] = useState<any[]>([
+    {id:1, data:'2026-10-19', litros:80, valor:6500, local:'Petromoc Xai-Xai', km:145230},
+  ])
+  const [revisoes, setRevisoes] = useState<any[]>([
+    {id:1, data:'2026-10-10', local:'Oficina Nagi - Xai-Xai', tipo:'Revisão geral', custo:12000},
+  ])
+  const [assentoSelecionado, setAssentoSelecionado] = useState<number|null>(null)
+  const [showReservaModal, setShowReservaModal] = useState(false)
+  const [novaReserva, setNovaReserva] = useState<any>({nome:'', tel:'', mpesa:'', valor:1500})
+;
   const [clausulaAtiva,setClausulaAtiva]=useState(4);
  const [tipoCadastro,setTipoCadastro]=useState("prof");
  const [filtroBusca,setFiltroBusca]=useState("");
@@ -374,8 +394,8 @@ export default function App(){
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
  const [viagensMock, setViagensMock] = useState([
-   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
+   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - MMB-456-MP-NOVA', matricula:'MMB-456-MP-NOVA', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - MMB-456-MP-NOVA', matricula:'MMB-456-MP-NOVA', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
    {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
    {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
  ]);
@@ -407,17 +427,17 @@ useEffect(()=>{
   document.addEventListener('click', intercept, true);
   return ()=>document.removeEventListener('click', intercept, true);
 }, [transportadorLoginForm, transportadorPerfil]);
- const [viaturas, setViaturas] = useState([
-   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
-   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
+ const [viaturas, setFrotaViaturas] = useState([
+   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'MMA-123-MP-NOVA', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
+   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'MMB-456-MP-NOVA', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'MMC-789-MP', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
  ] as any);
 
  // filtered list shown on PESQUISAR VIAGENS
  const [filteredViagens, setFilteredViagens] = useState<any[]>([]);
  useEffect(()=>{
    try{
-     const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
+     const candidate = [...viagensMock, ...frotaViaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
      setFilteredViagens(candidate);
    }catch(e){setFilteredViagens([])}
  },[viagensMock, viaturas, transportadorPerfil]);
@@ -436,7 +456,7 @@ useEffect(()=>{
   },[]);
 
   const todosCarrosOverview = useMemo(()=>{
-    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
+    const extras = frotaViaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
       id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
       lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
       rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
@@ -475,6 +495,8 @@ useEffect(()=>{
  const [viagemSel, setViagemSel] = useState<any>(null);
  const [mostrarFormPass, setMostrarFormPass] = useState(false);
  const [mostrarFormEnc, setMostrarFormEnc] = useState(false);
+
+
 
  const [formContrato,setFormContrato]=useState({
   empNome:"Artur Simao Zimba", empBI:"110200011B", empTel:"823832513", empEnd:"Av. Principal, Xai-Xai",
@@ -559,9 +581,12 @@ ${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${
 - Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
 </div>
 
-<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3>
-<b>
-<b>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - </div><div class="assinatura-box contratado"><b>CONTRATADO - </b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - </div></div>
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
+<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
+<b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
+</div>
+
+<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE - ESQUERDA - HORIZONTAL</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - Esquerda horizontal</div><div class="assinatura-box contratado"><b>CONTRATADO - DIREITA - HORIZONTAL</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - Direita horizontal</div></div>
 
 <div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
 <b>ONDE ENCONTRAR PDF FINAL?</b><br>
@@ -572,7 +597,7 @@ ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id}
 </div>
 
 <div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;margin:5px">Lei 23/2007 - valido em Mocambique - 11 clausulas completas com dados das partes, todas as clausulas e assinaturas na horizontal ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id}</button>
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF - 11 CLAUSULAS COMPLETAS - ASSINATURAS NA HORIZONTAL</button>
 </div>
 </body></html>`;
    const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
@@ -643,16 +668,21 @@ body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;
 - Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
 </div>
 
-<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3>
-<b>
-<b><br>
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
+<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
+<b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
+</div>
+
+<div class="assinaturas-horizontal">
+<div class="assinatura-box contratante">
+<b>CONTRATANTE - ESQUERDA - HORIZONTAL - 1/2</b><br><br>
 ${formContrato.empNome} - BI ${formContrato.empBI}<br>
 CONCORDO em ${assinaturaContratante.data}<br>
 <div class="concordowpp">Eu, ${formContrato.empNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratante.data}</div>
 Assinatura na HORIZONTAL - Esquerda - 1 de 2
 </div>
 <div class="assinatura-box contratado">
-<b>CONTRATADO -  - 2/2</b><br><br>
+<b>CONTRATADO - DIREITA - HORIZONTAL - 2/2</b><br><br>
 ${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
 CONCORDO em ${assinaturaContratado.data}<br>
 <div class="concordowpp">Eu, ${formContrato.trabNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratado.data}</div>
@@ -901,90 +931,116 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         </div>}
 
         {/* CLAUSULA 10 - ANEXOS - LIMPO */}
+        
         {clausulaAtiva===10 && (
           <div className="space-y-4">
-            <div className="font-black text-[13px]">CLAUSULA 10: ANEXOS (ANTES VALIDADE) - Prova legal</div>
-            <div className="text-[10px] text-gray-500">Esquerda seleciona documento, direita anexa - Logo no topo esquerdo</div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <div className="border-2 border-[#1e2f4a] rounded-xl p-3 bg-[#f8fafc]">
-                <div className="font-black text-[11px] mb-2">SELECIONA O DOCUMENTO</div>
-                <div className="space-y-1.5">
-                  {[
-                    {id:'logo_tipo', label:'Logo Tipo / Marca', desc:'Topo esquerdo contrato', icon:'🏢'},
-                    {id:'bi_contratante', label:'Foto BI Contratante', desc: (formContrato.empNome || 'Contratante') + ' BI', icon:'🪪'},
-                    {id:'bi_contratado', label:'Foto BI Contratado', desc: (formContrato.trabNome || 'Contratado') + ' BI', icon:'🪪'},
-                    {id:'foto_local', label:'Foto do local', desc: formContrato.localTrab || 'Local', icon:'📸'},
-                    {id:'nuit_contratante', label:'NUIT Contratante', desc:'Opcional', icon:'📄'},
-                    {id:'nuit_contratado', label:'NUIT Contratado', desc:'Opcional', icon:'📄'},
-                    {id:'comprovativo_mpesa', label:'M-Pesa', desc: (formContrato.valor || '0') + ' MZN', icon:'💳'},
-                    {id:'foto_obra', label:'Foto obra', desc:'Prova', icon:'🏗️'},
-                    {id:'cv', label:'CV', desc:'Curriculum', icon:'📜'},
-                    {id:'outro', label:'Outro', desc:'Outro doc', icon:'📎'},
-                  ].map((doc:any)=>(
-                    <button key={doc.id} onClick={()=>setDocSelecionadoAnexo(doc.id)} className={`w-full text-left p-2.5 rounded-lg border-2 flex items-start gap-2 ${docSelecionadoAnexo===doc.id ? 'bg-[#1e2f4a] text-white border-[#1e2f4a]' : 'bg-white border-[#e2e8f0]'}`}>
-                      <span>{doc.icon}</span>
-                      <div className="flex-1 min-w-0"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) || (doc.id==='logo_tipo' && formContrato.logoData) ? '✅' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
-                    </button>
-                  ))}
+            <div className="font-black text-[13px]">CLAUSULA 10: TRANSPORTADOR - Frota e Gestão (Rota + Localidades) - V69</div>
+            <div className="text-[10px] text-green-600 font-bold">✓ Arquivo correto V69 - MMA-123-MP com rota e localidades</div>
+            <div className="flex gap-2">
+              <button onClick={()=>setTransportadorTab('viaturas')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='viaturas' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>🚐 Minhas Viaturas ({frotaViaturas.length})</button>
+              <button onClick={()=>setTransportadorTab('gestao')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='gestao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>📊 Minha Gestão</button>
+            </div>
+            {transportadorTab==='viaturas' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="border-2 border-[#1e2f4a] rounded-xl p-3 bg-[#f8fafc] space-y-3">
+                  <div className="font-black text-[11px]">REGISTO NOVA VIATURA - Com Rota e Localidades</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={novaViatura.matricula} onChange={e=>setNovaViatura({...novaViatura, matricula:e.target.value.toUpperCase()})} placeholder="Matrícula MMA-123-MP" className="h-9 px-2 border-2 rounded-lg text-[11px] font-bold" />
+                    <select value={novaViatura.tipo} onChange={e=>setNovaViatura({...novaViatura, tipo:e.target.value, lotacao: e.target.value.includes('15')?15:29})} className="h-9 px-2 border-2 rounded-lg text-[11px] font-bold"><option>Mini-bus 15</option><option>Coaster 29</option><option>Autocarro 45</option></select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={novaViatura.marca} onChange={e=>setNovaViatura({...novaViatura, marca:e.target.value})} placeholder="Marca Toyota" className="h-9 px-2 border rounded-lg text-[10px]" />
+                    <input value={novaViatura.modelo} onChange={e=>setNovaViatura({...novaViatura, modelo:e.target.value})} placeholder="Modelo Coaster" className="h-9 px-2 border rounded-lg text-[10px]" />
+                  </div>
+                  <div className="space-y-2 p-2 bg-white border-2 border-[#d4a44a] rounded-lg">
+                    <div className="font-bold text-[10px] text-[#1e2f4a]">🛣️ ROTA PRINCIPAL</div>
+                    <input value={novaViatura.rota} onChange={e=>setNovaViatura({...novaViatura, rota:e.target.value})} placeholder="Ex: Maputo - Xai-Xai - Maxixe" className="w-full h-9 px-2 border-2 border-[#d4a44a] rounded-lg text-[11px] font-bold" />
+                    <div className="font-bold text-[10px] mt-2">📍 Localidades / Distritos na rota</div>
+                    <div className="flex gap-1">
+                      <input value={localidadeInput} onChange={e=>setLocalidadeInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter' && localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} placeholder="Ex: Marracuene, Manhiça, Macia" className="flex-1 h-8 px-2 border rounded-lg text-[10px]" />
+                      <button onClick={()=>{ if(localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} className="h-8 px-3 bg-[#d4a44a] text-white rounded-lg text-[10px] font-bold">+ Add</button>
+                    </div>
+                    <div className="flex flex-wrap gap-1">{novaViatura.localidades.map((loc:string, i:number)=><span key={i} className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[9px] flex items-center gap-1">{loc} <button onClick={()=>setNovaViatura({...novaViatura, localidades:novaViatura.localidades.filter((_:any, idx:number)=>idx!==i)})} className="w-3 h-3 bg-red-500 rounded-full">x</button></span>)}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <input value={novaViatura.km} onChange={e=>setNovaViatura({...novaViatura, km:e.target.value})} placeholder="Km" className="h-8 px-2 border rounded-lg text-[10px]" />
+                    <input value={novaViatura.livrete} onChange={e=>setNovaViatura({...novaViatura, livrete:e.target.value})} type="date" className="h-8 px-2 border rounded-lg text-[10px]" />
+                    <select value={novaViatura.estado} onChange={e=>setNovaViatura({...novaViatura, estado:e.target.value})} className="h-8 px-1 border rounded-lg text-[10px]"><option>Ativo</option><option>Em revisão</option><option>Parado</option></select>
+                  </div>
+                  <button onClick={()=>{ if(!novaViatura.matricula || !novaViatura.rota){ alert('Matrícula e Rota obrigatórios'); return; } setFrotaViaturas([...frotaViaturas, {...novaViatura, id:Date.now()}]); setNovaViatura({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''}); }} className="w-full h-10 bg-[#25D366] text-white rounded-xl font-black text-[11px]">💾 Guardar Viatura na Frota</button>
                 </div>
-                <div className="mt-2 p-2 bg-white border rounded text-[9px] text-center">Total {formContrato.anexos.length + (formContrato.logoData ? 1 : 0)} anexos</div>
-              </div>
-              <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white min-h-[320px]">
-                {docSelecionadoAnexo === '' && (
-                  <div className="h-full flex flex-col items-center justify-center py-12 text-center">
-                    <div className="text-[36px]">👈</div>
-                    <div className="font-bold text-[12px] mt-2">Selecione a esquerda</div>
-                    <div className="text-[10px] text-gray-500 mt-1">Escolha BI, Foto, Logo</div>
-                  </div>
-                )}
-                {docSelecionadoAnexo === 'logo_tipo' && (
-                  <div className="space-y-3">
-                    <div className="font-black text-[11px]">🏢 LOGO TIPO - Topo a esquerda</div>
-                    <div className="flex gap-3">
-                      <div className="w-20 h-20 border-2 border-dashed border-[#c9a86a] rounded-xl flex items-center justify-center bg-[#f8fafc] overflow-hidden">
-                        {formContrato.logoData ? <img src={formContrato.logoData} alt="Logo" className="w-full h-full object-contain" /> : <span className="text-[22px]">🏢</span>}
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa Ex: Nagi Invest" className="w-full h-9 px-3 border-2 rounded-lg text-[11px] font-bold" />
-                        <div className="flex gap-2">
-                          <button onClick={()=>document.getElementById('inputLogoTipoV62')?.click()} className="flex-1 h-8 bg-[#1e2f4a] text-white rounded-full text-[10px] font-bold">📎 Anexar Logo</button>
-                          {formContrato.logoData && <button onClick={()=>setFormContrato((prev:any)=>({...prev, logoData:'', logoTipo:''}))} className="h-8 px-3 bg-red-500 text-white rounded-full text-[10px]">X</button>}
+                <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
+                  <div className="font-black text-[11px] mb-2">🚐 FROTA CADASTRADA ({frotaViaturas.length}) - Rota + Localidades</div>
+                  <div className="space-y-2 max-h-[520px] overflow-y-auto">
+                    {frotaViaturas.map((v:any)=>(
+                      <div key={v.id} className="border-2 rounded-xl p-2.5 bg-[#f8fafc]">
+                        <div className="flex justify-between"><div className="font-black text-[12px]">{v.matricula}</div><div className={`text-[8px] px-2 py-0.5 rounded-full ${v.estado==='Ativo'?'bg-green-500 text-white':'bg-orange-400 text-white'}`}>{v.estado}</div></div>
+                        <div className="text-[10px] font-bold">{v.marca} {v.modelo} - {v.tipo} - {v.lotacao} lugares</div>
+                        <div className="mt-1 p-1.5 bg-white border border-[#d4a44a] rounded-lg">
+                          <div className="text-[9px] font-bold text-[#1e2f4a]">🛣️ Rota: {v.rota}</div>
+                          <div className="flex flex-wrap gap-1 mt-1">{v.localidades.map((loc:string, i:number)=><span key={i} className="text-[8px] px-1.5 py-0.5 bg-[#1e2f4a] text-white rounded-full">{loc}</span>)}</div>
                         </div>
-                        <input id="inputLogoTipoV62" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name.replace(/\.[^/.]+$/, '')})); r.readAsDataURL(f); }}} />
-                        <div className="text-[9px] text-green-600">{formContrato.logoData ? '✅ Vai no topo a esquerda no preview e PDF' : 'PNG JPG quadrado'}</div>
+                        <div className="flex gap-1 mt-2"><button onClick={()=>setViagemSelecionada({rota:v.rota, viaturaId:v.id, origem:v.rota.split('-')[0]?.trim(), destino:v.rota.split('-').slice(-1)[0]?.trim(), data:'2026-10-20', hora:'06:00'})} className="flex-1 h-7 bg-[#1e2f4a] text-white rounded-full text-[9px]">Usar nesta rota</button><button onClick={()=>setFrotaViaturas(frotaViaturas.filter((vv:any)=>vv.id!==v.id))} className="h-7 px-2 bg-red-500 text-white rounded-full text-[9px]">X</button></div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                )}
-                {docSelecionadoAnexo !== '' && docSelecionadoAnexo !== 'logo_tipo' && (
-                  <div className="space-y-3">
-                    <div className="font-black text-[11px]">📎 Anexar documento</div>
-                    <div className="border-2 border-dashed border-[#25D366] rounded-xl p-5 bg-[#f0fdf4] text-center">
-                      <div className="text-[28px]">📎</div>
-                      <div className="font-bold text-[11px] mt-2">{docSelecionadoAnexo}</div>
-                      <input type="file" accept="image/*,.pdf" className="mt-3 w-full text-[10px] file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#1e2f4a] file:text-white file:text-[10px] file:font-bold" onChange={e=>{ const file=e.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{ const novo={tipo:docSelecionadoAnexo, nome:file.name, label:docSelecionadoAnexo, data:reader.result, tamanho:file.size}; setFormContrato((prev:any)=>({...prev, anexos:[...prev.anexos.filter((a:any)=>a.tipo!==docSelecionadoAnexo), novo]})); setDocSelecionadoAnexo(''); }; reader.readAsDataURL(file); }} />
-                    </div>
-                    <div className="text-[9px] text-gray-500 text-center">Vira prova legal no PDF</div>
+                </div>
+              </div>
+            )}
+            {transportadorTab==='gestao' && (
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-3">
+                <div className="xl:col-span-3 border-2 rounded-xl p-2 bg-white">
+                  <div className="font-black text-[10px] mb-2">Viagens - {viagemSelecionada.rota}</div>
+                  <div className="p-2 bg-[#1e2f4a] text-white rounded-lg text-[10px]"><div className="font-bold">{viagemSelecionada.origem} → {viagemSelecionada.destino}</div><div>Ocupação: {assentos.filter((a:any)=>a.estado!=='livre').length}/29</div></div>
+                  <div className="mt-2"><div className="text-[9px] font-bold">Localidades nesta rota:</div><div className="flex flex-wrap gap-1 mt-1">{(frotaViaturas.find((vv:any)=>vv.id===viagemSelecionada.viaturaId)?.localidades || ['Marracuene','Manhiça','Macia']).map((loc:string, i:number)=><span key={i} className="text-[8px] px-1.5 py-0.5 bg-[#fef9c3] border rounded-full">{loc}</span>)}</div></div>
+                </div>
+                <div className="xl:col-span-5 border-2 border-[#1e2f4a] rounded-xl p-2 bg-[#f8fafc]">
+                  <div className="font-black text-[10px] mb-2">Mapa Assentos - Amarelo bloqueia mesmo lugar</div>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {assentos.map((a:any)=>(
+                      <button key={a.numero} onClick={()=>{ if(a.estado!=='livre') return; setAssentoSelecionado(a.numero); setShowReservaModal(true); }} className={`h-12 rounded-lg border-2 text-[10px] font-black flex flex-col items-center justify-center ${a.estado==='livre'?'bg-white border-gray-300': a.estado==='por_aprovar'?'bg-[#fef08a] border-yellow-500':'bg-green-300 border-green-600'}`}>
+                        <div>{a.numero}</div><div className="text-[7px]">{a.estado==='livre'?'Livre': a.estado==='por_aprovar'?'Amarelo':'Pago'}</div>
+                      </button>
+                    ))}
                   </div>
-                )}
-                {(formContrato.anexos.length > 0 || formContrato.logoData) && (
-                  <div className="mt-4 border-t pt-3">
-                    <div className="font-bold text-[10px] mb-2">📦 Guardados ({formContrato.anexos.length + (formContrato.logoData ? 1 : 0)}):</div>
-                    <div className="space-y-1 max-h-[120px] overflow-y-auto">
-                      {formContrato.logoData && <div className="flex items-center gap-2 p-2 bg-[#fef9c3] border rounded-lg text-[10px]"><span>🏢</span><div className="flex-1 truncate"><b>Logo:</b> {formContrato.logoTipo || 'Empresa'} topo</div><button onClick={()=>setFormContrato((prev:any)=>({...prev, logoData:'', logoTipo:''}))} className="w-5 h-5 bg-red-500 text-white rounded-full">X</button></div>}
-                      {formContrato.anexos.map((anexo:any, idx:number)=>(
-                        <div key={idx} className="flex items-center gap-2 p-2 bg-[#f8fafc] border rounded-lg text-[10px]">
-                          <div className="flex-1 truncate"><b>{anexo.tipo}</b> {anexo.nome}</div>
-                          <button onClick={()=>setFormContrato((prev:any)=>({...prev, anexos: prev.anexos.filter((_:any,i:number)=>i!==idx)}))} className="w-5 h-5 bg-red-500 text-white rounded-full">X</button>
+                </div>
+                <div className="xl:col-span-4 space-y-2">
+                  <div className="border-2 border-yellow-500 rounded-xl p-2 bg-[#fefce8]">
+                    <div className="font-black text-[10px]">🟡 Por Aprovar M-Pesa ({reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').length})</div>
+                    <div className="space-y-1 mt-1 max-h-[160px] overflow-y-auto">
+                      {reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').map((r:any)=>(
+                        <div key={r.id} className="p-2 bg-white border rounded-lg text-[9px]">
+                          <div className="font-bold">Assento {r.assento} - {r.nome}</div><div>M-Pesa: {r.mpesa} - {r.valor} MZN</div>
+                          <div className="flex gap-1 mt-1"><button onClick={()=>{ setReservasPendentes(reservasPendentes.map((rr:any)=>rr.id===r.id?{...rr, estado:'pago'}:rr)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'pago'}:aa)); }} className="flex-1 h-6 bg-green-600 text-white rounded-full">Aprovar</button><button onClick={()=>{ setReservasPendentes(reservasPendentes.filter((rr:any)=>rr.id!==r.id)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'livre'}:aa)); }} className="h-6 px-2 bg-red-500 text-white rounded-full">X</button></div>
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
+                  <div className="border-2 rounded-xl p-2 bg-white">
+                    <div className="font-black text-[10px]">⛽ Combustível</div>
+                    <div className="mt-1 space-y-1">{combustivel.map((c:any)=><div key={c.id} className="text-[8px] p-1 bg-[#f8fafc] border rounded">{c.data} - {c.local} - {c.litros}L - {c.valor} MZN</div>)}</div>
+                  </div>
+                  <div className="border-2 rounded-xl p-2 bg-white">
+                    <div className="font-black text-[10px]">🔧 Revisão</div>
+                    <div className="mt-1 space-y-1">{revisoes.map((r:any)=><div key={r.id} className="text-[8px] p-1 bg-[#fef9c3] border rounded">{r.data} - {r.local} - {r.tipo}</div>)}</div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+            {showReservaModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-4 w-full max-w-[340px] space-y-2">
+                  <div className="font-black text-[12px]">Reserva Assento {assentoSelecionado} - Amarelo bloqueia</div>
+                  <input value={novaReserva.nome} onChange={e=>setNovaReserva({...novaReserva, nome:e.target.value})} placeholder="Nome" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
+                  <input value={novaReserva.tel} onChange={e=>setNovaReserva({...novaReserva, tel:e.target.value})} placeholder="Telefone" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
+                  <input value={novaReserva.mpesa} onChange={e=>setNovaReserva({...novaReserva, mpesa:e.target.value})} placeholder="Ref M-Pesa" className="w-full h-9 px-2 border rounded-lg text-[10px]" />
+                  <div className="flex gap-2"><button onClick={()=>{ if(!novaReserva.nome) return; const id=Date.now(); setReservasPendentes([...reservasPendentes, {id, assento:assentoSelecionado, nome:novaReserva.nome, tel:novaReserva.tel, mpesa:novaReserva.mpesa, valor:novaReserva.valor, estado:'por_aprovar'}]); setAssentos(assentos.map((a:any)=>a.numero===assentoSelecionado?{...a, estado:'por_aprovar'}:a)); setShowReservaModal(false); setNovaReserva({nome:'', tel:'', mpesa:'', valor:1500}); }} className="flex-1 h-9 bg-yellow-400 border-2 border-yellow-600 rounded-xl font-black text-[11px]">🟡 Reservar</button><button onClick={()=>setShowReservaModal(false)} className="h-9 px-3 bg-gray-200 rounded-xl text-[10px]">Cancelar</button></div>
+                </div>
+              </div>
+            )}
           </div>
         )}
+
 
         {clausulaAtiva===11 && <div className="space-y-4">
           <div className="font-bold text-[14px] text-[#1e2f4a]">CLAUSULA 11 - PDF FINAL PARTILHAVEL COM ASSINATURAS</div>
@@ -1004,6 +1060,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
     </div>
    </section>
   )}
+
 
       {tab==='faturacao' && (
         <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10">
@@ -1057,6 +1114,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         </section>
       )}
 
+
+      
+      
       {tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -1070,6 +1130,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             </div>
           </div>
 
+          
           {viagensTab==='overview' && (
             <div className="space-y-3">
               <div id="mapaOverview" className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media - Filtro reflete a direita</span></div>
@@ -1085,7 +1146,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
                       <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
                         <div className="text-[12px]">➤</div>
-                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
+                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'MMB-456-MP-NOVA') : (idx+1)}</div>
                         <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
                       </button>
                       {focada && mostrarPopupMapa && (
@@ -1132,7 +1193,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{frotaViaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  
 
                   {filtradosOverview.map((v:any)=>(
                     <div key={v.id} className={`bg-white rounded-[12px] border p-3 shadow-sm ${carroFocadoMapa===v.id?'ring-2 ring-[#facc15] border-[#facc15]':''}`}>
@@ -1140,7 +1202,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                         <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
                         <div className="flex-1">
                           <div className="flex flex-wrap justify-between gap-2">
-                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'MMA-123-MP-NOVA'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
                             <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -1162,7 +1224,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   {filtradosOverview.length===0 && (
                     <div className="bg-white border-2 border-dashed rounded-[12px] p-8 text-center">
                       <div className="text-[12px] font-bold">Nenhum carro encontrado para {provOrigemF} - {provDestinoF}</div>
-                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {viaturas.length} viaturas.</div>
+                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {frotaViaturas.length} viaturas.</div>
                       <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira');}} className="mt-3 h-9 px-4 bg-[#1d4ed8] text-white rounded-full text-[10px] font-bold">Mostrar todos</button>
                     </div>
                   )}
@@ -1219,6 +1281,7 @@ Bilhete valido - Apresentar QR`;
               )}
             </div>
           )}
+
 
           {viagensTab==='viajar' && (
             <div className="flex flex-col lg:flex-row gap-3">
@@ -1292,7 +1355,7 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">
                     <div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1" /></div>
                     <div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select value={provinciaFiltroV} onChange={e=>setProvinciaFiltroV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala</option><option>Africa do Sul</option></select></div>
-                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
+                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...frotaViaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
                   </div>
                   <div className="text-[7px] text-[#94a3b8] mt-2">LOCAL COLETA / PONTO ENCONTRO (se nao for terminal) - DESTINO CUSTOM (se nao aparecer na lista) - LOCAL SERA ENCONTRADO / ACOMPANHANTE / MENOR - APAGADOS COM X VERMELHO COMO PEDISTE - ja havias feito - Rotas: Beira-Johannesburg via Ressano Garcia, Inhambane-Johannesburg via Ponta do Ouro, Maxixe-Johannesburg, Xai-Xai-Johannesburg, Chokwe-Johannesburg, Maputo-Durban, etc - Paragens SA: Park Station, Bosman, Nelspruit Mbombela, Komatiepoort Fronteira, Ressano Garcia, Durban Central</div>
                 </div>
@@ -1396,15 +1459,15 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <div className="lg:col-span-2 space-y-3">
                       <div className="bg-white rounded-[12px] border p-4">
-                        <div className="flex justify-between items-center"><div><div className="font-black text-[12px]">Minha Frota - Gestao centralizada - {viaturas.length} Viaturas - 1 conta gere varias viaturas</div><div className="text-[8px] text-[#64748b]">Dentro da Area Transportador privada - {transportadorPerfil.nomeEmpresa}</div></div><button onClick={()=>{ const req = { id: Date.now(), type: 'add_viatura', transportador: transportadorPerfil.username || transportadorPerfil.nomeEmpresa, createdAt: new Date().toISOString(), status: 'pending' }; const pending = JSON.parse(localStorage.getItem('viaturaRequests')||'[]'); pending.push(req); localStorage.setItem('viaturaRequests', JSON.stringify(pending)); alert('Pedido de adicionamento de viatura enviado ao administrador.'); }} className="px-4 h-8 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar viatura</button></div>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">{viaturas.map((v:any)=><div key={v.id} className="border rounded-[10px] p-3 bg-white"><div className="flex justify-between"><div className="font-black text-[10px]">{v.marca}</div><span className="text-[7px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">{v.estado}</span></div><div className="text-[8px] text-[#475569] mt-1">Matricula: {v.matricula} | Lugares: {v.lugares}<br/>AC: {v.ac?'Sim':'Nao'} | Bagagem: {v.bagagem?'Sim':'Nao'} | Encomendas: {v.encomendas?'Sim':'Nao'} | {v.cargaKg}kg<br/>Rota: {v.rota}</div><div className="flex gap-1 mt-2"><button onClick={()=>{setFormViatura(v); setEditandoViaturaId(v.id);}} className="flex-1 h-7 bg-[#f1f5f9] rounded-full text-[8px] font-bold">Editar</button><button onClick={()=>setViaturas(viaturas.filter((x:any)=>x.id!==v.id))} className="px-3 h-7 bg-[#f1f5f9] rounded-full text-[8px]">Remover</button><button onClick={()=>setViaturas(viaturas.map((x:any)=>x.id===v.id?{...x,activa:!x.activa}:x))} className={`px-3 h-7 rounded-full text-[8px] font-bold ${v.activa?'bg-[#22c55e] text-white':'bg-[#facc15] text-black'}`}>{v.activa?'Activa':'Activar para operacao'}</button></div></div>)}</div>
+                        <div className="flex justify-between items-center"><div><div className="font-black text-[12px]">Minha Frota - Gestao centralizada - {frotaViaturas.length} Viaturas - 1 conta gere varias viaturas</div><div className="text-[8px] text-[#64748b]">Dentro da Area Transportador privada - {transportadorPerfil.nomeEmpresa}</div></div><button onClick={()=>{ const req = { id: Date.now(), type: 'add_viatura', transportador: transportadorPerfil.username || transportadorPerfil.nomeEmpresa, createdAt: new Date().toISOString(), status: 'pending' }; const pending = JSON.parse(localStorage.getItem('viaturaRequests')||'[]'); pending.push(req); localStorage.setItem('viaturaRequests', JSON.stringify(pending)); alert('Pedido de adicionamento de viatura enviado ao administrador.'); }} className="px-4 h-8 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar viatura</button></div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">{frotaViaturas.map((v:any)=><div key={v.id} className="border rounded-[10px] p-3 bg-white"><div className="flex justify-between"><div className="font-black text-[10px]">{v.marca}</div><span className="text-[7px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">{v.estado}</span></div><div className="text-[8px] text-[#475569] mt-1">Matricula: {v.matricula} | Lugares: {v.lugares}<br/>AC: {v.ac?'Sim':'Nao'} | Bagagem: {v.bagagem?'Sim':'Nao'} | Encomendas: {v.encomendas?'Sim':'Nao'} | {v.cargaKg}kg<br/>Rota: {v.rota}</div><div className="flex gap-1 mt-2"><button onClick={()=>{setFormViatura(v); setEditandoViaturaId(v.id);}} className="flex-1 h-7 bg-[#f1f5f9] rounded-full text-[8px] font-bold">Editar</button><button onClick={()=>setFrotaViaturas(frotaViaturas.filter((x:any)=>x.id!==v.id))} className="px-3 h-7 bg-[#f1f5f9] rounded-full text-[8px]">Remover</button><button onClick={()=>setFrotaViaturas(frotaViaturas.map((x:any)=>x.id===v.id?{...x,activa:!x.activa}:x))} className={`px-3 h-7 rounded-full text-[8px] font-bold ${v.activa?'bg-[#22c55e] text-white':'bg-[#facc15] text-black'}`}>{v.activa?'Activa':'Activar para operacao'}</button></div></div>)}</div>
                       </div>
                       <div className="bg-white rounded-[12px] border-2 border-[#facc15] p-4">
                         <div className="font-black text-[12px] mb-3">Editar viatura - circulado laranja imagem - Tipo, Marca, Matricula, Lugares, Ano, Cor, Carga kg, Rota</div>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                           <div><label className="text-[8px] font-bold">Tipo *</label><select value={formViatura.tipo} onChange={e=>setFormViatura({...formViatura,tipo:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1"><option>Minibus / Chapa</option><option>Toyota Coaster 25 lugares</option><option>Toyota Hiace 15 lugares</option><option>Toyota hiace quantum</option><option>Bus 50 lugares</option></select></div>
                           <div><label className="text-[8px] font-bold">Marca e modelo *</label><input value={formViatura.marca} onChange={e=>setFormViatura({...formViatura,marca:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="Toyota Coaster 25 lugares" /></div>
-                          <div><label className="text-[8px] font-bold">Matricula *</label><input value={formViatura.matricula} onChange={e=>setFormViatura({...formViatura,matricula:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="ACD 456 MC" /></div>
+                          <div><label className="text-[8px] font-bold">Matricula *</label><input value={formViatura.matricula} onChange={e=>setFormViatura({...formViatura,matricula:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="MMB-456-MP-NOVA" /></div>
                           <div><label className="text-[8px] font-bold">Lugares *</label><input type="number" value={formViatura.lugares} onChange={e=>setFormViatura({...formViatura,lugares:Number(e.target.value)})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="25" /></div>
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 mt-2">
@@ -1420,10 +1483,10 @@ Bilhete valido - Apresentar QR`;
                           <button onClick={()=>{if(!formParagem.local||!formParagem.preco)return; setParagensTemp([...paragensTemp,{local:formParagem.local, preco:formParagem.preco}]); setFormParagem({local:'', preco:0} as any);}} className="mt-2 h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">+ Adicionar paragem com preco</button>
                           <div className="mt-2 space-y-1 max-h-[80px] overflow-auto">{paragensTemp.map((p:any,i:number)=><div key={i} className="flex justify-between border rounded p-1 text-[8px]"><span>{p.local} - {p.preco} MT</span><button onClick={()=>setParagensTemp(paragensTemp.filter((_:any,idx:number)=>idx!==i))} className="text-red-400">X</button></div>)}</div>
                         </div>
-                        <div className="flex gap-2 mt-3"><button onClick={()=>{if(!formViatura.matricula){alert('Matricula * obrigatoria'); return;} if(editandoViaturaId){setViaturas(viaturas.map((v:any)=>v.id===editandoViaturaId?{...v, ...formViatura, paragens:paragensTemp}:v)); setEditandoViaturaId(null);} else {const nova={id:'v'+Date.now(), ...formViatura, activa:false, paragens:paragensTemp}; setViaturas([...viaturas,nova]);} setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'2021', cor:'', cargaKg:500, rota:'', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any); setParagensTemp([]);}} className="flex-1 h-9 bg-[#facc15] text-black rounded-[6px] text-[10px] font-black">Guardar</button><button onClick={()=>{setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'', cor:'', cargaKg:500, rota:''} as any); setEditandoViaturaId(null);}} className="px-4 h-9 border rounded-[6px] text-[10px]">Cancelar</button></div>
+                        <div className="flex gap-2 mt-3"><button onClick={()=>{if(!formViatura.matricula){alert('Matricula * obrigatoria'); return;} if(editandoViaturaId){setFrotaViaturas(frotaViaturas.map((v:any)=>v.id===editandoViaturaId?{...v, ...formViatura, paragens:paragensTemp}:v)); setEditandoViaturaId(null);} else {const nova={id:'v'+Date.now(), ...formViatura, activa:false, paragens:paragensTemp}; setFrotaViaturas([...frotaViaturas,nova]);} setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'2021', cor:'', cargaKg:500, rota:'', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any); setParagensTemp([]);}} className="flex-1 h-9 bg-[#facc15] text-black rounded-[6px] text-[10px] font-black">Guardar</button><button onClick={()=>{setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'', cor:'', cargaKg:500, rota:''} as any); setEditandoViaturaId(null);}} className="px-4 h-9 border rounded-[6px] text-[10px]">Cancelar</button></div>
                       </div>
                     </div>
-                    <div className="space-y-3"><div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[10px]">Perfil Transportador - Com mais informacao - Amarelo</div><div className="mt-2 space-y-1 text-[9px]"><div><b>Empresa:</b> {transportadorPerfil.nomeEmpresa}</div><div><b>Responsavel:</b> {transportadorPerfil.responsavel}</div><div><b>Tel:</b> {transportadorPerfil.tel}</div><div><b>Provincia:</b> {transportadorPerfil.provincia}</div><div><b>Rotas:</b> {transportadorPerfil.rotas}</div><div><b>Viaturas:</b> {viaturas.length} / 15</div></div></div></div>
+                    <div className="space-y-3"><div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[10px]">Perfil Transportador - Com mais informacao - Amarelo</div><div className="mt-2 space-y-1 text-[9px]"><div><b>Empresa:</b> {transportadorPerfil.nomeEmpresa}</div><div><b>Responsavel:</b> {transportadorPerfil.responsavel}</div><div><b>Tel:</b> {transportadorPerfil.tel}</div><div><b>Provincia:</b> {transportadorPerfil.provincia}</div><div><b>Rotas:</b> {transportadorPerfil.rotas}</div><div><b>Viaturas:</b> {frotaViaturas.length} / 15</div></div></div></div>
                   </div>
                 </div>
               )}
@@ -1432,6 +1495,10 @@ Bilhete valido - Apresentar QR`;
           )}
 </section>
       )}
+
+
+
+
 
       {tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
@@ -1443,5 +1510,6 @@ Bilhete valido - Apresentar QR`;
  </div>
  )
 }
+
 
 // ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
