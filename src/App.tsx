@@ -506,20 +506,15 @@ useEffect(()=>{
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px}
-.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
-.header h1{color:#d4a44a;margin:0;font-size:16px}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:#f8fafc}
-.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
-.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-@media print{.no-print{display:none}}
+body{font-family:'Times New Roman', Times, serif !important;font-size:12pt !important;line-height:1.6 !important;color:#000 !important;background:#fff !important;max-width:850px;margin:20px auto;padding:20px}
+.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center;display:flex;align-items:center;gap:15px}
+.header h1{color:#d4a44a;font-size:14px;font-weight:bold;margin:0}
+.header div{font-size:10px}
+.clausula{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:10px 0;color:#000;font-family:'Times New Roman', Times, serif;font-size:12pt}
+.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;font-size:12pt;margin:0 0 10px 0}
 </style>
 </head><body>
-<div class="header" style="display:flex;align-items:center;gap:15px;text-align:left"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : ""}${formContrato.logoTipo ? `<div style="font-size:10px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 6px;border-radius:4px">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div>
+<div class="header"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;min-width:80px">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : `<div style="width:70px;height:70px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:9px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 6px;border-radius:4px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div>
 
 <div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
 <b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
@@ -608,7 +603,7 @@ body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;
 @media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
 </style>
 </head><body>
-<div class="header" style="display:flex;align-items:center;gap:15px;text-align:left"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : ""}${formContrato.logoTipo ? `<div style="font-size:10px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 6px;border-radius:4px">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS NA HORIZONTAL NAO VERTICAL</h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
+<div class="header"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;min-width:80px">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : `<div style="width:70px;height:70px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:9px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 6px;border-radius:4px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS NA HORIZONTAL NAO VERTICAL</h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
 
 <div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
 <b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
