@@ -156,25 +156,7 @@ export default function App(){
 
  const [tab,setTab]=useState("encontrar");
  const [contratoSel,setContratoSel]=useState(1);
- const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('')
-  const [transportadorTab, setTransportadorTab] = useState<'viaturas'|'gestao'>('viaturas')
-  const [novaViatura, setNovaViatura] = useState<any>({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''})
-  const [localidadeInput, setLocalidadeInput] = useState('')
-  const [viagemSelecionada, setViagemSelecionada] = useState<any>({id:1, rota:'Maputo - Xai-Xai', data:'2026-10-20', hora:'06:00', viaturaId:1, motorista:'Artur Zimba', origem:'Maputo', destino:'Xai-Xai'})
-  const [assentos, setAssentos] = useState<any[]>(Array.from({length:29}, (_,i)=>({numero:i+1, estado:'livre'})))
-  const [reservasPendentes, setReservasPendentes] = useState<any[]>([
-    {id:1, assento:5, nome:'Joao Mabote', tel:'84 123 4567', mpesa:'PP231020.1234.A12345', valor:1500, estado:'por_aprovar'},
-  ])
-  const [combustivel, setCombustivel] = useState<any[]>([
-    {id:1, data:'2026-10-19', litros:80, valor:6500, local:'Petromoc Xai-Xai', km:145230},
-  ])
-  const [revisoes, setRevisoes] = useState<any[]>([
-    {id:1, data:'2026-10-10', local:'Oficina Nagi - Xai-Xai', tipo:'Revisão geral', custo:12000},
-  ])
-  const [assentoSelecionado, setAssentoSelecionado] = useState<number|null>(null)
-  const [showReservaModal, setShowReservaModal] = useState(false)
-  const [novaReserva, setNovaReserva] = useState<any>({nome:'', tel:'', mpesa:'', valor:1500})
-;
+ const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('');
   const [clausulaAtiva,setClausulaAtiva]=useState(4);
  const [tipoCadastro,setTipoCadastro]=useState("prof");
  const [filtroBusca,setFiltroBusca]=useState("");
@@ -394,8 +376,8 @@ export default function App(){
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
  const [viagensMock, setViagensMock] = useState([
-   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - MMB-456-MP-NOVA', matricula:'MMB-456-MP-NOVA', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - MMB-456-MP-NOVA', matricula:'MMB-456-MP-NOVA', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
+   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
    {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
    {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
  ]);
@@ -427,17 +409,17 @@ useEffect(()=>{
   document.addEventListener('click', intercept, true);
   return ()=>document.removeEventListener('click', intercept, true);
 }, [transportadorLoginForm, transportadorPerfil]);
- const [viaturas, setFrotaViaturas] = useState([
-   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'MMA-123-MP-NOVA', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
-   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'MMB-456-MP-NOVA', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'MMC-789-MP', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
+ const [viaturas, setViaturas] = useState([
+   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
+   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
  ] as any);
 
  // filtered list shown on PESQUISAR VIAGENS
  const [filteredViagens, setFilteredViagens] = useState<any[]>([]);
  useEffect(()=>{
    try{
-     const candidate = [...viagensMock, ...frotaViaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
+     const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
      setFilteredViagens(candidate);
    }catch(e){setFilteredViagens([])}
  },[viagensMock, viaturas, transportadorPerfil]);
@@ -456,7 +438,7 @@ useEffect(()=>{
   },[]);
 
   const todosCarrosOverview = useMemo(()=>{
-    const extras = frotaViaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
+    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
       id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
       lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
       rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
@@ -934,10 +916,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         
         {clausulaAtiva===10 && (
           <div className="space-y-4">
-            <div className="font-black text-[13px]">CLAUSULA 10: TRANSPORTADOR - Frota e Gestão (Rota + Localidades) - V69</div>
-            <div className="text-[10px] text-green-600 font-bold">✓ Arquivo correto V69 - MMA-123-MP com rota e localidades</div>
+            <div className="font-black text-[13px]">CLAUSULA 10: TRANSPORTADOR - Frota e Gestão (Rota + Localidades) V70</div>
             <div className="flex gap-2">
-              <button onClick={()=>setTransportadorTab('viaturas')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='viaturas' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>🚐 Minhas Viaturas ({frotaViaturas.length})</button>
+              <button onClick={()=>setTransportadorTab('viaturas')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='viaturas' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>🚐 Minhas Viaturas ({viaturas.length})</button>
               <button onClick={()=>setTransportadorTab('gestao')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='gestao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>📊 Minha Gestão</button>
             </div>
             {transportadorTab==='viaturas' && (
@@ -949,38 +930,37 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <select value={novaViatura.tipo} onChange={e=>setNovaViatura({...novaViatura, tipo:e.target.value, lotacao: e.target.value.includes('15')?15:29})} className="h-9 px-2 border-2 rounded-lg text-[11px] font-bold"><option>Mini-bus 15</option><option>Coaster 29</option><option>Autocarro 45</option></select>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <input value={novaViatura.marca} onChange={e=>setNovaViatura({...novaViatura, marca:e.target.value})} placeholder="Marca Toyota" className="h-9 px-2 border rounded-lg text-[10px]" />
-                    <input value={novaViatura.modelo} onChange={e=>setNovaViatura({...novaViatura, modelo:e.target.value})} placeholder="Modelo Coaster" className="h-9 px-2 border rounded-lg text-[10px]" />
+                    <input value={novaViatura.marca} onChange={e=>setNovaViatura({...novaViatura, marca:e.target.value})} placeholder="Marca" className="h-9 px-2 border rounded-lg text-[10px]" />
+                    <input value={novaViatura.modelo} onChange={e=>setNovaViatura({...novaViatura, modelo:e.target.value})} placeholder="Modelo" className="h-9 px-2 border rounded-lg text-[10px]" />
                   </div>
                   <div className="space-y-2 p-2 bg-white border-2 border-[#d4a44a] rounded-lg">
-                    <div className="font-bold text-[10px] text-[#1e2f4a]">🛣️ ROTA PRINCIPAL</div>
+                    <div className="font-bold text-[10px]">🛣️ ROTA PRINCIPAL</div>
                     <input value={novaViatura.rota} onChange={e=>setNovaViatura({...novaViatura, rota:e.target.value})} placeholder="Ex: Maputo - Xai-Xai - Maxixe" className="w-full h-9 px-2 border-2 border-[#d4a44a] rounded-lg text-[11px] font-bold" />
-                    <div className="font-bold text-[10px] mt-2">📍 Localidades / Distritos na rota</div>
+                    <div className="font-bold text-[10px] mt-2">📍 Localidades / Distritos</div>
                     <div className="flex gap-1">
-                      <input value={localidadeInput} onChange={e=>setLocalidadeInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter' && localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} placeholder="Ex: Marracuene, Manhiça, Macia" className="flex-1 h-8 px-2 border rounded-lg text-[10px]" />
+                      <input value={localidadeInput} onChange={e=>setLocalidadeInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter' && localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} placeholder="Ex: Marracuene" className="flex-1 h-8 px-2 border rounded-lg text-[10px]" />
                       <button onClick={()=>{ if(localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} className="h-8 px-3 bg-[#d4a44a] text-white rounded-lg text-[10px] font-bold">+ Add</button>
                     </div>
-                    <div className="flex flex-wrap gap-1">{novaViatura.localidades.map((loc:string, i:number)=><span key={i} className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[9px] flex items-center gap-1">{loc} <button onClick={()=>setNovaViatura({...novaViatura, localidades:novaViatura.localidades.filter((_:any, idx:number)=>idx!==i)})} className="w-3 h-3 bg-red-500 rounded-full">x</button></span>)}</div>
+                    <div className="flex flex-wrap gap-1">{novaViatura.localidades.map((loc:string, i:number)=><span key={i} className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[9px]">{loc} <button onClick={()=>setNovaViatura({...novaViatura, localidades:novaViatura.localidades.filter((_:any, idx:number)=>idx!==i)})}>x</button></span>)}</div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <input value={novaViatura.km} onChange={e=>setNovaViatura({...novaViatura, km:e.target.value})} placeholder="Km" className="h-8 px-2 border rounded-lg text-[10px]" />
                     <input value={novaViatura.livrete} onChange={e=>setNovaViatura({...novaViatura, livrete:e.target.value})} type="date" className="h-8 px-2 border rounded-lg text-[10px]" />
                     <select value={novaViatura.estado} onChange={e=>setNovaViatura({...novaViatura, estado:e.target.value})} className="h-8 px-1 border rounded-lg text-[10px]"><option>Ativo</option><option>Em revisão</option><option>Parado</option></select>
                   </div>
-                  <button onClick={()=>{ if(!novaViatura.matricula || !novaViatura.rota){ alert('Matrícula e Rota obrigatórios'); return; } setFrotaViaturas([...frotaViaturas, {...novaViatura, id:Date.now()}]); setNovaViatura({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''}); }} className="w-full h-10 bg-[#25D366] text-white rounded-xl font-black text-[11px]">💾 Guardar Viatura na Frota</button>
+                  <button onClick={()=>{ if(!novaViatura.matricula || !novaViatura.rota){ alert('Matrícula e Rota obrigatórios'); return; } setViaturas([...viaturas, {...novaViatura, id:Date.now()}]); setNovaViatura({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''}); }} className="w-full h-10 bg-[#25D366] text-white rounded-xl font-black text-[11px]">💾 Guardar Viatura</button>
                 </div>
                 <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
-                  <div className="font-black text-[11px] mb-2">🚐 FROTA CADASTRADA ({frotaViaturas.length}) - Rota + Localidades</div>
+                  <div className="font-black text-[11px] mb-2">🚐 FROTA ({viaturas.length})</div>
                   <div className="space-y-2 max-h-[520px] overflow-y-auto">
-                    {frotaViaturas.map((v:any)=>(
+                    {viaturas.map((v:any)=>(
                       <div key={v.id} className="border-2 rounded-xl p-2.5 bg-[#f8fafc]">
                         <div className="flex justify-between"><div className="font-black text-[12px]">{v.matricula}</div><div className={`text-[8px] px-2 py-0.5 rounded-full ${v.estado==='Ativo'?'bg-green-500 text-white':'bg-orange-400 text-white'}`}>{v.estado}</div></div>
-                        <div className="text-[10px] font-bold">{v.marca} {v.modelo} - {v.tipo} - {v.lotacao} lugares</div>
+                        <div className="text-[10px] font-bold">{v.marca} {v.modelo} - {v.tipo}</div>
                         <div className="mt-1 p-1.5 bg-white border border-[#d4a44a] rounded-lg">
-                          <div className="text-[9px] font-bold text-[#1e2f4a]">🛣️ Rota: {v.rota}</div>
+                          <div className="text-[9px] font-bold">🛣️ Rota: {v.rota}</div>
                           <div className="flex flex-wrap gap-1 mt-1">{v.localidades.map((loc:string, i:number)=><span key={i} className="text-[8px] px-1.5 py-0.5 bg-[#1e2f4a] text-white rounded-full">{loc}</span>)}</div>
                         </div>
-                        <div className="flex gap-1 mt-2"><button onClick={()=>setViagemSelecionada({rota:v.rota, viaturaId:v.id, origem:v.rota.split('-')[0]?.trim(), destino:v.rota.split('-').slice(-1)[0]?.trim(), data:'2026-10-20', hora:'06:00'})} className="flex-1 h-7 bg-[#1e2f4a] text-white rounded-full text-[9px]">Usar nesta rota</button><button onClick={()=>setFrotaViaturas(frotaViaturas.filter((vv:any)=>vv.id!==v.id))} className="h-7 px-2 bg-red-500 text-white rounded-full text-[9px]">X</button></div>
                       </div>
                     ))}
                   </div>
@@ -992,37 +972,28 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 <div className="xl:col-span-3 border-2 rounded-xl p-2 bg-white">
                   <div className="font-black text-[10px] mb-2">Viagens - {viagemSelecionada.rota}</div>
                   <div className="p-2 bg-[#1e2f4a] text-white rounded-lg text-[10px]"><div className="font-bold">{viagemSelecionada.origem} → {viagemSelecionada.destino}</div><div>Ocupação: {assentos.filter((a:any)=>a.estado!=='livre').length}/29</div></div>
-                  <div className="mt-2"><div className="text-[9px] font-bold">Localidades nesta rota:</div><div className="flex flex-wrap gap-1 mt-1">{(frotaViaturas.find((vv:any)=>vv.id===viagemSelecionada.viaturaId)?.localidades || ['Marracuene','Manhiça','Macia']).map((loc:string, i:number)=><span key={i} className="text-[8px] px-1.5 py-0.5 bg-[#fef9c3] border rounded-full">{loc}</span>)}</div></div>
                 </div>
                 <div className="xl:col-span-5 border-2 border-[#1e2f4a] rounded-xl p-2 bg-[#f8fafc]">
-                  <div className="font-black text-[10px] mb-2">Mapa Assentos - Amarelo bloqueia mesmo lugar</div>
+                  <div className="font-black text-[10px] mb-2">Mapa Assentos - Amarelo bloqueia</div>
                   <div className="grid grid-cols-5 gap-1.5">
                     {assentos.map((a:any)=>(
-                      <button key={a.numero} onClick={()=>{ if(a.estado!=='livre') return; setAssentoSelecionado(a.numero); setShowReservaModal(true); }} className={`h-12 rounded-lg border-2 text-[10px] font-black flex flex-col items-center justify-center ${a.estado==='livre'?'bg-white border-gray-300': a.estado==='por_aprovar'?'bg-[#fef08a] border-yellow-500':'bg-green-300 border-green-600'}`}>
-                        <div>{a.numero}</div><div className="text-[7px]">{a.estado==='livre'?'Livre': a.estado==='por_aprovar'?'Amarelo':'Pago'}</div>
+                      <button key={a.numero} onClick={()=>{ if(a.estado!=='livre') return; setAssentoSelecionado(a.numero); setShowReservaModal(true); }} className={`h-12 rounded-lg border-2 text-[10px] font-black ${a.estado==='livre'?'bg-white border-gray-300': a.estado==='por_aprovar'?'bg-[#fef08a] border-yellow-500':'bg-green-300 border-green-600'}`}>
+                        <div>{a.numero}</div><div className="text-[7px]">{a.estado==='livre'?'Livre':'Amarelo'}</div>
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="xl:col-span-4 space-y-2">
                   <div className="border-2 border-yellow-500 rounded-xl p-2 bg-[#fefce8]">
-                    <div className="font-black text-[10px]">🟡 Por Aprovar M-Pesa ({reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').length})</div>
-                    <div className="space-y-1 mt-1 max-h-[160px] overflow-y-auto">
+                    <div className="font-black text-[10px]">🟡 Por Aprovar</div>
+                    <div className="space-y-1 mt-1">
                       {reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').map((r:any)=>(
                         <div key={r.id} className="p-2 bg-white border rounded-lg text-[9px]">
-                          <div className="font-bold">Assento {r.assento} - {r.nome}</div><div>M-Pesa: {r.mpesa} - {r.valor} MZN</div>
+                          <div className="font-bold">Assento {r.assento} - {r.nome}</div><div>{r.mpesa} - {r.valor} MZN</div>
                           <div className="flex gap-1 mt-1"><button onClick={()=>{ setReservasPendentes(reservasPendentes.map((rr:any)=>rr.id===r.id?{...rr, estado:'pago'}:rr)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'pago'}:aa)); }} className="flex-1 h-6 bg-green-600 text-white rounded-full">Aprovar</button><button onClick={()=>{ setReservasPendentes(reservasPendentes.filter((rr:any)=>rr.id!==r.id)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'livre'}:aa)); }} className="h-6 px-2 bg-red-500 text-white rounded-full">X</button></div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                  <div className="border-2 rounded-xl p-2 bg-white">
-                    <div className="font-black text-[10px]">⛽ Combustível</div>
-                    <div className="mt-1 space-y-1">{combustivel.map((c:any)=><div key={c.id} className="text-[8px] p-1 bg-[#f8fafc] border rounded">{c.data} - {c.local} - {c.litros}L - {c.valor} MZN</div>)}</div>
-                  </div>
-                  <div className="border-2 rounded-xl p-2 bg-white">
-                    <div className="font-black text-[10px]">🔧 Revisão</div>
-                    <div className="mt-1 space-y-1">{revisoes.map((r:any)=><div key={r.id} className="text-[8px] p-1 bg-[#fef9c3] border rounded">{r.data} - {r.local} - {r.tipo}</div>)}</div>
                   </div>
                 </div>
               </div>
@@ -1030,7 +1001,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             {showReservaModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-xl p-4 w-full max-w-[340px] space-y-2">
-                  <div className="font-black text-[12px]">Reserva Assento {assentoSelecionado} - Amarelo bloqueia</div>
+                  <div className="font-black text-[12px]">Reserva Assento {assentoSelecionado} - Amarelo</div>
                   <input value={novaReserva.nome} onChange={e=>setNovaReserva({...novaReserva, nome:e.target.value})} placeholder="Nome" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                   <input value={novaReserva.tel} onChange={e=>setNovaReserva({...novaReserva, tel:e.target.value})} placeholder="Telefone" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                   <input value={novaReserva.mpesa} onChange={e=>setNovaReserva({...novaReserva, mpesa:e.target.value})} placeholder="Ref M-Pesa" className="w-full h-9 px-2 border rounded-lg text-[10px]" />
@@ -1146,7 +1117,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
                       <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
                         <div className="text-[12px]">➤</div>
-                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'MMB-456-MP-NOVA') : (idx+1)}</div>
+                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
                         <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
                       </button>
                       {focada && mostrarPopupMapa && (
@@ -1193,7 +1164,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{frotaViaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
                   
 
                   {filtradosOverview.map((v:any)=>(
@@ -1202,7 +1173,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                         <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
                         <div className="flex-1">
                           <div className="flex flex-wrap justify-between gap-2">
-                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'MMA-123-MP-NOVA'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
                             <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -1224,7 +1195,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                   {filtradosOverview.length===0 && (
                     <div className="bg-white border-2 border-dashed rounded-[12px] p-8 text-center">
                       <div className="text-[12px] font-bold">Nenhum carro encontrado para {provOrigemF} - {provDestinoF}</div>
-                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {frotaViaturas.length} viaturas.</div>
+                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {viaturas.length} viaturas.</div>
                       <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira');}} className="mt-3 h-9 px-4 bg-[#1d4ed8] text-white rounded-full text-[10px] font-bold">Mostrar todos</button>
                     </div>
                   )}
@@ -1355,7 +1326,7 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">
                     <div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1" /></div>
                     <div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select value={provinciaFiltroV} onChange={e=>setProvinciaFiltroV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala</option><option>Africa do Sul</option></select></div>
-                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...frotaViaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
+                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
                   </div>
                   <div className="text-[7px] text-[#94a3b8] mt-2">LOCAL COLETA / PONTO ENCONTRO (se nao for terminal) - DESTINO CUSTOM (se nao aparecer na lista) - LOCAL SERA ENCONTRADO / ACOMPANHANTE / MENOR - APAGADOS COM X VERMELHO COMO PEDISTE - ja havias feito - Rotas: Beira-Johannesburg via Ressano Garcia, Inhambane-Johannesburg via Ponta do Ouro, Maxixe-Johannesburg, Xai-Xai-Johannesburg, Chokwe-Johannesburg, Maputo-Durban, etc - Paragens SA: Park Station, Bosman, Nelspruit Mbombela, Komatiepoort Fronteira, Ressano Garcia, Durban Central</div>
                 </div>
@@ -1459,15 +1430,15 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <div className="lg:col-span-2 space-y-3">
                       <div className="bg-white rounded-[12px] border p-4">
-                        <div className="flex justify-between items-center"><div><div className="font-black text-[12px]">Minha Frota - Gestao centralizada - {frotaViaturas.length} Viaturas - 1 conta gere varias viaturas</div><div className="text-[8px] text-[#64748b]">Dentro da Area Transportador privada - {transportadorPerfil.nomeEmpresa}</div></div><button onClick={()=>{ const req = { id: Date.now(), type: 'add_viatura', transportador: transportadorPerfil.username || transportadorPerfil.nomeEmpresa, createdAt: new Date().toISOString(), status: 'pending' }; const pending = JSON.parse(localStorage.getItem('viaturaRequests')||'[]'); pending.push(req); localStorage.setItem('viaturaRequests', JSON.stringify(pending)); alert('Pedido de adicionamento de viatura enviado ao administrador.'); }} className="px-4 h-8 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar viatura</button></div>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">{frotaViaturas.map((v:any)=><div key={v.id} className="border rounded-[10px] p-3 bg-white"><div className="flex justify-between"><div className="font-black text-[10px]">{v.marca}</div><span className="text-[7px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">{v.estado}</span></div><div className="text-[8px] text-[#475569] mt-1">Matricula: {v.matricula} | Lugares: {v.lugares}<br/>AC: {v.ac?'Sim':'Nao'} | Bagagem: {v.bagagem?'Sim':'Nao'} | Encomendas: {v.encomendas?'Sim':'Nao'} | {v.cargaKg}kg<br/>Rota: {v.rota}</div><div className="flex gap-1 mt-2"><button onClick={()=>{setFormViatura(v); setEditandoViaturaId(v.id);}} className="flex-1 h-7 bg-[#f1f5f9] rounded-full text-[8px] font-bold">Editar</button><button onClick={()=>setFrotaViaturas(frotaViaturas.filter((x:any)=>x.id!==v.id))} className="px-3 h-7 bg-[#f1f5f9] rounded-full text-[8px]">Remover</button><button onClick={()=>setFrotaViaturas(frotaViaturas.map((x:any)=>x.id===v.id?{...x,activa:!x.activa}:x))} className={`px-3 h-7 rounded-full text-[8px] font-bold ${v.activa?'bg-[#22c55e] text-white':'bg-[#facc15] text-black'}`}>{v.activa?'Activa':'Activar para operacao'}</button></div></div>)}</div>
+                        <div className="flex justify-between items-center"><div><div className="font-black text-[12px]">Minha Frota - Gestao centralizada - {viaturas.length} Viaturas - 1 conta gere varias viaturas</div><div className="text-[8px] text-[#64748b]">Dentro da Area Transportador privada - {transportadorPerfil.nomeEmpresa}</div></div><button onClick={()=>{ const req = { id: Date.now(), type: 'add_viatura', transportador: transportadorPerfil.username || transportadorPerfil.nomeEmpresa, createdAt: new Date().toISOString(), status: 'pending' }; const pending = JSON.parse(localStorage.getItem('viaturaRequests')||'[]'); pending.push(req); localStorage.setItem('viaturaRequests', JSON.stringify(pending)); alert('Pedido de adicionamento de viatura enviado ao administrador.'); }} className="px-4 h-8 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar viatura</button></div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">{viaturas.map((v:any)=><div key={v.id} className="border rounded-[10px] p-3 bg-white"><div className="flex justify-between"><div className="font-black text-[10px]">{v.marca}</div><span className="text-[7px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">{v.estado}</span></div><div className="text-[8px] text-[#475569] mt-1">Matricula: {v.matricula} | Lugares: {v.lugares}<br/>AC: {v.ac?'Sim':'Nao'} | Bagagem: {v.bagagem?'Sim':'Nao'} | Encomendas: {v.encomendas?'Sim':'Nao'} | {v.cargaKg}kg<br/>Rota: {v.rota}</div><div className="flex gap-1 mt-2"><button onClick={()=>{setFormViatura(v); setEditandoViaturaId(v.id);}} className="flex-1 h-7 bg-[#f1f5f9] rounded-full text-[8px] font-bold">Editar</button><button onClick={()=>setViaturas(viaturas.filter((x:any)=>x.id!==v.id))} className="px-3 h-7 bg-[#f1f5f9] rounded-full text-[8px]">Remover</button><button onClick={()=>setViaturas(viaturas.map((x:any)=>x.id===v.id?{...x,activa:!x.activa}:x))} className={`px-3 h-7 rounded-full text-[8px] font-bold ${v.activa?'bg-[#22c55e] text-white':'bg-[#facc15] text-black'}`}>{v.activa?'Activa':'Activar para operacao'}</button></div></div>)}</div>
                       </div>
                       <div className="bg-white rounded-[12px] border-2 border-[#facc15] p-4">
                         <div className="font-black text-[12px] mb-3">Editar viatura - circulado laranja imagem - Tipo, Marca, Matricula, Lugares, Ano, Cor, Carga kg, Rota</div>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                           <div><label className="text-[8px] font-bold">Tipo *</label><select value={formViatura.tipo} onChange={e=>setFormViatura({...formViatura,tipo:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1"><option>Minibus / Chapa</option><option>Toyota Coaster 25 lugares</option><option>Toyota Hiace 15 lugares</option><option>Toyota hiace quantum</option><option>Bus 50 lugares</option></select></div>
                           <div><label className="text-[8px] font-bold">Marca e modelo *</label><input value={formViatura.marca} onChange={e=>setFormViatura({...formViatura,marca:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="Toyota Coaster 25 lugares" /></div>
-                          <div><label className="text-[8px] font-bold">Matricula *</label><input value={formViatura.matricula} onChange={e=>setFormViatura({...formViatura,matricula:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="MMB-456-MP-NOVA" /></div>
+                          <div><label className="text-[8px] font-bold">Matricula *</label><input value={formViatura.matricula} onChange={e=>setFormViatura({...formViatura,matricula:e.target.value})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="ACD 456 MC" /></div>
                           <div><label className="text-[8px] font-bold">Lugares *</label><input type="number" value={formViatura.lugares} onChange={e=>setFormViatura({...formViatura,lugares:Number(e.target.value)})} className="w-full h-8 border rounded text-[9px] px-2 mt-1" placeholder="25" /></div>
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 mt-2">
@@ -1483,10 +1454,10 @@ Bilhete valido - Apresentar QR`;
                           <button onClick={()=>{if(!formParagem.local||!formParagem.preco)return; setParagensTemp([...paragensTemp,{local:formParagem.local, preco:formParagem.preco}]); setFormParagem({local:'', preco:0} as any);}} className="mt-2 h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">+ Adicionar paragem com preco</button>
                           <div className="mt-2 space-y-1 max-h-[80px] overflow-auto">{paragensTemp.map((p:any,i:number)=><div key={i} className="flex justify-between border rounded p-1 text-[8px]"><span>{p.local} - {p.preco} MT</span><button onClick={()=>setParagensTemp(paragensTemp.filter((_:any,idx:number)=>idx!==i))} className="text-red-400">X</button></div>)}</div>
                         </div>
-                        <div className="flex gap-2 mt-3"><button onClick={()=>{if(!formViatura.matricula){alert('Matricula * obrigatoria'); return;} if(editandoViaturaId){setFrotaViaturas(frotaViaturas.map((v:any)=>v.id===editandoViaturaId?{...v, ...formViatura, paragens:paragensTemp}:v)); setEditandoViaturaId(null);} else {const nova={id:'v'+Date.now(), ...formViatura, activa:false, paragens:paragensTemp}; setFrotaViaturas([...frotaViaturas,nova]);} setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'2021', cor:'', cargaKg:500, rota:'', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any); setParagensTemp([]);}} className="flex-1 h-9 bg-[#facc15] text-black rounded-[6px] text-[10px] font-black">Guardar</button><button onClick={()=>{setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'', cor:'', cargaKg:500, rota:''} as any); setEditandoViaturaId(null);}} className="px-4 h-9 border rounded-[6px] text-[10px]">Cancelar</button></div>
+                        <div className="flex gap-2 mt-3"><button onClick={()=>{if(!formViatura.matricula){alert('Matricula * obrigatoria'); return;} if(editandoViaturaId){setViaturas(viaturas.map((v:any)=>v.id===editandoViaturaId?{...v, ...formViatura, paragens:paragensTemp}:v)); setEditandoViaturaId(null);} else {const nova={id:'v'+Date.now(), ...formViatura, activa:false, paragens:paragensTemp}; setViaturas([...viaturas,nova]);} setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'2021', cor:'', cargaKg:500, rota:'', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any); setParagensTemp([]);}} className="flex-1 h-9 bg-[#facc15] text-black rounded-[6px] text-[10px] font-black">Guardar</button><button onClick={()=>{setFormViatura({tipo:'Minibus / Chapa', marca:'', matricula:'', lugares:15, ano:'', cor:'', cargaKg:500, rota:''} as any); setEditandoViaturaId(null);}} className="px-4 h-9 border rounded-[6px] text-[10px]">Cancelar</button></div>
                       </div>
                     </div>
-                    <div className="space-y-3"><div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[10px]">Perfil Transportador - Com mais informacao - Amarelo</div><div className="mt-2 space-y-1 text-[9px]"><div><b>Empresa:</b> {transportadorPerfil.nomeEmpresa}</div><div><b>Responsavel:</b> {transportadorPerfil.responsavel}</div><div><b>Tel:</b> {transportadorPerfil.tel}</div><div><b>Provincia:</b> {transportadorPerfil.provincia}</div><div><b>Rotas:</b> {transportadorPerfil.rotas}</div><div><b>Viaturas:</b> {frotaViaturas.length} / 15</div></div></div></div>
+                    <div className="space-y-3"><div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[10px]">Perfil Transportador - Com mais informacao - Amarelo</div><div className="mt-2 space-y-1 text-[9px]"><div><b>Empresa:</b> {transportadorPerfil.nomeEmpresa}</div><div><b>Responsavel:</b> {transportadorPerfil.responsavel}</div><div><b>Tel:</b> {transportadorPerfil.tel}</div><div><b>Provincia:</b> {transportadorPerfil.provincia}</div><div><b>Rotas:</b> {transportadorPerfil.rotas}</div><div><b>Viaturas:</b> {viaturas.length} / 15</div></div></div></div>
                   </div>
                 </div>
               )}
