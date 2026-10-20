@@ -915,85 +915,150 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         {/* CLAUSULA 10 - ANEXOS - LIMPO */}
         
         {clausulaAtiva===10 && (
-          <div className="space-y-4">
-            <div className="font-black text-[13px]">CLAUSULA 10: TRANSPORTADOR - Frota e Gestão (Rota + Localidades) V70</div>
-            <div className="flex gap-2">
-              <button onClick={()=>setTransportadorTab('viaturas')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='viaturas' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>🚐 Minhas Viaturas ({viaturas.length})</button>
-              <button onClick={()=>setTransportadorTab('gestao')} className={`flex-1 h-11 rounded-xl font-black text-[12px] ${transportadorTab==='gestao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>📊 Minha Gestão</button>
+          <div className="space-y-3">
+            <div className="bg-[#1e2f4a] text-white rounded-xl p-3 flex justify-between items-center">
+              <div>
+                <div className="font-black text-[12px]">Área Transportador - esse - Painel</div>
+                <div className="text-[9px] opacity-80">Minha frota: 1 conta gere várias viaturas | Maputo, Beira, Nampula, Johannesburg</div>
+              </div>
+              <button className="bg-white text-[#1e2f4a] text-[9px] font-bold px-2 py-1 rounded-full">Sair</button>
             </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <button onClick={()=>setTransportadorTab('viaturas')} className={`whitespace-nowrap px-3 h-8 rounded-full font-black text-[10px] ${transportadorTab==='viaturas' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>🚐 Minhas Viaturas ({viaturas.length})</button>
+              <button onClick={()=>setTransportadorTab('gestao')} className={`whitespace-nowrap px-3 h-8 rounded-full font-black text-[10px] ${transportadorTab==='gestao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border-2 border-[#1e2f4a] text-[#1e2f4a]'}`}>📊 Gestão - Ocupação & Reservas</button>
+            </div>
+
             {transportadorTab==='viaturas' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <div className="border-2 border-[#1e2f4a] rounded-xl p-3 bg-[#f8fafc] space-y-3">
-                  <div className="font-black text-[11px]">REGISTO NOVA VIATURA - Com Rota e Localidades</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input value={novaViatura.matricula} onChange={e=>setNovaViatura({...novaViatura, matricula:e.target.value.toUpperCase()})} placeholder="Matrícula MMA-123-MP" className="h-9 px-2 border-2 rounded-lg text-[11px] font-bold" />
-                    <select value={novaViatura.tipo} onChange={e=>setNovaViatura({...novaViatura, tipo:e.target.value, lotacao: e.target.value.includes('15')?15:29})} className="h-9 px-2 border-2 rounded-lg text-[11px] font-bold"><option>Mini-bus 15</option><option>Coaster 29</option><option>Autocarro 45</option></select>
+              <>
+                <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-[#fefce8]">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="font-black text-[11px]">Minha Frota - Gestão centralizada - {viaturas.length} Viaturas - 1 conta gere varias viaturas</div>
+                    <button onClick={()=>{ setViaturaEditando(null); setNovaViatura({matricula:'', tipo:'Minibus / Chapa', marca:'', modelo:'', lugares:15, ano:'', cor:'Branco', cargaKg:300, rota:'', ac:true, bagagem:true, encomendas:true, imagem:'', paragens:[], estado:'Ativo', verificada:false}); }} className="h-7 px-3 bg-[#d4a44a] text-white rounded-full font-bold text-[9px]">+ Adicionar viatura</button>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input value={novaViatura.marca} onChange={e=>setNovaViatura({...novaViatura, marca:e.target.value})} placeholder="Marca" className="h-9 px-2 border rounded-lg text-[10px]" />
-                    <input value={novaViatura.modelo} onChange={e=>setNovaViatura({...novaViatura, modelo:e.target.value})} placeholder="Modelo" className="h-9 px-2 border rounded-lg text-[10px]" />
-                  </div>
-                  <div className="space-y-2 p-2 bg-white border-2 border-[#d4a44a] rounded-lg">
-                    <div className="font-bold text-[10px]">🛣️ ROTA PRINCIPAL</div>
-                    <input value={novaViatura.rota} onChange={e=>setNovaViatura({...novaViatura, rota:e.target.value})} placeholder="Ex: Maputo - Xai-Xai - Maxixe" className="w-full h-9 px-2 border-2 border-[#d4a44a] rounded-lg text-[11px] font-bold" />
-                    <div className="font-bold text-[10px] mt-2">📍 Localidades / Distritos</div>
-                    <div className="flex gap-1">
-                      <input value={localidadeInput} onChange={e=>setLocalidadeInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter' && localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} placeholder="Ex: Marracuene" className="flex-1 h-8 px-2 border rounded-lg text-[10px]" />
-                      <button onClick={()=>{ if(localidadeInput.trim()){ setNovaViatura({...novaViatura, localidades:[...novaViatura.localidades, localidadeInput.trim()]}); setLocalidadeInput(''); }}} className="h-8 px-3 bg-[#d4a44a] text-white rounded-lg text-[10px] font-bold">+ Add</button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">{novaViatura.localidades.map((loc:string, i:number)=><span key={i} className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[9px]">{loc} <button onClick={()=>setNovaViatura({...novaViatura, localidades:novaViatura.localidades.filter((_:any, idx:number)=>idx!==i)})}>x</button></span>)}</div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <input value={novaViatura.km} onChange={e=>setNovaViatura({...novaViatura, km:e.target.value})} placeholder="Km" className="h-8 px-2 border rounded-lg text-[10px]" />
-                    <input value={novaViatura.livrete} onChange={e=>setNovaViatura({...novaViatura, livrete:e.target.value})} type="date" className="h-8 px-2 border rounded-lg text-[10px]" />
-                    <select value={novaViatura.estado} onChange={e=>setNovaViatura({...novaViatura, estado:e.target.value})} className="h-8 px-1 border rounded-lg text-[10px]"><option>Ativo</option><option>Em revisão</option><option>Parado</option></select>
-                  </div>
-                  <button onClick={()=>{ if(!novaViatura.matricula || !novaViatura.rota){ alert('Matrícula e Rota obrigatórios'); return; } setViaturas([...viaturas, {...novaViatura, id:Date.now()}]); setNovaViatura({matricula:'', marca:'', modelo:'', lotacao:29, tipo:'Coaster 29', rota:'', localidades:[], km:'', estado:'Ativo', livrete:'', seguro:'', inspecao:''}); }} className="w-full h-10 bg-[#25D366] text-white rounded-xl font-black text-[11px]">💾 Guardar Viatura</button>
-                </div>
-                <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
-                  <div className="font-black text-[11px] mb-2">🚐 FROTA ({viaturas.length})</div>
-                  <div className="space-y-2 max-h-[520px] overflow-y-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                     {viaturas.map((v:any)=>(
-                      <div key={v.id} className="border-2 rounded-xl p-2.5 bg-[#f8fafc]">
-                        <div className="flex justify-between"><div className="font-black text-[12px]">{v.matricula}</div><div className={`text-[8px] px-2 py-0.5 rounded-full ${v.estado==='Ativo'?'bg-green-500 text-white':'bg-orange-400 text-white'}`}>{v.estado}</div></div>
-                        <div className="text-[10px] font-bold">{v.marca} {v.modelo} - {v.tipo}</div>
-                        <div className="mt-1 p-1.5 bg-white border border-[#d4a44a] rounded-lg">
-                          <div className="text-[9px] font-bold">🛣️ Rota: {v.rota}</div>
-                          <div className="flex flex-wrap gap-1 mt-1">{v.localidades.map((loc:string, i:number)=><span key={i} className="text-[8px] px-1.5 py-0.5 bg-[#1e2f4a] text-white rounded-full">{loc}</span>)}</div>
+                      <div key={v.id} className="border-2 rounded-xl p-2.5 bg-white">
+                        <div className="flex justify-between items-start">
+                          <div className="font-black text-[10px]">{v.marca} {v.lugares} lugares</div>
+                          <div className={`text-[7px] px-1.5 py-0.5 rounded-full font-bold ${v.verificada ? 'bg-green-100 text-green-700 border border-green-500' : 'bg-orange-100 text-orange-700 border border-orange-400'}`}>{v.verificada ? 'Activa Verificada' : 'Activa Desactivada'}</div>
+                        </div>
+                        <div className="text-[8px] text-gray-600 mt-1">Matricula: {v.matricula} - {v.tipo} - {v.lugares} - {v.cor} - {v.cargaKg} - {v.modelo?.split(' ')[0]} - 100kg</div>
+                        <div className="text-[8px] text-gray-600">Rota: {v.rota}</div>
+                        <div className="text-[8px] text-gray-600">Paragens: {v.paragens.map((p:any)=>p.nome).join(', ')}</div>
+                        <div className="flex gap-1 mt-2">
+                          <button onClick={()=>setViaturaEditando(v)} className="flex-1 h-6 bg-gray-100 border rounded-full text-[8px]">Editar</button>
+                          <button onClick={()=>setViaturas(viaturas.filter((vv:any)=>vv.id!==v.id))} className="h-6 px-2 bg-gray-100 border rounded-full text-[8px]">Remover</button>
+                          <button className={`flex-1 h-6 rounded-full text-[8px] font-bold ${v.estado==='Ativo'?'bg-green-500 text-white':'bg-gray-300'}`}>{v.estado}</button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
+
+                <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-[#fefce8]">
+                  <div className="font-black text-[11px] mb-2">Editar viatura - circulado laranja Imagem - Tipo, Marca, Matricula, Lugares, Ano, Cor, Carga kg, Rota</div>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                    <div className="lg:col-span-2 flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-full border-4 border-orange-400 bg-gray-200 flex items-center justify-center text-[9px] text-center">Imagem<br/>Viatura<br/>{(viaturaEditando||novaViatura).matricula||'MMA'}</div>
+                      <input placeholder="URL imagem" value={(viaturaEditando||novaViatura).imagem} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, imagem:e.target.value}); else setNovaViatura({...novaViatura, imagem:e.target.value}); }} className="mt-1 w-full h-6 px-1 border rounded text-[8px]" />
+                    </div>
+                    <div className="lg:col-span-10 space-y-2">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div><div className="text-[8px] font-bold">Tipo *</div><select value={(viaturaEditando||novaViatura).tipo} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, tipo:e.target.value}); else setNovaViatura({...novaViatura, tipo:e.target.value}); }} className="w-full h-7 px-1 border rounded text-[9px]"><option>Minibus / Chapa</option><option>Coaster 25 lugares</option><option>Autocarro 45</option><option>Quantum</option></select></div>
+                        <div><div className="text-[8px] font-bold">Marca e modelo *</div><input value={(viaturaEditando||novaViatura).marca ? `${(viaturaEditando||novaViatura).marca} ${(viaturaEditando||novaViatura).modelo}` : ''} onChange={e=>{ const parts=e.target.value.split(' '); const marca=parts[0]||''; const modelo=parts.slice(1).join(' '); if(viaturaEditando) setViaturaEditando({...viaturaEditando, marca, modelo}); else setNovaViatura({...novaViatura, marca, modelo}); }} placeholder="Toyota Coaster 25 Lugares" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                        <div><div className="text-[8px] font-bold">Matricula *</div><input value={(viaturaEditando||novaViatura).matricula} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, matricula:e.target.value.toUpperCase()}); else setNovaViatura({...novaViatura, matricula:e.target.value.toUpperCase()}); }} placeholder="ABCD 123 MC" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                        <div><div className="text-[8px] font-bold">Lugares *</div><input type="number" value={(viaturaEditando||novaViatura).lugares} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, lugares:parseInt(e.target.value)||0}); else setNovaViatura({...novaViatura, lugares:parseInt(e.target.value)||0}); }} className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div><div className="text-[8px] font-bold">Ano</div><input value={(viaturaEditando||novaViatura).ano} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, ano:e.target.value}); else setNovaViatura({...novaViatura, ano:e.target.value}); }} placeholder="2021" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                        <div><div className="text-[8px] font-bold">Cor</div><input value={(viaturaEditando||novaViatura).cor} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, cor:e.target.value}); else setNovaViatura({...novaViatura, cor:e.target.value}); }} placeholder="Azul" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                        <div><div className="text-[8px] font-bold">Carga kg *</div><input type="number" value={(viaturaEditando||novaViatura).cargaKg} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, cargaKg:parseInt(e.target.value)||0}); else setNovaViatura({...novaViatura, cargaKg:parseInt(e.target.value)||0}); }} placeholder="500" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                        <div><div className="text-[8px] font-bold">Rota</div><input value={(viaturaEditando||novaViatura).rota} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, rota:e.target.value}); else setNovaViatura({...novaViatura, rota:e.target.value}); }} placeholder="Maputo - Beira" className="w-full h-7 px-1 border rounded text-[9px]" /></div>
+                      </div>
+                      <div className="flex gap-3">
+                        <label className="flex items-center gap-1 text-[9px]"><input type="checkbox" checked={(viaturaEditando||novaViatura).ac} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, ac:e.target.checked}); else setNovaViatura({...novaViatura, ac:e.target.checked}); }} /> AC</label>
+                        <label className="flex items-center gap-1 text-[9px]"><input type="checkbox" checked={(viaturaEditando||novaViatura).bagagem} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, bagagem:e.target.checked}); else setNovaViatura({...novaViatura, bagagem:e.target.checked}); }} /> Bagagem</label>
+                        <label className="flex items-center gap-1 text-[9px]"><input type="checkbox" checked={(viaturaEditando||novaViatura).encomendas} onChange={e=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, encomendas:e.target.checked}); else setNovaViatura({...novaViatura, encomendas:e.target.checked}); }} /> Encomendas</label>
+                      </div>
+
+                      <div className="border-2 border-gray-200 rounded-lg p-2 bg-[#f8fafc]">
+                        <div className="font-black text-[9px]">JANELA COM LISTA DE LOCALIDADE/DISTRITO/PARAGEM E VALOR - precos variam por destino real</div>
+                        <div className="grid grid-cols-[1fr_80px] gap-1 mt-1">
+                          <input value={paragemNome} onChange={e=>setParagemNome(e.target.value)} placeholder="Nome paragem - ex: Xai-Xai, Park Station, Cidade da Beira" className="h-7 px-2 border rounded text-[9px]" />
+                          <input value={paragemValor} onChange={e=>setParagemValor(e.target.value)} type="number" placeholder="0" className="h-7 px-2 border rounded text-[9px]" />
+                        </div>
+                        <button onClick={()=>{ if(!paragemNome || !paragemValor) { alert('Nome e valor obrigatórios'); return; } const novaParagem={nome:paragemNome, valor:parseInt(paragemValor)}; if(viaturaEditando){ setViaturaEditando({...viaturaEditando, paragens:[...viaturaEditando.paragens, novaParagem]}); } else { setNovaViatura({...novaViatura, paragens:[...novaViatura.paragens, novaParagem]}); } setParagemNome(''); setParagemValor(''); }} className="mt-1 h-6 px-3 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">+ Adicionar paragem com preco</button>
+                        <div className="mt-2 space-y-1">
+                          {(viaturaEditando||novaViatura).paragens.map((p:any, i:number)=>(
+                            <div key={i} className="flex justify-between items-center h-6 px-2 bg-white border rounded text-[9px]">
+                              <span>{p.nome} - {p.valor} MT</span>
+                              <button onClick={()=>{ if(viaturaEditando) setViaturaEditando({...viaturaEditando, paragens:viaturaEditando.paragens.filter((_:any, idx:number)=>idx!==i)}); else setNovaViatura({...novaViatura, paragens:novaViatura.paragens.filter((_:any, idx:number)=>idx!==i)}); }} className="text-red-500">x</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button onClick={()=>{ const dados = viaturaEditando||novaViatura; if(!dados.matricula || !dados.rota){ alert('Matricula e Rota obrigatórios'); return; } if(viaturaEditando){ setViaturas(viaturas.map((vv:any)=>vv.id===viaturaEditando.id?viaturaEditando:vv)); setViaturaEditando(null); } else { setViaturas([...viaturas, {...novaViatura, id:'v'+Date.now()}]); setNovaViatura({matricula:'', tipo:'Minibus / Chapa', marca:'', modelo:'', lugares:15, ano:'', cor:'Branco', cargaKg:300, rota:'', ac:true, bagagem:true, encomendas:true, imagem:'', paragens:[], estado:'Ativo', verificada:false}); } }} className="flex-1 h-8 bg-[#d4a44a] text-white rounded-lg font-black text-[10px]">Guardar</button>
+                        <button onClick={()=>{ setViaturaEditando(null); setNovaViatura({matricula:'', tipo:'Minibus / Chapa', marca:'', modelo:'', lugares:15, ano:'', cor:'Branco', cargaKg:300, rota:'', ac:true, bagagem:true, encomendas:true, imagem:'', paragens:[], estado:'Ativo', verificada:false}); }} className="h-8 px-4 bg-gray-200 rounded-lg text-[9px]">Cancelar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-2 rounded-xl p-2 bg-white">
+                  <div className="font-black text-[10px]">Perfil Transportador - Com mais Informação - Amarelo</div>
+                  <div className="grid grid-cols-2 gap-2 text-[9px] mt-1">
+                    <div>Empresa: {viaturas.length} viaturas</div><div>Responsável: Alberto</div>
+                    <div>Tel: +258845123893</div><div>Província: Maputo Provincia</div>
+                    <div>Rotas: Maputo - Beira, Maputo - Johannesburg</div><div>Viaturas: 2 / 15</div>
+                  </div>
+                </div>
+              </>
             )}
+
             {transportadorTab==='gestao' && (
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-3">
                 <div className="xl:col-span-3 border-2 rounded-xl p-2 bg-white">
-                  <div className="font-black text-[10px] mb-2">Viagens - {viagemSelecionada.rota}</div>
-                  <div className="p-2 bg-[#1e2f4a] text-white rounded-lg text-[10px]"><div className="font-bold">{viagemSelecionada.origem} → {viagemSelecionada.destino}</div><div>Ocupação: {assentos.filter((a:any)=>a.estado!=='livre').length}/29</div></div>
+                  <div className="font-black text-[10px] mb-2">Viagens - {viagemSelecionada.rota} - Rota com paragens e valores</div>
+                  <div className="p-2 bg-[#1e2f4a] text-white rounded-lg text-[10px]">
+                    <div className="font-bold">{viagemSelecionada.origem} → {viagemSelecionada.destino}</div>
+                    <div>Ocupação: {assentos.filter((a:any)=>a.estado!=='livre').length}/{assentos.length}</div>
+                    <div className="mt-1 text-[8px]">Paragens com valor:</div>
+                    <div className="flex flex-wrap gap-1 mt-1">{(viaturas.find((vv:any)=>vv.id===viagemSelecionada.viaturaId)?.paragens||[{nome:'Xai-Xai', valor:800},{nome:'Beira', valor:2500}]).map((p:any, i:number)=><span key={i} className="text-[7px] px-1.5 py-0.5 bg-white text-[#1e2f4a] rounded-full">{p.nome} {p.valor}MT</span>)}</div>
+                  </div>
+                  <div className="mt-2 space-y-1">{viaturas.map((v:any)=><button key={v.id} onClick={()=>setViagemSelecionada({...viagemSelecionada, viaturaId:v.id, rota:v.rota, origem:v.rota.split('-')[0]?.trim(), destino:v.rota.split('-').slice(-1)[0]?.trim()})} className={`w-full text-left p-1.5 border rounded text-[9px] ${viagemSelecionada.viaturaId===v.id?'bg-[#d4a44a] text-white':'bg-white'}`}>{v.matricula} - {v.rota}</button>)}</div>
                 </div>
                 <div className="xl:col-span-5 border-2 border-[#1e2f4a] rounded-xl p-2 bg-[#f8fafc]">
-                  <div className="font-black text-[10px] mb-2">Mapa Assentos - Amarelo bloqueia</div>
+                  <div className="font-black text-[10px] mb-2">Mapa Assentos - Amarelo bloqueia mesmo lugar até aprovar M-Pesa</div>
                   <div className="grid grid-cols-5 gap-1.5">
                     {assentos.map((a:any)=>(
-                      <button key={a.numero} onClick={()=>{ if(a.estado!=='livre') return; setAssentoSelecionado(a.numero); setShowReservaModal(true); }} className={`h-12 rounded-lg border-2 text-[10px] font-black ${a.estado==='livre'?'bg-white border-gray-300': a.estado==='por_aprovar'?'bg-[#fef08a] border-yellow-500':'bg-green-300 border-green-600'}`}>
-                        <div>{a.numero}</div><div className="text-[7px]">{a.estado==='livre'?'Livre':'Amarelo'}</div>
+                      <button key={a.numero} onClick={()=>{ if(a.estado!=='livre') return; setAssentoSelecionado(a.numero); setShowReservaModal(true); }} className={`h-12 rounded-lg border-2 text-[10px] font-black flex flex-col items-center justify-center ${a.estado==='livre'?'bg-white border-gray-300': a.estado==='por_aprovar'?'bg-[#fef08a] border-yellow-500':'bg-green-300 border-green-600'}`}>
+                        <div>{a.numero}</div><div className="text-[7px]">{a.estado==='livre'?'Livre': a.estado==='por_aprovar'?'Amarelo':'Pago'}</div>
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="xl:col-span-4 space-y-2">
                   <div className="border-2 border-yellow-500 rounded-xl p-2 bg-[#fefce8]">
-                    <div className="font-black text-[10px]">🟡 Por Aprovar</div>
-                    <div className="space-y-1 mt-1">
+                    <div className="font-black text-[10px]">🟡 Por Aprovar M-Pesa ({reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').length}) - Valor varia por paragem</div>
+                    <div className="space-y-1 mt-1 max-h-[200px] overflow-y-auto">
                       {reservasPendentes.filter((r:any)=>r.estado==='por_aprovar').map((r:any)=>(
                         <div key={r.id} className="p-2 bg-white border rounded-lg text-[9px]">
-                          <div className="font-bold">Assento {r.assento} - {r.nome}</div><div>{r.mpesa} - {r.valor} MZN</div>
+                          <div className="font-bold">Assento {r.assento} - {r.nome} - {r.valor} MT</div><div>M-Pesa: {r.mpesa}</div>
                           <div className="flex gap-1 mt-1"><button onClick={()=>{ setReservasPendentes(reservasPendentes.map((rr:any)=>rr.id===r.id?{...rr, estado:'pago'}:rr)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'pago'}:aa)); }} className="flex-1 h-6 bg-green-600 text-white rounded-full">Aprovar</button><button onClick={()=>{ setReservasPendentes(reservasPendentes.filter((rr:any)=>rr.id!==r.id)); setAssentos(assentos.map((aa:any)=>aa.numero===r.assento?{...aa, estado:'livre'}:aa)); }} className="h-6 px-2 bg-red-500 text-white rounded-full">X</button></div>
                         </div>
                       ))}
                     </div>
+                  </div>
+                  <div className="border-2 rounded-xl p-2 bg-white">
+                    <div className="font-black text-[10px]">⛽ Combustível & Despesas</div>
+                    <div className="mt-1 space-y-1">{combustivel.map((c:any)=><div key={c.id} className="text-[8px] p-1 bg-[#f8fafc] border rounded">{c.data} - {c.local} - {c.litros}L - {c.valor} MZN</div>)}</div>
+                  </div>
+                  <div className="border-2 rounded-xl p-2 bg-white">
+                    <div className="font-black text-[10px]">🔧 Revisão</div>
+                    <div className="mt-1 space-y-1">{revisoes.map((r:any)=><div key={r.id} className="text-[8px] p-1 bg-[#fef9c3] border rounded">{r.data} - {r.local} - {r.tipo} - {r.custo} MZN</div>)}</div>
                   </div>
                 </div>
               </div>
@@ -1001,11 +1066,12 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
             {showReservaModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-xl p-4 w-full max-w-[340px] space-y-2">
-                  <div className="font-black text-[12px]">Reserva Assento {assentoSelecionado} - Amarelo</div>
+                  <div className="font-black text-[12px]">Reserva Assento {assentoSelecionado} - Amarelo bloqueia até M-Pesa - Valor por paragem</div>
+                  <select className="w-full h-8 px-2 border rounded text-[10px]">{(viaturas.find((vv:any)=>vv.id===viagemSelecionada.viaturaId)?.paragens||[]).map((p:any, i:number)=><option key={i} value={p.valor}>{p.nome} - {p.valor} MT</option>)}</select>
                   <input value={novaReserva.nome} onChange={e=>setNovaReserva({...novaReserva, nome:e.target.value})} placeholder="Nome" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                   <input value={novaReserva.tel} onChange={e=>setNovaReserva({...novaReserva, tel:e.target.value})} placeholder="Telefone" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                   <input value={novaReserva.mpesa} onChange={e=>setNovaReserva({...novaReserva, mpesa:e.target.value})} placeholder="Ref M-Pesa" className="w-full h-9 px-2 border rounded-lg text-[10px]" />
-                  <div className="flex gap-2"><button onClick={()=>{ if(!novaReserva.nome) return; const id=Date.now(); setReservasPendentes([...reservasPendentes, {id, assento:assentoSelecionado, nome:novaReserva.nome, tel:novaReserva.tel, mpesa:novaReserva.mpesa, valor:novaReserva.valor, estado:'por_aprovar'}]); setAssentos(assentos.map((a:any)=>a.numero===assentoSelecionado?{...a, estado:'por_aprovar'}:a)); setShowReservaModal(false); setNovaReserva({nome:'', tel:'', mpesa:'', valor:1500}); }} className="flex-1 h-9 bg-yellow-400 border-2 border-yellow-600 rounded-xl font-black text-[11px]">🟡 Reservar</button><button onClick={()=>setShowReservaModal(false)} className="h-9 px-3 bg-gray-200 rounded-xl text-[10px]">Cancelar</button></div>
+                  <div className="flex gap-2"><button onClick={()=>{ if(!novaReserva.nome) return; const id=Date.now(); setReservasPendentes([...reservasPendentes, {id, assento:assentoSelecionado, nome:novaReserva.nome, tel:novaReserva.tel, mpesa:novaReserva.mpesa, valor:novaReserva.valor, estado:'por_aprovar'}]); setAssentos(assentos.map((a:any)=>a.numero===assentoSelecionado?{...a, estado:'por_aprovar'}:a)); setShowReservaModal(false); setNovaReserva({nome:'', tel:'', mpesa:'', valor:800}); }} className="flex-1 h-9 bg-yellow-400 border-2 border-yellow-600 rounded-xl font-black text-[11px]">🟡 Reservar Amarelo</button><button onClick={()=>setShowReservaModal(false)} className="h-9 px-3 bg-gray-200 rounded-xl text-[10px]">Cancelar</button></div>
                 </div>
               </div>
             )}
