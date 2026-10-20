@@ -506,16 +506,20 @@ useEffect(()=>{
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
 <style>
-body{font-family:'Times New Roman', Times, serif !important;font-size:12pt !important;line-height:1.6 !important;color:#000 !important;background:#fff !important;max-width:850px;margin:20px auto;padding:20px}
-.header{background:#1e2f4a;color:white;padding:15px 20px;border-radius:12px;display:flex;align-items:flex-start;gap:15px;text-align:left}
-.header h1{color:#d4a44a;font-size:13px;font-weight:bold;margin:0;line-height:1.3}
-.header div{font-size:10px;line-height:1.2}
-.clausula{background:#fff !important;border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;color:#000 !important;font-family:'Times New Roman', Times, serif !important;font-size:12pt !important}
-.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;font-size:11pt;margin:0 0 10px 0;font-family:'Times New Roman', Times, serif}
-.tarefa{display:inline-block;background:#fff !important;color:#000 !important;border:1px solid #1e2f4a !important;padding:4px 10px;border-radius:12px;font-size:10pt !important;font-family:'Times New Roman', Times, serif !important;margin:3px;white-space:normal}
+body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px}
+.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
+.header h1{color:#d4a44a;margin:0;font-size:16px}
+.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:#f8fafc}
+.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
+.tarefa{display:inline-block;background:#fff !important;color:#000 !important;border:1px solid #cbd5e1;padding:5px 10px;border-radius:12px;font-size:10px;margin:3px;font-family:'Times New Roman', Times, serif}
+.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
+.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
+.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
+@media print{.no-print{display:none}}
 </style>
 </head><body>
-<div class="header"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;min-width:90px;max-width:90px">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : `<div style="width:70px;height:70px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:8px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 4px;border-radius:3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1;min-width:0"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div>
+<div class="header" style="display:flex;align-items:center;gap:15px;text-align:left"><div style="background:white;border-radius:8px;padding:6px;min-width:80px;display:flex;flex-direction:column;align-items:center">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:65px;height:65px;object-fit:contain;border-radius:6px"/>` : `<div style="width:65px;height:65px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:8px;font-weight:bold;color:#1e2f4a;margin-top:3px;max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div></div>
 
 <div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
 <b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
@@ -604,7 +608,7 @@ body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;
 @media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
 </style>
 </head><body>
-<div class="header"><div style="background:white;border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;min-width:90px;max-width:90px">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:70px;height:70px;object-fit:contain;border-radius:6px"/>` : `<div style="width:70px;height:70px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:8px;font-weight:bold;color:#1e2f4a;margin-top:4px;background:white;padding:2px 4px;border-radius:3px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1;min-width:0"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS NA HORIZONTAL NAO VERTICAL</h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
+<div class="header" style="display:flex;align-items:center;gap:15px;text-align:left"><div style="background:white;border-radius:8px;padding:6px;min-width:80px;display:flex;flex-direction:column;align-items:center">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="width:65px;height:65px;object-fit:contain;border-radius:6px"/>` : `<div style="width:65px;height:65px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px">🏢</div>`}${formContrato.logoTipo ? `<div style="font-size:8px;font-weight:bold;color:#1e2f4a;margin-top:3px;max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${formContrato.logoTipo}</div>` : ""}</div><div style="flex:1"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS NA HORIZONTAL NAO VERTICAL</h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div></div>
 
 <div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
 <b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
@@ -909,15 +913,16 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
         </div>}
 
         {/* CLAUSULA 10 - ANEXOS - LIMPO */}
-        {clausulaAtiva===10 && <div className="space-y-4">
-          <div className="font-black text-[13px]">CLAUSULA 10: ANEXOS (ANTES VALIDADE) - Prova legal</div>
-          <div className="text-[10px] text-gray-500">Esquerda seleciona na lista o documento que quer anexar. Direita anexa + logo tipo - Como pediu</div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {clausulaAtiva===10 && (
+          <div className="space-y-4">
+            <div className="font-black text-[13px]">CLAUSULA 10: ANEXOS (ANTES VALIDADE) - Prova legal</div>
+            <div className="text-[10px] text-gray-500">Esquerda seleciona documento, direita anexa - Logo no topo esquerdo</div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="border-2 border-[#1e2f4a] rounded-xl p-3 bg-[#f8fafc]">
                 <div className="font-black text-[11px] mb-2">SELECIONA O DOCUMENTO</div>
                 <div className="space-y-1.5">
                   {[
-                    {id:'logo_tipo', label:'Logo Tipo / Marca', desc:'Topo do contrato a esquerda', icon:'🏢'},
+                    {id:'logo_tipo', label:'Logo Tipo / Marca', desc:'Topo esquerdo contrato', icon:'🏢'},
                     {id:'bi_contratante', label:'Foto BI Contratante', desc: (formContrato.empNome || 'Contratante') + ' BI', icon:'🪪'},
                     {id:'bi_contratado', label:'Foto BI Contratado', desc: (formContrato.trabNome || 'Contratado') + ' BI', icon:'🪪'},
                     {id:'foto_local', label:'Foto do local', desc: formContrato.localTrab || 'Local', icon:'📸'},
@@ -954,10 +959,10 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                       <div className="flex-1 space-y-2">
                         <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa Ex: Nagi Invest" className="w-full h-9 px-3 border-2 rounded-lg text-[11px] font-bold" />
                         <div className="flex gap-2">
-                          <button onClick={()=>document.getElementById('inputLogoTipoV55')?.click()} className="flex-1 h-8 bg-[#1e2f4a] text-white rounded-full text-[10px] font-bold">📎 Anexar Logo</button>
+                          <button onClick={()=>document.getElementById('inputLogoTipoV62')?.click()} className="flex-1 h-8 bg-[#1e2f4a] text-white rounded-full text-[10px] font-bold">📎 Anexar Logo</button>
                           {formContrato.logoData && <button onClick={()=>setFormContrato((prev:any)=>({...prev, logoData:'', logoTipo:''}))} className="h-8 px-3 bg-red-500 text-white rounded-full text-[10px]">X</button>}
                         </div>
-                        <input id="inputLogoTipoV55" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name.replace(/\.[^/.]+$/, '')})); r.readAsDataURL(f); }}} />
+                        <input id="inputLogoTipoV62" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name.replace(/\.[^/.]+$/, '')})); r.readAsDataURL(f); }}} />
                         <div className="text-[9px] text-green-600">{formContrato.logoData ? '✅ Vai no topo a esquerda no preview e PDF' : 'PNG JPG quadrado'}</div>
                       </div>
                     </div>
@@ -990,7 +995,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 )}
               </div>
             </div>
-        </div>}
+          </div>
+        )}
 
         {clausulaAtiva===11 && <div className="space-y-4">
           <div className="font-bold text-[14px] text-[#1e2f4a]">CLAUSULA 11 - PDF FINAL PARTILHAVEL COM ASSINATURAS</div>
