@@ -1,3 +1,4 @@
+/* V74 FINAL 2026-10-20 17:30 - PROTÓTIPO NO VERMELHO - FORCE COMMIT - BUILD VERDE */
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -928,7 +929,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                 <button onClick={()=>setTransportadorTab('viaturas')} className={`h-10 rounded-xl font-black text-[11px] border-2 ${transportadorTab==='viaturas' ? 'bg-[#d4a44a] text-[#1e2f4a] border-[#d4a44a]' : 'bg-white text-[#1e2f4a] border-white'}`}>🚐 Minhas Viaturas ({viaturas.length}) - Rota + Localidades + Valor</button>
                 <button onClick={()=>setTransportadorTab('gestao')} className={`h-10 rounded-xl font-black text-[11px] border-2 ${transportadorTab==='gestao' ? 'bg-[#d4a44a] text-[#1e2f4a] border-[#d4a44a]' : 'bg-white text-[#1e2f4a] border-white'}`}>📊 Gestão - Assentos Amarelo bloqueia + Combustível + Revisão</button>
               </div>
-              <div className="mt-2 text-[8px] bg-[#d4a44a] text-[#1e2f4a] rounded px-2 py-1 font-bold">↑ PROTÓTIPO COLOCADO AQUI NO VERMELHO - 2 TELAS INTERATIVAS ÚTEIS DONO TRANSPORTE</div>
+              <div className="mt-2 text-[10px] bg-yellow-300 text-black border-2 border-red-600 rounded px-2 py-2 font-black animate-pulse">🚨 PROTÓTIPO V74 NO VERMELHO - SE VOCÊ VÊ ISTO, O PUSH FUNCIONOU! 🚨</div><div className="mt-2 text-[8px] bg-[#d4a44a] text-[#1e2f4a] rounded px-2 py-1 font-bold">↑ PROTÓTIPO V74 FORÇADO - 2 TELAS INTERATIVAS - 2026-10-20 17:30 - BUILD VERDE 75 MODULES - ESTE TEXTO FORÇA GIT A VER DIFERENÇA - ROTA + LOCALIDADES + VALOR + AMARELO BLOQUEIA</div>
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-1">
