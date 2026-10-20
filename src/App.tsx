@@ -4,8 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // ===== SUPABASE CLIENT - CONTRATA-MZ VIAGENS NACIONAL =====
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 import AdminPanel from './AdminPanel';
@@ -156,7 +156,8 @@ export default function App(){
 
  const [tab,setTab]=useState("encontrar");
  const [contratoSel,setContratoSel]=useState(1);
- const [clausulaAtiva,setClausulaAtiva]=useState(4);
+ const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('bi_contratante');
+  const [clausulaAtiva,setClausulaAtiva]=useState(4);
  const [tipoCadastro,setTipoCadastro]=useState("prof");
  const [filtroBusca,setFiltroBusca]=useState("");
  const [paisFiltro,setPaisFiltro]=useState("Mocambique");
