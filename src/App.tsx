@@ -1400,6 +1400,7 @@ Bilhete valido - Apresentar QR`;
                           <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
                         </div>
                         <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar</button>
+                        <div className="mt-2 text-center text-[9px] opacity-60">Teste: nagi / 123</div>
                       </div>
                     ) : (
                       <div className="mt-5 max-w-[500px] mx-auto">
@@ -1418,23 +1419,86 @@ Bilhete valido - Apresentar QR`;
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white">
-                    <div className="font-black text-[12px]">LOGADO - Painel OK - {transportadorLoginForm.username || 'nagi'}</div>
-                    <div className="flex gap-1 mt-2">
-                      <button onClick={()=>setAreaTransSubTab('frota')} className="px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black">Minha Frota</button>
-                      <button onClick={()=>setAreaTransSubTab('registar')} className="px-3 py-1 rounded-full bg-white/20 text-white text-[9px]">Registar</button>
-                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1 rounded-full bg-white/10 text-[9px]">Sair</button>
+                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center flex-wrap gap-2">
+                    <div><div className="font-black text-[12px]">Transportador - 3 Viaturas - Logado {transportadorLoginForm.username || 'nagi'}</div><div className="text-[9px] opacity-70">1 conta gere varias viaturas - Max 3</div></div>
+                    <div className="flex gap-1 flex-wrap">
+                      <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Minha Frota</button>
+                      <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Registar Viatura</button>
+                      <button onClick={()=>setAreaTransSubTab('mapa')} className={areaTransSubTab==='mapa' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Mapa Assentos</button>
+                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1.5 rounded-full bg-white/10 text-[10px]">Sair</button>
                     </div>
                   </div>
-                  <div className="bg-white rounded-[12px] border p-4">
-                    <div className="font-black text-[12px]">Minha Frota - 3 Viaturas - V83 FIX BRANCO</div>
-                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <div className="border-2 border-[#facc15] rounded-[10px] p-3 bg-[#fefce8]"><div className="font-black text-[11px]">Viatura 1 - Coaster 29 - ABM 123 MP</div><div className="text-[8px] mt-1">Maputo - Xai-Xai - Activa</div></div>
-                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 2 - Hiace 15 - ACD 456 MP</div><div className="text-[8px] mt-1">Maputo - Beira - Activa</div></div>
-                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 3 - Mini-Bus 22 - AEF 789 MP</div><div className="text-[8px] mt-1">Maputo - Nampula - Manutencao</div></div>
+
+                  {areaTransSubTab==='frota' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="md:col-span-1 bg-white rounded-[12px] border p-3">
+                        <div className="font-black text-[11px]">Minhas Viaturas</div>
+                        <div className="mt-3 space-y-2">
+                          <div className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px]">Maputo - Beira - 4/29</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai - 2/15</div></div>
+                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula</div></div>
+                        </div>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens</div></div>
+                        <div className="mt-2 text-[8px] text-gray-500">REGRAS NEGOCIO - 1 conta 3 viaturas</div>
+                      </div>
+                      <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
+                        <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares</div><div className="flex gap-1"><span className="text-[8px] bg-gray-100 px-2 py-0.5 rounded">FRENTE</span><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-0.5 rounded">+ Nova Viagem</button></div></div>
+                        <div className="mt-3 grid grid-cols-4 gap-1 max-w-[280px] mx-auto">
+                          {Array.from({length:28}, (_,i)=>(
+                            <div key={i} className={i===1 ? 'h-8 border rounded-[6px] flex items-center justify-center text-[8px] font-black bg-[#facc15] border-[#facc15]' : i===3 ? 'h-8 border rounded-[6px] flex items-center justify-center text-[8px] font-black bg-[#22c55e] text-white' : i===7 ? 'h-8 border rounded-[6px] flex items-center justify-center text-[8px] font-black bg-[#ef4444] text-white' : 'h-8 border rounded-[6px] flex items-center justify-center text-[8px] bg-white'}>
+                              {i+1}
+                            </div>
+                          ))}
+                          <div className="h-8 col-span-4 flex items-center justify-center text-[7px]">_ 28 - WC</div>
+                        </div>
+                        <div className="mt-2 flex justify-center gap-2 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#22c55e] rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#ef4444] rounded"></div>Reservado</div></div>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-3 bg-green-50 border border-green-200 rounded p-2"><div className="text-[10px] font-black text-green-800">FIX PAGINA BRANCA OK - Se voce ve isso, funcionou!</div></div>
-                  </div>
+                  )}
+
+                  {areaTransSubTab==='registar' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-white rounded-[12px] border p-3">
+                        <div className="font-black text-[11px]">Registar Nova Viatura</div>
+                        <div className="text-[8px] text-gray-500 mt-1">Preencha para adicionar a sua frota - Max 3</div>
+                        <div className="mt-3 space-y-2">
+                          <div><label className="text-[8px] font-black">MATRICULA</label><input placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5" /></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><select className="w-full p-2 border rounded text-[10px] mt-0.5"><option>Toyota</option><option>Nissan</option></select></div><div><label className="text-[8px] font-black">MODELO</label><select className="w-full p-2 border rounded text-[10px] mt-0.5"><option>Coaster</option><option>Hiace</option></select></div></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><input placeholder="2018" className="w-full p-2 border rounded text-[10px]" /></div><div><label className="text-[8px] font-black">LOTACAO</label><input placeholder="29" className="w-full p-2 border rounded text-[10px]" /></div></div>
+                          <div><label className="text-[8px] font-black">TIPO</label><select className="w-full p-2 border rounded text-[10px]"><option>Mini-Bus 29</option><option>Hiace 15</option></select></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">COMBUSTIVEL</label><select className="w-full p-2 border rounded text-[10px]"><option>Diesel</option></select></div><div><label className="text-[8px] font-black">ESTADO</label><select className="w-full p-2 border rounded text-[10px]"><option>Boa</option></select></div></div>
+                          <div><label className="text-[8px] font-black">ROTA PRINCIPAL</label><input placeholder="Maputo - Xai-Xai" className="w-full p-2 border rounded text-[10px]" /></div>
+                          <div><label className="text-[8px] font-black">KM ATUAL</label><input placeholder="120000" className="w-full p-2 border rounded text-[10px]" /></div>
+                          <div className="pt-2 border-t"><label className="text-[8px] font-black">DOCUMENTOS E VALIDACAO</label><div className="grid grid-cols-2 gap-1 mt-1"><div className="flex items-center gap-1 text-[8px]"><input type="checkbox" /> Seguro</div><div className="flex items-center gap-1 text-[8px]"><input type="checkbox" /> Inspeccao</div><div className="flex items-center gap-1 text-[8px]"><input type="checkbox" /> Licenca</div><div className="flex items-center gap-1 text-[8px]"><input type="checkbox" /> Manifesto</div></div></div>
+                          <div className="pt-2"><label className="text-[8px] font-black">FOTOS DA VIATURA</label><div className="grid grid-cols-4 gap-1 mt-1"><div className="h-8 border-2 border-dashed rounded flex items-center justify-center text-[10px]">+</div><div className="h-8 border-2 border-dashed rounded flex items-center justify-center text-[10px]">+</div><div className="h-8 border-2 border-dashed rounded flex items-center justify-center text-[10px]">+</div><div className="h-8 border-2 border-dashed rounded flex items-center justify-center text-[10px]">+</div></div></div>
+                          <button className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px]">Registar Viatura - 2 min foto</button>
+                        </div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <div className="font-black text-[11px] mb-2">Frota registada - { (typeof viaturas !== 'undefined' && viaturas ? viaturas.length : 2) } viaturas</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-123-MP - Coaster 29</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span><span className="text-[6px] bg-[#facc15] text-black px-1 rounded">Verificada</span></div></div><div className="p-2"><div className="text-[8px] font-black">Toyota Coaster</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2018</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo-Beira</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-456-MP - Hiace 15</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span></div></div><div className="p-2"><div className="text-[8px] font-black">Nissan Civilian</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 15</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2020</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
+                        </div>
+                        <div className="mt-3 bg-green-50 border border-green-200 rounded-[8px] p-2"><div className="text-[8px] font-black text-green-800">Layout igual a foto amarela que voce circulou - Form + 2 cards frota</div></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {areaTransSubTab==='mapa' && (
+                    <div className="bg-white rounded-[12px] border p-3">
+                      <div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - Igual foto laranja</div>
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="bg-gray-50 rounded-[10px] p-2"><div className="text-[8px] font-black">Lista Viaturas</div><div className="mt-2 space-y-1"><div className="bg-white border-2 border-[#facc15] rounded p-1 text-[8px]">MMN-123 - 29 - 4/29</div><div className="bg-white border rounded p-1 text-[8px]">MMN-456 - 15</div></div></div>
+                        <div className="bg-white border rounded-[10px] p-2"><div className="text-[8px] font-black text-center">FRENTE - Motorista</div><div className="grid grid-cols-4 gap-1 mt-2 max-w-[200px] mx-auto">{Array.from({length:28}, (_,i)=><div key={i} className="h-6 border rounded flex items-center justify-center text-[7px]">{i+1}</div>)}</div></div>
+                        <div className="bg-gray-50 rounded-[10px] p-2"><div className="text-[8px] font-black">Reservas</div><div className="mt-2 bg-[#fefce8] border rounded p-1 text-[7px]">Joao - Assento 2 - <button className="bg-green-500 text-white px-1 rounded">Aprovar</button></div></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
