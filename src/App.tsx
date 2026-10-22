@@ -1389,12 +1389,10 @@ Bilhete valido - Apresentar QR`;
                   <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
                     <h2 className="text-[16px] font-black text-center">AREA TRANSPORTADOR - Login / Cadastro</h2>
                     <p className="text-[10px] opacity-70 text-center">Transportador entra aqui - Crie conta ou entre</p>
-                    
                     <div className="flex justify-center gap-2 mt-4">
                       <button onClick={()=>setAuthMode('login')} className={`px-4 py-1.5 rounded-full font-black text-[11px] ${authMode==='login'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>LOGIN</button>
                       <button onClick={()=>setAuthMode('cadastro')} className={`px-4 py-1.5 rounded-full font-black text-[11px] ${authMode==='cadastro'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>CADASTRO</button>
                     </div>
-
                     {authMode==='login' ? (
                       <div className="mt-4 max-w-[400px] mx-auto space-y-3">
                         <div className="grid grid-cols-2 gap-2">
@@ -1402,21 +1400,18 @@ Bilhete valido - Apresentar QR`;
                           <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2 rounded text-black text-[12px]"/>
                         </div>
                         <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full px-6 py-2.5 bg-[#facc15] text-black font-black rounded-full text-[12px]">Entrar</button>
-                        <p className="text-[9px] opacity-60 text-center">Teste: qualquer username/password -> nagi / 123</p>
                       </div>
                     ) : (
                       <div className="mt-4 max-w-[500px] mx-auto space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                           <input placeholder="Nome Completo" className="p-2 rounded text-black text-[11px]"/>
                           <input placeholder="BI / NUIT" className="p-2 rounded text-black text-[11px]"/>
-                          <input placeholder="Telefone WhatsApp" className="p-2 rounded text-black text-[11px]"/>
+                          <input placeholder="WhatsApp" className="p-2 rounded text-black text-[11px]"/>
                           <input placeholder="Email" className="p-2 rounded text-black text-[11px]"/>
-                          <input placeholder="Empresa (Opcional)" className="p-2 rounded text-black text-[11px] col-span-2"/>
-                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Crie Username" className="p-2 rounded text-black text-[11px]"/>
-                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Crie Password" type="password" className="p-2 rounded text-black text-[11px]"/>
+                          <input placeholder="Crie Username" className="p-2 rounded text-black text-[11px]" value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})}/>
+                          <input placeholder="Crie Password" type="password" className="p-2 rounded text-black text-[11px]" value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})}/>
                         </div>
                         <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-2 px-6 py-2.5 bg-[#25D366] text-white font-black rounded-full text-[12px]">Cadastrar e Entrar</button>
-                        <p className="text-[9px] opacity-60 text-center">Ao cadastrar, aceita termos Contrata-MZ - 3 viaturas por conta</p>
                       </div>
                     )}
                   </div>
