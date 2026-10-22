@@ -381,6 +381,7 @@ export default function App(){
    {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
  ]);
  const [transportadorLogado, setTransportadorLogado] = useState(false);
+  const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
  const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
  const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
 useEffect(()=>{
