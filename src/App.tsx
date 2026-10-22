@@ -1386,101 +1386,40 @@ Bilhete valido - Apresentar QR`;
             <div className="space-y-3">
               {!transportadorLogado ? (
                 <div className="max-w-[900px] mx-auto">
-                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
-                    <h2 className="text-[16px] font-black text-center">AREA TRANSPORTADOR - Login / Cadastro</h2>
-                    <p className="text-[10px] opacity-70 text-center mt-1">Crie conta ou entre - 1 conta gere 3 viaturas</p>
+                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white text-center">
+                    <h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro - V86 DEBUG</h2>
+                    <p className="text-[10px] opacity-70 mt-1">V85 deu branco apos login - V86 minimal para testar</p>
                     <div className="flex justify-center gap-2 mt-4">
-                      <button onClick={()=>setAuthMode('login')} className={authMode==='login' ? 'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black' : 'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>LOGIN</button>
-                      <button onClick={()=>setAuthMode('cadastro')} className={authMode==='cadastro' ? 'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black' : 'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>CADASTRO</button>
+                      <button onClick={()=>setAuthMode('login')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black">LOGIN</button>
+                      <button onClick={()=>setAuthMode('cadastro')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white">CADASTRO</button>
                     </div>
-                    {authMode==='login' ? (
-                      <div className="mt-5 max-w-[420px] mx-auto">
-                        <div className="grid grid-cols-2 gap-2">
-                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
-                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
-                        </div>
-                        <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar - nagi / 123</button>
+                    <div className="mt-5 max-w-[420px] mx-auto">
+                      <div className="grid grid-cols-2 gap-2">
+                        <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
+                        <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
                       </div>
-                    ) : (
-                      <div className="mt-5 max-w-[500px] mx-auto">
-                        <div className="grid grid-cols-2 gap-2">
-                          <input placeholder="Nome Completo" className="p-2.5 rounded text-black text-[11px]" />
-                          <input placeholder="BI / NUIT" className="p-2.5 rounded text-black text-[11px]" />
-                          <input placeholder="WhatsApp" className="p-2.5 rounded text-black text-[11px]" />
-                          <input placeholder="Email" className="p-2.5 rounded text-black text-[11px]" />
-                          <input placeholder="Crie Username" className="p-2.5 rounded text-black text-[11px]" />
-                          <input placeholder="Crie Password" type="password" className="p-2.5 rounded text-black text-[11px]" />
-                        </div>
-                        <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#25D366] text-white font-black rounded-full text-[12px]">Cadastrar e Entrar</button>
-                      </div>
-                    )}
+                      <button onClick={()=>{console.log('LOGIN CLICK'); setTransportadorLogado(true); setAreaTransSubTab('frota'); console.log('LOGADO TRUE')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar - TESTE V86</button>
+                    </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center flex-wrap gap-2">
-                    <div><div className="font-black text-[12px]">Transportador Logado - {transportadorLoginForm.username || 'nagi'} - 3 Viaturas</div><div className="text-[9px] opacity-70">1 conta gere varias viaturas - Max 3 - V85 FIX BRANCO</div></div>
-                    <div className="flex gap-1 flex-wrap">
-                      <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Minha Frota</button>
-                      <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Registar</button>
-                      <button onClick={()=>setAreaTransSubTab('mapa')} className={areaTransSubTab==='mapa' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Mapa 29</button>
-                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1.5 rounded-full bg-white/10 text-[10px]">Sair</button>
+                  <div className="bg-green-600 rounded-[12px] p-6 text-white text-center">
+                    <div className="text-[20px] font-black">LOGADO COM SUCESSO - V86 DEBUG OK!</div>
+                    <div className="text-[12px] mt-2">Se voce esta vendo isso, o branco foi corrigido!</div>
+                    <div className="text-[10px] mt-1 opacity-80">Username: {transportadorLoginForm.username || 'nagi'}</div>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <button onClick={()=>setAreaTransSubTab('frota')} className="px-4 py-2 bg-white text-black rounded-full text-[10px] font-black">Frota</button>
+                      <button onClick={()=>setAreaTransSubTab('registar')} className="px-4 py-2 bg-black/20 text-white rounded-full text-[10px]">Registar</button>
+                      <button onClick={()=>setAreaTransSubTab('mapa')} className="px-4 py-2 bg-black/20 text-white rounded-full text-[10px]">Mapa</button>
+                      <button onClick={()=>setTransportadorLogado(false)} className="px-4 py-2 bg-red-500 text-white rounded-full text-[10px]">Sair</button>
+                    </div>
+                    <div className="mt-4 bg-white text-black rounded-[10px] p-3">
+                      <div className="font-black text-[12px]">AreaTransSubTab atual: {areaTransSubTab || 'vazio'}</div>
+                      <div className="mt-2 text-[10px]">Frota: 3 viaturas - MMN-123, MMN-456, MMN-789</div>
+                      <div className="mt-2 text-[9px] text-gray-600">Esse e o V86 minimal - depois que funcionar, adiciono o layout completo das fotos</div>
                     </div>
                   </div>
-
-                  {areaTransSubTab==='frota' && (
-                    <div className="bg-white rounded-[12px] border p-4">
-                      <div className="flex justify-between"><div className="font-black text-[12px]">Minha Frota - 3 Viaturas - V85 SEM BRANCO</div><button onClick={()=>setAreaTransSubTab('registar')} className="px-3 py-1 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar</button></div>
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 1 - Coaster 29 - MMN-123-MP</div><div className="text-[9px] mt-1">Maputo - Beira - 4/29 ocupados - Activa - Verificada</div><div className="mt-2 text-[8px] bg-green-50 border p-1 rounded">RESUMO HOJE: 1.400 MT - 3 viagens</div></div>
-                        <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 2 - Hiace 15 - MMN-456-MP</div><div className="text-[9px] mt-1">Maputo - Xai-Xai - 2/15 - Activa</div></div>
-                        <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 3 - Mini-Bus 22 - MMN-789-MP</div><div className="text-[9px] mt-1">Maputo - Nampula - Manutencao</div></div>
-                      </div>
-                      <div className="mt-3 bg-green-50 border border-green-200 rounded p-2 text-center"><div className="text-[10px] font-black text-green-800">V85 FIX BRANCO OK - Se voce ve isso, NAO esta mais em branco!</div><div className="text-[8px] text-green-700 mt-1">Agora clique em Registar e Mapa 29 acima</div></div>
-                    </div>
-                  )}
-
-                  {areaTransSubTab==='registar' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Registar Nova Viatura - Igual foto amarela</div>
-                        <div className="mt-3 space-y-2">
-                          <div><label className="text-[8px] font-black">MATRICULA</label><input defaultValue="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-gray-50" /></div>
-                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><div className="w-full p-2 border rounded text-[10px] bg-white">Toyota</div></div><div><label className="text-[8px] font-black">MODELO</label><div className="w-full p-2 border rounded text-[10px] bg-white">Coaster</div></div></div>
-                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><div className="w-full p-2 border rounded text-[10px]">2018</div></div><div><label className="text-[8px] font-black">LOTACAO</label><div className="w-full p-2 border rounded text-[10px]">29</div></div></div>
-                          <div><label className="text-[8px] font-black">TIPO</label><div className="w-full p-2 border rounded text-[10px]">Mini-Bus 29</div></div>
-                          <div><label className="text-[8px] font-black">ROTA PRINCIPAL</label><div className="w-full p-2 border rounded text-[10px]">Maputo - Xai-Xai</div></div>
-                          <div className="pt-2 border-t"><label className="text-[8px] font-black">DOCUMENTOS E VALIDACAO</label><div className="mt-1 text-[8px] space-y-1"><div>☑ Seguro - Valido ate 2026-12</div><div>☑ Inspeccao - Valido</div><div>☐ Licenca</div></div></div>
-                          <div className="pt-2"><label className="text-[8px] font-black">FOTOS DA VIATURA - 4 fotos</label><div className="grid grid-cols-4 gap-1 mt-1"><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+</div></div></div>
-                          <button className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px]">Registar Viatura - 2 min foto</button>
-                        </div>
-                      </div>
-                      <div className="md:col-span-2">
-                        <div className="font-black text-[11px] mb-2">Frota registada - 2 viaturas - Igual foto amarela</div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2"><div className="text-[8px] font-black">MMN-123-MP - COASTER 29 - Verificada</div></div><div className="p-2"><div className="text-[8px]">Toyota Coaster - 2018 - 29 lugares</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2"><div className="text-[8px] font-black">MMN-456-MP - HIACE 15</div></div><div className="p-2"><div className="text-[8px]">Nissan - 2020 - 15 lugares</div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {areaTransSubTab==='mapa' && (
-                    <div className="bg-white rounded-[12px] border p-4">
-                      <div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - Igual foto laranja - SEM Array.from</div>
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="bg-gray-50 rounded-[10px] p-2"><div className="text-[8px] font-black">Minhas Viaturas</div><div className="mt-2 space-y-1"><div className="bg-white border-2 border-[#facc15] rounded p-2 text-[9px] font-black">MMN-123-MP - 29 - 4/29 - Maputo-Beira</div><div className="bg-white border rounded p-2 text-[9px]">MMN-456-MP - 15 - Maputo-Xai</div></div><div className="mt-3 bg-[#1e2f4a] rounded p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO</div><div className="text-[9px] mt-1">1.400 MT hoje</div></div></div>
-                        <div className="bg-white border-2 rounded-[10px] p-3">
-                          <div className="flex justify-between"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - 4/29</div><div className="text-[7px] bg-[#facc15] px-2 rounded-full">Coaster 29</div></div>
-                          <div className="mt-3 max-w-[220px] mx-auto">
-                            <div className="grid grid-cols-4 gap-1"><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">1</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#facc15] font-black">2</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">3</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e] text-white">4</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">5</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e]">6</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444] text-white">7</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444]">8</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">9</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">10</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">11</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">12</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">13</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">15</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">16</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">17</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">18</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">19</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">20</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">21</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">22</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">23</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">24</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">25</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">26</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">27</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">28</div><div className="col-span-4 h-6 flex items-center justify-center text-[7px]">WC - 29</div></div>
-                          </div>
-                          <div className="mt-2 flex justify-center gap-2 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#22c55e] rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#ef4444] rounded"></div>Reservado</div></div>
-                        </div>
-                        <div className="bg-gray-50 rounded-[10px] p-2"><div className="text-[8px] font-black">Reservas - 2 pendentes</div><div className="mt-2 space-y-2"><div className="bg-[#fefce8] border border-yellow-200 rounded p-2"><div className="text-[8px] font-black">Reserva 1 - Joao - Assento 2</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div><div className="bg-[#fefce8] border rounded p-2"><div className="text-[8px] font-black">Reserva 2 - Maria - Assento 8</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button></div></div></div><div className="mt-3 text-[7px] text-gray-500">Legenda: amarelo=ocupado verde=livre vermelho=reservado</div></div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
