@@ -1384,46 +1384,64 @@ Bilhete valido - Apresentar QR`;
           
       {viagensTab==='area' && (
             <div className="space-y-3">
-              {!transportadorLogado ? (
+                            {!transportadorLogado ? (
                 <div className="max-w-[900px] mx-auto">
-                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white text-center"><h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro</h2><p className="text-[10px] opacity-70">Transportador entra aqui</p>
-                    <div className="grid grid-cols-2 gap-2 mt-4 max-w-[400px] mx-auto">
-                      <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2 rounded text-black text-[12px]"/>
-                      <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2 rounded text-black text-[12px]"/>
+                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
+                    <h2 className="text-[16px] font-black text-center">AREA TRANSPORTADOR - Login / Cadastro</h2>
+                    <p className="text-[10px] opacity-70 text-center mt-1">Transportador entra aqui - Crie conta ou entre</p>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <button onClick={()=>setAuthMode('login')} className={authMode==='login'?'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black':'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>LOGIN</button>
+                      <button onClick={()=>setAuthMode('cadastro')} className={authMode==='cadastro'?'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black':'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>CADASTRO</button>
                     </div>
-                    <button onClick={()=>{setTransportadorLogado(true)}} className="mt-3 px-6 py-2 bg-[#facc15] text-black font-black rounded-full text-[12px]">Entrar</button>
+                    {authMode==='login' ? (
+                      <div className="mt-5 max-w-[420px] mx-auto">
+                        <div className="grid grid-cols-2 gap-2">
+                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]"/>
+                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]"/>
+                        </div>
+                        <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar</button>
+                      </div>
+                    ) : (
+                      <div className="mt-5 max-w-[500px] mx-auto">
+                        <div className="grid grid-cols-2 gap-2">
+                          <input placeholder="Nome Completo" className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="BI / NUIT" className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="WhatsApp" className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="Email" className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="Crie Username" value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="Crie Password" type="password" value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} className="p-2.5 rounded text-black text-[11px]"/>
+                        </div>
+                        <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#25D366] text-white font-black rounded-full text-[12px]">Cadastrar e Entrar</button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex flex-wrap justify-between items-center gap-2">
-                    <div><div className="font-black text-[12px]">Area Transportador - Painel - 2 Telas Dentro</div><div className="text-[9px] opacity-70">3 Viaturas - 1 conta gere varias viaturas</div></div>
-                    <div className="flex gap-1 flex-wrap">
-                      <button onClick={()=>setAreaTransSubTab('frota')} className={`px-3 py-1.5 rounded-full font-black text-[9px] ${areaTransSubTab==='frota'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>Minha Frota</button>
-                      <button onClick={()=>setAreaTransSubTab('registar')} className={`px-3 py-1.5 rounded-full font-black text-[9px] ${areaTransSubTab==='registar'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>Registar Viatura</button>
-                      <button onClick={()=>setAreaTransSubTab('mapa')} className={`px-3 py-1.5 rounded-full font-black text-[9px] ${areaTransSubTab==='mapa'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>Mapa Assentos</button>
-                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1.5 rounded-full bg-white/10 text-[9px]">Sair</button>
+                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center">
+                    <div><div className="font-black text-[12px]">LOGADO - Painel Transportador</div><div className="text-[9px] opacity-70">3 Viaturas - 1 conta - {transportadorLoginForm.username || 'nagi'}</div></div>
+                    <div className="flex gap-1">
+                      <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Frota</button>
+                      <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Registar</button>
+                      <button onClick={()=>setAreaTransSubTab('mapa')} className={areaTransSubTab==='mapa'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Mapa</button>
+                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1 rounded-full bg-white/10 text-[9px]">Sair</button>
                     </div>
                   </div>
-                  {areaTransSubTab==='frota' && (
-                    <div className="space-y-3">
-                      <div className="bg-white rounded-[12px] border p-3"><div className="flex justify-between"><div className="font-black text-[11px]">Minha Frota - Gestao centralizada - {(viaturas && viaturas.length) || 3} Viaturas</div><button onClick={()=>setAreaTransSubTab('registar')} className="px-3 py-1.5 bg-[#facc15] rounded-full text-[9px] font-black">+ Adicionar</button></div><div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">{(viaturas || []).map((vt:any)=>(<div key={vt.id} className="border rounded-[10px] p-2"><div className="font-black text-[10px]">{vt.tipo}</div><div className="text-[8px] text-gray-500">Matricula: {vt.matricula}<br/>Lugares: {vt.lugares}<br/>Rota: {vt.rota}</div></div>))}</div></div>
-                      <div className="bg-white rounded-[12px] border-2 border-[#facc15] p-3"><div className="font-black text-[10px]">Editar viatura - Tipo, Marca, Matricula, Lugares, Ano, Cor, Carga kg, Rota</div><div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2"><div><label className="text-[8px] font-bold">Tipo</label><select className="w-full p-1.5 border rounded text-[9px]"><option>Minibus / Chapa</option><option>Coaster 29</option></select></div><div><label className="text-[8px] font-bold">Marca</label><input className="w-full p-1.5 border rounded text-[9px]" defaultValue="Toyota Coaster 25"/></div><div><label className="text-[8px] font-bold">Matricula</label><input className="w-full p-1.5 border rounded text-[9px]" defaultValue="ACD 456 MC"/></div><div><label className="text-[8px] font-bold">Lugares</label><input className="w-full p-1.5 border rounded text-[9px]" defaultValue="25"/></div></div><div className="mt-3 bg-[#f9f9f9] rounded-[10px] p-2 border"><div className="font-black text-[8px]">JANELA COM LISTA DE LOCALIDADE/DISTRITO/PARAGEM E VALOR</div><div className="grid grid-cols-[2fr_1fr] gap-2 mt-2"><input placeholder="Nome paragem" className="p-1.5 border rounded text-[8px]"/><input placeholder="0" className="p-1.5 border rounded text-[8px]"/></div><button className="mt-2 px-3 py-1 bg-[#1e2f4a] text-white rounded-full text-[8px]">+ Adicionar paragem com preco</button></div></div>
+                  <div className="bg-white rounded-[12px] border p-4">
+                    <div className="font-black text-[12px]">Minha Frota - 3 Viaturas - V82 FIX</div>
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div className="border-2 border-[#facc15] rounded-[10px] p-3 bg-[#fefce8]"><div className="font-black text-[11px]">Viatura 1 - Coaster 29 - ABM 123 MP - Activa</div><div className="text-[8px] mt-1">Maputo - Xai-Xai</div></div>
+                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 2 - Hiace 15 - ACD 456 MP - Activa</div><div className="text-[8px] mt-1">Maputo - Beira</div></div>
+                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 3 - Mini-Bus 22 - AEF 789 MP</div><div className="text-[8px] mt-1">Maputo - Nampula</div></div>
                     </div>
-                  )}
-                  {areaTransSubTab==='registar' && (
-                    <div className="bg-white rounded-[12px] border p-3 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-3"><div className="bg-gray-50 rounded-[10px] p-2"><div className="font-black text-[10px]">Registar Nova Viatura</div><div className="space-y-2 mt-2"><input placeholder="MATRICULA" className="w-full p-1.5 border rounded text-[9px]"/><button className="w-full py-2 bg-[#1e2f4a] text-white rounded-full text-[9px]">Registar</button></div></div><div><div className="font-black text-[10px] mb-2">Frota registada</div><div className="grid grid-cols-2 gap-2"><div className="border rounded-[10px]"><div className="bg-[#1e2f4a] text-white p-2 text-[8px]">MMA-123-MP - COASTER 29</div><div className="p-2 text-[7px]">Toyota - LICENCA, SEGURO</div></div></div></div></div>
-                  )}
-                  {areaTransSubTab==='mapa' && (
-                    <div className="bg-white rounded-[12px] border p-3"><div className="font-black text-[10px]">Mapa de assentos - 29 lugares</div><div className="grid grid-cols-5 gap-1 max-w-[300px] mx-auto mt-2">{Array.from({length:29},(_,i)=><div key={i} className="h-[28px] border rounded flex items-center justify-center text-[8px]">{i+1}</div>)}</div></div>
-                  )}
+                    <div className="mt-3 bg-green-50 border border-green-200 rounded p-2"><div className="text-[10px] font-black text-green-800">FIX PAGINA BRANCA OK - Dashboard carregou!</div></div>
+                  </div>
                 </div>
-              )}
+              )
             </div>
           )}
 </section>
       )}
-
 
 
 
