@@ -1384,32 +1384,32 @@ Bilhete valido - Apresentar QR`;
           
       {viagensTab==='area' && (
             <div className="space-y-3">
-                            {!transportadorLogado ? (
+              {!transportadorLogado ? (
                 <div className="max-w-[900px] mx-auto">
                   <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
                     <h2 className="text-[16px] font-black text-center">AREA TRANSPORTADOR - Login / Cadastro</h2>
-                    <p className="text-[10px] opacity-70 text-center mt-1">Transportador entra aqui - Crie conta ou entre</p>
+                    <p className="text-[10px] opacity-70 text-center mt-1">Crie conta ou entre - 1 conta gere 3 viaturas</p>
                     <div className="flex justify-center gap-2 mt-4">
-                      <button onClick={()=>setAuthMode('login')} className={authMode==='login'?'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black':'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>LOGIN</button>
-                      <button onClick={()=>setAuthMode('cadastro')} className={authMode==='cadastro'?'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black':'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>CADASTRO</button>
+                      <button onClick={()=>setAuthMode('login')} className={authMode==='login' ? 'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black' : 'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>LOGIN</button>
+                      <button onClick={()=>setAuthMode('cadastro')} className={authMode==='cadastro' ? 'px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black' : 'px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white'}>CADASTRO</button>
                     </div>
                     {authMode==='login' ? (
                       <div className="mt-5 max-w-[420px] mx-auto">
                         <div className="grid grid-cols-2 gap-2">
-                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]"/>
-                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]"/>
+                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
                         </div>
                         <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar</button>
                       </div>
                     ) : (
                       <div className="mt-5 max-w-[500px] mx-auto">
                         <div className="grid grid-cols-2 gap-2">
-                          <input placeholder="Nome Completo" className="p-2.5 rounded text-black text-[11px]"/>
-                          <input placeholder="BI / NUIT" className="p-2.5 rounded text-black text-[11px]"/>
-                          <input placeholder="WhatsApp" className="p-2.5 rounded text-black text-[11px]"/>
-                          <input placeholder="Email" className="p-2.5 rounded text-black text-[11px]"/>
-                          <input placeholder="Crie Username" value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} className="p-2.5 rounded text-black text-[11px]"/>
-                          <input placeholder="Crie Password" type="password" value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} className="p-2.5 rounded text-black text-[11px]"/>
+                          <input placeholder="Nome Completo" className="p-2.5 rounded text-black text-[11px]" />
+                          <input placeholder="BI / NUIT" className="p-2.5 rounded text-black text-[11px]" />
+                          <input placeholder="WhatsApp" className="p-2.5 rounded text-black text-[11px]" />
+                          <input placeholder="Email" className="p-2.5 rounded text-black text-[11px]" />
+                          <input placeholder="Crie Username" className="p-2.5 rounded text-black text-[11px]" />
+                          <input placeholder="Crie Password" type="password" className="p-2.5 rounded text-black text-[11px]" />
                         </div>
                         <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#25D366] text-white font-black rounded-full text-[12px]">Cadastrar e Entrar</button>
                       </div>
@@ -1418,26 +1418,25 @@ Bilhete valido - Apresentar QR`;
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center">
-                    <div><div className="font-black text-[12px]">LOGADO - Painel Transportador</div><div className="text-[9px] opacity-70">3 Viaturas - 1 conta - {transportadorLoginForm.username || 'nagi'}</div></div>
-                    <div className="flex gap-1">
-                      <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Frota</button>
-                      <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Registar</button>
-                      <button onClick={()=>setAreaTransSubTab('mapa')} className={areaTransSubTab==='mapa'?'px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black':'px-3 py-1 rounded-full bg-white/20 text-white text-[9px]'}>Mapa</button>
+                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white">
+                    <div className="font-black text-[12px]">LOGADO - Painel OK - {transportadorLoginForm.username || 'nagi'}</div>
+                    <div className="flex gap-1 mt-2">
+                      <button onClick={()=>setAreaTransSubTab('frota')} className="px-3 py-1 rounded-full bg-[#facc15] text-black text-[9px] font-black">Minha Frota</button>
+                      <button onClick={()=>setAreaTransSubTab('registar')} className="px-3 py-1 rounded-full bg-white/20 text-white text-[9px]">Registar</button>
                       <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1 rounded-full bg-white/10 text-[9px]">Sair</button>
                     </div>
                   </div>
                   <div className="bg-white rounded-[12px] border p-4">
-                    <div className="font-black text-[12px]">Minha Frota - 3 Viaturas - V82 FIX</div>
+                    <div className="font-black text-[12px]">Minha Frota - 3 Viaturas - V83 FIX BRANCO</div>
                     <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <div className="border-2 border-[#facc15] rounded-[10px] p-3 bg-[#fefce8]"><div className="font-black text-[11px]">Viatura 1 - Coaster 29 - ABM 123 MP - Activa</div><div className="text-[8px] mt-1">Maputo - Xai-Xai</div></div>
-                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 2 - Hiace 15 - ACD 456 MP - Activa</div><div className="text-[8px] mt-1">Maputo - Beira</div></div>
-                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 3 - Mini-Bus 22 - AEF 789 MP</div><div className="text-[8px] mt-1">Maputo - Nampula</div></div>
+                      <div className="border-2 border-[#facc15] rounded-[10px] p-3 bg-[#fefce8]"><div className="font-black text-[11px]">Viatura 1 - Coaster 29 - ABM 123 MP</div><div className="text-[8px] mt-1">Maputo - Xai-Xai - Activa</div></div>
+                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 2 - Hiace 15 - ACD 456 MP</div><div className="text-[8px] mt-1">Maputo - Beira - Activa</div></div>
+                      <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Viatura 3 - Mini-Bus 22 - AEF 789 MP</div><div className="text-[8px] mt-1">Maputo - Nampula - Manutencao</div></div>
                     </div>
-                    <div className="mt-3 bg-green-50 border border-green-200 rounded p-2"><div className="text-[10px] font-black text-green-800">FIX PAGINA BRANCA OK - Dashboard carregou!</div></div>
+                    <div className="mt-3 bg-green-50 border border-green-200 rounded p-2"><div className="text-[10px] font-black text-green-800">FIX PAGINA BRANCA OK - Se voce ve isso, funcionou!</div></div>
                   </div>
                 </div>
-              )
+              )}
             </div>
           )}
 </section>
