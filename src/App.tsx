@@ -1420,7 +1420,6 @@ Bilhete valido - Apresentar QR`;
               )}
             </div>
           )}
-}
 </section>
       )}
 
