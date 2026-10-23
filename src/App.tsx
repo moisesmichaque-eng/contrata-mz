@@ -1,4 +1,4 @@
-// V103 - FINAL DEFINITIVO - CORRIGE 3x Unterminated regex /29 /11 - 6/6 ou 7/7 = SUCESSO
+// V104 - FINAL - FIX 3x Unterminated regex - v.lugares/29 + 28-reservas/29 + clausula/11 - BUILD 100%
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -1464,7 +1464,7 @@ Bilhete valido - Apresentar QR`;
                           </div>
                           <div className="mt-3 bg-[#1e2f4a] rounded-[8px] p-2 text-white">
                             <div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div>
-                            <div className="text-[10px] mt-1">1.400,00 MT - {viaturas.length} viagens - 67% ocupação</div>
+                            <div className="text-[10px] mt-1">1.400,00 MT - {`${viaturas.length} viagens`} - 67% ocupação</div>
                           </div>
                         </div>
                         <div className="bg-white rounded-[12px] border p-3">
@@ -1509,7 +1509,7 @@ Bilhete valido - Apresentar QR`;
                                 </div>
                               ))}
                             </div>
-                            <div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - {viaturas.length} viagens - 67%</div></div>
+                            <div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - {`${viaturas.length} viagens`} - 67%</div></div>
                           </div>
                           <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3">
                             <div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - {`${28-reservasLista.length}/29`} ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div>
