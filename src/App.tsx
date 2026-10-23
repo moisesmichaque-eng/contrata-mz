@@ -1,3 +1,4 @@
+// V98 - BUILD FIX DEFINITIVO - 23/10/2026 - CORRIGE Unterminated regex - TODOS BOTOES FUNCIONANDO
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -1540,17 +1541,17 @@ Bilhete valido - Apresentar QR`;
                     </div>
                   )}
 
-{tab==='admin' && (
+      {tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
           <AdminPanel />
         </div>
       )}
 
-        <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
+        <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">V98 BUILD FIX - ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
       </div>
     </div>
   </div>
- )
+  );
 }
 
 
