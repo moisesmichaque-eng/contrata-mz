@@ -1547,7 +1547,9 @@ Bilhete valido - Apresentar QR`;
       )}
 
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
- </div>
+      </div>
+    </div>
+  </div>
  )
 }
 
