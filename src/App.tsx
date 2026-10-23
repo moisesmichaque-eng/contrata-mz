@@ -382,6 +382,9 @@ export default function App(){
  ]);
  const [transportadorLogado, setTransportadorLogado] = useState(false);
  const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
+ const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Hiace', ano:'2023', lotacao:'28', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Nampula', km:'0', seguro:false, inspeccao:false, licenca:false, manifesto:false} as any);
+ const [viaturaSelecionada, setViaturaSelecionada] = useState('v1');
+ const [reservasLista, setReservasLista] = useState([{id:1, cliente:'Joao Silva - Assento 2 - 450MT', tel:'82 123 4567', status:'pendente'}, {id:2, cliente:'Maria - Assento 5 - 450MT', tel:'84 987 6543', status:'pendente'}] as any);
   const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
  const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
  const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
@@ -698,7 +701,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
       <button onClick={()=>setTab('viagens')} className={`px-4 py-2 rounded-full font-black text-[11px] flex items-center gap-1 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
       <button onClick={()=>setTab('encontrar')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
       <button onClick={()=>setTab('contratos')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>CONTRATOS 11</button>
-      <button className="px-4 py-2 rounded-md font-bold text-xs bg-transparent text-white">MEUS</button>
+      <button onClick={()=>setTab('meus')} className={`px-4 py-2 rounded-md font-bold text-xs ${tab==='meus'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white hover:bg-white/10'}`}>MEUS</button>
       <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
     </div>
    </header>
@@ -1391,16 +1394,44 @@ Bilhete valido - Apresentar QR`;
                     <h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro</h2>
                     <p className="text-[10px] opacity-70 mt-1">Crie conta ou entre - 1 conta gere 3 viaturas</p>
                     <div className="flex justify-center gap-2 mt-4">
-                      <button onClick={()=>setAuthMode('login')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black">LOGIN</button>
-                      <button onClick={()=>setAuthMode('cadastro')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white">CADASTRO</button>
+                      <button onClick={()=>setAuthMode('login')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${authMode==='login'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>LOGIN</button>
+                      <button onClick={()=>setAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${authMode==='cadastro'?'bg-[#facc15] text-black':'bg-white/20 text-white'}`}>CADASTRO</button>
                     </div>
-                    <div className="mt-5 max-w-[420px] mx-auto">
-                      <div className="grid grid-cols-2 gap-2">
-                        <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
-                        <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
+                    
+                    {authMode==='login' ? (
+                      <div className="mt-5 max-w-[420px] mx-auto">
+                        <div className="grid grid-cols-2 gap-2">
+                          <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username - nagi" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password - 123" type="password" className="p-2.5 rounded text-black text-[12px]" />
+                        </div>
+                        <button onClick={()=>{ if((transportadorLoginForm.username==='nagi' && transportadorLoginForm.password==='123') || transportadorLoginForm.username){ setTransportadorLogado(true); setAreaTransSubTab('frota'); } else { alert('Use nagi / 123 ou cadastre nova conta'); } }} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px] hover:bg-yellow-300">Entrar - nagi / 123</button>
+                        <p className="text-[9px] opacity-60 mt-2">Teste: nagi / 123 - Ou cadastre nova conta em CADASTRO</p>
                       </div>
-                      <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar - nagi / 123</button>
-                    </div>
+                    ) : (
+                      <div className="mt-5 max-w-[520px] mx-auto text-left">
+                        <div className="grid grid-cols-2 gap-2">
+                          <input value={transportadorPerfil.nomeEmpresa} onChange={e=>setTransportadorPerfil({...transportadorPerfil, nomeEmpresa:e.target.value})} placeholder="Nome Completo" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorPerfil.nuit} onChange={e=>setTransportadorPerfil({...transportadorPerfil, nuit:e.target.value})} placeholder="BI / NUIT" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorPerfil.tel} onChange={e=>setTransportadorPerfil({...transportadorPerfil, tel:e.target.value})} placeholder="WhatsApp" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorPerfil.email} onChange={e=>setTransportadorPerfil({...transportadorPerfil, email:e.target.value})} placeholder="Email" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorPerfil.username} onChange={e=>setTransportadorPerfil({...transportadorPerfil, username:e.target.value})} placeholder="Crie Username" className="p-2.5 rounded text-black text-[12px]" />
+                          <input value={transportadorPerfil.password} onChange={e=>setTransportadorPerfil({...transportadorPerfil, password:e.target.value})} placeholder="Crie Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
+                        </div>
+                        <button onClick={()=>{ 
+                          if(transportadorPerfil.username && transportadorPerfil.password){
+                            const lista = JSON.parse(localStorage.getItem('transportadores')||'[]');
+                            lista.push({...transportadorPerfil});
+                            localStorage.setItem('transportadores', JSON.stringify(lista));
+                            setTransportadorLoginForm({username: transportadorPerfil.username, password: transportadorPerfil.password});
+                            setTransportadorLogado(true); 
+                            setAreaTransSubTab('frota');
+                            alert('Conta criada! Logado com sucesso: '+transportadorPerfil.username);
+                          } else {
+                            alert('Preencha Username e Password');
+                          }
+                        }} className="w-full mt-3 px-6 py-3 bg-[#22c55e] text-white font-black rounded-full text-[13px] hover:bg-green-600">Cadastrar e Entrar</button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -1415,90 +1446,101 @@ Bilhete valido - Apresentar QR`;
                     </div>
                   </div>
 
-                  {areaTransSubTab==='frota' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
-                        <div className="mt-3 space-y-2">
-                          <div className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
-                        </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
-                      </div>
-                      <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
-                        <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
-                        <div className="mt-3 max-w-[260px] mx-auto">
-                          <div className="text-[7px] text-center font-black mb-2">FRENTE - Motorista</div>
-                          <div className="grid grid-cols-4 gap-1">
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">1</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#facc15] font-black">2 Ocup</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">3</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e] text-white">4 Livre</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">5</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e]">6</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444] text-white">7 Res</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444]">8 Res</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">9</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">10</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">11</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">12</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">13</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">15</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">16</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">17</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">18</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">19</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">20</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">21</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">22</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">23</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">24</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">25</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">26</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">27</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">28</div>
-                            <div className="col-span-4 h-6 flex items-center justify-center text-[7px] bg-gray-50 rounded">WC - 29</div>
+                                    {areaTransSubTab==='frota' && (
+                    <div className="space-y-3">
+                      <div className="bg-[#dcfce7] border border-green-300 p-2 rounded text-[11px] text-green-800">LOGADO COM SUCESSO | Viatura selecionada: {viaturaSelecionada} | {viaturas.length} viaturas | Clique nos cards para selecionar | Aprovar remove reserva</div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="bg-white rounded-[12px] border p-3">
+                          <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} - CLIQUE PARA SELECIONAR</div>
+                          <div className="mt-2 space-y-2">
+                            {viaturas.map(v=>(
+                              <div key={v.id} onClick={()=>{ setViaturaSelecionada(v.id); alert('Selecionado: '+v.matricula); }} className={`p-2 rounded-[8px] border-2 cursor-pointer hover:shadow ${viaturaSelecionada===v.id?'border-[#facc15] bg-yellow-50':'border-gray-200 bg-white'}`}>
+                                <div className="text-[9px] font-black">{v.matricula} - {v.marca} - {v.lugares} lugares</div>
+                                <div className="text-[8px] text-gray-600">{v.rota||'Maputo - Beira'} - {v.estado}</div>
+                                <div className="text-[7px] mt-1">Clique para selecionar esta viatura</div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-3 bg-[#1e2f4a] rounded-[8px] p-2 text-white">
+                            <div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div>
+                            <div className="text-[10px] mt-1">1.400,00 MT - {viaturas.length} viagens - 67% ocupação</div>
                           </div>
                         </div>
-                        <div className="mt-3 grid grid-cols-2 gap-2">
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
+                        <div className="bg-white rounded-[12px] border p-3">
+                          <div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA - Clique assentos</div>
+                          <div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1">
+                            {Array.from({length:28}, (_,i)=>{ const n=i+1; return <div key={n} onClick={()=>alert('Assento '+n+' - Clique para reservar - Status: '+(n%3===0?'Reservado':n%2===0?'Ocupado':'Livre'))} className={`h-6 border rounded flex items-center justify-center text-[7px] cursor-pointer hover:ring-1 ${n===2?'bg-[#facc15]':n===4||n===6?'bg-green-500 text-white':n===7||n===8?'bg-red-500 text-white':'bg-white'}`}>{n}</div>})}
+                            <div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div>
+                          </div>
+                          <div className="mt-3 flex justify-center gap-3 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded"></div>Reservado</div></div>
+                        </div>
+                        <div className="bg-white rounded-[12px] border p-3">
+                          <div className="font-black text-[11px]">Reservas - {reservasLista.length} pendentes - CLIQUE APROVAR</div>
+                          <div className="mt-2 space-y-2">
+                            {reservasLista.map((r:any)=>(
+                              <div key={r.id} className="bg-[#fefce8] border-2 border-yellow-200 rounded-[8px] p-2">
+                                <div className="text-[8px] font-black">Reserva {r.id} - {r.cliente}</div>
+                                <div className="text-[7px]">WhatsApp: {r.tel} - 450MT - M-Pesa pago</div>
+                                <div className="flex gap-1 mt-2">
+                                  <button onClick={()=>{ setReservasLista(reservasLista.filter((x:any)=>x.id!==r.id)); alert('Reserva '+r.id+' APROVADA! Passageiro '+r.cliente+' notificado via WhatsApp. Lugar confirmado.'); }} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded hover:bg-green-600">Aprovar</button>
+                                  <button onClick={()=>{ setReservasLista(reservasLista.filter((x:any)=>x.id!==r.id)); alert('Reserva '+r.id+' REJEITADA'); }} className="flex-1 text-[7px] bg-gray-200 py-1.5 rounded hover:bg-gray-300">Rejeitar</button>
+                                </div>
+                              </div>
+                            ))}
+                            {reservasLista.length===0 && <div className="text-[10px] text-green-600 text-center p-3 bg-green-50 rounded">Todas reservas processadas! Nenhuma pendente.</div>}
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
-
-                  {areaTransSubTab==='registar' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Registar Nova Viatura - FOTO AMARELA</div>
-                        <div className="text-[8px] text-gray-500 mt-1">Preencha para adicionar a sua frota - Max 3 viaturas</div>
-                        <div className="mt-3 space-y-2">
-                          <div><label className="text-[8px] font-black">MATRICULA</label><input placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white" /></div>
-                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><select className="w-full p-2 border rounded text-[10px]"><option>Toyota</option><option>Nissan</option></select></div><div><label className="text-[8px] font-black">MODELO</label><select className="w-full p-2 border rounded text-[10px]"><option>Coaster</option><option>Hiace</option></select></div></div>
-                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><input placeholder="2018" className="w-full p-2 border rounded text-[10px]" /></div><div><label className="text-[8px] font-black">LOTACAO</label><input placeholder="29" className="w-full p-2 border rounded text-[10px]" /></div></div>
-                          <div><label className="text-[8px] font-black">TIPO VIATURA</label><select className="w-full p-2 border rounded text-[10px]"><option>Mini-Bus 29 lugares</option><option>Hiace 15 lugares</option></select></div>
-                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">COMBUSTIVEL</label><select className="w-full p-2 border rounded text-[10px]"><option>Diesel</option><option>Gasolina</option></select></div><div><label className="text-[8px] font-black">ESTADO</label><select className="w-full p-2 border rounded text-[10px]"><option>Boa</option><option>Excelente</option></select></div></div>
-                          <div><label className="text-[8px] font-black">ROTA PRINCIPAL</label><input placeholder="Maputo - Xai-Xai" className="w-full p-2 border rounded text-[10px]" /></div>
-                          <div><label className="text-[8px] font-black">KM ATUAL</label><input placeholder="120000" className="w-full p-2 border rounded text-[10px]" /></div>
-                          <div className="pt-2 border-t"><label className="text-[8px] font-black">DOCUMENTOS E VALIDACAO</label><div className="grid grid-cols-2 gap-1 mt-1 text-[8px]"><div className="flex items-center gap-1"><input type="checkbox" defaultChecked /> Seguro valido</div><div className="flex items-center gap-1"><input type="checkbox" defaultChecked /> Inspeccao</div><div className="flex items-center gap-1"><input type="checkbox" /> Licenca transporte</div><div className="flex items-center gap-1"><input type="checkbox" /> Manifesto</div></div></div>
-                          <div className="pt-2"><label className="text-[8px] font-black">FOTOS DA VIATURA - 4 fotos obrigatorias</label><div className="grid grid-cols-4 gap-1 mt-1"><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Frente</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Tras</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Lado</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Interior</div></div></div>
-                          <button className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px]">Registar Viatura - 2 min foto - Igual foto amarela</button>
-                        </div>
-                      </div>
-                      <div className="md:col-span-2">
-                        <div className="font-black text-[11px] mb-2">Frota registada - 2 viaturas - FOTO AMARELA DIREITA</div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-123-MP - COASTER 29</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span><span className="text-[6px] bg-[#facc15] text-black px-1 rounded">Verificada</span></div></div><div className="p-2"><div className="text-[8px] font-black">Toyota Coaster - 2018</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29 lugares</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2018</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao Cumbane</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Beira</div><div className="bg-[#fef2f2] p-1 rounded">KM: 120.000</div><div className="bg-[#fef2f2] p-1 rounded">Estado: Boa</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button><button className="flex-1 py-1 bg-[#facc15] rounded text-[7px] font-black">Ver</button></div></div></div>
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-456-MP - HIACE 15</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span></div></div><div className="p-2"><div className="text-[8px] font-black">Nissan Civilian - 2020</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 15</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2020</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Xai-Xai</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
-                        </div>
-                        <div className="mt-3 bg-green-50 border border-green-200 rounded-[8px] p-3 text-center"><div className="text-[10px] font-black text-green-800">V87 FULL LAYOUT OK - Igual as 2 fotos que voce circulou!</div><div className="text-[8px] text-green-700 mt-1">Esquerda: Form Registar Nova Viatura completo | Direita: Frota registada 2 cards</div></div>
-                      </div>
-                    </div>
-                  )}
-
                   {areaTransSubTab==='mapa' && (
-                    <div className="bg-white rounded-[12px] border p-4">
-                      <div className="font-black text-[12px]">Mapa 29 - FOTO LARANJA - Coaster 29 lugares - 3 colunas</div>
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Minhas Viaturas - 3</div><div className="mt-2 space-y-2"><div className="bg-white border-2 border-[#facc15] rounded-[8px] p-2"><div className="text-[8px] font-black">MMN-123-MP - Coaster 29 - 4/29</div><div className="text-[7px]">Maputo - Beira - 450MT</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-456-MP - Hiace 15 - 2/15</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-789-MP - Mini-Bus 22</div></div></div><div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67%</div><div className="text-[7px] opacity-70 mt-1">REGRAS NEGOCIO: 1 conta 3 viaturas max</div></div></div>
-                        <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3"><div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - 4/29 ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div><div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1"><div className="h-6 border rounded flex items-center justify-center text-[7px]">1</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-[#facc15]">2</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">3</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500 text-white">4</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">5</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500">6</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">7</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">8</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">9</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">10</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">11</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">12</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">13</div><div className="h-6 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">15</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">16</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">17</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">18</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">19</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">20</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">21</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">22</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">23</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">24</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">25</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">26</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">27</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">28</div><div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div></div><div className="mt-3 flex justify-center gap-3 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded"></div>Reservado</div></div></div>
-                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Reservas - 2 pendentes</div><div className="mt-2 space-y-2"><div className="bg-[#fefce8] border-2 border-yellow-200 rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 1 - Joao Silva - Assento 2 - Maputo-Beira</div><div className="text-[7px]">WhatsApp: 82 123 4567 - 450MT - M-Pesa pago</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1.5 rounded">Rejeitar</button></div></div><div className="bg-[#fefce8] border rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button></div></div></div><div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2"><div className="text-[7px] font-black">Legenda cores - Igual foto laranja</div><div className="text-[7px] mt-1">Amarelo=Ocupado Verde=Livre Vermelho=Reservado</div></div></div>
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-[12px] border p-4">
+                        <div className="font-black text-[12px]">Mapa 29 - FOTO LARANJA - Coaster 29 lugares - 3 colunas - TUDO CLICÁVEL</div>
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="bg-gray-50 rounded-[10px] p-3">
+                            <div className="text-[9px] font-black">Minhas Viaturas - {viaturas.length} - CLIQUE</div>
+                            <div className="mt-2 space-y-2">
+                              {viaturas.map(v=>(
+                                <div key={v.id} onClick={()=>{ setViaturaSelecionada(v.id); alert('Viatura '+v.matricula+' selecionada para mapa'); }} className={`bg-white border-2 rounded-[8px] p-2 cursor-pointer ${viaturaSelecionada===v.id?'border-[#facc15] bg-yellow-50':'border-gray-200'}`}>
+                                  <div className="text-[8px] font-black">{v.matricula} - Coaster 29 - {v.lugares}/29</div>
+                                  <div className="text-[7px]">Maputo - Beira - 450MT - Clique para ver mapa</div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - {viaturas.length} viagens - 67%</div></div>
+                          </div>
+                          <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3">
+                            <div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - {28-reservasLista.length}/29 ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div>
+                            <div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1">
+                              {Array.from({length:28}, (_,i)=>{ const n=i+1; return <div key={n} onClick={()=>alert('Assento '+n+' clicado! Status: '+(n%4===0?'Reservado':n%2===0?'Ocupado':'Livre')+' - Clique Aprovar na reserva ao lado para confirmar')} className={`h-6 border rounded flex items-center justify-center text-[7px] cursor-pointer hover:ring-1 ${n===2?'bg-[#facc15]':n%3===0?'bg-red-500 text-white':n%2===0?'bg-green-500 text-white':'bg-white'}`}>{n}</div>})}
+                              <div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div>
+                            </div>
+                            <div className="mt-3 flex justify-center gap-3 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded"></div>Reservado</div></div>
+                          </div>
+                          <div className="bg-gray-50 rounded-[10px] p-3">
+                            <div className="text-[9px] font-black">Reservas - {reservasLista.length} pendentes - APROVAR FUNCIONA</div>
+                            <div className="mt-2 space-y-2">
+                              {reservasLista.map((r:any)=>(
+                                <div key={r.id} className="bg-[#fefce8] border-2 border-yellow-200 rounded-[8px] p-2">
+                                  <div className="text-[8px] font-black">Reserva {r.id} - {r.cliente}</div>
+                                  <div className="text-[7px]">WhatsApp: {r.tel} - 450MT - M-Pesa pago</div>
+                                  <div className="flex gap-1 mt-2">
+                                    <button onClick={()=>{ setReservasLista(reservasLista.filter((x:any)=>x.id!==r.id)); alert('APROVADO! '+r.cliente+' confirmado assento. WhatsApp enviado.'); }} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded hover:bg-green-600">Aprovar</button>
+                                    <button onClick={()=>{ setReservasLista(reservasLista.filter((x:any)=>x.id!==r.id)); alert('Rejeitado '+r.id); }} className="flex-1 text-[7px] bg-gray-200 py-1.5 rounded">Rejeitar</button>
+                                  </div>
+                                </div>
+                              ))}
+                              {reservasLista.length===0 && <div className="text-[10px] text-green-700 bg-green-50 p-2 rounded text-center">Nenhuma reserva pendente - Todas aprovadas!</div>}
+                            </div>
+                            <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2"><div className="text-[7px] font-black">Legenda cores - Igual foto laranja</div><div className="text-[7px] mt-1">Amarelo=Ocupado Verde=Livre Vermelho=Reservado - Clique nos assentos</div></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
-                </div>
-              )}
-            </div>
-          )}
-</section>
-      )}
 
-
-
-
-      {tab==='admin' && (
+{tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
           <AdminPanel />
         </div>
