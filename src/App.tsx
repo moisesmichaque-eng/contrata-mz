@@ -565,11 +565,11 @@ ${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${
 </div>
 
 <div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
-<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
+<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS  - 11 CLAUSULAS COMPLETAS</b><br>
 <b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
 </div>
 
-<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE - ESQUERDA - HORIZONTAL</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - Esquerda horizontal</div><div class="assinatura-box contratado"><b>CONTRATADO - DIREITA - HORIZONTAL</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - Direita horizontal</div></div>
+<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE - </b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - Esquerda horizontal</div><div class="assinatura-box contratado"><b>CONTRATADO - </b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - Direita horizontal</div></div>
 
 <div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
 <b>ONDE ENCONTRAR PDF FINAL?</b><br>
