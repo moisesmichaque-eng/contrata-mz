@@ -1,4 +1,3 @@
-// V105 - FIX DEFINITIVO - corrige linha 994, 1506, 1514 - Unterminated regex - BUILD VERDE
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -992,7 +991,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
           <div className="bg-[#fff8ed] border-2 border-[#d4a44a] rounded-xl p-4"><button onClick={gerarPDFFinal} disabled={!assinaturaContratante.concordo || !assinaturaContratado.concordo} className="w-full h-[56px] bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-black text-[12px] disabled:opacity-40">3. GERAR PDF FINAL PARTILHAVEL COM ASSINATURAS</button></div>
         </div>}
       </div>
-      <div className="mt-4 flex gap-2"><button disabled={clausulaAtiva===1} onClick={()=>setClausulaAtiva(c=>Math.max(1,c-1))} className="flex-1 h-9 border-2 rounded-lg font-bold text-[11px] disabled:opacity-40">Voltar</button><button disabled={clausulaAtiva===11} onClick={()=>setClausulaAtiva(c=>Math.min(11,c+1))} className="flex-1 h-9 bg-[#1e2f4a] text-white rounded-lg font-bold text-[11px] disabled:opacity-40">Proximo - {`${clausulaAtiva}/11`}</button></div>
+      <div className="mt-4 flex gap-2"><button disabled={clausulaAtiva===1} onClick={()=>setClausulaAtiva(c=>Math.max(1,c-1))} className="flex-1 h-9 border-2 rounded-lg font-bold text-[11px] disabled:opacity-40">Voltar</button><button disabled={clausulaAtiva===11} onClick={()=>setClausulaAtiva(c=>Math.min(11,c+1))} className="flex-1 h-9 bg-[#1e2f4a] text-white rounded-lg font-bold text-[11px] disabled:opacity-40">Proximo - {clausulaAtiva}/11</button></div>
      </div>
 
      <div className={`${mostrarPreviewMobile?"block":"hidden"} lg:block bg-white rounded-[12px] border-2 border-[#1e2f4a] p-3 h-fit lg:sticky lg:top-[70px] order-3 min-w-0 w-full`}>
@@ -1504,7 +1503,7 @@ Bilhete valido - Apresentar QR`;
                             <div className="mt-2 space-y-2">
                               {viaturas.map(v=>(
                                 <div key={v.id} onClick={()=>{ setViaturaSelecionada(v.id); alert('Viatura '+v.matricula+' selecionada para mapa'); }} className={`bg-white border-2 rounded-[8px] p-2 cursor-pointer ${viaturaSelecionada===v.id?'border-[#facc15] bg-yellow-50':'border-gray-200'}`}>
-                                  <div className="text-[8px] font-black">{v.matricula} - Coaster 29 - {`${v.lugares}/29`}</div>
+                                  <div className="text-[8px] font-black">{v.matricula} - Coaster 29 - {v.lugares}/29</div>
                                   <div className="text-[7px]">Maputo - Beira - 450MT - Clique para ver mapa</div>
                                 </div>
                               ))}
@@ -1512,7 +1511,7 @@ Bilhete valido - Apresentar QR`;
                             <div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - {viaturas.length} viagens - 67%</div></div>
                           </div>
                           <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3">
-                            <div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - {`${28-reservasLista.length}/29`} ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div>
+                            <div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - {28-reservasLista.length}/29 ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div>
                             <div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1">
                               {Array.from({length:28}, (_,i)=>{ const n=i+1; return <div key={n} onClick={()=>alert('Assento '+n+' clicado! Status: '+(n%4===0?'Reservado':n%2===0?'Ocupado':'Livre')+' - Clique Aprovar na reserva ao lado para confirmar')} className={`h-6 border rounded flex items-center justify-center text-[7px] cursor-pointer hover:ring-1 ${n===2?'bg-[#facc15]':n%3===0?'bg-red-500 text-white':n%2===0?'bg-green-500 text-white':'bg-white'}`}>{n}</div>})}
                               <div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div>
@@ -1555,4 +1554,4 @@ Bilhete valido - Apresentar QR`;
 }
 
 
-// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS// V108 NUKE ADMIN - 23-10 18:47 
+// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
