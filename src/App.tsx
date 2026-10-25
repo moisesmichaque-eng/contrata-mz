@@ -506,85 +506,9 @@ useEffect(()=>{
 
  const gerarPDFInicial = () => {
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
-   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
-<style>
-body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px}
-.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
-.header h1{color:#d4a44a;margin:0;font-size:16px}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:#f8fafc}
-.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
-.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-@media print{.no-print{display:none}}
-</style>
-</head><body>
-<div class="header"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div>
-
-<div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
-<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
-<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - End: ${formContrato.trabEnd} - Profissao: ${formContrato.trabProf}
-</div>
-
-<div class="clausula"><h3>2. OBJETO E TAREFAS - O que sera feito - ${formContrato.tarefas.length} tarefas de ${catName}</h3>
-${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}
-</div>
-
-<div class="clausula"><h3>3. HORARIO E LOCAL - Quando e onde</h3>
-<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
-<b>Dias de trabalho:</b> ${formContrato.dias}<br>
-<b>Data inicio:</b> ${formContrato.dataInicio}<br>
-<b>Local de trabalho:</b> ${formContrato.localTrab}
-</div>
-
-<div class="clausula"><h3>4. SALARIO E PAGAMENTO - Quanto e como paga</h3>
-<b>Valor salario:</b> ${formContrato.valor} MZN<br>
-<b>Dia de pagamento:</b> Todo dia ${formContrato.diaPag}<br>
-<b>Forma de pagamento:</b> ${formContrato.formaPag}<br>
-<b>Prazo do contrato:</b> ${formContrato.prazo}
-</div>
-
-<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO - Beneficios</h3>
-<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
-<b>Alojamento:</b> ${formContrato.alojamento}<br>
-<b>Transporte:</b> ${formContrato.transporte}
-</div>
-
-<div class="clausula"><h3>6. FOLGAS E FERIAS - Descanso legal</h3>${formContrato.folgas}</div>
-<div class="clausula"><h3>7. PERIODO EXPERIMENTAL - Teste inicial</h3>${formContrato.periodoExp}</div>
-<div class="clausula"><h3>8. DEVERES DO TRABALHADOR - Obrigacoes</h3>${formContrato.deveresTrab}</div>
-<div class="clausula"><h3>9. DEVERES DO EMPREGADOR - Obrigacoes</h3>${formContrato.deveresEmp}</div>
-<div class="clausula"><h3>10. ANEXOS (ANTES VALIDADE) - Fotos e provas - Fotos viram prova legal</h3>
-<b>Fotos e comprovativos anexados antes da validade - viram prova legal:</b><br>
-- Foto BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto do local: ${formContrato.localTrab} - Foto antes de comecar<br>
-- Fotos: ${formContrato.anexos.length} ficheiros - ${formContrato.anexos.join(", ") || "BI, NUIT, Fotos obra, CV"}<br>
-- Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
-</div>
-
-<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
-<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
-<b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
-</div>
-
-<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE - ESQUERDA - HORIZONTAL</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - Esquerda horizontal</div><div class="assinatura-box contratado"><b>CONTRATADO - DIREITA - HORIZONTAL</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - Direita horizontal</div></div>
-
-<div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
-<b>ONDE ENCONTRAR PDF FINAL?</b><br>
-- Pasta Downloads: CONTRATO-FINAL-COM-ASSINATURAS-${catName}-ID-${id}.html<br>
-- Assinaturas na horizontal lado a lado como pediu - nao vertical<br>
-- Lei 23/2007 - valido em Mocambique - 11 clausulas completas com dados das partes, todas as clausulas e assinaturas na horizontal<br>
-ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id}
-</div>
-
-<div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF - 11 CLAUSULAS COMPLETAS - ASSINATURAS NA HORIZONTAL</button>
-</div>
-</body></html>`;
-   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
+   const agora = new Date().toLocaleString("pt-MZ");
+   const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO '+catName+' - ID '+id+'</title></head><body>PDF Inicial removido - usar PDF Final</body></html>';
+   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank");
  };
 
  const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.empNome}, BI ${formContrato.empBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.trabNome} - ${formContrato.tarefas.length} tarefas - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.trabTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
@@ -1446,12 +1370,8 @@ Bilhete valido - Apresentar QR`;
                 </div>
               )}
             </div>
-          )}
 </section>
       )}
-
-
-
 
       {tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
@@ -1464,4 +1384,3 @@ Bilhete valido - Apresentar QR`;
     )
   }
 
-// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
