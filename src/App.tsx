@@ -496,6 +496,7 @@ useEffect(()=>{
  });
  const [assinaturaContratante, setAssinaturaContratante] = useState({ concordo:false, data:"" });
  const [assinaturaContratado, setAssinaturaContratado] = useState({ concordo:false, data:"" });
+  const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('bi_contratante');
 
  useEffect(()=>{
    const catName = CATS[contratoSel] || "Carpinteiro";
@@ -505,186 +506,62 @@ useEffect(()=>{
 
  const gerarPDFInicial = () => {
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
-   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
-<style>
-body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px}
-.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
-.header h1{color:#d4a44a;margin:0;font-size:16px}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:#f8fafc}
-.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
-.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-@media print{.no-print{display:none}}
-</style>
-</head><body>
-<div class="header"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div>
-
-<div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
-<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
-<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - End: ${formContrato.trabEnd} - Profissao: ${formContrato.trabProf}
-</div>
-
-<div class="clausula"><h3>2. OBJETO E TAREFAS - O que sera feito - ${formContrato.tarefas.length} tarefas de ${catName}</h3>
-${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}
-</div>
-
-<div class="clausula"><h3>3. HORARIO E LOCAL - Quando e onde</h3>
-<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
-<b>Dias de trabalho:</b> ${formContrato.dias}<br>
-<b>Data inicio:</b> ${formContrato.dataInicio}<br>
-<b>Local de trabalho:</b> ${formContrato.localTrab}
-</div>
-
-<div class="clausula"><h3>4. SALARIO E PAGAMENTO - Quanto e como paga</h3>
-<b>Valor salario:</b> ${formContrato.valor} MZN<br>
-<b>Dia de pagamento:</b> Todo dia ${formContrato.diaPag}<br>
-<b>Forma de pagamento:</b> ${formContrato.formaPag}<br>
-<b>Prazo do contrato:</b> ${formContrato.prazo}
-</div>
-
-<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO - Beneficios</h3>
-<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
-<b>Alojamento:</b> ${formContrato.alojamento}<br>
-<b>Transporte:</b> ${formContrato.transporte}
-</div>
-
-<div class="clausula"><h3>6. FOLGAS E FERIAS - Descanso legal</h3>${formContrato.folgas}</div>
-<div class="clausula"><h3>7. PERIODO EXPERIMENTAL - Teste inicial</h3>${formContrato.periodoExp}</div>
-<div class="clausula"><h3>8. DEVERES DO TRABALHADOR - Obrigacoes</h3>${formContrato.deveresTrab}</div>
-<div class="clausula"><h3>9. DEVERES DO EMPREGADOR - Obrigacoes</h3>${formContrato.deveresEmp}</div>
-<div class="clausula"><h3>10. ANEXOS (ANTES VALIDADE) - Fotos e provas - Fotos viram prova legal</h3>
-<b>Fotos e comprovativos anexados antes da validade - viram prova legal:</b><br>
-- Foto BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto do local: ${formContrato.localTrab} - Foto antes de comecar<br>
-- Fotos: ${formContrato.anexos.length} ficheiros - ${formContrato.anexos.join(", ") || "BI, NUIT, Fotos obra, CV"}<br>
-- Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
-</div>
-
-<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
-<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
-<b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
-</div>
-
-<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE - ESQUERDA - HORIZONTAL</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"} - Esquerda horizontal</div><div class="assinatura-box contratado"><b>CONTRATADO - DIREITA - HORIZONTAL</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"} - Direita horizontal</div></div>
-
-<div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
-<b>ONDE ENCONTRAR PDF FINAL?</b><br>
-- Pasta Downloads: CONTRATO-FINAL-COM-ASSINATURAS-${catName}-ID-${id}.html<br>
-- Assinaturas na horizontal lado a lado como pediu - nao vertical<br>
-- Lei 23/2007 - valido em Mocambique - 11 clausulas completas com dados das partes, todas as clausulas e assinaturas na horizontal<br>
-ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id}
-</div>
-
-<div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF - 11 CLAUSULAS COMPLETAS - ASSINATURAS NA HORIZONTAL</button>
-</div>
-</body></html>`;
-   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
+   const agora = new Date().toLocaleString("pt-MZ");
+   const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO '+catName+' - ID '+id+'</title></head><body>PDF Inicial removido - usar PDF Final</body></html>';
+   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank");
  };
 
  const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.empNome}, BI ${formContrato.empBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.trabNome} - ${formContrato.tarefas.length} tarefas - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.trabTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
  const assinarContratado = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratado({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.trabNome}, BI ${formContrato.trabBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.empNome} - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.empTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
 
  const gerarPDFFinal = () => {
-   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado na horizontal."); return; }
+   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado."); return; }
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000); const agora = new Date().toLocaleString("pt-MZ");
-   const htmlFinal = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL 11 CLAUSULAS COMPLETAS - ${catName} - ID ${id} - ASSINATURAS HORIZONTAL</title>
-<style>
-body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:11px}
-.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
-.header h1{color:#d4a44a;margin:0;font-size:15px}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}
-.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}
-.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:220px}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}
-.footer{background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:12px;margin-top:15px;font-size:10px}
-@media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
-</style>
-</head><body>
-<div class="header"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS NA HORIZONTAL NAO VERTICAL</h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
+   const logoHtml = formContrato.logoData ? '<div style="text-align:center;margin-bottom:15px"><img src="'+formContrato.logoData+'" style="max-height:80px;max-width:200px;background:white;padding:6px;border-radius:8px" /><div style="font-size:10px;margin-top:4px">'+(formContrato.logoTipo||'')+'</div></div>' : '';
+   const anexosHtml = formContrato.anexos.filter((a:any)=>a.tipo!=='logo_tipo').map((a:any)=>{
+     const isImg = a.data && typeof a.data==='string' && a.data.startsWith('data:image');
+     const imgTag = isImg ? '<img src="'+a.data+'" style="max-width:100%;max-height:350px;border-radius:6px;margin-top:6px" />' : '<div>Ficheiro: '+a.nome+' ('+Math.round((a.tamanho||0)/1024)+' KB)</div>';
+     return '<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin:8px 0;background:white"><b>'+a.tipo.toUpperCase()+' - '+a.nome+'</b><br/>'+imgTag+'</div>';
+   }).join('') || '<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;background:white">Nenhum anexo adicional.</div>';
 
-<div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
-<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
-<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - End: ${formContrato.trabEnd} - Profissao: ${formContrato.trabProf}
-</div>
+   const htmlFinal = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL - '+catName+' - ID '+id+'</title>'+
+'<style>'+
+'body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.6;color:#1a2a3a;font-size:11px}'+
+'.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}'+
+'.header h1{color:#d4a44a;margin:0;font-size:14px}'+
+'.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}'+
+'.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}'+
+'.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}'+
+'.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}'+
+'.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:140px}'+
+'.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}'+
+'.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}'+
+'.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}'+
+'.footer{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:15px;font-size:9px;color:#64748b;text-align:center}'+
+'@media print{.no-print{display:none}}'+
+'</style>'+
+'</head><body>'+
+'<div class="header">'+logoHtml+'<h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS - '+catName.toUpperCase()+' - ID '+id+'</h1><div style="font-size:10px;opacity:0.9">Data: '+agora+' | contrata-mz.vercel.app | '+formContrato.tarefas.length+' tarefas | Lei nº 23/2007</div></div>'+
+'<div class="clausula"><h3>1. DADOS DAS PARTES</h3><b>CONTRATANTE:</b> '+formContrato.empNome+' - BI: '+formContrato.empBI+' - Tel: '+formContrato.empTel+' - End: '+formContrato.empEnd+'<br/><b>TRABALHADOR:</b> '+formContrato.trabNome+' - BI: '+formContrato.trabBI+' - Tel: '+formContrato.trabTel+' - End: '+formContrato.trabEnd+' - Profissão: '+formContrato.trabProf+'</div>'+
+'<div class="clausula"><h3>2. OBJETO E TAREFAS - '+formContrato.tarefas.length+' TAREFAS</h3>'+formContrato.tarefas.map((t:string,i:number)=>'<span class="tarefa">'+(i+1)+'. '+t+'</span>').join('')+'</div>'+
+'<div class="clausula"><h3>3. HORÁRIO E LOCAL</h3><b>Horário:</b> '+formContrato.horarioInicio+' às '+formContrato.horarioFim+'<br/><b>Dias:</b> '+formContrato.dias+'<br/><b>Data início:</b> '+formContrato.dataInicio+'<br/><b>Local:</b> '+formContrato.localTrab+'</div>'+
+'<div class="clausula"><h3>4. SALÁRIO E PAGAMENTO</h3><b>Valor:</b> '+formContrato.valor+' MZN<br/><b>Dia pagamento:</b> '+formContrato.diaPag+'<br/><b>Forma:</b> '+formContrato.formaPag+'<br/><b>Prazo:</b> '+formContrato.prazo+'</div>'+
+'<div class="clausula"><h3>5. ALIMENTAÇÃO E ALOJAMENTO</h3><b>Alimentação:</b> '+formContrato.alimentacao+'<br/><b>Alojamento:</b> '+formContrato.alojamento+'<br/><b>Transporte:</b> '+formContrato.transporte+'</div>'+
+'<div class="clausula"><h3>6. FOLGAS E FÉRIAS</h3>'+formContrato.folgas+'</div>'+
+'<div class="clausula"><h3>7. PERÍODO EXPERIMENTAL</h3>'+formContrato.periodoExp+'</div>'+
+'<div class="clausula"><h3>8. DEVERES DO TRABALHADOR</h3>'+formContrato.deveresTrab+'</div>'+
+'<div class="clausula"><h3>9. DEVERES DO EMPREGADOR</h3>'+formContrato.deveresEmp+'</div>'+
+'<div class="clausula"><h3>10. ANEXOS</h3>Documentos anexados que servem como prova. Ver detalhes no final.</div>'+
+'<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3>O presente contrato entra em vigor na data de assinatura por ambas as partes, nos termos da Lei nº 23/2007.</div>'+
+'<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE</b><br/><br/>'+formContrato.empNome+'<br/>BI: '+formContrato.empBI+'<br/><br/><div class="concordowpp">Eu, '+formContrato.empNome+', CONCORDO - '+formContrato.valor+'MZN - '+assinaturaContratante.data+'</div>Data: '+assinaturaContratante.data+'</div><div class="assinatura-box contratado"><b>CONTRATADO</b><br/><br/>'+formContrato.trabNome+'<br/>BI: '+formContrato.trabBI+'<br/><br/><div class="concordowpp">Eu, '+formContrato.trabNome+', CONCORDO - '+formContrato.valor+'MZN - '+assinaturaContratado.data+'</div>Data: '+assinaturaContratado.data+'</div></div>'+
+'<div class="footer">ESSE - NUIT 401866876 | contrata-mz.vercel.app | ID '+id+' | '+formContrato.valor+' MZN | '+formContrato.localTrab+'<br/>Gerado em '+agora+' - Válido Lei 23/2007</div>'+
+'<div style="margin-top:20px"><h3 style="background:#1e2f4a;color:white;padding:8px;border-radius:6px">ANEXOS - Documentos</h3>'+anexosHtml+'</div>'+
+'<div style="text-align:center;margin-top:20px" class="no-print"><button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold">IMPRIMIR / SALVAR COMO PDF</button></div>'+
+'</body></html>';
 
-<div class="clausula"><h3>2. OBJETO E TAREFAS - ${formContrato.tarefas.length} TAREFAS DE ${catName.toUpperCase()}</h3>${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}</div>
-
-<div class="clausula"><h3>3. HORARIO E LOCAL - Quando e onde</h3>
-<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
-<b>Dias:</b> ${formContrato.dias}<br>
-<b>Data inicio:</b> ${formContrato.dataInicio}<br>
-<b>Local de trabalho:</b> ${formContrato.localTrab}
-</div>
-
-<div class="clausula"><h3>4. SALARIO E PAGAMENTO - Quanto e como paga</h3>
-<b>Valor:</b> ${formContrato.valor} MZN<br>
-<b>Dia pagamento:</b> Todo dia ${formContrato.diaPag}<br>
-<b>Forma:</b> ${formContrato.formaPag}<br>
-<b>Prazo:</b> ${formContrato.prazo}
-</div>
-
-<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO - Beneficios</h3>
-<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
-<b>Alojamento:</b> ${formContrato.alojamento}<br>
-<b>Transporte:</b> ${formContrato.transporte}
-</div>
-
-<div class="clausula"><h3>6. FOLGAS E FERIAS - Descanso legal</h3>${formContrato.folgas}</div>
-<div class="clausula"><h3>7. PERIODO EXPERIMENTAL - Teste inicial</h3>${formContrato.periodoExp}</div>
-<div class="clausula"><h3>8. DEVERES DO TRABALHADOR - Obrigacoes</h3>${formContrato.deveresTrab}</div>
-<div class="clausula"><h3>9. DEVERES DO EMPREGADOR - Obrigacoes</h3>${formContrato.deveresEmp}</div>
-<div class="clausula"><h3>10. ANEXOS (ANTES VALIDADE) - Fotos e provas - Fotos viram prova legal</h3>
-<b>Fotos e comprovativos anexados antes da validade - viram prova legal:</b><br>
-- Foto BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI} - Frente e verso - Anexado na Clausula 10<br>
-- Foto do local: ${formContrato.localTrab} - Foto antes de comecar<br>
-- Fotos: ${formContrato.anexos.length} ficheiros - ${formContrato.anexos.join(", ") || "BI, NUIT, Fotos obra, CV"}<br>
-- Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
-</div>
-
-<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
-<b>CONTRATO COM DADOS DAS PARTES, TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - VEJA SO ISSO E MAIS NADA - 11 CLAUSULAS COMPLETAS</b><br>
-<b>Assinaturas na horizontal lado a lado - Contratante esquerda - Contratado direita - como pediu</b>
-</div>
-
-<div class="assinaturas-horizontal">
-<div class="assinatura-box contratante">
-<b>CONTRATANTE - ESQUERDA - HORIZONTAL - 1/2</b><br><br>
-${formContrato.empNome} - BI ${formContrato.empBI}<br>
-CONCORDO em ${assinaturaContratante.data}<br>
-<div class="concordowpp">Eu, ${formContrato.empNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratante.data}</div>
-Assinatura na HORIZONTAL - Esquerda - 1 de 2
-</div>
-<div class="assinatura-box contratado">
-<b>CONTRATADO - DIREITA - HORIZONTAL - 2/2</b><br><br>
-${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
-CONCORDO em ${assinaturaContratado.data}<br>
-<div class="concordowpp">Eu, ${formContrato.trabNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratado.data}</div>
-Assinatura na HORIZONTAL - Direita - 2 de 2
-</div>
-</div>
-
-<div class="footer"><b>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ASSINATURAS NA HORIZONTAL</b><br>
-CONTRATO COM DADOS DAS PARTES + TODAS AS CLAUSULAS E ASSINATURAS SEPARADAS NA PARTE HORIZONTAL NAO VERTICAL - COMO PEDIU - 11 CLAUSULAS COMPLETAS - LEI 23/2007 - VALIDO EM MOCAMBIQUE<br>
-ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id} - ${formContrato.valor} MZN - ${formContrato.localTrab}<br>
-${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 ASSINATURAS HORIZONTAL SEM REPETICAO
-</div>
-
-<div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF FINAL COM ASSINATURAS - 11 CLAUSULAS - HORIZONTAL</button>
-</div>
-</body></html>`;
-   const blob = new Blob([htmlFinal], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-FINAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
- };
+   const blob = new Blob([htmlFinal], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download='CONTRATO-FINAL-'+catName+'-ID-'+id+'.html'; a.click();
+   };
+};
 
  return (
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
@@ -945,8 +822,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
               <div className="font-black text-[11px] mb-2">DIREITA - ANEXAR + LOGO TIPO</div>
               <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione à esquerda'}</div>
               <div className="space-y-3">
+                {docSelecionadoAnexo==='logo_tipo' && (
                 <div>
-                  <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo) 🏢</label>
+                  <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo do PDF) 🏢</label>
                   <div className="mt-1 flex gap-2">
                     <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? "✅ Logo" : "🏢"}</div>
                     <div className="flex-1">
@@ -959,6 +837,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS NA HORIZONTAL NAO VERTICAL - 2 
                     </div>
                   </div>
                 </div>
+                )}
                 <div className="border-t pt-3">
                   <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione à esquerda'}</label>
                   <div className="mt-1 border-2 border-dashed border-[#25D366] rounded-xl p-4 bg-[#f0fdf4] text-center">
@@ -1491,12 +1370,8 @@ Bilhete valido - Apresentar QR`;
                 </div>
               )}
             </div>
-          )}
 </section>
       )}
-
-
-
 
       {tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
@@ -1505,9 +1380,7 @@ Bilhete valido - Apresentar QR`;
       )}
 
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
- </div>
- )
-}
+      </div>
+    )
+  }
 
-
-// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
