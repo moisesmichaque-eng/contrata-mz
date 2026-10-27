@@ -193,16 +193,16 @@ export default function App(){
 
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
   const [stockProdutos, setStockProdutos] = useState([
-    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:45, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
-    {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:22, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
-    {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:4, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
-    {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:210, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
-    {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', marca:'Cin', grupo:'Tintas', subGrupo:'Plastica', fabricante:'Cin Mocambique', dataEntrada:'29/04/2025', qtdEntrada:150, noArmazem:28, entradaLoja:30, dataReq:'09/05/2025', stockLoja:8, venda:84, mediaDia:4.2, precoVenda:4250, precoCusto:3100, minimo:40, ideal:120},
-    {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', marca:'Tonon', grupo:'Cobertura', subGrupo:'Zinco', fabricante:'Tonon', dataEntrada:'20/04/2025', qtdEntrada:400, noArmazem:95, entradaLoja:60, dataReq:'06/05/2025', stockLoja:18, venda:227, mediaDia:9.1, precoVenda:1450, precoCusto:1100, minimo:60, ideal:250},
-    {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', marca:'Plastubos', grupo:'Canalizacao', subGrupo:'PVC', fabricante:'Plastubos', dataEntrada:'03/05/2025', qtdEntrada:250, noArmazem:140, entradaLoja:40, dataReq:'08/05/2025', stockLoja:12, venda:58, mediaDia:3.2, precoVenda:980, precoCusto:720, minimo:50, ideal:150},
-    {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', marca:'Gerdau', grupo:'Arames', subGrupo:'Farpado', fabricante:'Gerdau', dataEntrada:'18/04/2025', qtdEntrada:100, noArmazem:22, entradaLoja:20, dataReq:'05/05/2025', stockLoja:3, venda:55, mediaDia:2.2, precoVenda:5200, precoCusto:4100, minimo:20, ideal:60},
-    {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:2, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
-    {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:32, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
+    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:200, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
+    {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:80, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
+    {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:10, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
+    {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:500, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
+    {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', marca:'Cin', grupo:'Tintas', subGrupo:'Plastica', fabricante:'Cin Mocambique', dataEntrada:'29/04/2025', qtdEntrada:150, noArmazem:28, entradaLoja:30, dataReq:'09/05/2025', stockLoja:30, venda:84, mediaDia:4.2, precoVenda:4250, precoCusto:3100, minimo:40, ideal:120},
+    {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', marca:'Tonon', grupo:'Cobertura', subGrupo:'Zinco', fabricante:'Tonon', dataEntrada:'20/04/2025', qtdEntrada:400, noArmazem:95, entradaLoja:60, dataReq:'06/05/2025', stockLoja:60, venda:227, mediaDia:9.1, precoVenda:1450, precoCusto:1100, minimo:60, ideal:250},
+    {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', marca:'Plastubos', grupo:'Canalizacao', subGrupo:'PVC', fabricante:'Plastubos', dataEntrada:'03/05/2025', qtdEntrada:250, noArmazem:140, entradaLoja:40, dataReq:'08/05/2025', stockLoja:40, venda:58, mediaDia:3.2, precoVenda:980, precoCusto:720, minimo:50, ideal:150},
+    {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', marca:'Gerdau', grupo:'Arames', subGrupo:'Farpado', fabricante:'Gerdau', dataEntrada:'18/04/2025', qtdEntrada:100, noArmazem:22, entradaLoja:20, dataReq:'05/05/2025', stockLoja:20, venda:55, mediaDia:2.2, precoVenda:5200, precoCusto:4100, minimo:20, ideal:60},
+    {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:12, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
+    {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:50, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
   ] as any[]);
   const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
@@ -217,8 +217,31 @@ export default function App(){
   const [abaSaidaStock, setAbaSaidaStock] = useState<'transfer'|'venda'>('transfer');
 
     const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
-  const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
+  const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
   const [ivaTipo, setIvaTipo] = useState("16");
+  const finalizarComWhatsApp = ()=>{
+    if(produtosFat.length===0){alert('Adicione produtos'); return;}
+    if(!telFat){alert('Telefone obrigatorio'); return;}
+    const subtotal = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd),0);
+    const desc = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
+    const base = subtotal - desc;
+    const iva = ivaTipo==='sem'?0: ivaTipo==='16'? base*0.16 : base*0.05;
+    const total = base + iva;
+    const msg = `*${perfilLoja.nome||'Minha Loja'}* - Fatura\nCliente: ${nomeFat||'Cliente'}${nuitFat?`\nNUIT: ${nuitFat}`:''}\nTel: ${telFat}\n\nItens:\n${produtosFat.map(p=>`- ${p.nome} x${p.qtd} = ${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT`).join('\n')}\n\nSubtotal: ${subtotal.toFixed(0)} MT\nDesconto: ${desc.toFixed(0)} MT\nIVA (${ivaTipo}%): ${iva.toFixed(0)} MT\n*TOTAL: ${total.toFixed(0)} MT*\n\nObrigado pela preferencia!`;
+    const telClean = telFat.replace(/\D/g,'').slice(-9);
+    const waUrl = `https://wa.me/258${telClean}?text=${encodeURIComponent(msg)}`;
+    // Baixa stock auto
+    produtosFat.forEach(p=>{
+      setStockProdutos(prev=>prev.map(s=>s.nome===p.nome?{...s, stockLoja: Math.max(0, ((s as any).stockLoja||0)-p.qtd)}:s as any));
+    });
+    // Salva fatura
+    setFaturas([{id:Date.now(), data:new Date().toLocaleDateString(), cliente:nomeFat||telFat, nuit:nuitFat, total: total.toFixed(0), pagamento:'Numerario', itens: produtosFat.length}] as any);
+    // Abre WhatsApp
+    window.open(waUrl, '_blank');
+    alert(`Fatura finalizada! Stock baixado. A abrir WhatsApp para ${telFat}`);
+    setProdutosFat([]);
+  };
+
  const [produtosFat, setProdutosFat] = useState([
    {id:'p1', nome:'Saco de Cimento 50kg - CMPOR', preco:850, qtd:3, desc:0},
    {id:'p2', nome:'Bloco 15cm - 40x20', preco:42, qtd:20, desc:5},
@@ -238,6 +261,11 @@ export default function App(){
   useEffect(()=>{ try{ localStorage.setItem("produtos_base", JSON.stringify(produtosBaseState)) }catch(e){} },[produtosBaseState]);
    const [mostrarNovoProd, setMostrarNovoProd] = useState(false);
    const [novoProdNome, setNovoProdNome] = useState('');
+  const [novoProdPrecoUnidade, setNovoProdPrecoUnidade] = useState('');
+  const [novoProdPrecoEmbalagem, setNovoProdPrecoEmbalagem] = useState('');
+  const [novoProdPrecoCaixa, setNovoProdPrecoCaixa] = useState('');
+  const [novoProdPrecoSaco, setNovoProdPrecoSaco] = useState('');
+  const [novoProdPrecoAtacado, setNovoProdPrecoAtacado] = useState('');
    const [novoProdPreco, setNovoProdPreco] = useState('');
    const [novoProdCat, setNovoProdCat] = useState('');
  const totalDescFat = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
@@ -1085,7 +1113,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div>
           {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
           <div className="bg-white rounded-[12px] border p-2 mb-3 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Minha Loja - Vender e Faturar - {lojaPerfil.nomeLoja}</div></div>
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Minha Loja - Vender e Faturar</div></div>
             <div className="flex gap-1 bg-[#f1f5f9] rounded-full p-1 ml-2">
               <button onClick={()=>setFaturacaoTab('faturacao')} className={faturacaoTab==='faturacao' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>VENDER</button>
               <button onClick={()=>setFaturacaoTab('stock')} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
@@ -1122,7 +1150,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-[#111827] rounded-[12px] p-4 text-white">
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido - {lojaPerfil.nomeLoja}</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like - Stock auto</span></div>
                 <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>{produtosFat.length} - QTD total {produtosFat.reduce((a,b)=>a+b.qtd,0)}</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>{lojaPerfil.nomeLoja}</span></div></div>
-                <button onClick={()=>{alert('Documento finalizado! Stock baixado automaticamente. Total: '+totalFat.toFixed(0)+' MT'); setProdutosFat([]);}} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento - Baixa Stock Auto</button>
+                <button onClick={()=>{alert('Documento finalizado! Stock baixado automaticamente. Total: '+totalFat.toFixed(0)+' MT'); setProdutosFat([]);}} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento - Baixa Stock Auto + WhatsApp</button>
                 <div className="text-[8px] text-white/40 text-center mt-2">Telefone obrigatorio - Stock baixa automatica - IVA global</div>
               </div>
             </div>
@@ -1200,7 +1228,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
+                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]"> PRECO UNIT</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
                           const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
                           const sf = p.noArmazem + p.stockLoja;
                           let matchTipo = true;
@@ -1223,8 +1251,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                                 <td className="text-center p-1.5 border">{p.noArmazem}</td>
                                 <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
                                 <td className="text-center p-1.5 border">{p.dataReq}</td>
-                                <td className="text-center p-1.5 border">{p.stockLoja}</td>
-                                <td className="text-center p-1.5 border">{p.venda}</td>
+                                <td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||(p as any).preco||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td>
                                 <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
                                 <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
                                 <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
