@@ -188,8 +188,6 @@ export default function App(){
  const [buscaFat, setBuscaFat] = useState("");
  const [filtroCatFat, setFiltroCatFat] = useState("Todos");
  const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
-
-  const [faturarAba, setFaturarAba] = useState('VENDER');
   const [faturacaoLogado, setFaturacaoLogado] = useState(false);
   const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'>('faturacao');
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
@@ -1034,250 +1032,127 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   )}
 
 
-      {tab==='faturar' && (
-        <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10">
-          {!faturacaoLogado ? (
-            <div className="max-w-[600px] mx-auto">
-              <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
-                <div className="text-center">
-                  <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
-                  <h2 className="text-[18px] font-black mt-3">Facilita Faturacao - Cadastro simples</h2>
-                  <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos para entrar na parte de faturacao</p>
-                  <p className="text-[9px] opacity-50 mt-1">Depois pode acrescentar mais dados no seu perfil - NUIT, endereco, logo, forma de pagamento</p>
-                  <div className="flex justify-center gap-2 mt-4">
-                    <button onClick={()=>setFaturacaoAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='cadastro' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>CADASTRO SIMPLES</button>
-                    <button onClick={()=>setFaturacaoAuthMode('login')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='login' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>LOGIN</button>
-                  </div>
+      {{tab==='faturar' ? (
+            <div className="w-full max-w-[1150px] mx-auto px-2">
+              <div className="bg-[#1e2f4a] text-white rounded-[12px] p-4 mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-[10px] bg-[#22c55e] text-white grid place-items-center font-black text-[18px]">F</div>
+                  <div><div className="font-black text-[15px]">Minha Loja - Vender e Faturar</div><div className="text-[10px] opacity-70">Venda rapido, controle stock, emita fatura com NUIT</div></div>
                 </div>
-                <div className="mt-6 max-w-[420px] mx-auto">
-                  {faturacaoAuthMode==='cadastro' ? (
-                  <>
-                  <div className="space-y-3">
-                    <div><label className="text-[9px] font-bold opacity-80">NOME DA LOJA / EMPRESA *</label><input value={faturacaoCadastroForm.nomeLoja} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, nomeLoja:e.target.value})} placeholder="Ex: Ferragem Central Matola" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <div><label className="text-[9px] font-bold opacity-80">TELEFONE / WHATSAPP *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84 123 4567" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black bg-[#f0fdf4]" /></div>
-                    <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <div className="text-[8px] opacity-60">NUIT, endereco, logo - pode acrescentar depois no perfil</div>
-                  </div>
-                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
-                  </>
-                  ) : (
-                  <>
-                  <div className="space-y-3">
-                    <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                  </div>
-                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Minha Ferragem', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
-                  <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
-                  </>
-                  )}
-                </div>
+                <div className="text-[9px] bg-[#facc15] text-black px-3 py-1 rounded-full font-black">NUIT: {perfilLoja.nuit || 'Pendente'}</div>
               </div>
-              <div className="mt-3 bg-white rounded-[12px] border p-4">
-                <div className="font-bold text-[11px]">Como funciona - Cadastro simples</div>
-                <div className="mt-2 space-y-1 text-[9px] text-[#475569]">
-                  <div>- Cadastro: so nome loja, telefone, password - 10 segundos</div>
-                  <div>- Depois de entrar: pode acrescentar NUIT, endereco, provincia, logo, forma pagamento, horario</div>
-                  <div>- Dentro da conta: tem pagina de gestao de stock - produtos, quantidade, preco, custo, alerta stock baixo</div>
-                  <div>- Faturacao ultra rapida: so telefone do comprador obrigatorio - 15s</div>
-                </div>
+              <div className="bg-white rounded-full p-1 w-fit shadow-sm border mb-4 flex gap-1 overflow-x-auto max-w-full">
+                <button onClick={()=>setFaturarAba('VENDER')} className={faturarAba==='VENDER' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>VENDER</button>
+                <button onClick={()=>setFaturarAba('STOCK')} className={faturarAba==='STOCK' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>STOCK</button>
+                <button onClick={()=>setFaturarAba('FATURAS')} className={faturarAba==='FATURAS' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>FATURAS</button>
+                <button onClick={()=>setFaturarAba('CLIENTES')} className={faturarAba==='CLIENTES' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>CLIENTES</button>
+                <button onClick={()=>setFaturarAba('PERFIL')} className={faturarAba==='PERFIL' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>PERFIL</button>
               </div>
+              {faturarAba==='VENDER' && (
+                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="lg:col-span-2">
+                      <div className="flex justify-between mb-3">
+                        <h3 className="font-black text-[13px]">Produtos para vender - Clique VENDER</h3>
+                        <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar" className="h-8 px-3 border rounded-full text-[11px] w-[160px]" />
+                      </div>
+                      <div className="border rounded-[8px] max-h-[460px] overflow-auto">
+                        <table className="w-full text-[11px]">
+                          <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">PRODUTO</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-right">PRECO</th><th className="p-2 text-center">ACAO</th></tr></thead>
+                          <tbody>
+                            {stockProdutos.filter((p:any)=> (p.nome+p.codigo).toLowerCase().includes(buscaStock.toLowerCase())).map((p:any)=>{
+                              const isBaixo = p.stockLoja <= 49;
+                              const bg = isBaixo ? 'bg-[#fee2e2]' : '';
+                              return (<tr key={p.id} className={`border-b ${bg} hover:bg-[#f8fafc]`}><td className="p-2"><div className="font-bold">{p.codigo}</div><div className="text-[10px] opacity-70">{p.nome}</div></td><td className="p-2 text-center">{p.stockLoja}</td><td className="p-2 text-right font-bold">{p.precoVenda} MT</td><td className="p-2 text-center"><button onClick={()=>{setVendaProduto(p); setVendaQtd(1);}} className="px-4 py-1 bg-[#22c55e] text-white rounded-full font-black text-[10px]">VENDER</button></td></tr>)
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div className="bg-[#f8fafc] rounded-[12px] p-3 border h-fit">
+                      <h4 className="font-black text-[12px] mb-3">Carrinho de venda</h4>
+                      {vendaProduto ? (
+                        <div className="space-y-3">
+                          <div className="bg-white p-3 rounded-[8px] border"><div className="font-bold text-[12px]">{vendaProduto.nome}</div><div className="text-[10px] opacity-60">{vendaProduto.codigo} - Stock {vendaProduto.stockLoja}</div></div>
+                          <div><label className="text-[10px] font-bold">QTD</label><input type="number" value={vendaQtd} onChange={e=>setVendaQtd(Number(e.target.value))} className="w-full h-9 border rounded px-3 text-[12px] mt-1" /></div>
+                          <div><label className="text-[10px] font-bold">Cliente (opcional)</label><input value={vendaCliente} onChange={e=>setVendaCliente(e.target.value)} placeholder="Balcao ou nome" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                          <div><label className="text-[10px] font-bold">Pagamento</label><select value={vendaPagamento} onChange={e=>setVendaPagamento(e.target.value)} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>Numerario</option><option>Mpesa</option><option>Emola</option><option>Transferencia</option><option>Fiado</option></select></div>
+                          <div className="flex justify-between font-black text-[13px] pt-2 border-t"><span>Total</span><span>{(vendaProduto.precoVenda*vendaQtd).toLocaleString()} MT</span></div>
+                          <button onClick={()=>{
+                            const ok = vendaProduto.stockLoja >= vendaQtd;
+                            if(!ok){alert('Stock insuficiente'); return;}
+                            const total = vendaProduto.precoVenda*vendaQtd;
+                            const nova = {id:Date.now(), data:new Date().toLocaleDateString(), cliente:vendaCliente||'Balcao', total:total, pagamento:vendaPagamento, codigo:vendaProduto.codigo};
+                            setFaturas([nova, ...faturas]);
+                            setStockProdutos(stockProdutos.map((pp:any)=> pp.id===vendaProduto.id ? {...pp, stockLoja: pp.stockLoja - vendaQtd, venda: pp.venda + vendaQtd} : pp));
+                            if(vendaPagamento==='Fiado' && vendaCliente){setClientesFiado([...clientesFiado, {nome:vendaCliente, divida:total, data:nova.data}]);}
+                            setVendaProduto(null); setVendaCliente(''); setVendaQtd(1);
+                          }} className="w-full h-11 bg-[#1e2f4a] text-white rounded-full font-black text-[12px]">FINALIZAR VENDA - BAIXA STOCK AUTO</button>
+                        </div>
+                      ) : (<div className="py-12 text-center text-[11px] opacity-50">Selecione um produto em VENDER para ver aqui</div>)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {faturarAba==='STOCK' && (
+                <div className="bg-white rounded-[12px] p-3 shadow-sm border">
+                  <div className="flex gap-2 mb-3 flex-wrap">
+                    <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar nome, codigo" className="h-8 px-3 border rounded-full text-[11px] w-[220px]" />
+                    <button onClick={()=>setFiltroStock('todos')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1e2f4a] text-white">Todos</button>
+                    <button onClick={()=>setFiltroStock('baixo')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#fee2e2] text-[#dc2626]">Baixo menor 50</button>
+                    <button onClick={()=>setFiltroStock('zerado')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-black text-white">Zerado</button>
+                  </div>
+                  <div className="overflow-auto max-h-[520px]">
+                    <table className="w-full text-[10px]">
+                      <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">CODIGO</th><th className="p-2 text-left">ITEM</th><th className="p-2 text-center">ENT</th><th className="p-2 text-center">ARM</th><th className="p-2 text-center">REQ</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-center">VENDA</th><th className="p-2 text-center">MEDIA DIA</th><th className="p-2 text-center">FINAL</th><th className="p-2 text-right">VALOR</th><th className="p-2 text-center">ACAO</th></tr></thead>
+                      <tbody>
+                        {stockProdutos.filter((p:any)=>{
+                          const busca = (p.nome+p.codigo).toLowerCase().includes(buscaStock.toLowerCase());
+                          if(!busca) return false;
+                          if(filtroStock==='baixo') return p.stockLoja <= 49 && p.stockLoja > 0;
+                          if(filtroStock==='zerado') return p.stockLoja === 0;
+                          return true;
+                        }).map((p:any)=>{
+                          const isBaixo = p.stockLoja <= 49;
+                          const bg = isBaixo ? 'bg-[#fee2e2]' : '';
+                          const finalCalc = p.stockLoja;
+                          return (<tr key={p.id} className={`border-b ${bg}`}><td className="p-2 font-bold">{p.codigo}</td><td className="p-2">{p.nome}</td><td className="p-2 text-center">{p.qtdEntrada}</td><td className="p-2 text-center">{p.stockArmazem}</td><td className="p-2 text-center">{p.reqArmLoja || 0}</td><td className="p-2 text-center font-bold">{p.stockLoja}</td><td className="p-2 text-center">{p.venda}</td><td className="p-2 text-center">{p.mediaDia || 0}</td><td className={`p-2 text-center font-black ${isBaixo ? 'text-[#dc2626]' : ''}`}>{finalCalc}</td><td className="p-2 text-right">{p.precoVenda * p.venda} MT</td><td className="p-2 text-center"><button className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[8px]">Arm-&gt;Loja</button></td></tr>)
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {faturarAba==='FATURAS' && (
+                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                  <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
+                  <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">COD</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={5} className="p-6 text-center opacity-50">Nenhuma fatura ainda - venda em VENDER</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.codigo}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
+                </div>
+              )}
+              {faturarAba==='CLIENTES' && (
+                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                  <h3 className="font-black text-[13px] mb-3">Clientes - Fiado</h3>
+                  <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
+                </div>
+              )}
+              {faturarAba==='PERFIL' && (
+                <div className="bg-white rounded-[12px] p-4 shadow-sm border max-w-[650px]">
+                  <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura valer na AT</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilLoja.nome} onChange={e=>setPerfilLoja({...perfilLoja,nome:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                    <div><label className="text-[10px] font-bold">NUIT *</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} placeholder="400123456" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                    <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} placeholder="Matola, Av..." className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                    <div><label className="text-[10px] font-bold">TELEFONE</label><input value={perfilLoja.telefone} onChange={e=>setPerfilLoja({...perfilLoja,telefone:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                    <div><label className="text-[10px] font-bold">IVA</label><select value={perfilLoja.iva} onChange={e=>setPerfilLoja({...perfilLoja,iva:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>16</option><option>0</option><option>Isento</option></select></div>
+                    <div><label className="text-[10px] font-bold">MOEDA</label><select value={perfilLoja.moeda} onChange={e=>setPerfilLoja({...perfilLoja,moeda:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>MT</option><option>USD</option></select></div>
+                  </div>
+                  <button onClick={()=>alert('Perfil salvo - vai aparecer na fatura')} className="mt-4 h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button>
+                </div>
+              )}
             </div>
           ) : (
             <div>
-          {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
-          <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Facilita Faturacao - {lojaPerfil.nomeLoja}</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">Logado - {lojaPerfil.tel}</span></div>
-            <div className="flex gap-2 flex-wrap"><button onClick={()=>setFaturacaoTab('faturacao')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='faturacao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border'}`}>7. Faturacao - 10 seg</button><button onClick={()=>setFaturacaoTab('painel')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='painel' ? 'bg-[#1e2f4a] text-white' : 'bg-white border'}`}>11. Painel da Loja - 5.4k</button><button onClick={()=>setFaturacaoTab('stock')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='stock' ? 'bg-[#facc15] text-black' : 'bg-white border'}`}>12. Gestao de Stock - {stockProdutos.length} prod</button><button onClick={()=>setFaturacaoLogado(false)} className="px-3 h-7 rounded-full bg-white/10 border text-[9px]">Sair</button></div>
-          </div>
-
-          {faturacaoTab==='faturacao' && (
-          <div className="flex flex-col lg:flex-row gap-3">
-            {/* ESQUERDA - FATURACAO ULTRA RAPIDA */}
-            <div className="flex-1 space-y-3">
-              <div className="bg-white rounded-[12px] border p-4">
-                <div className="flex justify-between"><div className="font-black text-[13px] italic">Dados do comprador - ultra rapido</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">+ Fluxo rapido ativo - {lojaPerfil.nomeLoja}</span></div>
-                <div className="text-[9px] text-[#64748b] mt-1">So telefone obrigatorio. Nome opcional para recibo rapido. Tempo alvo: 15s como supermercado.</div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
-                  <div><label className="text-[8px] font-bold">TELEFONE / WHATSAPP *</label><input value={telFat} onChange={e=>setTelFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-200" placeholder="+258 84 123 4567" /><div className="text-[8px] text-green-600 mt-1">Numero valido para WhatsApp/SMS - Stock baixa automatica</div></div>
-                  <div><label className="text-[8px] font-bold">NOME / EMPRESA (opcional)</label><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f8fafc]" placeholder="Nome opcional - para recibo rapido" /></div>
-                </div>
-              </div>
-              <div className="bg-white rounded-[12px] border p-4">
-                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Produtos e Servicos - do Stock - IVA no fim</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3] font-bold">{stockProdutos.length} produtos no stock</span></div>
-                <div className="mt-3"><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder='Digite "Cimento" - busca no stock' className="w-full h-10 px-3 rounded-[8px] border text-[11px]" /></div>
-                <div className="mt-2 flex flex-wrap gap-1.5">{stockProdutos.filter(p=>!buscaFat||p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,12).map(p=><button key={p.id} onClick={()=>{const ex=produtosFat.find(x=>x.nome===p.nome); if(ex){setProdutosFat(produtosFat.map(x=>x.nome===p.nome?{...x,qtd:x.qtd+1}:x))} else {setProdutosFat([...produtosFat,{id:p.id,nome:p.nome,preco:p.preco,qtd:1,desc:0}]); if(p.qtd>0){setStockProdutos(stockProdutos.map(s=>s.id===p.id?{...s, qtd:s.qtd-1}:s))}}}} className={p.qtd<=p.qtdMin ? 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-red-50 border-red-200 text-red-700' : 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-[#1e293b] text-white'}>{p.nome} - {p.preco}MT - Stock:{p.qtd}</button>)}</div>
-                <div className="mt-4 overflow-x-auto"><table className="w-full text-[10px]"><thead><tr className="text-[8px] text-[#94a3b8] border-b"><th className="text-left py-1">DESCRICAO</th><th>QTD</th><th>PRECO UNIT.</th><th>DESC %</th><th className="text-right">SUBTOTAL</th><th></th></tr></thead><tbody>{produtosFat.map(pr=>(<tr key={pr.id} className="border-b"><td className="py-2"><div className="font-bold text-[10px]">{pr.nome}</div></td><td className="text-center"><input type="number" value={pr.qtd} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,qtd:Math.max(0,Number(e.target.value))}:x).filter(x=>x.qtd>0))} className="w-12 h-7 border rounded text-center text-[10px]" /></td><td className="text-center">{pr.preco}</td><td className="text-center"><input type="number" value={pr.desc} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,desc:Math.max(0,Math.min(100,Number(e.target.value)))}:x))} className="w-10 h-7 border rounded text-center text-[10px]" /></td><td className="text-right font-bold">{(pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0)} MT</td><td><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==pr.id))} className="text-red-400 ml-1">x</button></td></tr>))}</tbody></table></div>
-                <div className="mt-3 flex justify-end"><div className="w-[200px] space-y-1 text-[10px]"><div className="flex justify-between"><span className="text-[#64748b]">Subtotal bruto</span><span className="font-bold">{subtotalBrutoFat} MT</span></div><div className="flex justify-between text-red-500"><span>Descontos</span><span>- {totalDescFat} MT</span></div><div className="flex justify-between"><span>Subtotal liquido</span><span>{baseFat} MT</span></div><div className="flex justify-between"><span>IVA ({ivaTipo}%)</span><span>{ivaFat.toFixed(0)} MT</span></div><div className="flex justify-between font-black text-[12px] border-t pt-1"><span>TOTAL</span><span className="text-[#0f766e]">{totalFat.toFixed(0)} MT</span></div></div></div>
-                <div className="mt-3"><div className="text-[8px] font-bold">IVA NO RODAPE - GLOBAL</div><div className="flex gap-2 mt-1"><button onClick={()=>setIvaTipo('sem')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='sem'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='16'?'bg-[#0f766e] text-white':'bg-white'}`}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='5'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Com IVA 5%</button></div></div>
-              </div>
-            </div>
-            {/* DIREITA */}
-            <div className="w-full lg:w-[300px] lg:min-w-[300px] space-y-3">
-              <div className="bg-[#111827] rounded-[12px] p-4 text-white">
-                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido - {lojaPerfil.nomeLoja}</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like - Stock auto</span></div>
-                <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>{produtosFat.length} - QTD total {produtosFat.reduce((a,b)=>a+b.qtd,0)}</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>{lojaPerfil.nomeLoja}</span></div></div>
-                <button onClick={()=>{alert('Documento finalizado! Stock baixado automaticamente. Total: '+totalFat.toFixed(0)+' MT'); setProdutosFat([]);}} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento - Baixa Stock Auto</button>
-                <div className="text-[8px] text-white/40 text-center mt-2">Telefone obrigatorio - Stock baixa automatica - IVA global</div>
-              </div>
-            </div>
-          </div>
-          )}
-
-          {faturacaoTab==='painel' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <div className="bg-white rounded-[12px] border p-4">
-                <div className="font-black text-[13px]">Perfil da Loja - Acrescente mais dados</div>
-                <div className="text-[9px] text-[#64748b] mt-1">Cadastro simples foi so nome, telefone, password - agora pode completar</div>
-                <div className="mt-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="text-[8px] font-bold">NOME DA LOJA *</label><input value={lojaPerfil.nomeLoja} onChange={e=>setLojaPerfil({...lojaPerfil, nomeLoja:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                    <div><label className="text-[8px] font-bold">RESPONSAVEL</label><input value={lojaPerfil.responsavel} onChange={e=>setLojaPerfil({...lojaPerfil, responsavel:e.target.value})} placeholder="Nome responsavel" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="text-[8px] font-bold">TELEFONE</label><input value={lojaPerfil.tel} onChange={e=>setLojaPerfil({...lojaPerfil, tel:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                    <div><label className="text-[8px] font-bold">EMAIL (opcional)</label><input value={lojaPerfil.email} onChange={e=>setLojaPerfil({...lojaPerfil, email:e.target.value})} placeholder="email@loja.com" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="text-[8px] font-bold">NUIT</label><input value={lojaPerfil.nuit} onChange={e=>setLojaPerfil({...lojaPerfil, nuit:e.target.value})} placeholder="NUIT da empresa" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                    <div><label className="text-[8px] font-bold">PROVINCIA</label><select value={lojaPerfil.provincia} onChange={e=>setLojaPerfil({...lojaPerfil, provincia:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option></select></div>
-                  </div>
-                  <div><label className="text-[8px] font-bold">ENDERECO COMPLETO</label><input value={lojaPerfil.endereco} onChange={e=>setLojaPerfil({...lojaPerfil, endereco:e.target.value})} placeholder="Bairro, Avenida, Numero" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="text-[8px] font-bold">FORMA PAGAMENTO</label><input value={lojaPerfil.formaPag} onChange={e=>setLojaPerfil({...lojaPerfil, formaPag:e.target.value})} placeholder="M-Pesa, Numerario, Banco" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                    <div><label className="text-[8px] font-bold">HORARIO</label><input value={lojaPerfil.horario} onChange={e=>setLojaPerfil({...lojaPerfil, horario:e.target.value})} placeholder="08:00 - 18:00" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
-                  </div>
-                  <div><label className="text-[8px] font-bold">LOGO DA LOJA - aparece no PDF e no topo</label><div className="flex gap-2 mt-1"><input value={lojaPerfil.logoNome} onChange={e=>setLojaPerfil({...lojaPerfil, logoNome:e.target.value})} placeholder="Nome para logo" className="flex-1 h-9 px-3 rounded-[8px] border text-[11px]" /><button onClick={()=>{const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>{const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=(ev:any)=>{setLojaPerfil({...lojaPerfil, logoData:ev.target.result, logoNome:file.name});}; reader.readAsDataURL(file);}}; input.click();}} className="px-4 h-9 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Anexar Logo</button></div>{lojaPerfil.logoData && <div className="mt-2 bg-white border rounded p-2 flex items-center gap-2"><img src={lojaPerfil.logoData} className="h-10 w-10 object-contain border rounded" /><span className="text-[9px]">{lojaPerfil.logoNome}</span></div>}</div>
-                  <button onClick={()=>alert('Perfil atualizado! '+lojaPerfil.nomeLoja)} className="w-full h-10 bg-[#1e2f4a] text-white rounded-[8px] font-bold text-[11px] mt-3">Salvar Perfil Completo</button>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-white rounded-[12px] border p-4">
-                  <div className="font-bold text-[11px]">Painel da Loja - 5.4k vendas</div>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <div className="bg-[#f0fdf4] border border-green-200 rounded-[10px] p-3"><div className="text-[8px] font-bold text-green-700">VENDAS HOJE</div><div className="text-[16px] font-black mt-1">12.450 MT</div><div className="text-[8px] text-[#64748b]">8 documentos</div></div>
-                    <div className="bg-[#fefce8] border border-yellow-200 rounded-[10px] p-3"><div className="text-[8px] font-bold text-yellow-700">STOCK BAIXO</div><div className="text-[16px] font-black mt-1">{stockProdutos.filter(s=>s.qtd<=s.qtdMin).length} produtos</div><div className="text-[8px] text-[#64748b]">Precisa repor</div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {faturacaoTab==='stock' && (
-            <div className="space-y-3">
-              <div className="bg-white rounded-[12px] border p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50</div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
-                  <div className="flex gap-2 items-center">
-                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
-                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
-                    <div className="flex items-center gap-1">
-                      <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
-                        <option value="todos">Todos ({stockProdutos.length})</option>
-                        <option value="baixo">Baixo &lt;50 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length})</option>
-                        <option value="zerado">Zerado (0) ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length})</option>
-                        <option value="medio">Medio 50-100 ({stockProdutos.filter((p:any)=>{const sf=p.noArmazem+p.stockLoja; return sf>=50 && sf<=100}).length})</option>
-                        <option value="alto">Alto &gt;100 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)>100).length})</option>
-                      </select>
-                      <button onClick={()=>setFiltroTipoStock(filtroTipoStock==='baixo'?'todos':'baixo')} className={`h-8 px-3 rounded-full text-[10px] font-black border ${filtroTipoStock==='baixo'?'bg-red-500 text-white border-red-500':'bg-red-50 text-red-700 border-red-200'}`}>{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length} stock baixo</button>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3 grid grid-cols-1 md:grid-cols-[160px_1fr] gap-3">
-                  <div className="bg-[#f8fafc] border rounded-[8px] p-2">
-                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
-                    <div className="space-y-1.5">
-                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center">+</span>Novo Item</button>
-                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
-                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Relatorios [F9]</button>
-                    </div>
-                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
-                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
-                          const sf = p.noArmazem + p.stockLoja;
-                          let matchTipo = true;
-                          if(filtroTipoStock==='baixo') matchTipo = isBaixoCheck(sf);
-                          else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
-                          else if(filtroTipoStock==='medio') matchTipo = sf >= 50 && sf <= 100;
-                          else if(filtroTipoStock==='alto') matchTipo = sf >= 101;
-                          return matchBusca && matchTipo;
-                        }).map((p:any)=>{
-                            const sf=p.noArmazem+p.stockLoja;
-                            const vv=p.venda*p.precoVenda;
-                            const isBaixo = isBaixoCheck(sf);
-                            const rowBg = isBaixo ? 'bg-[#fee2e2]' : '';
-                            const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
-                            return (
-                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}>
-                                <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div>{p.nome}</div></td>
-                                <td className="text-center p-1.5 border">{p.dataEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.qtdEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.noArmazem}</td>
-                                <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
-                                <td className="text-center p-1.5 border">{p.dataReq}</td>
-                                <td className="text-center p-1.5 border">{p.stockLoja}</td>
-                                <td className="text-center p-1.5 border">{p.venda}</td>
-                                <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
-                                <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
-                                <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
-                              </tr>
-                            );
-                          })}</tbody></table>
-                  </div>
-                </div>
-              </div>
-            </div>
-         )}
-
-
-                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
-                {showEntradaStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
-                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
-                      <div className="p-4 space-y-3">
-                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome}</div></div>
-                        <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">QTD Entrada</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data</label><input type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div></div>
-                        <div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[12px]">Cancelar</button><button onClick={()=>{setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:p.qtdEntrada+entradaQtdStock, noArmazem:p.noArmazem+entradaQtdStock, dataEntrada:new Date().toLocaleDateString('pt-MZ')}:p)); setShowEntradaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[12px] font-bold">Confirmar Entrada</button></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {showSaidaStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[520px] border overflow-hidden">
-                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Saida de Item [F6]</span><button onClick={()=>setShowSaidaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
-                      <div className="p-0">
-                        <div className="flex border-b"><button onClick={()=>setAbaSaidaStock('transfer')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='transfer'?'bg-[#eff6ff] text-[#1e40af] border-b-2 border-[#1e40af]':'bg-[#f8fafc]'}`}>Transferencia Arm-&gt;Loja</button><button onClick={()=>setAbaSaidaStock('venda')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='venda'?'bg-[#f0fdf4] text-[#166534] border-b-2 border-[#166534]':'bg-[#f8fafc]'}`}>Venda - Loja</button></div>
-                        <div className="p-4">
-                          {abaSaidaStock==='transfer' ? (
-                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Requisicao Arm-&gt;Loja</label><input type="number" value={transferQtdStock} onChange={e=>setTransferQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Armazem atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem||0)-transferQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.noArmazem<transferQtdStock){alert('Stock insuficiente no armazem'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, noArmazem:p.noArmazem-transferQtdStock, stockLoja:p.stockLoja+transferQtdStock, entradaLoja:transferQtdStock, dataReq:new Date().toLocaleDateString('pt-MZ')}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#2563eb] text-white rounded font-bold">Transferir</button></div></div>
-                          ) : (
-                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Venda</label><input type="number" value={vendaQtdStock} onChange={e=>setVendaQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Stock Loja atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja||0)-vendaQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.stockLoja<vendaQtdStock){alert('Stock insuficiente na loja'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, stockLoja:p.stockLoja-vendaQtdStock, venda:p.venda+vendaQtdStock, mediaDia:((p.venda+vendaQtdStock)/30)}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded font-bold">Confirmar Venda</button></div></div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {showNovoStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Novo Item - Cadastro</span><button onClick={()=>setShowNovoStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">Codigo</label><input placeholder="Ex: CEM-..." className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Grupo</label><select className="w-full mt-1 h-8 border rounded px-2 text-[12px]"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option></select></div></div><div><label className="text-[11px] font-bold">Nome Produto</label><input placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowNovoStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>setShowNovoStock(false)} className="h-8 px-5 bg-[#2b4c7e] text-white rounded font-bold">Criar Produto</button></div></div></div>
-                  </div>
-                )}
-                {showRelatorioStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[640px] border overflow-hidden"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Relatorios - Stock 11 Colunas - Alerta &lt;50</span><button onClick={()=>setShowRelatorioStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 grid grid-cols-3 gap-3"><div className="bg-[#f8fafc] border rounded p-3"><div className="text-[11px] text-[#64748b]">Total Itens</div><div className="text-[20px] font-bold">{stockProdutos.length}</div></div><div className="bg-[#fee2e2] border border-[#fca5a5] rounded p-3"><div className="text-[11px] text-[#991b1b] font-bold">Abaixo de 50</div><div className="text-[20px] font-bold text-[#991b1b]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length}</div></div><div className="bg-[#fecaca] border border-[#ef4444] rounded p-3"><div className="text-[11px] text-[#7f1d1d]">Zerados</div><div className="text-[20px] font-bold text-[#7f1d1d]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length}</div></div><div className="col-span-3 bg-[#eff6ff] border rounded p-3 flex justify-between"><div><div className="text-[11px] text-[#1e40af]">Soma Custo Arm+Loja</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+(b.noArmazem+b.stockLoja)*b.precoCusto,0).toFixed(0)} MT</div></div><div className="text-right"><div className="text-[11px] text-[#1e40af]">Total Vendas Valor</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+b.venda*b.precoVenda,0).toFixed(0)} MT</div></div></div></div><div className="p-3 border-t bg-[#f8fafc] flex justify-end"><button onClick={()=>setShowRelatorioStock(false)} className="h-8 px-4 bg-[#2b4c7e] text-white rounded">Fechar</button></div></div>
-                  </div>
-                )}
-
-          </div>
-          )}
-        </section>
-      )}
-{tab==='viagens' && (
+tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
@@ -1733,3 +1608,4 @@ Bilhete valido - Apresentar QR`;
 
 
 // ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
+}
