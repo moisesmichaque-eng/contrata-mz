@@ -1032,7 +1032,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   )}
 
 
-      {{tab==='faturar' ? (
+      {tab==='faturar' ? (
             <div className="w-full max-w-[1150px] mx-auto px-2">
               <div className="bg-[#1e2f4a] text-white rounded-[12px] p-4 mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -1608,4 +1608,3 @@ Bilhete valido - Apresentar QR`;
 
 
 // ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
-}
