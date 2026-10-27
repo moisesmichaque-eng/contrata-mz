@@ -11,15 +11,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
-const LOGO_WEZHA_BASE64 = "/logo_wezha.jpg";
-const LOGO_ESSE = LOGO_WEZHA_BASE64;
-const LOGO_FALLBACK = LOGO_WEZHA_BASE64;
-const LOGO_ESSE_DARK = LOGO_WEZHA_BASE64;
+const LOGO_ESSE = "\uD83C\uDFE2";
+const LOGO_ESSE_DARK = "\uD83C\uDFE2";
 
 
 
-
-const isBaixoCheck = (n:number)=> n <= 49;
 const PAISES: any = {
   "Mocambique": ["Maputo Cidade","Matola","Boane","Gaza - Xai-Xai","Inhambane","Sofala - Beira","Nampula","Tete","Zambezia - Quelimane","Cabo Delgado - Pemba"],
   "South Africa": ["Gauteng - Johannesburg","Western Cape - Cape Town","KZN - Durban"],
@@ -115,10 +111,10 @@ export default function App(){
   
   const distritosPorProvincia:any = {
     "Maputo Cidade": ["KaMpfumo","Nlhamankulu","KaMaxakeni","KaMavota","KaMubukwana"],
-    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhica","Namaacha","Moamba"],
-    "Gaza": ["Xai-Xai","Chibuto","Chokwe","Bilene","Manjacaze"],
+    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhiça","Namaacha","Moamba"],
+    "Gaza": ["Xai-Xai","Chibuto","Chokwé","Bilene","Manjacaze"],
     "Inhambane": ["Inhambane","Maxixe","Vilankulo"],
-    "Sofala": ["Beira","Dondo","Nhamatanda","Buzi","Maringue"],
+    "Sofala": ["Beira","Dondo","Nhamatanda","Buzi","Maringué"],
     "Manica": ["Chimoio","Manica","Gondola"],
     "Tete": ["Tete","Moatize","Angonia"],
     "Zambezia": ["Quelimane","Mocuba","Gurue"],
@@ -128,18 +124,18 @@ export default function App(){
     "Joanesburgo - SA": ["Park Station Johannesburg (destino #1)","Soweto - Bara","Sandton","Hillbrow","Rosettenville","Yeoville"],
     "Pretoria - SA": ["Pretoria Bosman Station","Centurion","Mamelodi","Soshanguve"],
     "Durban - SA": ["Durban Berea Station","Umhlanga","Pinetown","Umlazi"],
-    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade mocambicana","White River","Hazyview","Nelspruit Central"],
+    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade moçambicana","White River","Hazyview","Nelspruit Central"],
   };
 
   // OBJECT DONE 7 - 7 CARROS REAIS
   const carrosReaisFoto3 = [
-    { id:1, rota:"Boane -&gt; Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
-    { id:2, rota:"Maputo -&gt; Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
-    { id:3, rota:"Matola -&gt; Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
-    { id:4, rota:"Maputo -&gt; Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
-    { id:5, rota:"Maputo -&gt; Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
-    { id:6, rota:"Matola -&gt; Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
-    { id:7, rota:"Beira -&gt; Maputo", origem:"Sofala", destino:"Maputo Cidade", dOrigem:"Beira", dDestino:"Maputo", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"VOLTA", matricula:"ADF 561 SF" },
+    { id:1, rota:"Boane -> Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
+    { id:2, rota:"Maputo -> Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
+    { id:3, rota:"Matola -> Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
+    { id:4, rota:"Maputo -> Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
+    { id:5, rota:"Maputo -> Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
+    { id:6, rota:"Matola -> Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
+    { id:7, rota:"Beira -> Maputo", origem:"Sofala", destino:"Maputo Cidade", dOrigem:"Beira", dDestino:"Maputo", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"VOLTA", matricula:"ADF 561 SF" },
   ];
 
   const listaDistOrigem = distritosPorProvincia[provOrigemF] || ["Matola","Boane"];
@@ -155,7 +151,7 @@ export default function App(){
   });
 
   function handleReservarRealFinalV11(carro:any){
-    alert(" RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreco: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
+    alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreço: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
   }
 
  const [tab,setTab]=useState("encontrar");
@@ -188,34 +184,26 @@ export default function App(){
  const [buscaFat, setBuscaFat] = useState("");
  const [filtroCatFat, setFiltroCatFat] = useState("Todos");
  const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
+
+  const [faturarAba, setFaturarAba] = useState('VENDER');
+  const [vendaProduto, setVendaProduto] = useState<any>(null);
+  const [vendaQtd, setVendaQtd] = useState(1);
+  const [vendaCliente, setVendaCliente] = useState('');
+  const [vendaPagamento, setVendaPagamento] = useState('Numerario');
+  const [faturas, setFaturas] = useState<any[]>([]);
+  const [clientesFiado, setClientesFiado] = useState<any[]>([]);
+  const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
+  const [buscaStock, setBuscaStock] = useState('');
   const [faturacaoLogado, setFaturacaoLogado] = useState(false);
   const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'>('faturacao');
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
   const [stockProdutos, setStockProdutos] = useState([
-    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:45, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
-    {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:22, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
-    {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:4, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
-    {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:210, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
-    {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', marca:'Cin', grupo:'Tintas', subGrupo:'Plastica', fabricante:'Cin Mocambique', dataEntrada:'29/04/2025', qtdEntrada:150, noArmazem:28, entradaLoja:30, dataReq:'09/05/2025', stockLoja:8, venda:84, mediaDia:4.2, precoVenda:4250, precoCusto:3100, minimo:40, ideal:120},
-    {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', marca:'Tonon', grupo:'Cobertura', subGrupo:'Zinco', fabricante:'Tonon', dataEntrada:'20/04/2025', qtdEntrada:400, noArmazem:95, entradaLoja:60, dataReq:'06/05/2025', stockLoja:18, venda:227, mediaDia:9.1, precoVenda:1450, precoCusto:1100, minimo:60, ideal:250},
-    {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', marca:'Plastubos', grupo:'Canalizacao', subGrupo:'PVC', fabricante:'Plastubos', dataEntrada:'03/05/2025', qtdEntrada:250, noArmazem:140, entradaLoja:40, dataReq:'08/05/2025', stockLoja:12, venda:58, mediaDia:3.2, precoVenda:980, precoCusto:720, minimo:50, ideal:150},
-    {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', marca:'Gerdau', grupo:'Arames', subGrupo:'Farpado', fabricante:'Gerdau', dataEntrada:'18/04/2025', qtdEntrada:100, noArmazem:22, entradaLoja:20, dataReq:'05/05/2025', stockLoja:3, venda:55, mediaDia:2.2, precoVenda:5200, precoCusto:4100, minimo:20, ideal:60},
-    {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:2, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
-    {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:32, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
-  ] as any[]);
-  const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
-  const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
-  const [stockSelecionado, setStockSelecionado] = useState('2');
-  const [showEntradaStock, setShowEntradaStock] = useState(false);
-  const [showSaidaStock, setShowSaidaStock] = useState(false);
-  const [showNovoStock, setShowNovoStock] = useState(false);
-  const [showRelatorioStock, setShowRelatorioStock] = useState(false);
-  const [entradaQtdStock, setEntradaQtdStock] = useState(50);
-  const [transferQtdStock, setTransferQtdStock] = useState(20);
-  const [vendaQtdStock, setVendaQtdStock] = useState(5);
-  const [abaSaidaStock, setAbaSaidaStock] = useState<'transfer'|'venda'>('transfer');
-
-    const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
+    {id:'s1', nome:'Saco de Cimento 32.5 50kg - CMPOR', cat:'Cimento', preco:850, custo:700, qtd:25, qtdMin:5, fornecedor:'CMP'},
+    {id:'s2', nome:'Bloco 15cm', cat:'Bloco', preco:45, custo:35, qtd:2, qtdMin:10, fornecedor:'Local'},
+    {id:'s3', nome:'Tinta Plastica Branca 20L', cat:'Tinta', preco:3500, custo:2800, qtd:8, qtdMin:3, fornecedor:'Cin'},
+    {id:'s4', nome:'Ferro 12mm 12m', cat:'Ferro', preco:1200, custo:950, qtd:15, qtdMin:5, fornecedor:'Mittal'},
+  ]);
+  const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
   const [ivaTipo, setIvaTipo] = useState("16");
  const [produtosFat, setProdutosFat] = useState([
@@ -270,7 +258,7 @@ export default function App(){
     }
     fetchLive();
 
-    // subscreve tempo real - qualquer carro que mexer no paAAs aparece
+    // subscreve tempo real - qualquer carro que mexer no paAÂ­s aparece
     const channel = supabase.channel('viagens_nacional')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'viagens_motoristas' }, (payload:any) => {
         if (payload.eventType === 'INSERT') {
@@ -287,7 +275,7 @@ export default function App(){
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Fallback simulado se Supabase vazio (para nAAo ficar mapa vazio)
+  // Fallback simulado se Supabase vazio (para nAÂ£o ficar mapa vazio)
   useEffect(()=>{
     if(liveViaturas.length===0 && !loadingLive){
       // se depois de 3s ainda vazio, usa dados de exemplo locais
@@ -719,16 +707,16 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-auto object-contain bg-white rounded-full p-1" onError={(e:any)=>{try{(e.currentTarget as HTMLImageElement).style.display="none";}catch{}}} /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE.</div></div>
-        <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
-      {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
-      <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
+    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="ESSE - Energy Solutions and Services Enterprise" className="h-9 w-auto object-contain" /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE. 11 CLAUSULAS</div></div>
+    <div className="flex items-center gap-2">
+      {/* BOTAO CIRCULADO AMARELO - FACTURACAO - ADICIONADO App_40 - MANTIDO */}
+      <button onClick={()=>setTab('faturacao')} className={`px-4 py-2 rounded-full font-black text-[11px] ${tab==='faturacao'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FACTURACAO</button>
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
-      <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
-      <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
-      <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
-      
-      <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
+      <button onClick={()=>setTab('viagens')} className={`px-4 py-2 rounded-full font-black text-[11px] flex items-center gap-1 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
+      <button onClick={()=>setTab('encontrar')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
+      <button onClick={()=>setTab('contratos')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>CONTRATOS 11</button>
+      <button className="px-4 py-2 rounded-md font-bold text-xs bg-transparent text-white">MEUS</button>
+      <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
     </div>
    </header>
 
@@ -957,14 +945,14 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                   {id:'nuit_contratante', label:'NUIT Contratante (opcional)', desc:'NUIT Frente', icon:'\uD83D\uDCC4'},
                   {id:'nuit_contratado', label:'NUIT Contratado (opcional)', desc:'NUIT Frente', icon:'\uD83D\uDCC4'},
                   {id:'comprovativo_mpesa', label:'Comprovativo M-Pesa', desc: formContrato.valor + ' MZN - ' + formContrato.formaPag, icon:'\uD83D\uDCB3'},
-                  {id:'foto_obra', label:'Foto obra / local', desc:'Prova antes de comecar', icon:'\uD83C\uDFD7\uFE0F'},
+                  {id:'foto_obra', label:'Foto obra / local', desc:'Prova antes de começar', icon:'\uD83C\uDFD7\uFE0F'},
                   {id:'cv', label:'CV / Certificado', desc:'Curriculum profissional', icon:'\uD83D\uDCDC'},
                   {id:'logo_tipo', label:'Logo Tipo / Empresa', desc:'Logo empresa no contrato', icon:'\uD83C\uDFE2'},
                   {id:'outro', label:'Outro documento', desc:'Outro comprovativo', icon:'\uD83D\uDCCE'},
                 ].map((doc:any)=>(
                   <button key={doc.id} onClick={()=>setDocSelecionadoAnexo(doc.id)} className={`w-full text-left p-2.5 rounded-lg border-2 flex items-start gap-2 ${docSelecionadoAnexo===doc.id ? 'bg-[#1e2f4a] text-white border-[#1e2f4a]' : 'bg-white border-[#e2e8f0]'}`}>
                     <span>{doc.icon}</span>
-                    <div className="flex-1"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) ? '' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
+                    <div className="flex-1"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) ? '✅' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
                   </button>
                 ))}
               </div>
@@ -972,26 +960,26 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             </div>
             <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
               <div className="font-black text-[11px] mb-2">DIREITA - ANEXAR</div>
-              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione a esquerda'}</div>
+              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione à esquerda'}</div>
               <div className="space-y-3">
                 {docSelecionadoAnexo==='logo_tipo' && (
                 <div>
                   <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo) \uD83C\uDFE2</label>
                   <div className="mt-1 flex gap-2">
-                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? " Logo" : "\uD83C\uDFE2"}</div>
+                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? "✅ Logo" : "\uD83C\uDFE2"}</div>
                     <div className="flex-1">
                       <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                       <div className="flex gap-1 mt-1">
                         <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">\uD83D\uDCCE Anexar Logo</button>
                         <input id="inputLogoTipo" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name})); r.readAsDataURL(f); }}} />
-                        <span className="text-[9px] text-gray-500">{formContrato.logoData ? ' Logo ok' : 'PNG/JPG'}</span>
+                        <span className="text-[9px] text-gray-500">{formContrato.logoData ? '✅ Logo ok' : 'PNG/JPG'}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 )}
                 <div className="border-t pt-3">
-                  <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione a esquerda'}</label>
+                  <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione à esquerda'}</label>
                   <div className="mt-1 border-2 border-dashed border-[#25D366] rounded-xl p-4 bg-[#f0fdf4] text-center">
                     <div className="text-[20px]">\uD83D\uDCCE</div>
                     <div className="text-[11px] font-bold mt-1">Clica para anexar {docSelecionadoAnexo}</div>
@@ -1005,7 +993,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <button onClick={()=>setFormContrato((prev:any)=>({...prev, anexos: prev.anexos.filter((_:any,i:number)=>i!==idx)}))} className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px]">X</button>
                     </div>
                   ))}
-                  {formContrato.anexos.length===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione a esquerda e anexe a direita. BI e NUIT opcional.</div>}
+                  {formContrato.anexos.length===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione à esquerda e anexe à direita. BI e NUIT opcional.</div>}
                 </div>
               </div>
             </div>
@@ -1032,22 +1020,82 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   )}
 
 
-      {tab==='faturar' && (
+      {tab==='faturacao' && (
         <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10">
           {!faturacaoLogado ? (
             <div className="max-w-[600px] mx-auto">
               <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
                 <div className="text-center">
-                  <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
-                  <h2 className="text-[18px] font-black mt-3">Facilita Faturacao - Cadastro simples</h2>
-                  <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos para entrar na parte de faturacao</p>
-                  <p className="text-[9px] opacity-50 mt-1">Depois pode acrescentar mais dados no seu perfil - NUIT, endereco, logo, forma de pagamento</p>
-                  <div className="flex justify-center gap-2 mt-4">
-                    <button onClick={()=>setFaturacaoAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='cadastro' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>CADASTRO SIMPLES</button>
-                    <button onClick={()=>setFaturacaoAuthMode('login')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='login' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>LOGIN</button>
+                  
+                <div className="w-full max-w-[1100px] mx-auto">
+                  <div className="text-center mb-4">
+                    <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
+                    <h2 className="text-[18px] font-black mt-3">Minha Loja - Vender e Faturar</h2>
+                    <p className="text-[10px] opacity-70 mt-1">Venda rapido, controle stock, emita fatura com NUIT</p>
                   </div>
-                </div>
-                <div className="mt-6 max-w-[420px] mx-auto">
+
+                  {/* Abas FATURAR */}
+                  <div className="flex gap-1 bg-white rounded-full p-1 w-fit mx-auto shadow-sm border mb-4 overflow-x-auto">
+                    {['VENDER','STOCK','FATURAS','CLIENTES','PERFIL'].map((t)=>(
+                      <button key={t} onClick={()=>setFaturarAba(t)} className={`px-4 py-2 rounded-full font-black text-[10px] whitespace-nowrap ${faturarAba===t?'bg-[#1e2f4a] text-white':'bg-transparent text-[#64748b] hover:bg-[#f1f5f9]'}`}>{t}</button>
+                    ))}
+                  </div>
+
+                  {/* VENDER - Botao grande */}
+                  {faturarAba==='VENDER' && (
+                    <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-2">
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-black text-[13px]">Produtos para vender</h3>
+                            <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar nome, codigo, marca" className="h-8 px-3 border rounded-full text-[11px] w-[180px]" />
+                          </div>
+                          <div className="max-h-[420px] overflow-auto border rounded-[8px]">
+                            <table className="w-full text-[11px]">
+                              <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">ITEM</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-right">PRECO</th><th className="p-2 text-center">ACAO</th></tr></thead>
+                              <tbody>
+                                {stockProdutos.filter((p:any)=> (p.nome+p.codigo+p.marca).toLowerCase().includes(buscaStock.toLowerCase())).map((p:any)=>(
+                                  <tr key={p.id} className="border-b hover:bg-[#f8fafc]">
+                                    <td className="p-2"><div className="font-bold">{p.codigo}</div><div className="text-[10px] opacity-70">{p.nome}</div></td>
+                                    <td className="p-2 text-center">{p.stockLoja}</td>
+                                    <td className="p-2 text-right">{p.precoVenda} MT</td>
+                                    <td className="p-2 text-center"><button onClick={()=>{setVendaProduto(p); setVendaQtd(1);}} className="px-3 py-1 bg-[#22c55e] text-white rounded-full font-black text-[10px]">VENDER</button></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div className="bg-[#f8fafc] rounded-[10px] p-3 border">
+                          <h4 className="font-black text-[12px] mb-2">Carrinho</h4>
+                          {vendaProduto ? (
+                            <div className="space-y-3">
+                              <div className="bg-white p-3 rounded-[8px] border"><div className="font-bold text-[12px]">{vendaProduto.nome}</div><div className="text-[10px] opacity-60">{vendaProduto.codigo}</div><div className="mt-2 text-[11px]">Stock Loja: {vendaProduto.stockLoja}</div></div>
+                              <div><label className="text-[10px] font-bold">QTD</label><input type="number" value={vendaQtd} onChange={e=>setVendaQtd(Number(e.target.value))} className="w-full h-9 border rounded px-3 text-[12px] mt-1" /></div>
+                              <div><label className="text-[10px] font-bold">Cliente (opcional)</label><input value={vendaCliente} onChange={e=>setVendaCliente(e.target.value)} placeholder="Nome ou telefone" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                              <div><label className="text-[10px] font-bold">Pagamento</label><select value={vendaPagamento} onChange={e=>setVendaPagamento(e.target.value)} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>Numerario</option><option>Mpesa</option><option>Emola</option><option>Transferencia</option><option>Fiado</option></select></div>
+                              <div className="pt-2 border-t flex justify-between font-black text-[12px]"><span>Total</span><span>{(vendaProduto.precoVenda*vendaQtd).toLocaleString()} MT</span></div>
+                              <button onClick={()=>{
+                                if(!vendaProduto || vendaProduto.stockLoja < vendaQtd){alert('Stock insuficiente'); return;}
+                                const total = vendaProduto.precoVenda*vendaQtd;
+                                const novaFatura = {id:Date.now(), data:new Date().toLocaleDateString(), cliente:vendaCliente||'Balcao', itens:[{codigo:vendaProduto.codigo,nome:vendaProduto.nome,qtd:vendaQtd,preco:vendaProduto.precoVenda}], total:total, pagamento:vendaPagamento};
+                                setFaturas([novaFatura, ...faturas]);
+                                setStockProdutos(stockProdutos.map((pp:any)=> pp.id===vendaProduto.id ? {...pp, stockLoja: pp.stockLoja - vendaQtd, venda: pp.venda + vendaQtd} : pp));
+                                if(vendaPagamento==='Fiado' && vendaCliente){
+                                  setClientesFiado([...clientesFiado, {nome:vendaCliente, telefone:'', divida: total, data:novaFatura.data}]);
+                                }
+                                setVendaProduto(null); setVendaCliente(''); setVendaQtd(1);
+                                alert('Venda concluida!');
+                              }} className="w-full h-10 bg-[#1e2f4a] text-white rounded-full font-black text-[12px]">FINALIZAR VENDA</button>
+                            </div>
+                          ) : (<div className="text-center py-10 text-[11px] opacity-50">Selecione um produto para vender</div>)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* STOCK - reutiliza tabela 11 colunas */}
+<div className="mt-6 max-w-[420px] mx-auto">
                   {faturacaoAuthMode==='cadastro' ? (
                   <>
                   <div className="space-y-3">
@@ -1103,7 +1151,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-white rounded-[12px] border p-4">
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Produtos e Servicos - do Stock - IVA no fim</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3] font-bold">{stockProdutos.length} produtos no stock</span></div>
                 <div className="mt-3"><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder='Digite "Cimento" - busca no stock' className="w-full h-10 px-3 rounded-[8px] border text-[11px]" /></div>
-                <div className="mt-2 flex flex-wrap gap-1.5">{stockProdutos.filter(p=>!buscaFat||p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,12).map(p=><button key={p.id} onClick={()=>{const ex=produtosFat.find(x=>x.nome===p.nome); if(ex){setProdutosFat(produtosFat.map(x=>x.nome===p.nome?{...x,qtd:x.qtd+1}:x))} else {setProdutosFat([...produtosFat,{id:p.id,nome:p.nome,preco:p.preco,qtd:1,desc:0}]); if(p.qtd>0){setStockProdutos(stockProdutos.map(s=>s.id===p.id?{...s, qtd:s.qtd-1}:s))}}}} className={p.qtd<=p.qtdMin ? 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-red-50 border-red-200 text-red-700' : 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-[#1e293b] text-white'}>{p.nome} - {p.preco}MT - Stock:{p.qtd}</button>)}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">{stockProdutos.filter(p=>!buscaFat||p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,12).map(p=><button key={p.id} onClick={()=>{const ex=produtosFat.find(x=>x.nome===p.nome); if(ex){setProdutosFat(produtosFat.map(x=>x.nome===p.nome?{...x,qtd:x.qtd+1}:x))} else {setProdutosFat([...produtosFat,{id:p.id,nome:p.nome,preco:p.preco,qtd:1,desc:0}]); if(p.qtd>0){setStockProdutos(stockProdutos.map(s=>s.id===p.id?{...s, qtd:s.qtd-1}:s))}}}} className={`px-2.5 py-1 rounded-full text-[9px] font-bold border ${p.qtd<=p.qtdMin ? 'bg-red-50 border-red-200 text-red-700' : 'bg-[#1e293b] text-white'}`}>{p.nome} - {p.preco}MT - Stock:{p.qtd}</button>)}</div>
                 <div className="mt-4 overflow-x-auto"><table className="w-full text-[10px]"><thead><tr className="text-[8px] text-[#94a3b8] border-b"><th className="text-left py-1">DESCRICAO</th><th>QTD</th><th>PRECO UNIT.</th><th>DESC %</th><th className="text-right">SUBTOTAL</th><th></th></tr></thead><tbody>{produtosFat.map(pr=>(<tr key={pr.id} className="border-b"><td className="py-2"><div className="font-bold text-[10px]">{pr.nome}</div></td><td className="text-center"><input type="number" value={pr.qtd} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,qtd:Math.max(0,Number(e.target.value))}:x).filter(x=>x.qtd>0))} className="w-12 h-7 border rounded text-center text-[10px]" /></td><td className="text-center">{pr.preco}</td><td className="text-center"><input type="number" value={pr.desc} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,desc:Math.max(0,Math.min(100,Number(e.target.value)))}:x))} className="w-10 h-7 border rounded text-center text-[10px]" /></td><td className="text-right font-bold">{(pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0)} MT</td><td><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==pr.id))} className="text-red-400 ml-1">x</button></td></tr>))}</tbody></table></div>
                 <div className="mt-3 flex justify-end"><div className="w-[200px] space-y-1 text-[10px]"><div className="flex justify-between"><span className="text-[#64748b]">Subtotal bruto</span><span className="font-bold">{subtotalBrutoFat} MT</span></div><div className="flex justify-between text-red-500"><span>Descontos</span><span>- {totalDescFat} MT</span></div><div className="flex justify-between"><span>Subtotal liquido</span><span>{baseFat} MT</span></div><div className="flex justify-between"><span>IVA ({ivaTipo}%)</span><span>{ivaFat.toFixed(0)} MT</span></div><div className="flex justify-between font-black text-[12px] border-t pt-1"><span>TOTAL</span><span className="text-[#0f766e]">{totalFat.toFixed(0)} MT</span></div></div></div>
                 <div className="mt-3"><div className="text-[8px] font-bold">IVA NO RODAPE - GLOBAL</div><div className="flex gap-2 mt-1"><button onClick={()=>setIvaTipo('sem')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='sem'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='16'?'bg-[#0f766e] text-white':'bg-white'}`}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='5'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Com IVA 5%</button></div></div>
@@ -1162,114 +1210,42 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 
           {faturacaoTab==='stock' && (
             <div className="space-y-3">
-              <div className="bg-white rounded-[12px] border p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50</div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
-                  <div className="flex gap-2 items-center">
-                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
-                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
-                    <div className="flex items-center gap-1">
-                      <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
-                        <option value="todos">Todos ({stockProdutos.length})</option>
-                        <option value="baixo">Baixo &lt;50 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length})</option>
-                        <option value="zerado">Zerado (0) ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length})</option>
-                        <option value="medio">Medio 50-100 ({stockProdutos.filter((p:any)=>{const sf=p.noArmazem+p.stockLoja; return sf>=50 && sf<=100}).length})</option>
-                        <option value="alto">Alto &gt;100 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)>100).length})</option>
-                      </select>
-                      <button onClick={()=>setFiltroTipoStock(filtroTipoStock==='baixo'?'todos':'baixo')} className={`h-8 px-3 rounded-full text-[10px] font-black border ${filtroTipoStock==='baixo'?'bg-red-500 text-white border-red-500':'bg-red-50 text-red-700 border-red-200'}`}>{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length} stock baixo</button>
-                    </div>
+              <div className="bg-white rounded-[12px] border p-4">
+                <div className="flex justify-between items-center"><div><div className="font-black text-[13px]">Gestao de Stock - {stockProdutos.length} produtos</div><div className="text-[9px] text-[#64748b]">Adicione produtos, controle quantidade, custo, preco, alerta stock baixo - Baixa automatica na faturacao</div></div><div className="flex gap-2"><span className="text-[8px] px-2 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 font-bold">{stockProdutos.filter(s=>s.qtd<=s.qtdMin).length} stock baixo</span><span className="text-[8px] px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 font-bold">{stockProdutos.reduce((a,b)=>a+(b.qtd*b.custo),0).toFixed(0)} MT investido</span></div></div>
+                
+                <div className="mt-4 bg-[#f8fafc] border rounded-[10px] p-3">
+                  <div className="font-bold text-[10px]">Adicionar Novo Produto ao Stock</div>
+                  <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mt-2">
+                    <input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Nome produto" className="h-9 px-2 border rounded text-[10px]" />
+                    <select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="h-9 px-2 border rounded text-[10px]"><option>Cimento</option><option>Bloco</option><option>Tinta</option><option>Ferro</option><option>Cobertura</option><option>Inertes</option><option>Outros</option></select>
+                    <input value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="QTD" type="number" className="h-9 px-2 border rounded text-[10px]" />
+                    <input value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="Preco venda" type="number" className="h-9 px-2 border rounded text-[10px]" />
+                    <input value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="Custo compra" type="number" className="h-9 px-2 border rounded text-[10px]" />
+                    <button onClick={()=>{if(!novoStockNome||!novoStockPreco||!novoStockQtd){alert('Nome, preco e quantidade obrigatorios'); return;} const id='s'+Date.now(); setStockProdutos([...stockProdutos, {id, nome:novoStockNome, cat:novoStockCat, preco:Number(novoStockPreco), custo:Number(novoStockCusto)||Number(novoStockPreco)*0.7, qtd:Number(novoStockQtd), qtdMin:5, fornecedor:'Local'}]); setNovoStockNome(''); setNovoStockPreco(''); setNovoStockQtd(''); setNovoStockCusto('');}} className="h-9 px-3 bg-[#22c55e] text-white rounded font-bold text-[10px]">Adicionar</button>
                   </div>
                 </div>
-                <div className="mt-3 grid grid-cols-1 md:grid-cols-[160px_1fr] gap-3">
-                  <div className="bg-[#f8fafc] border rounded-[8px] p-2">
-                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
-                    <div className="space-y-1.5">
-                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center">+</span>Novo Item</button>
-                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
-                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Relatorios [F9]</button>
-                    </div>
-                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
-                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
-                          const sf = p.noArmazem + p.stockLoja;
-                          let matchTipo = true;
-                          if(filtroTipoStock==='baixo') matchTipo = isBaixoCheck(sf);
-                          else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
-                          else if(filtroTipoStock==='medio') matchTipo = sf >= 50 && sf <= 100;
-                          else if(filtroTipoStock==='alto') matchTipo = sf >= 101;
-                          return matchBusca && matchTipo;
-                        }).map((p:any)=>{
-                            const sf=p.noArmazem+p.stockLoja;
-                            const vv=p.venda*p.precoVenda;
-                            const isBaixo = isBaixoCheck(sf);
-                            const rowBg = isBaixo ? 'bg-[#fee2e2]' : '';
-                            const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
-                            return (
-                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}>
-                                <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div>{p.nome}</div></td>
-                                <td className="text-center p-1.5 border">{p.dataEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.qtdEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.noArmazem}</td>
-                                <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
-                                <td className="text-center p-1.5 border">{p.dataReq}</td>
-                                <td className="text-center p-1.5 border">{p.stockLoja}</td>
-                                <td className="text-center p-1.5 border">{p.venda}</td>
-                                <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
-                                <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
-                                <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
-                              </tr>
-                            );
-                          })}</tbody></table>
+
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full text-[10px]">
+                    <thead><tr className="text-[8px] text-[#94a3b8] border-b"><th className="text-left py-2">PRODUTO</th><th>CAT</th><th>QTD / MIN</th><th>PRECO VENDA</th><th>CUSTO</th><th>MARGEM</th><th>ALERTA</th><th></th></tr></thead>
+                    <tbody>{stockProdutos.map(p=>{const margem=((p.preco-p.custo)/p.preco*100).toFixed(0); const baixo=p.qtd<=p.qtdMin; return (<tr key={p.id} className={`border-b ${baixo ? 'bg-red-50' : ''}`}><td className="py-2"><div className="font-bold">{p.nome}</div><div className="text-[8px] text-[#94a3b8]">{p.fornecedor}</div></td><td className="text-center"><span className="px-2 py-0.5 bg-[#f1f5f9] rounded-full text-[8px]">{p.cat}</span></td><td className="text-center"><input type="number" value={p.qtd} onChange={e=>setStockProdutos(stockProdutos.map(x=>x.id===p.id?{...x, qtd:Math.max(0,Number(e.target.value))}:x))} className={`w-14 h-7 border rounded text-center ${baixo ? 'border-red-300 bg-red-50' : ''}`} /> / {p.qtdMin}</td><td className="text-center">{p.preco} MT</td><td className="text-center">{p.custo} MT</td><td className="text-center"><span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${Number(margem)>30 ? 'bg-green-100 text-green-700' : 'bg-yellow-100'}`}>{margem}%</span></td><td className="text-center">{baixo ? <span className="text-[7px] bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">STOCK BAIXO</span> : <span className="text-[7px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">OK</span>}</td><td><button onClick={()=>setStockProdutos(stockProdutos.filter(x=>x.id!==p.id))} className="text-red-400 text-[10px]">x</button></td></tr>);})}</tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 bg-[#fff8ed] border border-[#fde68a] rounded-[10px] p-3">
+                  <div className="font-bold text-[9px]">Como funciona - Gestao de Stock integrada com Faturacao</div>
+                  <div className="text-[8px] text-[#854d0e] mt-1 space-y-1">
+                    <div>- Cadastro simples: so nome loja, telefone, password - 10 segundos</div>
+                    <div>- Perfil: pode acrescentar NUIT, endereco, provincia, logo, forma pagamento, horario - aparece no PDF</div>
+                    <div>- Stock: adiciona produto com nome, categoria, quantidade, preco venda, custo compra, margem automatica</div>
+                    <div>- Alerta: quando qtd {`<=`} qtdMin, mostra STOCK BAIXO em vermelho - precisa repor</div>
+                    <div>- Faturacao: quando adiciona produto da lista do stock, baixa 1 unidade automaticamente</div>
+                    <div>- Total investido: {stockProdutos.reduce((a,b)=>a+(b.qtd*b.custo),0).toFixed(0)} MT - Lucro potencial: {stockProdutos.reduce((a,b)=>a+(b.qtd*(b.preco-b.custo)),0).toFixed(0)} MT</div>
                   </div>
                 </div>
               </div>
             </div>
-         )}
-
-
-                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
-                {showEntradaStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
-                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
-                      <div className="p-4 space-y-3">
-                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome}</div></div>
-                        <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">QTD Entrada</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data</label><input type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div></div>
-                        <div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[12px]">Cancelar</button><button onClick={()=>{setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:p.qtdEntrada+entradaQtdStock, noArmazem:p.noArmazem+entradaQtdStock, dataEntrada:new Date().toLocaleDateString('pt-MZ')}:p)); setShowEntradaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[12px] font-bold">Confirmar Entrada</button></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {showSaidaStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[520px] border overflow-hidden">
-                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Saida de Item [F6]</span><button onClick={()=>setShowSaidaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
-                      <div className="p-0">
-                        <div className="flex border-b"><button onClick={()=>setAbaSaidaStock('transfer')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='transfer'?'bg-[#eff6ff] text-[#1e40af] border-b-2 border-[#1e40af]':'bg-[#f8fafc]'}`}>Transferencia Arm-&gt;Loja</button><button onClick={()=>setAbaSaidaStock('venda')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='venda'?'bg-[#f0fdf4] text-[#166534] border-b-2 border-[#166534]':'bg-[#f8fafc]'}`}>Venda - Loja</button></div>
-                        <div className="p-4">
-                          {abaSaidaStock==='transfer' ? (
-                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Requisicao Arm-&gt;Loja</label><input type="number" value={transferQtdStock} onChange={e=>setTransferQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Armazem atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem||0)-transferQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.noArmazem<transferQtdStock){alert('Stock insuficiente no armazem'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, noArmazem:p.noArmazem-transferQtdStock, stockLoja:p.stockLoja+transferQtdStock, entradaLoja:transferQtdStock, dataReq:new Date().toLocaleDateString('pt-MZ')}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#2563eb] text-white rounded font-bold">Transferir</button></div></div>
-                          ) : (
-                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Venda</label><input type="number" value={vendaQtdStock} onChange={e=>setVendaQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Stock Loja atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja||0)-vendaQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.stockLoja<vendaQtdStock){alert('Stock insuficiente na loja'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, stockLoja:p.stockLoja-vendaQtdStock, venda:p.venda+vendaQtdStock, mediaDia:((p.venda+vendaQtdStock)/30)}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded font-bold">Confirmar Venda</button></div></div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {showNovoStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Novo Item - Cadastro</span><button onClick={()=>setShowNovoStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">Codigo</label><input placeholder="Ex: CEM-..." className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Grupo</label><select className="w-full mt-1 h-8 border rounded px-2 text-[12px]"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option></select></div></div><div><label className="text-[11px] font-bold">Nome Produto</label><input placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowNovoStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>setShowNovoStock(false)} className="h-8 px-5 bg-[#2b4c7e] text-white rounded font-bold">Criar Produto</button></div></div></div>
-                  </div>
-                )}
-                {showRelatorioStock && (
-                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[640px] border overflow-hidden"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Relatorios - Stock 11 Colunas - Alerta &lt;50</span><button onClick={()=>setShowRelatorioStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 grid grid-cols-3 gap-3"><div className="bg-[#f8fafc] border rounded p-3"><div className="text-[11px] text-[#64748b]">Total Itens</div><div className="text-[20px] font-bold">{stockProdutos.length}</div></div><div className="bg-[#fee2e2] border border-[#fca5a5] rounded p-3"><div className="text-[11px] text-[#991b1b] font-bold">Abaixo de 50</div><div className="text-[20px] font-bold text-[#991b1b]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length}</div></div><div className="bg-[#fecaca] border border-[#ef4444] rounded p-3"><div className="text-[11px] text-[#7f1d1d]">Zerados</div><div className="text-[20px] font-bold text-[#7f1d1d]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length}</div></div><div className="col-span-3 bg-[#eff6ff] border rounded p-3 flex justify-between"><div><div className="text-[11px] text-[#1e40af]">Soma Custo Arm+Loja</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+(b.noArmazem+b.stockLoja)*b.precoCusto,0).toFixed(0)} MT</div></div><div className="text-right"><div className="text-[11px] text-[#1e40af]">Total Vendas Valor</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+b.venda*b.precoVenda,0).toFixed(0)} MT</div></div></div></div><div className="p-3 border-t bg-[#f8fafc] flex justify-end"><button onClick={()=>setShowRelatorioStock(false)} className="h-8 px-4 bg-[#2b4c7e] text-white rounded">Fechar</button></div></div>
-                  </div>
-                )}
+          )}
 
           </div>
           )}
@@ -1303,7 +1279,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                   return (
                     <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
                       <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
-                        <div className="text-[12px]"></div>
+                        <div className="text-[12px]">➤</div>
                         <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
                         <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
                       </button>
@@ -1326,8 +1302,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                   <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</h3>
                   <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete automaticamente a direita - {filtradosOverview.length} de {todosCarrosOverview.length} carros</p>
                   <div className="grid grid-cols-2 gap-2 mt-3">
-                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
-                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ':'MAIS PROXIMO '}</button>
+                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ✓':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
+                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ✓':'MAIS PROXIMO ✓'}</button>
                   </div>
                   <div className="mt-4 space-y-3">
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label>
@@ -1360,19 +1336,19 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                         <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
                         <div className="flex-1">
                           <div className="flex flex-wrap justify-between gap-2">
-                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]"> {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
                             <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -&gt; ${v.destino||provDestinoF}`}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📍 ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -> ${v.destino||provDestinoF}`}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">⏱️ PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">👤 MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📦 CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
                           </div>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <button onClick={()=>{ setViagemSel(v); setMostrarFormPass(true); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
-                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]"> {v.tel||'82 888 9900'}</button>
-                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold"> Ver no mapa</button>
+                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.tel||'82 888 9900'}</button>
+                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
                             <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula||v.mat||'ADF 561 SF'} - {v.activa? 'Adicionado por transportador':'Actualizado agora'}</span>
                           </div>
                         </div>
@@ -1450,7 +1426,7 @@ Bilhete valido - Apresentar QR`;
                   {/* ===== BOTAO TEMPO REAL NACIONAL - NAO ALTERA O QUE JA EXISTE - APENAS ADICIONA ===== */}
                   <div className="mb-3 flex flex-wrap gap-2 items-center bg-[#f0f9ff] border border-[#0ea5e9] rounded-[8px] p-2">
                     <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-4 h-8 rounded-full text-[10px] font-black ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-white border text-[#0ea5e9]'}`}>
-                      {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'a- VER CARROS AO VIVO NO MAPA (NACIONAL)'}
+                      {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'â—‹ VER CARROS AO VIVO NO MAPA (NACIONAL)'}
                     </button>
                     {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros proximos em {origemV} para {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
                     <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provincias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Cabo Delgado, Niassa</span>
@@ -1497,7 +1473,7 @@ Bilhete valido - Apresentar QR`;
                             </div>
                           </div>
                         ))}
-                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prAximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paAs.</div>}
+                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prA³ximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paA­s.</div>}
                       </div>
                     </div>
                   )}
