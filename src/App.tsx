@@ -720,7 +720,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-auto object-contain bg-white rounded-full p-1" /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE. 11 CLAUSULAS</div></div>
+    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-auto object-contain bg-white rounded-full p-1" /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE.</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
       {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
       <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
@@ -1040,7 +1040,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
                 <div className="text-center">
                   <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
-                  <h2 className="text-[18px] font-black mt-3">Facilita Faturacao - Cadastro simples</h2>
+                  <h2 className="text-[18px] font-black mt-3">Minha Loja - Vender e Faturar</h2>
                   <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos para entrar na parte de faturacao</p>
                   <p className="text-[9px] opacity-50 mt-1">Depois pode acrescentar mais dados no seu perfil - NUIT, endereco, logo, forma de pagamento</p>
                   <div className="flex justify-center gap-2 mt-4">
@@ -1085,15 +1085,14 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div>
           {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
           <div className="bg-white rounded-[12px] border p-2 mb-3 flex flex-wrap items-center gap-2">
-            <div className="flex gap-1 bg-[#f1f5f9] rounded-full p-1">
-              <button onClick={()=>{setFaturacaoTab('faturacao'); setFaturarAba('VENDER');}} className={faturacaoTab==='faturacao' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>VENDER</button>
-              <button onClick={()=>{setFaturacaoTab('stock'); setFaturarAba('STOCK');}} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
-              <button onClick={()=>{setFaturacaoTab('faturas'); setFaturarAba('FATURAS');}} className={faturacaoTab==='faturas' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>FATURAS</button>
-              <button onClick={()=>{setFaturacaoTab('clientes'); setFaturarAba('CLIENTES');}} className={faturacaoTab==='clientes' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>CLIENTES</button>
-              <button onClick={()=>{setFaturacaoTab('perfil'); setFaturarAba('PERFIL');}} className={faturacaoTab==='perfil' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PERFIL</button>
-            </div>
-            <div className="ml-auto flex gap-2">
-              <button onClick={()=>setFaturacaoTab('painel')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='painel' ? 'bg-[#1e2f4a] text-white' : 'bg-white border'}`}>11. Painel - 5.4k</button>
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Minha Loja - Vender e Faturar - {lojaPerfil.nomeLoja}</div></div>
+            <div className="flex gap-1 bg-[#f1f5f9] rounded-full p-1 ml-2">
+              <button onClick={()=>setFaturacaoTab('faturacao')} className={faturacaoTab==='faturacao' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>VENDER</button>
+              <button onClick={()=>setFaturacaoTab('stock')} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
+              <button onClick={()=>setFaturacaoTab('faturas')} className={faturacaoTab==='faturas' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>FATURAS</button>
+              <button onClick={()=>setFaturacaoTab('clientes')} className={faturacaoTab==='clientes' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>CLIENTES</button>
+              <button onClick={()=>setFaturacaoTab('perfil')} className={faturacaoTab==='perfil' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PERFIL</button>
+              <button onClick={()=>setFaturacaoTab('painel')} className={faturacaoTab==='painel' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PAINEL 5.4k</button>
             </div>
           </div>
           </div>
@@ -1738,29 +1737,26 @@ Bilhete valido - Apresentar QR`;
           {faturacaoTab==='faturas' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
               <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
-              <p className="text-[10px] opacity-60 mb-3">Todas as vendas feitas em VENDER com Finalizar Documento</p>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">COD</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={5} className="p-6 text-center opacity-50">Nenhuma fatura ainda - venda em VENDER</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.codigo}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
+              <p className="text-[10px] opacity-60 mb-3">Vendas com Finalizar Documento - Baixa Stock Auto</p>
+              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={4} className="p-6 text-center opacity-50">Nenhuma fatura ainda</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
             </div>
           )}
           {faturacaoTab==='clientes' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-              <h3 className="font-black text-[13px] mb-3">Clientes - Fiado e Dividas</h3>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas - vendas Fiado aparecem aqui</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
+              <h3 className="font-black text-[13px] mb-3">Clientes - Fiado</h3>
+              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
             </div>
           )}
           {faturacaoTab==='perfil' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border max-w-[650px]">
-              <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura valer na AT</h3>
+              <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura AT</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilLoja.nome} onChange={e=>setPerfilLoja({...perfilLoja,nome:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">NUIT *</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} placeholder="400123456" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} placeholder="Matola, Av..." className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                <div><label className="text-[10px] font-bold">NUIT</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
+                <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
                 <div><label className="text-[10px] font-bold">TELEFONE</label><input value={perfilLoja.telefone} onChange={e=>setPerfilLoja({...perfilLoja,telefone:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">IVA</label><select value={perfilLoja.iva} onChange={e=>setPerfilLoja({...perfilLoja,iva:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>16</option><option>0</option><option>Isento</option></select></div>
-                <div><label className="text-[10px] font-bold">MOEDA</label><select value={perfilLoja.moeda} onChange={e=>setPerfilLoja({...perfilLoja,moeda:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>MT</option><option>USD</option></select></div>
               </div>
-              <button onClick={()=>alert('Perfil salvo - vai aparecer na fatura')} className="mt-4 h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button>
-              <p className="text-[9px] opacity-50 mt-3">Estes dados aparecem na fatura com NUIT, logo e endereco</p>
+              <button onClick={()=>alert('Perfil salvo')} className="mt-4 h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button>
             </div>
           )}
 
