@@ -181,6 +181,7 @@ export default function App(){
  // ===== FACTURACAO - App_40 - MANTIDO App_39 INTACTO - SO ADICAO =====
  const [telFat, setTelFat] = useState("+258 84 123 4567");
  const [nomeFat, setNomeFat] = useState("");
+  const [nuitFat, setNuitFat] = useState('');
  const [buscaFat, setBuscaFat] = useState("");
  const [filtroCatFat, setFiltroCatFat] = useState("Todos");
  const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
@@ -1153,9 +1154,10 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-white rounded-[12px] border p-4">
                 <div className="flex justify-between"><div className="font-black text-[13px] italic">Dados do comprador - ultra rapido</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">+ Fluxo rapido ativo - {lojaPerfil.nomeLoja}</span></div>
                 <div className="text-[9px] text-[#64748b] mt-1">So telefone obrigatorio. Nome opcional para recibo rapido. Tempo alvo: 15s como supermercado.</div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
-                  <div><label className="text-[8px] font-bold">TELEFONE / WHATSAPP *</label><input value={telFat} onChange={e=>setTelFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-200" placeholder="+258 84 123 4567" /><div className="text-[8px] text-green-600 mt-1">Numero valido para WhatsApp/SMS - Stock baixa automatica</div></div>
-                  <div><label className="text-[8px] font-bold">NOME / EMPRESA (opcional)</label><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f8fafc]" placeholder="Nome opcional - para recibo rapido" /></div>
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
+                  <div><label className="text-[8px] font-bold">TELEFONE / WHATSAPP *</label><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="840532899" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  <div><label className="text-[8px] font-bold">NOME / EMPRESA (opcional)</label><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  <div><label className="text-[8px] font-bold">NUIT (opcional)</label><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
                 </div>
               </div>
               <div className="bg-white rounded-[12px] border p-4">
