@@ -185,7 +185,7 @@ export default function App(){
  const [filtroCatFat, setFiltroCatFat] = useState("Todos");
  const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
   const [faturacaoLogado, setFaturacaoLogado] = useState(false);
-  const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'|'faturas'|'clientes'|'perfil'>('faturacao');
+  const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'|'faturas'|'clientes'>('faturacao');
   const [faturarAba, setFaturarAba] = useState('VENDER');
   const [faturas, setFaturas] = useState<any[]>([]);
   const [clientesFiado, setClientesFiado] = useState<any[]>([]);
@@ -1119,7 +1119,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <button onClick={()=>setFaturacaoTab('stock')} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
               <button onClick={()=>setFaturacaoTab('faturas')} className={faturacaoTab==='faturas' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>FATURAS</button>
               <button onClick={()=>setFaturacaoTab('clientes')} className={faturacaoTab==='clientes' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>CLIENTES</button>
-              <button onClick={()=>setFaturacaoTab('perfil')} className={faturacaoTab==='perfil' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PERFIL</button>
+              
               <button onClick={()=>setFaturacaoTab('painel')} className={faturacaoTab==='painel' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PAINEL 5.4k</button>
             </div>
           </div>
@@ -1773,20 +1773,7 @@ Bilhete valido - Apresentar QR`;
               <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
             </div>
           )}
-          {faturacaoTab==='perfil' && (
-            <div className="bg-white rounded-[12px] p-4 shadow-sm border max-w-[650px]">
-              <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura AT</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilLoja.nome} onChange={e=>setPerfilLoja({...perfilLoja,nome:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">NUIT</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                <div><label className="text-[10px] font-bold">TELEFONE</label><input value={perfilLoja.telefone} onChange={e=>setPerfilLoja({...perfilLoja,telefone:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-              </div>
-              <button onClick={()=>alert('Perfil salvo')} className="mt-4 h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button>
-            </div>
-          )}
-
-          ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
+                    ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
  </div>
  )
 }
