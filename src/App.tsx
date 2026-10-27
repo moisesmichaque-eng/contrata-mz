@@ -190,14 +190,6 @@ export default function App(){
  const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
 
   const [faturarAba, setFaturarAba] = useState('VENDER');
-  const [vendaProduto, setVendaProduto] = useState<any>(null);
-  const [vendaQtd, setVendaQtd] = useState(1);
-  const [vendaCliente, setVendaCliente] = useState('');
-  const [vendaPagamento, setVendaPagamento] = useState('Numerario');
-  const [faturas, setFaturas] = useState<any[]>([]);
-  const [clientesFiado, setClientesFiado] = useState<any[]>([]);
-  const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
-  const [buscaStock, setBuscaStock] = useState('');
   const [faturacaoLogado, setFaturacaoLogado] = useState(false);
   const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'>('faturacao');
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
@@ -1048,77 +1040,16 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="max-w-[600px] mx-auto">
               <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
                 <div className="text-center">
-                  
-                <div className="w-full max-w-[1100px] mx-auto">
-                  <div className="text-center mb-4">
-                    <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
-                    <h2 className="text-[18px] font-black mt-3">Minha Loja - Vender e Faturar</h2>
-                    <p className="text-[10px] opacity-70 mt-1">Venda rapido, controle stock, emita fatura com NUIT</p>
+                  <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
+                  <h2 className="text-[18px] font-black mt-3">Facilita Faturacao - Cadastro simples</h2>
+                  <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos para entrar na parte de faturacao</p>
+                  <p className="text-[9px] opacity-50 mt-1">Depois pode acrescentar mais dados no seu perfil - NUIT, endereco, logo, forma de pagamento</p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    <button onClick={()=>setFaturacaoAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='cadastro' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>CADASTRO SIMPLES</button>
+                    <button onClick={()=>setFaturacaoAuthMode('login')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='login' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>LOGIN</button>
                   </div>
-                  <div className="flex gap-1 bg-white rounded-full p-1 w-fit mx-auto shadow-sm border mb-4 overflow-x-auto">
-                    {['VENDER','STOCK','FATURAS','CLIENTES','PERFIL'].map((t)=>(
-                      <button key={t} onClick={()=>setFaturarAba(t)} className={faturarAba===t ? 'px-4 py-2 rounded-full font-black text-[10px] whitespace-nowrap bg-[#1e2f4a] text-white' : 'px-4 py-2 rounded-full font-black text-[10px] whitespace-nowrap bg-transparent text-[#64748b]'}>{t}</button>
-                    ))}
-                  </div>
-
-                  {faturarAba==='VENDER' && (
-                    <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-2">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-black text-[13px]">Produtos para vender</h3>
-                            <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar nome, codigo, marca" className="h-8 px-3 border rounded-full text-[11px] w-[180px]" />
-                          </div>
-                          <div className="max-h-[420px] overflow-auto border rounded-[8px]">
-                            <table className="w-full text-[11px]">
-                              <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">ITEM</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-right">PRECO</th><th className="p-2 text-center">ACAO</th></tr></thead>
-                              <tbody>
-                                {stockProdutos.filter((p:any)=> (p.nome+p.codigo).toLowerCase().includes(buscaStock.toLowerCase())).map((p:any)=>{
-                                  const isBaixo = p.stockLoja <= 49;
-                                  return (
-                                  <tr key={p.id} className={isBaixo ? 'border-b bg-[#fee2e2]' : 'border-b hover:bg-[#f8fafc]'}>
-                                    <td className="p-2"><div className="font-bold">{p.codigo}</div><div className="text-[10px] opacity-70">{p.nome}</div></td>
-                                    <td className="p-2 text-center">{p.stockLoja}</td>
-                                    <td className="p-2 text-right">{p.precoVenda} MT</td>
-                                    <td className="p-2 text-center"><button onClick={()=>{setVendaProduto(p); setVendaQtd(1);}} className="px-3 py-1 bg-[#22c55e] text-white rounded-full font-black text-[10px]">VENDER</button></td>
-                                  </tr>
-                                )})}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                        <div className="bg-[#f8fafc] rounded-[10px] p-3 border">
-                          <h4 className="font-black text-[12px] mb-2">Carrinho</h4>
-                          {vendaProduto ? (
-                            <div className="space-y-3">
-                              <div className="bg-white p-3 rounded-[8px] border"><div className="font-bold text-[12px]">{vendaProduto.nome}</div><div className="text-[10px] opacity-60">{vendaProduto.codigo}</div><div className="mt-2 text-[11px]">Stock Loja: {vendaProduto.stockLoja}</div></div>
-                              <div><label className="text-[10px] font-bold">QTD</label><input type="number" value={vendaQtd} onChange={e=>setVendaQtd(Number(e.target.value))} className="w-full h-9 border rounded px-3 text-[12px] mt-1" /></div>
-                              <div><label className="text-[10px] font-bold">Cliente</label><input value={vendaCliente} onChange={e=>setVendaCliente(e.target.value)} placeholder="Nome ou telefone" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                              <div><label className="text-[10px] font-bold">Pagamento</label><select value={vendaPagamento} onChange={e=>setVendaPagamento(e.target.value)} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>Numerario</option><option>Mpesa</option><option>Emola</option><option>Transferencia</option><option>Fiado</option></select></div>
-                              <div className="pt-2 border-t flex justify-between font-black text-[12px]"><span>Total</span><span>{(vendaProduto.precoVenda*vendaQtd).toLocaleString()} MT</span></div>
-                              <button onClick={()=>{
-                                const temStock = vendaProduto.stockLoja >= vendaQtd;
-                                if(!temStock){alert('Stock insuficiente'); return;}
-                                const total = vendaProduto.precoVenda*vendaQtd;
-                                const novaFatura = {id:Date.now(), data:new Date().toLocaleDateString(), cliente:vendaCliente||'Balcao', itens:[{codigo:vendaProduto.codigo,nome:vendaProduto.nome,qtd:vendaQtd,preco:vendaProduto.precoVenda}], total:total, pagamento:vendaPagamento};
-                                setFaturas([novaFatura, ...faturas]);
-                                setStockProdutos(stockProdutos.map((pp:any)=> pp.id===vendaProduto.id ? {...pp, stockLoja: pp.stockLoja - vendaQtd, venda: pp.venda + vendaQtd} : pp));
-                                if(vendaPagamento==='Fiado' && vendaCliente){
-                                  setClientesFiado([...clientesFiado, {nome:vendaCliente, divida: total, data:novaFatura.data}]);
-                                }
-                                setVendaProduto(null); setVendaCliente(''); setVendaQtd(1);
-                                alert('Venda concluida!');
-                              }} className="w-full h-10 bg-[#1e2f4a] text-white rounded-full font-black text-[12px]">FINALIZAR VENDA</button>
-                            </div>
-                          ) : (<div className="text-center py-10 text-[11px] opacity-50">Selecione um produto</div>)}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {faturarAba==='STOCK' && (
-                    <div className="bg-white rounded-[12px] p-3 shadow-sm border">
-<div className="mt-6 max-w-[420px] mx-auto">
+                </div>
+                <div className="mt-6 max-w-[420px] mx-auto">
                   {faturacaoAuthMode==='cadastro' ? (
                   <>
                   <div className="space-y-3">
@@ -1297,56 +1228,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                   </div>
                 </div>
               </div>
-                    </div>
-                  )}
-
-                  {faturarAba==='FATURAS' && (
-                    <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                      <h3 className="font-black text-[13px] mb-3">Faturas emitidas</h3>
-                      <div className="overflow-auto">
-                        <table className="w-full text-[11px]">
-                          <thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead>
-                          <tbody>
-                            {faturas.length===0 ? <tr><td colSpan={4} className="p-4 text-center opacity-50">Nenhuma fatura ainda</td></tr> : faturas.map((f:any)=>(
-                              <tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {faturarAba==='CLIENTES' && (
-                    <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                      <h3 className="font-black text-[13px] mb-3">Clientes e Fiado</h3>
-                      <table className="w-full text-[11px]">
-                        <thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead>
-                        <tbody>
-                          {clientesFiado.length===0 ? <tr><td colSpan={3} className="p-4 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(
-                            <tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-red-600">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {faturarAba==='PERFIL' && (
-                    <div className="bg-white rounded-[12px] p-4 shadow-sm border max-w-[600px]">
-                      <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilLoja.nome} onChange={e=>setPerfilLoja({...perfilLoja,nome:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                        <div><label className="text-[10px] font-bold">NUIT</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} placeholder="123456789" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                        <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                        <div><label className="text-[10px] font-bold">TELEFONE</label><input value={perfilLoja.telefone} onChange={e=>setPerfilLoja({...perfilLoja,telefone:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                        <div><label className="text-[10px] font-bold">IVA %</label><select value={perfilLoja.iva} onChange={e=>setPerfilLoja({...perfilLoja,iva:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>16</option><option>0</option><option>Isento</option></select></div>
-                        <div><label className="text-[10px] font-bold">MOEDA</label><select value={perfilLoja.moeda} onChange={e=>setPerfilLoja({...perfilLoja,moeda:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>MT</option><option>USD</option></select></div>
-                      </div>
-                      <div className="mt-4"><button onClick={()=>alert('Perfil salvo!')} className="h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button></div>
-                      <p className="text-[9px] opacity-50 mt-3">Estes dados aparecem na fatura com NUIT e logo</p>
-                    </div>
-                  )}
-                </div>
-
             </div>
          )}
 
