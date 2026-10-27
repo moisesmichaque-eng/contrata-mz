@@ -219,26 +219,99 @@ export default function App(){
     const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
   const [ivaTipo, setIvaTipo] = useState("16");
-  const finalizarComWhatsApp = ()=>{
-    if(produtosFat.length===0){alert('Adicione produtos'); return;}
-    if(!telFat){alert('Telefone obrigatorio'); return;}
+  const finalizarComWhatsApp = async ()=>{
+    if(produtosFat.length===0){alert('Adicione produtos do stock'); return;}
+    if(!telFat || telFat.replace(/\D/g,'').length<9){alert('Telefone/WhatsApp obrigatorio - ex: 840532899'); return;}
     const subtotal = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd),0);
     const desc = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
     const base = subtotal - desc;
     const iva = ivaTipo==='sem'?0: ivaTipo==='16'? base*0.16 : base*0.05;
     const total = base + iva;
-    const msg = `*${perfilLoja.nome||'Minha Loja'}* - Fatura\nCliente: ${nomeFat||'Cliente'}${nuitFat?`\nNUIT: ${nuitFat}`:''}\nTel: ${telFat}\n\nItens:\n${produtosFat.map(p=>`- ${p.nome} x${p.qtd} = ${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT`).join('\n')}\n\nSubtotal: ${subtotal.toFixed(0)} MT\nDesconto: ${desc.toFixed(0)} MT\nIVA (${ivaTipo}%): ${iva.toFixed(0)} MT\n*TOTAL: ${total.toFixed(0)} MT*\n\nObrigado pela preferencia!`;
-    const telClean = telFat.replace(/\D/g,'').slice(-9);
-    const waUrl = `https://wa.me/258${telClean}?text=${encodeURIComponent(msg)}`;
+    const telCliente = telFat.replace(/\D/g,'').slice(-9);
+    const telFull = `258${telCliente}`;
+    const nomeCliente = nomeFat||'Cliente';
+    const dataHoje = new Date().toLocaleDateString('pt-MZ');
+    
+    // Texto para WhatsApp - dinamico com numero do cliente
+    const msg = `*${perfilLoja.nome||'Minha Loja'}* - Fatura/Recibo\n\nCliente: ${nomeCliente}${nuitFat?`\nNUIT: ${nuitFat}`:''}\nTel: ${telFat}\nData: ${dataHoje}\n\n*Itens:*\n${produtosFat.map(p=>`- ${p.nome}\n  Qtd: ${p.qtd} x ${p.preco} MT = ${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT${p.desc>0?` (Desc ${p.desc}%)`:''}`).join('\n')}\n\nSubtotal: ${subtotal.toFixed(0)} MT\nDesconto: -${desc.toFixed(0)} MT\nSubtotal liquido: ${base.toFixed(0)} MT\nIVA (${ivaTipo}%): ${iva.toFixed(0)} MT\n*TOTAL: ${total.toFixed(0)} MT*\n\nObrigado pela preferencia! - ${perfilLoja.nome||'Minha Loja'}`;
+    
+    // Gerar PDF simples da fatura
+    const faturaHtml = `
+      <html><head><title>Fatura - ${nomeCliente}</title><style>
+        body{font-family:Arial,sans-serif;padding:20px;color:#111}
+        h1{font-size:18px;margin-bottom:5px}
+        .header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;margin-bottom:15px}
+        .info{font-size:11px;line-height:1.6}
+        table{width:100%;border-collapse:collapse;margin-top:15px;font-size:11px}
+        th{background:#f1f5f9;text-align:left;padding:6px;border:1px solid #ddd}
+        td{padding:6px;border:1px solid #ddd}
+        .total{margin-top:15px;text-align:right;font-size:12px;line-height:1.8}
+        .footer{margin-top:30px;font-size:9px;color:#64748b;text-align:center;border-top:1px solid #ddd;padding-top:10px}
+      </style></head><body>
+        <div class="header">
+          <h1>${perfilLoja.nome||'Minha Loja'} - Vender e Faturar</h1>
+          <div class="info">NUIT: ${perfilLoja.nuit||''} | Tel: ${perfilLoja.telefone||''} | ${perfilLoja.endereco||''}</div>
+        </div>
+        <div class="info">
+          <strong>Cliente:</strong> ${nomeCliente}<br/>
+          ${nuitFat?`<strong>NUIT Cliente:</strong> ${nuitFat}<br/>`:''}
+          <strong>Telefone/WhatsApp:</strong> ${telFat}<br/>
+          <strong>Data:</strong> ${dataHoje}
+        </div>
+        <table>
+          <thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC %</th><th>SUBTOTAL</th></tr></thead>
+          <tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco} MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT</td></tr>`).join('')}</tbody>
+        </table>
+        <div class="total">
+          Subtotal bruto: ${subtotal.toFixed(0)} MT<br/>
+          Descontos: -${desc.toFixed(0)} MT<br/>
+          Subtotal liquido: ${base.toFixed(0)} MT<br/>
+          IVA (${ivaTipo}%): ${iva.toFixed(0)} MT<br/>
+          <strong style="font-size:16px">TOTAL: ${total.toFixed(0)} MT</strong>
+        </div>
+        <div class="footer">Documento gerado em ${new Date().toLocaleString('pt-MZ')} - Obrigado pela preferencia!</div>
+      </body></html>
+    `;
+    
+    // Criar blob do PDF (via html) e tentar partilhar
+    const blob = new Blob([faturaHtml], {type: 'text/html'});
+    const fileName = `Fatura-${nomeCliente.replace(/\s+/g,'_')}-${Date.now()}.html`;
+    const file = new File([blob], fileName, {type: 'text/html'});
+    
     // Baixa stock auto
     produtosFat.forEach(p=>{
       setStockProdutos(prev=>prev.map(s=>s.nome===p.nome?{...s, stockLoja: Math.max(0, ((s as any).stockLoja||0)-p.qtd)}:s as any));
     });
-    // Salva fatura
-    setFaturas([{id:Date.now(), data:new Date().toLocaleDateString(), cliente:nomeFat||telFat, nuit:nuitFat, total: total.toFixed(0), pagamento:'Numerario', itens: produtosFat.length}] as any);
-    // Abre WhatsApp
-    window.open(waUrl, '_blank');
-    alert(`Fatura finalizada! Stock baixado. A abrir WhatsApp para ${telFat}`);
+    setFaturas([{id:Date.now(), data:dataHoje, cliente:nomeCliente, tel:telFat, nuit:nuitFat, total: total.toFixed(0), pagamento:'Numerario', itens: produtosFat.length, subtotal, desc, iva, base}] as any);
+    
+    // Tentar partilhar ficheiro via Web Share API (mobile) - partilha PDF/HTML com WhatsApp do cliente
+    try {
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({
+          files:[file],
+          title:`Fatura - ${nomeCliente} - ${total.toFixed(0)} MT`,
+          text: msg
+        });
+      } else if(navigator.share){
+        // Fallback: partilha so texto, mas abre WhatsApp com numero dinamico do cliente
+        await navigator.share({title:`Fatura ${nomeCliente}`, text: msg});
+        window.open(`https://wa.me/${telFull}?text=${encodeURIComponent(msg)}`, '_blank');
+      } else {
+        // Desktop fallback: download do ficheiro + abre WhatsApp com numero do cliente
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+        window.open(`https://wa.me/${telFull}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    } catch(e){
+      // Se user cancelar share, ainda abre WhatsApp
+      window.open(`https://wa.me/${telFull}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+    
+    alert(`Documento finalizado! Stock baixado. Fatura partilhada para WhatsApp ${telFat} (cliente ${nomeCliente})`);
     setProdutosFat([]);
   };
 
