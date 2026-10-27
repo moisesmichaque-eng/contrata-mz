@@ -1135,7 +1135,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div>
           {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
           <div className="bg-white rounded-[12px] border p-2 mb-3 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Minha Loja - Vender e Faturar</div></div>
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">{lojaPerfil.nomeLoja||'Minha Loja'} - Vender e Faturar</div></div>
             <div className="flex gap-1 bg-[#f1f5f9] rounded-full p-1 ml-2">
               <button onClick={()=>setFaturacaoTab('faturacao')} className={faturacaoTab==='faturacao' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>VENDER</button>
               <button onClick={()=>setFaturacaoTab('stock')} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
@@ -1172,7 +1172,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-[#111827] rounded-[12px] p-4 text-white">
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido - {lojaPerfil.nomeLoja}</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like - Stock auto</span></div>
                 <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>{produtosFat.length} - QTD total {produtosFat.reduce((a,b)=>a+b.qtd,0)}</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>{lojaPerfil.nomeLoja}</span></div></div>
-                <button onClick={()=>{alert('Documento finalizado! Stock baixado automaticamente. Total: '+totalFat.toFixed(0)+' MT'); setProdutosFat([]);}} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento - Baixa Stock Auto + WhatsApp</button>
+                <button onClick={finalizarComWhatsApp} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px] hover:bg-[#16a34a]">Finalizar Documento - Baixa Stock Auto + WhatsApp</button>
                 <div className="text-[8px] text-white/40 text-center mt-2">Telefone obrigatorio - Stock baixa automatica - IVA global</div>
               </div>
             </div>
