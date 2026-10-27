@@ -11,11 +11,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 import AdminPanel from './AdminPanel';
 
 // BOTAO LOCALIZAR - DENTRO DO COMPONENTE
-const LOGO_ESSE = "🏢";
-const LOGO_ESSE_DARK = "🏢";
+const LOGO_WEZHA_BASE64 = "/logo_wezha.jpg";
+const LOGO_ESSE = LOGO_WEZHA_BASE64;
+const LOGO_FALLBACK = LOGO_WEZHA_BASE64;
+const LOGO_ESSE_DARK = LOGO_WEZHA_BASE64;
 
 
 
+
+const isBaixoCheck = (n:number)=> n <= 49;
 const PAISES: any = {
   "Mocambique": ["Maputo Cidade","Matola","Boane","Gaza - Xai-Xai","Inhambane","Sofala - Beira","Nampula","Tete","Zambezia - Quelimane","Cabo Delgado - Pemba"],
   "South Africa": ["Gauteng - Johannesburg","Western Cape - Cape Town","KZN - Durban"],
@@ -111,10 +115,10 @@ export default function App(){
   
   const distritosPorProvincia:any = {
     "Maputo Cidade": ["KaMpfumo","Nlhamankulu","KaMaxakeni","KaMavota","KaMubukwana"],
-    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhiça","Namaacha","Moamba"],
-    "Gaza": ["Xai-Xai","Chibuto","Chokwé","Bilene","Manjacaze"],
+    "Maputo Provincia": ["Matola","Boane","Marracuene","Manhica","Namaacha","Moamba"],
+    "Gaza": ["Xai-Xai","Chibuto","Chokwe","Bilene","Manjacaze"],
     "Inhambane": ["Inhambane","Maxixe","Vilankulo"],
-    "Sofala": ["Beira","Dondo","Nhamatanda","Buzi","Maringué"],
+    "Sofala": ["Beira","Dondo","Nhamatanda","Buzi","Maringue"],
     "Manica": ["Chimoio","Manica","Gondola"],
     "Tete": ["Tete","Moatize","Angonia"],
     "Zambezia": ["Quelimane","Mocuba","Gurue"],
@@ -124,18 +128,18 @@ export default function App(){
     "Joanesburgo - SA": ["Park Station Johannesburg (destino #1)","Soweto - Bara","Sandton","Hillbrow","Rosettenville","Yeoville"],
     "Pretoria - SA": ["Pretoria Bosman Station","Centurion","Mamelodi","Soshanguve"],
     "Durban - SA": ["Durban Berea Station","Umhlanga","Pinetown","Umlazi"],
-    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade moçambicana","White River","Hazyview","Nelspruit Central"],
+    "Nelspruit - SA": ["Komatipoort - Fronteira Ressano Garcia","Matsulu - comunidade mocambicana","White River","Hazyview","Nelspruit Central"],
   };
 
   // OBJECT DONE 7 - 7 CARROS REAIS
   const carrosReaisFoto3 = [
-    { id:1, rota:"Boane -> Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
-    { id:2, rota:"Maputo -> Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
-    { id:3, rota:"Matola -> Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
-    { id:4, rota:"Maputo -> Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
-    { id:5, rota:"Maputo -> Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
-    { id:6, rota:"Matola -> Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
-    { id:7, rota:"Beira -> Maputo", origem:"Sofala", destino:"Maputo Cidade", dOrigem:"Beira", dDestino:"Maputo", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"VOLTA", matricula:"ADF 561 SF" },
+    { id:1, rota:"Boane -&gt; Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
+    { id:2, rota:"Maputo -&gt; Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
+    { id:3, rota:"Matola -&gt; Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
+    { id:4, rota:"Maputo -&gt; Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
+    { id:5, rota:"Maputo -&gt; Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
+    { id:6, rota:"Matola -&gt; Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
+    { id:7, rota:"Beira -&gt; Maputo", origem:"Sofala", destino:"Maputo Cidade", dOrigem:"Beira", dDestino:"Maputo", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"VOLTA", matricula:"ADF 561 SF" },
   ];
 
   const listaDistOrigem = distritosPorProvincia[provOrigemF] || ["Matola","Boane"];
@@ -151,7 +155,7 @@ export default function App(){
   });
 
   function handleReservarRealFinalV11(carro:any){
-    alert("✅ RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreço: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
+    alert(" RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreco: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
   }
 
  const [tab,setTab]=useState("encontrar");
@@ -183,7 +187,37 @@ export default function App(){
  const [nomeFat, setNomeFat] = useState("");
  const [buscaFat, setBuscaFat] = useState("");
  const [filtroCatFat, setFiltroCatFat] = useState("Todos");
- const [ivaTipo, setIvaTipo] = useState("16");
+ const [faturacaoAuthMode, setFaturacaoAuthMode] = useState<'login'|'cadastro'>('cadastro');
+  const [faturacaoLogado, setFaturacaoLogado] = useState(false);
+  const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'>('faturacao');
+  const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
+  const [stockProdutos, setStockProdutos] = useState([
+    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:45, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
+    {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:22, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
+    {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:4, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
+    {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:210, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
+    {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', marca:'Cin', grupo:'Tintas', subGrupo:'Plastica', fabricante:'Cin Mocambique', dataEntrada:'29/04/2025', qtdEntrada:150, noArmazem:28, entradaLoja:30, dataReq:'09/05/2025', stockLoja:8, venda:84, mediaDia:4.2, precoVenda:4250, precoCusto:3100, minimo:40, ideal:120},
+    {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', marca:'Tonon', grupo:'Cobertura', subGrupo:'Zinco', fabricante:'Tonon', dataEntrada:'20/04/2025', qtdEntrada:400, noArmazem:95, entradaLoja:60, dataReq:'06/05/2025', stockLoja:18, venda:227, mediaDia:9.1, precoVenda:1450, precoCusto:1100, minimo:60, ideal:250},
+    {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', marca:'Plastubos', grupo:'Canalizacao', subGrupo:'PVC', fabricante:'Plastubos', dataEntrada:'03/05/2025', qtdEntrada:250, noArmazem:140, entradaLoja:40, dataReq:'08/05/2025', stockLoja:12, venda:58, mediaDia:3.2, precoVenda:980, precoCusto:720, minimo:50, ideal:150},
+    {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', marca:'Gerdau', grupo:'Arames', subGrupo:'Farpado', fabricante:'Gerdau', dataEntrada:'18/04/2025', qtdEntrada:100, noArmazem:22, entradaLoja:20, dataReq:'05/05/2025', stockLoja:3, venda:55, mediaDia:2.2, precoVenda:5200, precoCusto:4100, minimo:20, ideal:60},
+    {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:2, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
+    {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:32, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
+  ] as any[]);
+  const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
+  const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
+  const [stockSelecionado, setStockSelecionado] = useState('2');
+  const [showEntradaStock, setShowEntradaStock] = useState(false);
+  const [showSaidaStock, setShowSaidaStock] = useState(false);
+  const [showNovoStock, setShowNovoStock] = useState(false);
+  const [showRelatorioStock, setShowRelatorioStock] = useState(false);
+  const [entradaQtdStock, setEntradaQtdStock] = useState(50);
+  const [transferQtdStock, setTransferQtdStock] = useState(20);
+  const [vendaQtdStock, setVendaQtdStock] = useState(5);
+  const [abaSaidaStock, setAbaSaidaStock] = useState<'transfer'|'venda'>('transfer');
+
+    const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
+  const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
+  const [ivaTipo, setIvaTipo] = useState("16");
  const [produtosFat, setProdutosFat] = useState([
    {id:'p1', nome:'Saco de Cimento 50kg - CMPOR', preco:850, qtd:3, desc:0},
    {id:'p2', nome:'Bloco 15cm - 40x20', preco:42, qtd:20, desc:5},
@@ -236,7 +270,7 @@ export default function App(){
     }
     fetchLive();
 
-    // subscreve tempo real - qualquer carro que mexer no paAÂ­s aparece
+    // subscreve tempo real - qualquer carro que mexer no paAAs aparece
     const channel = supabase.channel('viagens_nacional')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'viagens_motoristas' }, (payload:any) => {
         if (payload.eventType === 'INSERT') {
@@ -253,7 +287,7 @@ export default function App(){
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Fallback simulado se Supabase vazio (para nAÂ£o ficar mapa vazio)
+  // Fallback simulado se Supabase vazio (para nAAo ficar mapa vazio)
   useEffect(()=>{
     if(liveViaturas.length===0 && !loadingLive){
       // se depois de 3s ainda vazio, usa dados de exemplo locais
@@ -494,9 +528,9 @@ useEffect(()=>{
   deveresEmp:"Pagar salario pontualmente todo dia 05 via M-Pesa com comprovativo e recibo assinado, respeitar dignidade, privacidade e direitos humanos, fornecer agua potavel, refeicao e condicoes dignas de trabalho, fornecer todo material, ferramentas e EPI necessario, nao descontar salario sem motivo justo por escrito, cumprir folgas e ferias conforme lei, fornecer transporte ou vale transporte 500MT/mes, comunicar com respeito no WhatsApp, nao pedir trabalho fora do combinado sem pagar extra, fornecer alojamento se combinado",
   anexos:[] as any[]
  });
+ const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('bi_contratante');
  const [assinaturaContratante, setAssinaturaContratante] = useState({ concordo:false, data:"" });
  const [assinaturaContratado, setAssinaturaContratado] = useState({ concordo:false, data:"" });
-  const [docSelecionadoAnexo, setDocSelecionadoAnexo] = useState('bi_contratante');
 
  useEffect(()=>{
    const catName = CATS[contratoSel] || "Carpinteiro";
@@ -506,77 +540,195 @@ useEffect(()=>{
 
  const gerarPDFInicial = () => {
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
-   const agora = new Date().toLocaleString("pt-MZ");
-   const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO '+catName+' - ID '+id+'</title></head><body>PDF Inicial removido - usar PDF Final</body></html>';
-   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank");
+   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px;background:#f8fafc}
+.header{background:#1e2f4a;color:white;padding:15px 20px;border-radius:12px;display:flex;align-items:center;gap:15px}
+.header h1{color:#d4a44a;margin:0;font-size:14px}
+.header-logo{background:white;border-radius:8px;padding:5px;width:70px;height:70px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:white}
+.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
+.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
+.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
+.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
+.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
+@media print{.no-print{display:none} body{background:white}}
+</style>
+</head><body>
+<div class="header"><div class="header-logo">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="max-height:50px;max-width:60px;display:block;border-radius:4px;object-fit:contain" />` : `<div style="font-size:9px;color:#1e2f4a;font-weight:bold;text-align:center">${(formContrato.logoTipo || 'LOGO').substring(0,20)}</div>`}</div><div style="flex:1;text-align:left"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div style="font-size:10px;margin-top:4px">contrata-mz.vercel.app - ${formContrato.logoTipo || 'ESSE'} - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div></div>
+
+<div class="clausula"><h3>1. DADOS DAS PARTES</h3>
+<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel}<br>
+<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - Profissao: ${formContrato.trabProf}
+</div>
+
+<div class="clausula"><h3>2. OBJETO E TAREFAS - ${formContrato.tarefas.length} tarefas</h3>
+${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}
+</div>
+
+<div class="clausula"><h3>3. HORARIO E LOCAL</h3>
+<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
+<b>Dias:</b> ${formContrato.dias}<br>
+<b>Data inicio:</b> ${formContrato.dataInicio}<br>
+<b>Local:</b> ${formContrato.localTrab}
+</div>
+
+<div class="clausula"><h3>4. SALARIO E PAGAMENTO</h3>
+<b>Valor:</b> ${formContrato.valor} MZN<br>
+<b>Dia:</b> Todo dia ${formContrato.diaPag}<br>
+<b>Forma:</b> ${formContrato.formaPag}<br>
+<b>Prazo:</b> ${formContrato.prazo}
+</div>
+
+<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO</h3>
+<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
+<b>Alojamento:</b> ${formContrato.alojamento}<br>
+<b>Transporte:</b> ${formContrato.transporte}
+</div>
+
+<div class="clausula"><h3>6. FOLGAS E FERIAS</h3>${formContrato.folgas}</div>
+<div class="clausula"><h3>7. PERIODO EXPERIMENTAL</h3>${formContrato.periodoExp}</div>
+<div class="clausula"><h3>8. DEVERES DO TRABALHADOR</h3>${formContrato.deveresTrab}</div>
+<div class="clausula"><h3>9. DEVERES DO EMPREGADOR</h3>${formContrato.deveresEmp}</div>
+<div class="clausula"><h3>10. ANEXOS - Fotos e provas</h3>
+<b>Fotos anexadas:</b><br>
+- BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI}<br>
+- BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
+- Local: ${formContrato.localTrab}<br>
+- Anexos: ${formContrato.anexos.length} ficheiros<br>
+</div>
+
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3></div>
+
+<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"}</div><div class="assinatura-box contratado"><b>CONTRATADO</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"}</div></div>
+
+<div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
+<b>CONTRATO FINAL - 11 CLAUSULAS</b><br>
+${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
+</div>
+
+<div style="text-align:center;margin-top:20px" class="no-print">
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL</button>
+</div>
+</body></html>`;
+   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}.html`; a.click();
  };
 
  const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.empNome}, BI ${formContrato.empBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.trabNome} - ${formContrato.tarefas.length} tarefas - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.trabTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
  const assinarContratado = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratado({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.trabNome}, BI ${formContrato.trabBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.empNome} - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.empTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
 
  const gerarPDFFinal = () => {
-   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado."); return; }
+   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado na horizontal."); return; }
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000); const agora = new Date().toLocaleString("pt-MZ");
-   const logoHtml = formContrato.logoData ? '<div style="text-align:center;margin-bottom:15px"><img src="'+formContrato.logoData+'" style="max-height:80px;max-width:200px;background:white;padding:6px;border-radius:8px" /><div style="font-size:10px;margin-top:4px">'+(formContrato.logoTipo||'')+'</div></div>' : '';
-   const anexosHtml = formContrato.anexos.filter((a:any)=>a.tipo!=='logo_tipo').map((a:any)=>{
-     const isImg = a.data && typeof a.data==='string' && a.data.startsWith('data:image');
-     const imgTag = isImg ? '<img src="'+a.data+'" style="max-width:100%;max-height:350px;border-radius:6px;margin-top:6px" />' : '<div>Ficheiro: '+a.nome+' ('+Math.round((a.tamanho||0)/1024)+' KB)</div>';
-     return '<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin:8px 0;background:white"><b>'+a.tipo.toUpperCase()+' - '+a.nome+'</b><br/>'+imgTag+'</div>';
-   }).join('') || '<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;background:white">Nenhum anexo adicional.</div>';
+   const htmlFinal = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL 11 CLAUSULAS COMPLETAS - ${catName} - ID ${id} - ASSINATURAS HORIZONTAL</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:11px}
+.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
+.header h1{color:#d4a44a;margin:0;font-size:15px}
+.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}
+.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}
+.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}
+.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
+.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:220px}
+.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
+.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
+.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}
+.footer{background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:12px;margin-top:15px;font-size:10px}
+@media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
+</style>
+</head><body>
+<div class="header"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS </h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
 
-   const htmlFinal = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL - '+catName+' - ID '+id+'</title>'+
-'<style>'+
-'body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.6;color:#1a2a3a;font-size:11px}'+
-'.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}'+
-'.header h1{color:#d4a44a;margin:0;font-size:14px}'+
-'.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}'+
-'.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}'+
-'.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}'+
-'.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}'+
-'.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:140px}'+
-'.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}'+
-'.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}'+
-'.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}'+
-'.footer{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:15px;font-size:9px;color:#64748b;text-align:center}'+
-'@media print{.no-print{display:none}}'+
-'</style>'+
-'</head><body>'+
-'<div class="header">'+logoHtml+'<h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS - '+catName.toUpperCase()+' - ID '+id+'</h1><div style="font-size:10px;opacity:0.9">Data: '+agora+' | contrata-mz.vercel.app | '+formContrato.tarefas.length+' tarefas | Lei nº 23/2007</div></div>'+
-'<div class="clausula"><h3>1. DADOS DAS PARTES</h3><b>CONTRATANTE:</b> '+formContrato.empNome+' - BI: '+formContrato.empBI+' - Tel: '+formContrato.empTel+' - End: '+formContrato.empEnd+'<br/><b>TRABALHADOR:</b> '+formContrato.trabNome+' - BI: '+formContrato.trabBI+' - Tel: '+formContrato.trabTel+' - End: '+formContrato.trabEnd+' - Profissão: '+formContrato.trabProf+'</div>'+
-'<div class="clausula"><h3>2. OBJETO E TAREFAS - '+formContrato.tarefas.length+' TAREFAS</h3>'+formContrato.tarefas.map((t:string,i:number)=>'<span class="tarefa">'+(i+1)+'. '+t+'</span>').join('')+'</div>'+
-'<div class="clausula"><h3>3. HORÁRIO E LOCAL</h3><b>Horário:</b> '+formContrato.horarioInicio+' às '+formContrato.horarioFim+'<br/><b>Dias:</b> '+formContrato.dias+'<br/><b>Data início:</b> '+formContrato.dataInicio+'<br/><b>Local:</b> '+formContrato.localTrab+'</div>'+
-'<div class="clausula"><h3>4. SALÁRIO E PAGAMENTO</h3><b>Valor:</b> '+formContrato.valor+' MZN<br/><b>Dia pagamento:</b> '+formContrato.diaPag+'<br/><b>Forma:</b> '+formContrato.formaPag+'<br/><b>Prazo:</b> '+formContrato.prazo+'</div>'+
-'<div class="clausula"><h3>5. ALIMENTAÇÃO E ALOJAMENTO</h3><b>Alimentação:</b> '+formContrato.alimentacao+'<br/><b>Alojamento:</b> '+formContrato.alojamento+'<br/><b>Transporte:</b> '+formContrato.transporte+'</div>'+
-'<div class="clausula"><h3>6. FOLGAS E FÉRIAS</h3>'+formContrato.folgas+'</div>'+
-'<div class="clausula"><h3>7. PERÍODO EXPERIMENTAL</h3>'+formContrato.periodoExp+'</div>'+
-'<div class="clausula"><h3>8. DEVERES DO TRABALHADOR</h3>'+formContrato.deveresTrab+'</div>'+
-'<div class="clausula"><h3>9. DEVERES DO EMPREGADOR</h3>'+formContrato.deveresEmp+'</div>'+
-'<div class="clausula"><h3>10. ANEXOS</h3>Documentos anexados que servem como prova. Ver detalhes no final.</div>'+
-'<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3>O presente contrato entra em vigor na data de assinatura por ambas as partes, nos termos da Lei nº 23/2007.</div>'+
-'<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE</b><br/><br/>'+formContrato.empNome+'<br/>BI: '+formContrato.empBI+'<br/><br/><div class="concordowpp">Eu, '+formContrato.empNome+', CONCORDO - '+formContrato.valor+'MZN - '+assinaturaContratante.data+'</div>Data: '+assinaturaContratante.data+'</div><div class="assinatura-box contratado"><b>CONTRATADO</b><br/><br/>'+formContrato.trabNome+'<br/>BI: '+formContrato.trabBI+'<br/><br/><div class="concordowpp">Eu, '+formContrato.trabNome+', CONCORDO - '+formContrato.valor+'MZN - '+assinaturaContratado.data+'</div>Data: '+assinaturaContratado.data+'</div></div>'+
-'<div class="footer">ESSE - NUIT 401866876 | contrata-mz.vercel.app | ID '+id+' | '+formContrato.valor+' MZN | '+formContrato.localTrab+'<br/>Gerado em '+agora+' - Válido Lei 23/2007</div>'+
-'<div style="margin-top:20px"><h3 style="background:#1e2f4a;color:white;padding:8px;border-radius:6px">ANEXOS - Documentos</h3>'+anexosHtml+'</div>'+
-'<div style="text-align:center;margin-top:20px" class="no-print"><button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold">IMPRIMIR / SALVAR COMO PDF</button></div>'+
-'</body></html>';
+<div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
+<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
+<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - End: ${formContrato.trabEnd} - Profissao: ${formContrato.trabProf}
+</div>
 
-   const blob = new Blob([htmlFinal], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download='CONTRATO-FINAL-'+catName+'-ID-'+id+'.html'; a.click();
-   };
-};
+<div class="clausula"><h3>2. OBJETO E TAREFAS - ${formContrato.tarefas.length} TAREFAS DE ${catName.toUpperCase()}</h3>${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}</div>
+
+<div class="clausula"><h3>3. HORARIO E LOCAL - Quando e onde</h3>
+<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
+<b>Dias:</b> ${formContrato.dias}<br>
+<b>Data inicio:</b> ${formContrato.dataInicio}<br>
+<b>Local de trabalho:</b> ${formContrato.localTrab}
+</div>
+
+<div class="clausula"><h3>4. SALARIO E PAGAMENTO - Quanto e como paga</h3>
+<b>Valor:</b> ${formContrato.valor} MZN<br>
+<b>Dia pagamento:</b> Todo dia ${formContrato.diaPag}<br>
+<b>Forma:</b> ${formContrato.formaPag}<br>
+<b>Prazo:</b> ${formContrato.prazo}
+</div>
+
+<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO - Beneficios</h3>
+<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
+<b>Alojamento:</b> ${formContrato.alojamento}<br>
+<b>Transporte:</b> ${formContrato.transporte}
+</div>
+
+<div class="clausula"><h3>6. FOLGAS E FERIAS - Descanso legal</h3>${formContrato.folgas}</div>
+<div class="clausula"><h3>7. PERIODO EXPERIMENTAL - Teste inicial</h3>${formContrato.periodoExp}</div>
+<div class="clausula"><h3>8. DEVERES DO TRABALHADOR - Obrigacoes</h3>${formContrato.deveresTrab}</div>
+<div class="clausula"><h3>9. DEVERES DO EMPREGADOR - Obrigacoes</h3>${formContrato.deveresEmp}</div>
+<div class="clausula"><h3>10. ANEXOS (ANTES VALIDADE) - Fotos e provas - Fotos viram prova legal</h3>
+<b>Fotos e comprovativos anexados antes da validade - viram prova legal:</b><br>
+- Foto BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI} - Frente e verso - Anexado na Clausula 10<br>
+- Foto BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI} - Frente e verso - Anexado na Clausula 10<br>
+- Foto do local: ${formContrato.localTrab} - Foto antes de comecar<br>
+- Fotos: ${formContrato.anexos.length} ficheiros - ${formContrato.anexos.join(", ") || "BI, NUIT, Fotos obra, CV"}<br>
+- Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
+</div>
+
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
+
+<b></b>
+</div>
+
+<div class="assinaturas-horizontal">
+<div class="assinatura-box contratante">
+<b>CONTRATANTE - </b><br><br>
+${formContrato.empNome} - BI ${formContrato.empBI}<br>
+CONCORDO em ${assinaturaContratante.data}<br>
+<div class="concordowpp">Eu, ${formContrato.empNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratante.data}</div>
+Assinatura  - 1 de 2
+</div>
+<div class="assinatura-box contratado">
+<b>CONTRATADO - </b><br><br>
+${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
+CONCORDO em ${assinaturaContratado.data}<br>
+<div class="concordowpp">Eu, ${formContrato.trabNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratado.data}</div>
+Assinatura  - 2 de 2
+</div>
+</div>
+
+<div class="footer"><b>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - </b><br>
+ LEI 23/2007 - VALIDO EM MOCAMBIQUE<br>
+ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id} - ${formContrato.valor} MZN - ${formContrato.localTrab}<br>
+${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS 
+</div>
+
+<div style="text-align:center;margin-top:20px" class="no-print">
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF FINAL COM ASSINATURAS - 11 CLAUSULAS - HORIZONTAL</button>
+</div>
+</body></html>`;
+   const blob = new Blob([htmlFinal], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-FINAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
+ };
 
  return (
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="ESSE - Energy Solutions and Services Enterprise" className="h-9 w-auto object-contain" /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE. 11 CLAUSULAS</div></div>
-    <div className="flex items-center gap-2">
-      {/* BOTAO CIRCULADO AMARELO - FACTURACAO - ADICIONADO App_40 - MANTIDO */}
-      <button onClick={()=>setTab('faturacao')} className={`px-4 py-2 rounded-full font-black text-[11px] ${tab==='faturacao'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FACTURACAO</button>
+    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-auto object-contain bg-white rounded-full p-1" onError={(e:any)=>{try{(e.currentTarget as HTMLImageElement).style.display="none";}catch{}}} /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">ENCONTRE. NEGOCIE. FORMALIZE.</div></div>
+        <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
+      {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
+      <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
-      <button onClick={()=>setTab('viagens')} className={`px-4 py-2 rounded-full font-black text-[11px] flex items-center gap-1 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
-      <button onClick={()=>setTab('encontrar')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
-      <button onClick={()=>setTab('contratos')} className={`px-4 py-2 rounded-md font-extrabold text-xs ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>CONTRATOS 11</button>
-      <button className="px-4 py-2 rounded-md font-bold text-xs bg-transparent text-white">MEUS</button>
-      <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
+      <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
+      <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
+      <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
+      
+      <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
     </div>
    </header>
 
@@ -799,49 +951,49 @@ useEffect(()=>{
               <div className="font-black text-[11px] mb-2">ESQUERDA - SELECIONA NA LISTA</div>
               <div className="space-y-1.5">
                 {[
-                  {id:'bi_contratante', label:'Foto BI Contratante', desc: formContrato.empNome + ' - BI ' + formContrato.empBI, icon:'🪪'},
-                  {id:'bi_contratado', label:'Foto BI Contratado', desc: formContrato.trabNome + ' - BI ' + formContrato.trabBI, icon:'🪪'},
-                  {id:'foto_local', label:'Foto do local', desc: formContrato.localTrab, icon:'📸'},
-                  {id:'nuit_contratante', label:'NUIT Contratante (opcional)', desc:'NUIT Frente', icon:'📄'},
-                  {id:'nuit_contratado', label:'NUIT Contratado (opcional)', desc:'NUIT Frente', icon:'📄'},
-                  {id:'comprovativo_mpesa', label:'Comprovativo M-Pesa', desc: formContrato.valor + ' MZN - ' + formContrato.formaPag, icon:'💳'},
-                  {id:'foto_obra', label:'Foto obra / local', desc:'Prova antes de começar', icon:'🏗️'},
-                  {id:'cv', label:'CV / Certificado', desc:'Curriculum profissional', icon:'📜'},
-                  {id:'logo_tipo', label:'Logo Tipo / Empresa', desc:'Logo empresa no contrato', icon:'🏢'},
-                  {id:'outro', label:'Outro documento', desc:'Outro comprovativo', icon:'📎'},
+                  {id:'bi_contratante', label:'Foto BI Contratante', desc: formContrato.empNome + ' - BI ' + formContrato.empBI, icon:'\uD83E\uDEAA'},
+                  {id:'bi_contratado', label:'Foto BI Contratado', desc: formContrato.trabNome + ' - BI ' + formContrato.trabBI, icon:'\uD83E\uDEAA'},
+                  {id:'foto_local', label:'Foto do local', desc: formContrato.localTrab, icon:'\uD83D\uDCF8'},
+                  {id:'nuit_contratante', label:'NUIT Contratante (opcional)', desc:'NUIT Frente', icon:'\uD83D\uDCC4'},
+                  {id:'nuit_contratado', label:'NUIT Contratado (opcional)', desc:'NUIT Frente', icon:'\uD83D\uDCC4'},
+                  {id:'comprovativo_mpesa', label:'Comprovativo M-Pesa', desc: formContrato.valor + ' MZN - ' + formContrato.formaPag, icon:'\uD83D\uDCB3'},
+                  {id:'foto_obra', label:'Foto obra / local', desc:'Prova antes de comecar', icon:'\uD83C\uDFD7\uFE0F'},
+                  {id:'cv', label:'CV / Certificado', desc:'Curriculum profissional', icon:'\uD83D\uDCDC'},
+                  {id:'logo_tipo', label:'Logo Tipo / Empresa', desc:'Logo empresa no contrato', icon:'\uD83C\uDFE2'},
+                  {id:'outro', label:'Outro documento', desc:'Outro comprovativo', icon:'\uD83D\uDCCE'},
                 ].map((doc:any)=>(
                   <button key={doc.id} onClick={()=>setDocSelecionadoAnexo(doc.id)} className={`w-full text-left p-2.5 rounded-lg border-2 flex items-start gap-2 ${docSelecionadoAnexo===doc.id ? 'bg-[#1e2f4a] text-white border-[#1e2f4a]' : 'bg-white border-[#e2e8f0]'}`}>
                     <span>{doc.icon}</span>
-                    <div className="flex-1"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) ? '✅' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
+                    <div className="flex-1"><div className="font-bold text-[11px]">{doc.label} {formContrato.anexos.find((a:any)=>a.tipo===doc.id) ? '' : ''}</div><div className="text-[9px] opacity-70 truncate">{doc.desc}</div></div>
                   </button>
                 ))}
               </div>
               <div className="mt-3 p-2 bg-white border rounded text-[9px]">Total: {formContrato.anexos.length} ficheiros - BI e NUIT opcional mantido</div>
             </div>
             <div className="border-2 border-[#c9a86a] rounded-xl p-3 bg-white">
-              <div className="font-black text-[11px] mb-2">DIREITA - ANEXAR + LOGO TIPO</div>
-              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione à esquerda'}</div>
+              <div className="font-black text-[11px] mb-2">DIREITA - ANEXAR</div>
+              <div className="p-2 bg-[#fffbeb] border border-[#facc15] rounded-lg mb-3 text-[10px] font-bold">Selecionado: {docSelecionadoAnexo ? docSelecionadoAnexo.toUpperCase() : 'Selecione a esquerda'}</div>
               <div className="space-y-3">
                 {docSelecionadoAnexo==='logo_tipo' && (
                 <div>
-                  <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo do PDF) 🏢</label>
+                  <label className="text-[10px] font-bold">Logo Tipo / Marca (incluir no topo) \uD83C\uDFE2</label>
                   <div className="mt-1 flex gap-2">
-                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? "✅ Logo" : "🏢"}</div>
+                    <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? " Logo" : "\uD83C\uDFE2"}</div>
                     <div className="flex-1">
                       <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                       <div className="flex gap-1 mt-1">
-                        <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">📎 Anexar Logo</button>
+                        <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">\uD83D\uDCCE Anexar Logo</button>
                         <input id="inputLogoTipo" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name})); r.readAsDataURL(f); }}} />
-                        <span className="text-[9px] text-gray-500">{formContrato.logoData ? '✅ Logo ok' : 'PNG/JPG'}</span>
+                        <span className="text-[9px] text-gray-500">{formContrato.logoData ? ' Logo ok' : 'PNG/JPG'}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 )}
                 <div className="border-t pt-3">
-                  <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione à esquerda'}</label>
+                  <label className="text-[10px] font-bold">Anexar: {docSelecionadoAnexo || 'Selecione a esquerda'}</label>
                   <div className="mt-1 border-2 border-dashed border-[#25D366] rounded-xl p-4 bg-[#f0fdf4] text-center">
-                    <div className="text-[20px]">📎</div>
+                    <div className="text-[20px]">\uD83D\uDCCE</div>
                     <div className="text-[11px] font-bold mt-1">Clica para anexar {docSelecionadoAnexo}</div>
                     <input type="file" accept="image/*,.pdf" className="mt-2 text-[10px]" onChange={e=>{ const file=e.target.files?.[0]; if(!file || !docSelecionadoAnexo) return; const reader=new FileReader(); reader.onload=()=>{ const novo={tipo:docSelecionadoAnexo, nome:file.name, label:docSelecionadoAnexo, data:reader.result, tamanho:file.size}; setFormContrato((prev:any)=>({...prev, anexos:[...prev.anexos.filter((a:any)=>a.tipo!==docSelecionadoAnexo), novo]})); }; reader.readAsDataURL(file); }} />
                   </div>
@@ -853,7 +1005,7 @@ useEffect(()=>{
                       <button onClick={()=>setFormContrato((prev:any)=>({...prev, anexos: prev.anexos.filter((_:any,i:number)=>i!==idx)}))} className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px]">X</button>
                     </div>
                   ))}
-                  {formContrato.anexos.length===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione à esquerda e anexe à direita. BI e NUIT opcional.</div>}
+                  {formContrato.anexos.length===0 && <div className="text-[10px] text-gray-400 text-center py-3">Nenhum - Selecione a esquerda e anexe a direita. BI e NUIT opcional.</div>}
                 </div>
               </div>
             </div>
@@ -872,7 +1024,7 @@ useEffect(()=>{
 
      <div className={`${mostrarPreviewMobile?"block":"hidden"} lg:block bg-white rounded-[12px] border-2 border-[#1e2f4a] p-3 h-fit lg:sticky lg:top-[70px] order-3 min-w-0 w-full`}>
        <div className="flex justify-between items-center"><div className="text-[10px] font-bold uppercase">3 - Preview do contrato - {CATS[contratoSel]} - {formContrato.tarefas.length} tarefas - vendo o que esta a ser editado</div><button onClick={()=>setMostrarPreviewMobile(false)} className="xl:hidden w-6 h-6 bg-[#f1f0eb] rounded-full grid place-items-center text-[10px]">X</button></div>
-       <div className="mt-3 max-h-[60vh] xl:h-[520px] overflow-y-auto overscroll-contain break-words [overflow-wrap:anywhere] bg-[#f8fafc] border rounded-xl p-3 text-[10px] font-mono leading-relaxed">CONTRATO {CATS[contratoSel].toUpperCase()} - 11 CLAUSULAS<br/><br/>1. DADOS: {formContrato.empNome} BI {formContrato.empBI} e {formContrato.trabNome} BI {formContrato.trabBI}<br/><br/>2. TAREFAS ({formContrato.tarefas.length}):<br/>{formContrato.tarefas.map((t:string,i:number)=>`${i+1}. ${t}`).join("<br/>")}<br/><br/>3. HORARIO: {formContrato.horarioInicio} as {formContrato.horarioFim} - {formContrato.localTrab}<br/><br/>4. SALARIO: {formContrato.valor} MZN - Dia {formContrato.diaPag} - {formContrato.formaPag} - Prazo {formContrato.prazo}<br/><br/>5. ALIMENTACAO: {formContrato.alimentacao} - {formContrato.alojamento} - {formContrato.transporte}<br/><br/>6. FOLGAS: {formContrato.folgas}<br/><br/>7. PERIODO: {formContrato.periodoExp}<br/><br/>8. DEVERES TRAB: {formContrato.deveresTrab.substring(0,100)}...<br/><br/>9. DEVERES EMP: {formContrato.deveresEmp.substring(0,100)}...<br/><br/>10. ANEXOS: {formContrato.anexos.length} ficheiros - Fotos BI, NUIT, M-Pesa<br/><br/>11. ASSINATURA: {formContrato.empNome} {assinaturaContratante.concordo?`CONCORDO em ${assinaturaContratante.data}`:"FALTA"} - {formContrato.trabNome} {assinaturaContratado.concordo?`CONCORDO em ${assinaturaContratado.data}`:"FALTA"}<br/><br/>FORMULARIO COMPLETO ABERTO</div>
+       <div className="mt-3 max-h-[60vh] xl:h-[520px] overflow-y-auto overscroll-contain break-words [overflow-wrap:anywhere] bg-[#f8fafc] border rounded-xl p-3 text-[10px] font-mono leading-relaxed">{formContrato.logoData && (<div className="bg-white border-2 border-[#d4a44a] rounded-xl p-2 mb-3 flex items-center gap-2"><img src={formContrato.logoData} alt="Logo" className="max-h-[40px] max-w-[60px] block" /><div className="text-[9px] font-bold">{formContrato.logoTipo || 'Logo Empresa'}</div></div>)}CONTRATO {CATS[contratoSel].toUpperCase()} - 11 CLAUSULAS<br/><br/>1. DADOS: {formContrato.empNome} BI {formContrato.empBI} e {formContrato.trabNome} BI {formContrato.trabBI}<br/><br/>2. TAREFAS ({formContrato.tarefas.length}):<br/>{formContrato.tarefas.map((t:string,i:number)=>`${i+1}. ${t}`).join("<br/>")}<br/><br/>3. HORARIO: {formContrato.horarioInicio} as {formContrato.horarioFim} - {formContrato.localTrab}<br/><br/>4. SALARIO: {formContrato.valor} MZN - Dia {formContrato.diaPag} - {formContrato.formaPag} - Prazo {formContrato.prazo}<br/><br/>5. ALIMENTACAO: {formContrato.alimentacao} - {formContrato.alojamento} - {formContrato.transporte}<br/><br/>6. FOLGAS: {formContrato.folgas}<br/><br/>7. PERIODO: {formContrato.periodoExp}<br/><br/>8. DEVERES TRAB: {formContrato.deveresTrab.substring(0,100)}...<br/><br/>9. DEVERES EMP: {formContrato.deveresEmp.substring(0,100)}...<br/><br/>10. ANEXOS: {formContrato.anexos.length} ficheiros - Fotos BI, NUIT, M-Pesa<br/><br/>11. ASSINATURA: {formContrato.empNome} {assinaturaContratante.concordo?`CONCORDO em ${assinaturaContratante.data}`:"FALTA"} - {formContrato.trabNome} {assinaturaContratado.concordo?`CONCORDO em ${assinaturaContratado.data}`:"FALTA"}<br/><br/>FORMULARIO COMPLETO ABERTO</div>
        <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL</button></div>
      </div>
     </div>
@@ -880,62 +1032,250 @@ useEffect(()=>{
   )}
 
 
-      {tab==='faturacao' && (
+      {tab==='faturar' && (
         <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10">
-          {/* TOPO - EXATO DO PRINT */}
+          {!faturacaoLogado ? (
+            <div className="max-w-[600px] mx-auto">
+              <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
+                <div className="text-center">
+                  <div className="h-12 w-12 rounded-[12px] bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">F</div>
+                  <h2 className="text-[18px] font-black mt-3">Facilita Faturacao - Cadastro simples</h2>
+                  <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos para entrar na parte de faturacao</p>
+                  <p className="text-[9px] opacity-50 mt-1">Depois pode acrescentar mais dados no seu perfil - NUIT, endereco, logo, forma de pagamento</p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    <button onClick={()=>setFaturacaoAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='cadastro' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>CADASTRO SIMPLES</button>
+                    <button onClick={()=>setFaturacaoAuthMode('login')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${faturacaoAuthMode==='login' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>LOGIN</button>
+                  </div>
+                </div>
+                <div className="mt-6 max-w-[420px] mx-auto">
+                  {faturacaoAuthMode==='cadastro' ? (
+                  <>
+                  <div className="space-y-3">
+                    <div><label className="text-[9px] font-bold opacity-80">NOME DA LOJA / EMPRESA *</label><input value={faturacaoCadastroForm.nomeLoja} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, nomeLoja:e.target.value})} placeholder="Ex: Ferragem Central Matola" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
+                    <div><label className="text-[9px] font-bold opacity-80">TELEFONE / WHATSAPP *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84 123 4567" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black bg-[#f0fdf4]" /></div>
+                    <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
+                    <div className="text-[8px] opacity-60">NUIT, endereco, logo - pode acrescentar depois no perfil</div>
+                  </div>
+                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
+                  </>
+                  ) : (
+                  <>
+                  <div className="space-y-3">
+                    <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
+                    <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
+                  </div>
+                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Minha Ferragem', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                  <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
+                  </>
+                  )}
+                </div>
+              </div>
+              <div className="mt-3 bg-white rounded-[12px] border p-4">
+                <div className="font-bold text-[11px]">Como funciona - Cadastro simples</div>
+                <div className="mt-2 space-y-1 text-[9px] text-[#475569]">
+                  <div>- Cadastro: so nome loja, telefone, password - 10 segundos</div>
+                  <div>- Depois de entrar: pode acrescentar NUIT, endereco, provincia, logo, forma pagamento, horario</div>
+                  <div>- Dentro da conta: tem pagina de gestao de stock - produtos, quantidade, preco, custo, alerta stock baixo</div>
+                  <div>- Faturacao ultra rapida: so telefone do comprador obrigatorio - 15s</div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+          {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Facilita Faturacao</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#f1f5f9] border">Pagina 5 e 10 removidas - Partilha integrada no 7</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">Ocasional permitido sem conta</span></div>
-            <div className="flex gap-2"><button className="px-3 h-7 rounded-full bg-[#1e2f4a] text-white text-[9px] font-bold">7. Faturacao - 10 seg - com perfis</button><button className="px-3 h-7 rounded-full bg-white border text-[9px] font-bold">11. Painel da Loja - 5.4k</button></div>
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">Facilita Faturacao - {lojaPerfil.nomeLoja}</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">Logado - {lojaPerfil.tel}</span></div>
+            <div className="flex gap-2 flex-wrap"><button onClick={()=>setFaturacaoTab('faturacao')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='faturacao' ? 'bg-[#1e2f4a] text-white' : 'bg-white border'}`}>7. Faturacao - 10 seg</button><button onClick={()=>setFaturacaoTab('painel')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='painel' ? 'bg-[#1e2f4a] text-white' : 'bg-white border'}`}>11. Painel da Loja - 5.4k</button><button onClick={()=>setFaturacaoTab('stock')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${faturacaoTab==='stock' ? 'bg-[#facc15] text-black' : 'bg-white border'}`}>12. Gestao de Stock - {stockProdutos.length} prod</button><button onClick={()=>setFaturacaoLogado(false)} className="px-3 h-7 rounded-full bg-white/10 border text-[9px]">Sair</button></div>
           </div>
+
+          {faturacaoTab==='faturacao' && (
           <div className="flex flex-col lg:flex-row gap-3">
-            {/* ESQUERDA - IGUAL PRINT */}
+            {/* ESQUERDA - FATURACAO ULTRA RAPIDA */}
             <div className="flex-1 space-y-3">
               <div className="bg-white rounded-[12px] border p-4">
-                <div className="flex justify-between"><div className="font-black text-[13px] italic">Dados do comprador - ultra rapido</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">+ Fluxo rapido ativo</span></div>
+                <div className="flex justify-between"><div className="font-black text-[13px] italic">Dados do comprador - ultra rapido</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534] font-bold">+ Fluxo rapido ativo - {lojaPerfil.nomeLoja}</span></div>
                 <div className="text-[9px] text-[#64748b] mt-1">So telefone obrigatorio. Nome opcional para recibo rapido. Tempo alvo: 15s como supermercado.</div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
-                  <div><label className="text-[8px] font-bold">TELEFONE / WHATSAPP *</label><input value={telFat} onChange={e=>setTelFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-200" placeholder="+258 84 123 4567" /><div className="text-[8px] text-green-600 mt-1">Numero valido para WhatsApp/SMS</div><div className="text-[8px] text-[#94a3b8]">+ mais detalhes (NUIT, endereco) - opcional</div></div>
+                  <div><label className="text-[8px] font-bold">TELEFONE / WHATSAPP *</label><input value={telFat} onChange={e=>setTelFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-200" placeholder="+258 84 123 4567" /><div className="text-[8px] text-green-600 mt-1">Numero valido para WhatsApp/SMS - Stock baixa automatica</div></div>
                   <div><label className="text-[8px] font-bold">NOME / EMPRESA (opcional)</label><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1 bg-[#f8fafc]" placeholder="Nome opcional - para recibo rapido" /></div>
                 </div>
               </div>
               <div className="bg-white rounded-[12px] border p-4">
-                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Produtos e Servicos - IVA no fim - Memoria ativa</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#f1f5f9] border">Colunas: Descricao | QTD | Preco Unit | Desc % | Subtotal</span></div>
-                <div className="mt-3"><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder='Digite "Saco" - sugere "Saco de Cimento 50kg - CMPOR - 850 MT" (memoria IA ferragem)' className="w-full h-10 px-3 rounded-[8px] border text-[11px]" /></div>
-                <div className="mt-3"><div className="text-[8px] font-bold text-[#64748b]">PRODUTOS FREQUENTES DESTA LOJA (IA POR TIPO FERRAGEM)</div><div className="text-[7px] text-[#94a3b8]">1 clique = adiciona com preco memorizado</div><div className="flex flex-wrap gap-1.5 mt-2">{catsFat.map(c=><button key={c} onClick={()=>setFiltroCatFat(c)} className={`px-2.5 py-1 rounded-full text-[8px] font-bold border ${filtroCatFat===c?'bg-[#1e2f4a] text-white':'bg-white'}`}>{c}</button>)}</div>
-<div className="mt-2 flex items-center gap-2">
-  <button onClick={()=>setMostrarNovoProd(p=>!p)} className="px-3 py-1 rounded bg-[#1e293b] text-white font-bold">+ Novo Produto</button>
-  {mostrarNovoProd && (<div className="flex gap-2 items-center">
-    <input value={novoProdNome} onChange={e=>setNovoProdNome(e.target.value)} placeholder="Nome" className="h-8 px-2 border rounded" />
-    <input value={novoProdPreco} onChange={e=>setNovoProdPreco(e.target.value)} placeholder="Preco" className="h-8 px-2 border rounded w-20" />
-    <input value={novoProdCat} onChange={e=>setNovoProdCat(e.target.value)} placeholder="Categoria" className="h-8 px-2 border rounded w-28" />
-    <button onClick={()=>{ if(!novoProdNome||!novoProdPreco){ alert('Nome e preco obrigatorios'); return;} const id='p'+Date.now(); const newp={id,nome:novoProdNome,preco:Number(novoProdPreco),cat:novoProdCat||'Outros'}; setProdutosBaseState([...produtosBaseState,newp]); setProdutosFat(prev=>[...prev,{id:newp.id,nome:newp.nome,preco:newp.preco,qtd:1,desc:0}]); setNovoProdNome(''); setNovoProdPreco(''); setNovoProdCat(''); setMostrarNovoProd(false); }} className="px-2 py-1 bg-[#16a34a] text-white rounded font-bold">Adicionar</button>
-  </div>)}
-</div>
-<div className="flex flex-wrap gap-1.5 mt-2">{produtosBaseState.filter(p=>filtroCatFat==='Todos'||p.cat===filtroCatFat).filter(p=>!buscaFat||p.nome.toLowerCase().includes(buscaFat.toLowerCase())).map(p=><button key={p.id} onClick={()=>{const ex=produtosFat.find(x=>x.nome===p.nome); if(ex){setProdutosFat(produtosFat.map(x=>x.nome===p.nome?{...x,qtd:x.qtd+1}:x))} else {setProdutosFat([...produtosFat,{id:p.id,nome:p.nome,preco:p.preco,qtd:1,desc:0}])}}} className="px-2.5 py-1 rounded-full bg-[#1e293b] text-white text-[9px] font-bold">- {p.nome}</button>)}</div></div>
-                <div className="mt-4 overflow-x-auto"><table className="w-full text-[10px]"><thead><tr className="text-[8px] text-[#94a3b8] border-b"><th className="text-left py-1">DESCRICAO</th><th>QTD</th><th>PRECO UNIT.</th><th>DESC %</th><th className="text-right">SUBTOTAL</th><th></th></tr></thead><tbody>{produtosFat.map(pr=>(<tr key={pr.id} className="border-b"><td className="py-2"><div className="font-bold text-[10px]">{pr.nome}</div><div className="text-[8px] text-[#94a3b8]">Preco memorizado - IA ajusta QTD</div></td><td className="text-center"><input type="number" value={pr.qtd} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,qtd:Math.max(0,Number(e.target.value))}:x).filter(x=>x.qtd>0))} className="w-12 h-7 border rounded text-center text-[10px]" /></td><td className="text-center">{pr.preco}</td><td className="text-center"><input type="number" value={pr.desc} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,desc:Math.max(0,Math.min(100,Number(e.target.value)))}:x))} className="w-10 h-7 border rounded text-center text-[10px]" /></td><td className="text-right font-bold">{(pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0)} MT</td><td><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==pr.id))} className="text-red-400 ml-1">x</button></td></tr>))}</tbody></table></div>
+                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Produtos e Servicos - do Stock - IVA no fim</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3] font-bold">{stockProdutos.length} produtos no stock</span></div>
+                <div className="mt-3"><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder='Digite "Cimento" - busca no stock' className="w-full h-10 px-3 rounded-[8px] border text-[11px]" /></div>
+                <div className="mt-2 flex flex-wrap gap-1.5">{stockProdutos.filter(p=>!buscaFat||p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,12).map(p=><button key={p.id} onClick={()=>{const ex=produtosFat.find(x=>x.nome===p.nome); if(ex){setProdutosFat(produtosFat.map(x=>x.nome===p.nome?{...x,qtd:x.qtd+1}:x))} else {setProdutosFat([...produtosFat,{id:p.id,nome:p.nome,preco:p.preco,qtd:1,desc:0}]); if(p.qtd>0){setStockProdutos(stockProdutos.map(s=>s.id===p.id?{...s, qtd:s.qtd-1}:s))}}}} className={p.qtd<=p.qtdMin ? 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-red-50 border-red-200 text-red-700' : 'px-2.5 py-1 rounded-full text-[9px] font-bold border bg-[#1e293b] text-white'}>{p.nome} - {p.preco}MT - Stock:{p.qtd}</button>)}</div>
+                <div className="mt-4 overflow-x-auto"><table className="w-full text-[10px]"><thead><tr className="text-[8px] text-[#94a3b8] border-b"><th className="text-left py-1">DESCRICAO</th><th>QTD</th><th>PRECO UNIT.</th><th>DESC %</th><th className="text-right">SUBTOTAL</th><th></th></tr></thead><tbody>{produtosFat.map(pr=>(<tr key={pr.id} className="border-b"><td className="py-2"><div className="font-bold text-[10px]">{pr.nome}</div></td><td className="text-center"><input type="number" value={pr.qtd} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,qtd:Math.max(0,Number(e.target.value))}:x).filter(x=>x.qtd>0))} className="w-12 h-7 border rounded text-center text-[10px]" /></td><td className="text-center">{pr.preco}</td><td className="text-center"><input type="number" value={pr.desc} onChange={e=>setProdutosFat(produtosFat.map(x=>x.id===pr.id?{...x,desc:Math.max(0,Math.min(100,Number(e.target.value)))}:x))} className="w-10 h-7 border rounded text-center text-[10px]" /></td><td className="text-right font-bold">{(pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0)} MT</td><td><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==pr.id))} className="text-red-400 ml-1">x</button></td></tr>))}</tbody></table></div>
                 <div className="mt-3 flex justify-end"><div className="w-[200px] space-y-1 text-[10px]"><div className="flex justify-between"><span className="text-[#64748b]">Subtotal bruto</span><span className="font-bold">{subtotalBrutoFat} MT</span></div><div className="flex justify-between text-red-500"><span>Descontos</span><span>- {totalDescFat} MT</span></div><div className="flex justify-between"><span>Subtotal liquido</span><span>{baseFat} MT</span></div><div className="flex justify-between"><span>IVA ({ivaTipo}%)</span><span>{ivaFat.toFixed(0)} MT</span></div><div className="flex justify-between font-black text-[12px] border-t pt-1"><span>TOTAL</span><span className="text-[#0f766e]">{totalFat.toFixed(0)} MT</span></div></div></div>
-                <div className="mt-3"><div className="text-[8px] font-bold">IVA NO RODAPE - GLOBAL</div><div className="flex gap-2 mt-1"><button onClick={()=>setIvaTipo('sem')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='sem'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='16'?'bg-[#0f766e] text-white':'bg-white'}`}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='5'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Com IVA 5%</button></div><div className="text-[7px] text-[#94a3b8] mt-1">IVA aplica no total final, nao por produto - sistema mais rapido</div></div>
+                <div className="mt-3"><div className="text-[8px] font-bold">IVA NO RODAPE - GLOBAL</div><div className="flex gap-2 mt-1"><button onClick={()=>setIvaTipo('sem')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='sem'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='16'?'bg-[#0f766e] text-white':'bg-white'}`}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={`px-3 h-7 rounded-full text-[9px] font-bold border ${ivaTipo==='5'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Com IVA 5%</button></div></div>
               </div>
             </div>
-            {/* DIREITA - EXATO PRINT */}
+            {/* DIREITA */}
             <div className="w-full lg:w-[300px] lg:min-w-[300px] space-y-3">
               <div className="bg-[#111827] rounded-[12px] p-4 text-white">
-                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like</span></div>
-                <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>2 - QTD total 23</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>Ocasional (sem conta)</span></div><div className="flex justify-between items-center mt-2"><span className="text-white/50">CobranAÂ§a actual?</span><div className="h-5 w-9 bg-white/20 rounded-full relative"><div className="h-4 w-4 bg-white rounded-full absolute top-0.5 left-0.5"></div></div></div></div>
-                <button className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento DEMO</button>
-                <div className="text-[8px] text-white/40 text-center mt-2">Fluxo mais curto - telefone obrigatArio - QTD - artigo - Nome, nAÂ£o pagamento - IVA ao selecionar activo</div>
+                <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido - {lojaPerfil.nomeLoja}</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like - Stock auto</span></div>
+                <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>{produtosFat.length} - QTD total {produtosFat.reduce((a,b)=>a+b.qtd,0)}</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>{lojaPerfil.nomeLoja}</span></div></div>
+                <button onClick={()=>{alert('Documento finalizado! Stock baixado automaticamente. Total: '+totalFat.toFixed(0)+' MT'); setProdutosFat([]);}} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px]">Finalizar Documento - Baixa Stock Auto</button>
+                <div className="text-[8px] text-white/40 text-center mt-2">Telefone obrigatorio - Stock baixa automatica - IVA global</div>
               </div>
-              <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">O QUE MUDOU V2.0 LIMPO</div><div className="mt-2 space-y-1 text-[8px] text-[#475569]"><div>- Removidas abas 5 e 10 - sA 7. Faturacao e 11. Painel</div><div>- Partilha integrada no 7 - botAÂµes num sA lugar, mantAÂ©m mostra NAÂºmero detectado: +258 84 123 4567*</div><div>- WhatsApp botAÂ£o: Partilhar PDF no WhatsApp abre acima com PDF + nota</div><div>- 35% menos custo: "Loja: Saco Cimento 50kg - CMPOR - 850 MT..." - 7% total</div><div>- PKV-FM-N-20: gerado tudo em background - "A guardar pagamentos" vs sA cobranAÂ§a activa</div></div></div>
-              <div className="bg-[#fefce8] rounded-[12px] border border-[#fde68a] p-3"><div className="font-bold text-[9px]">Nota rAÂ¡pida</div><div className="text-[8px] text-[#854d0e] mt-1">MudanAÂ§as sAÂ£o sA de interface, lAgica de negAcio, nome opcional, IVA global, N fim, produtos memorizados, pagamento mesmo BN Ã¢â‚¬â€ MantAÂ©m memAria de cada cliente</div></div>
             </div>
           </div>
+          )}
+
+          {faturacaoTab==='painel' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="bg-white rounded-[12px] border p-4">
+                <div className="font-black text-[13px]">Perfil da Loja - Acrescente mais dados</div>
+                <div className="text-[9px] text-[#64748b] mt-1">Cadastro simples foi so nome, telefone, password - agora pode completar</div>
+                <div className="mt-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-[8px] font-bold">NOME DA LOJA *</label><input value={lojaPerfil.nomeLoja} onChange={e=>setLojaPerfil({...lojaPerfil, nomeLoja:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                    <div><label className="text-[8px] font-bold">RESPONSAVEL</label><input value={lojaPerfil.responsavel} onChange={e=>setLojaPerfil({...lojaPerfil, responsavel:e.target.value})} placeholder="Nome responsavel" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-[8px] font-bold">TELEFONE</label><input value={lojaPerfil.tel} onChange={e=>setLojaPerfil({...lojaPerfil, tel:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                    <div><label className="text-[8px] font-bold">EMAIL (opcional)</label><input value={lojaPerfil.email} onChange={e=>setLojaPerfil({...lojaPerfil, email:e.target.value})} placeholder="email@loja.com" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-[8px] font-bold">NUIT</label><input value={lojaPerfil.nuit} onChange={e=>setLojaPerfil({...lojaPerfil, nuit:e.target.value})} placeholder="NUIT da empresa" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                    <div><label className="text-[8px] font-bold">PROVINCIA</label><select value={lojaPerfil.provincia} onChange={e=>setLojaPerfil({...lojaPerfil, provincia:e.target.value})} className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option></select></div>
+                  </div>
+                  <div><label className="text-[8px] font-bold">ENDERECO COMPLETO</label><input value={lojaPerfil.endereco} onChange={e=>setLojaPerfil({...lojaPerfil, endereco:e.target.value})} placeholder="Bairro, Avenida, Numero" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-[8px] font-bold">FORMA PAGAMENTO</label><input value={lojaPerfil.formaPag} onChange={e=>setLojaPerfil({...lojaPerfil, formaPag:e.target.value})} placeholder="M-Pesa, Numerario, Banco" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                    <div><label className="text-[8px] font-bold">HORARIO</label><input value={lojaPerfil.horario} onChange={e=>setLojaPerfil({...lojaPerfil, horario:e.target.value})} placeholder="08:00 - 18:00" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
+                  </div>
+                  <div><label className="text-[8px] font-bold">LOGO DA LOJA - aparece no PDF e no topo</label><div className="flex gap-2 mt-1"><input value={lojaPerfil.logoNome} onChange={e=>setLojaPerfil({...lojaPerfil, logoNome:e.target.value})} placeholder="Nome para logo" className="flex-1 h-9 px-3 rounded-[8px] border text-[11px]" /><button onClick={()=>{const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>{const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=(ev:any)=>{setLojaPerfil({...lojaPerfil, logoData:ev.target.result, logoNome:file.name});}; reader.readAsDataURL(file);}}; input.click();}} className="px-4 h-9 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Anexar Logo</button></div>{lojaPerfil.logoData && <div className="mt-2 bg-white border rounded p-2 flex items-center gap-2"><img src={lojaPerfil.logoData} className="h-10 w-10 object-contain border rounded" /><span className="text-[9px]">{lojaPerfil.logoNome}</span></div>}</div>
+                  <button onClick={()=>alert('Perfil atualizado! '+lojaPerfil.nomeLoja)} className="w-full h-10 bg-[#1e2f4a] text-white rounded-[8px] font-bold text-[11px] mt-3">Salvar Perfil Completo</button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-white rounded-[12px] border p-4">
+                  <div className="font-bold text-[11px]">Painel da Loja - 5.4k vendas</div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="bg-[#f0fdf4] border border-green-200 rounded-[10px] p-3"><div className="text-[8px] font-bold text-green-700">VENDAS HOJE</div><div className="text-[16px] font-black mt-1">12.450 MT</div><div className="text-[8px] text-[#64748b]">8 documentos</div></div>
+                    <div className="bg-[#fefce8] border border-yellow-200 rounded-[10px] p-3"><div className="text-[8px] font-bold text-yellow-700">STOCK BAIXO</div><div className="text-[16px] font-black mt-1">{stockProdutos.filter(s=>s.qtd<=s.qtdMin).length} produtos</div><div className="text-[8px] text-[#64748b]">Precisa repor</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {faturacaoTab==='stock' && (
+            <div className="space-y-3">
+              <div className="bg-white rounded-[12px] border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50</div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
+                  <div className="flex gap-2 items-center">
+                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
+                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
+                    <div className="flex items-center gap-1">
+                      <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
+                        <option value="todos">Todos ({stockProdutos.length})</option>
+                        <option value="baixo">Baixo &lt;50 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length})</option>
+                        <option value="zerado">Zerado (0) ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length})</option>
+                        <option value="medio">Medio 50-100 ({stockProdutos.filter((p:any)=>{const sf=p.noArmazem+p.stockLoja; return sf>=50 && sf<=100}).length})</option>
+                        <option value="alto">Alto &gt;100 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)>100).length})</option>
+                      </select>
+                      <button onClick={()=>setFiltroTipoStock(filtroTipoStock==='baixo'?'todos':'baixo')} className={`h-8 px-3 rounded-full text-[10px] font-black border ${filtroTipoStock==='baixo'?'bg-red-500 text-white border-red-500':'bg-red-50 text-red-700 border-red-200'}`}>{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length} stock baixo</button>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-[160px_1fr] gap-3">
+                  <div className="bg-[#f8fafc] border rounded-[8px] p-2">
+                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center">+</span>Novo Item</button>
+                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
+                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Relatorios [F9]</button>
+                    </div>
+                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
+                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
+                          const sf = p.noArmazem + p.stockLoja;
+                          let matchTipo = true;
+                          if(filtroTipoStock==='baixo') matchTipo = isBaixoCheck(sf);
+                          else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
+                          else if(filtroTipoStock==='medio') matchTipo = sf >= 50 && sf <= 100;
+                          else if(filtroTipoStock==='alto') matchTipo = sf >= 101;
+                          return matchBusca && matchTipo;
+                        }).map((p:any)=>{
+                            const sf=p.noArmazem+p.stockLoja;
+                            const vv=p.venda*p.precoVenda;
+                            const isBaixo = isBaixoCheck(sf);
+                            const rowBg = isBaixo ? 'bg-[#fee2e2]' : '';
+                            const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
+                            return (
+                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}>
+                                <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div>{p.nome}</div></td>
+                                <td className="text-center p-1.5 border">{p.dataEntrada}</td>
+                                <td className="text-center p-1.5 border">{p.qtdEntrada}</td>
+                                <td className="text-center p-1.5 border">{p.noArmazem}</td>
+                                <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
+                                <td className="text-center p-1.5 border">{p.dataReq}</td>
+                                <td className="text-center p-1.5 border">{p.stockLoja}</td>
+                                <td className="text-center p-1.5 border">{p.venda}</td>
+                                <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
+                                <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
+                                <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
+                              </tr>
+                            );
+                          })}</tbody></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+         )}
+
+
+                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
+                {showEntradaStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
+                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
+                      <div className="p-4 space-y-3">
+                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome}</div></div>
+                        <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">QTD Entrada</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data</label><input type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div></div>
+                        <div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[12px]">Cancelar</button><button onClick={()=>{setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:p.qtdEntrada+entradaQtdStock, noArmazem:p.noArmazem+entradaQtdStock, dataEntrada:new Date().toLocaleDateString('pt-MZ')}:p)); setShowEntradaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[12px] font-bold">Confirmar Entrada</button></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {showSaidaStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[520px] border overflow-hidden">
+                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Saida de Item [F6]</span><button onClick={()=>setShowSaidaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
+                      <div className="p-0">
+                        <div className="flex border-b"><button onClick={()=>setAbaSaidaStock('transfer')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='transfer'?'bg-[#eff6ff] text-[#1e40af] border-b-2 border-[#1e40af]':'bg-[#f8fafc]'}`}>Transferencia Arm-&gt;Loja</button><button onClick={()=>setAbaSaidaStock('venda')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='venda'?'bg-[#f0fdf4] text-[#166534] border-b-2 border-[#166534]':'bg-[#f8fafc]'}`}>Venda - Loja</button></div>
+                        <div className="p-4">
+                          {abaSaidaStock==='transfer' ? (
+                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Requisicao Arm-&gt;Loja</label><input type="number" value={transferQtdStock} onChange={e=>setTransferQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Armazem atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem||0)-transferQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.noArmazem<transferQtdStock){alert('Stock insuficiente no armazem'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, noArmazem:p.noArmazem-transferQtdStock, stockLoja:p.stockLoja+transferQtdStock, entradaLoja:transferQtdStock, dataReq:new Date().toLocaleDateString('pt-MZ')}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#2563eb] text-white rounded font-bold">Transferir</button></div></div>
+                          ) : (
+                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Venda</label><input type="number" value={vendaQtdStock} onChange={e=>setVendaQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Stock Loja atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja||0)-vendaQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.stockLoja<vendaQtdStock){alert('Stock insuficiente na loja'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, stockLoja:p.stockLoja-vendaQtdStock, venda:p.venda+vendaQtdStock, mediaDia:((p.venda+vendaQtdStock)/30)}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded font-bold">Confirmar Venda</button></div></div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {showNovoStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Novo Item - Cadastro</span><button onClick={()=>setShowNovoStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">Codigo</label><input placeholder="Ex: CEM-..." className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Grupo</label><select className="w-full mt-1 h-8 border rounded px-2 text-[12px]"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option></select></div></div><div><label className="text-[11px] font-bold">Nome Produto</label><input placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowNovoStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>setShowNovoStock(false)} className="h-8 px-5 bg-[#2b4c7e] text-white rounded font-bold">Criar Produto</button></div></div></div>
+                  </div>
+                )}
+                {showRelatorioStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[640px] border overflow-hidden"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Relatorios - Stock 11 Colunas - Alerta &lt;50</span><button onClick={()=>setShowRelatorioStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 grid grid-cols-3 gap-3"><div className="bg-[#f8fafc] border rounded p-3"><div className="text-[11px] text-[#64748b]">Total Itens</div><div className="text-[20px] font-bold">{stockProdutos.length}</div></div><div className="bg-[#fee2e2] border border-[#fca5a5] rounded p-3"><div className="text-[11px] text-[#991b1b] font-bold">Abaixo de 50</div><div className="text-[20px] font-bold text-[#991b1b]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length}</div></div><div className="bg-[#fecaca] border border-[#ef4444] rounded p-3"><div className="text-[11px] text-[#7f1d1d]">Zerados</div><div className="text-[20px] font-bold text-[#7f1d1d]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length}</div></div><div className="col-span-3 bg-[#eff6ff] border rounded p-3 flex justify-between"><div><div className="text-[11px] text-[#1e40af]">Soma Custo Arm+Loja</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+(b.noArmazem+b.stockLoja)*b.precoCusto,0).toFixed(0)} MT</div></div><div className="text-right"><div className="text-[11px] text-[#1e40af]">Total Vendas Valor</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+b.venda*b.precoVenda,0).toFixed(0)} MT</div></div></div></div><div className="p-3 border-t bg-[#f8fafc] flex justify-end"><button onClick={()=>setShowRelatorioStock(false)} className="h-8 px-4 bg-[#2b4c7e] text-white rounded">Fechar</button></div></div>
+                  </div>
+                )}
+
+          </div>
+          )}
         </section>
       )}
-
-
-      
-      
-      {tab==='viagens' && (
+{tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
@@ -963,7 +1303,7 @@ useEffect(()=>{
                   return (
                     <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
                       <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
-                        <div className="text-[12px]">➤</div>
+                        <div className="text-[12px]"></div>
                         <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
                         <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
                       </button>
@@ -986,8 +1326,8 @@ useEffect(()=>{
                   <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</h3>
                   <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete automaticamente a direita - {filtradosOverview.length} de {todosCarrosOverview.length} carros</p>
                   <div className="grid grid-cols-2 gap-2 mt-3">
-                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ✓':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
-                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ✓':'MAIS PROXIMO ✓'}</button>
+                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
+                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ':'MAIS PROXIMO '}</button>
                   </div>
                   <div className="mt-4 space-y-3">
                     <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label>
@@ -1020,19 +1360,19 @@ useEffect(()=>{
                         <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
                         <div className="flex-1">
                           <div className="flex flex-wrap justify-between gap-2">
-                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]">⭐ {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]"> {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
                             <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📍 ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -> ${v.destino||provDestinoF}`}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">⏱️ PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">👤 MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
-                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]">📦 CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -&gt; ${v.destino||provDestinoF}`}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
                           </div>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <button onClick={()=>{ setViagemSel(v); setMostrarFormPass(true); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
-                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]">📞 {v.tel||'82 888 9900'}</button>
-                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold">🗺️ Ver no mapa</button>
+                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]"> {v.tel||'82 888 9900'}</button>
+                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold"> Ver no mapa</button>
                             <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula||v.mat||'ADF 561 SF'} - {v.activa? 'Adicionado por transportador':'Actualizado agora'}</span>
                           </div>
                         </div>
@@ -1110,7 +1450,7 @@ Bilhete valido - Apresentar QR`;
                   {/* ===== BOTAO TEMPO REAL NACIONAL - NAO ALTERA O QUE JA EXISTE - APENAS ADICIONA ===== */}
                   <div className="mb-3 flex flex-wrap gap-2 items-center bg-[#f0f9ff] border border-[#0ea5e9] rounded-[8px] p-2">
                     <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-4 h-8 rounded-full text-[10px] font-black ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-white border text-[#0ea5e9]'}`}>
-                      {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'â—‹ VER CARROS AO VIVO NO MAPA (NACIONAL)'}
+                      {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'a- VER CARROS AO VIVO NO MAPA (NACIONAL)'}
                     </button>
                     {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros proximos em {origemV} para {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
                     <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provincias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Cabo Delgado, Niassa</span>
@@ -1157,7 +1497,7 @@ Bilhete valido - Apresentar QR`;
                             </div>
                           </div>
                         ))}
-                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prA³ximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paA­s.</div>}
+                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prAximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paAs.</div>}
                       </div>
                     </div>
                   )}
@@ -1299,9 +1639,9 @@ Bilhete valido - Apresentar QR`;
                       <div className="bg-white rounded-[12px] border p-3">
                         <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
                         <div className="mt-3 space-y-2">
-                          <div className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div className="border rounded-[10px] p-2"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
+                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
                         </div>
                         <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
                       </div>
@@ -1321,9 +1661,10 @@ Bilhete valido - Apresentar QR`;
                           </div>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-2">
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1 rounded">Rejeitar</button></div></div>
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 1 aprovada! Joao Silva - Assento 2 - 450MT - Viatura MMN-123-MP')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 1 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 2 aprovada! Maria - Assento 8 - 450MT')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 2 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
                         </div>
+                        <div className="mt-2 text-[8px] text-center text-gray-500">2 pendentes - Clique em Aprovar/Rejeitar para gerir - Viaturas clicaveis</div>
                       </div>
                     </div>
                   )}
@@ -1374,6 +1715,9 @@ Bilhete valido - Apresentar QR`;
 </section>
       )}
 
+
+
+
       {tab==='admin' && (
         <div className="max-w-[1200px] mx-auto p-3">
           <AdminPanel />
@@ -1381,7 +1725,9 @@ Bilhete valido - Apresentar QR`;
       )}
 
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
-      </div>
-    )
-  }
+ </div>
+ )
+}
 
+
+// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
