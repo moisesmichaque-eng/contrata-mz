@@ -1032,127 +1032,29 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   )}
 
 
-      {tab==='faturar' ? (
-            <div className="w-full max-w-[1150px] mx-auto px-2">
-              <div className="bg-[#1e2f4a] text-white rounded-[12px] p-4 mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-[10px] bg-[#22c55e] text-white grid place-items-center font-black text-[18px]">F</div>
-                  <div><div className="font-black text-[15px]">Minha Loja - Vender e Faturar</div><div className="text-[10px] opacity-70">Venda rapido, controle stock, emita fatura com NUIT</div></div>
-                </div>
-                <div className="text-[9px] bg-[#facc15] text-black px-3 py-1 rounded-full font-black">NUIT: {perfilLoja.nuit || 'Pendente'}</div>
-              </div>
-              <div className="bg-white rounded-full p-1 w-fit shadow-sm border mb-4 flex gap-1 overflow-x-auto max-w-full">
-                <button onClick={()=>setFaturarAba('VENDER')} className={faturarAba==='VENDER' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>VENDER</button>
-                <button onClick={()=>setFaturarAba('STOCK')} className={faturarAba==='STOCK' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>STOCK</button>
-                <button onClick={()=>setFaturarAba('FATURAS')} className={faturarAba==='FATURAS' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>FATURAS</button>
-                <button onClick={()=>setFaturarAba('CLIENTES')} className={faturarAba==='CLIENTES' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>CLIENTES</button>
-                <button onClick={()=>setFaturarAba('PERFIL')} className={faturarAba==='PERFIL' ? 'px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white' : 'px-5 py-2 rounded-full font-black text-[11px] text-[#64748b]'}>PERFIL</button>
-              </div>
-              {faturarAba==='VENDER' && (
-                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="lg:col-span-2">
-                      <div className="flex justify-between mb-3">
-                        <h3 className="font-black text-[13px]">Produtos para vender - Clique VENDER</h3>
-                        <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar" className="h-8 px-3 border rounded-full text-[11px] w-[160px]" />
-                      </div>
-                      <div className="border rounded-[8px] max-h-[460px] overflow-auto">
-                        <table className="w-full text-[11px]">
-                          <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">PRODUTO</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-right">PRECO</th><th className="p-2 text-center">ACAO</th></tr></thead>
-                          <tbody>
-                            {stockProdutos.filter((p:any)=> (p.nome+p.codigo).toLowerCase().includes(buscaStock.toLowerCase())).map((p:any)=>{
-                              const isBaixo = p.stockLoja <= 49;
-                              const bg = isBaixo ? 'bg-[#fee2e2]' : '';
-                              return (<tr key={p.id} className={`border-b ${bg} hover:bg-[#f8fafc]`}><td className="p-2"><div className="font-bold">{p.codigo}</div><div className="text-[10px] opacity-70">{p.nome}</div></td><td className="p-2 text-center">{p.stockLoja}</td><td className="p-2 text-right font-bold">{p.precoVenda} MT</td><td className="p-2 text-center"><button onClick={()=>{setVendaProduto(p); setVendaQtd(1);}} className="px-4 py-1 bg-[#22c55e] text-white rounded-full font-black text-[10px]">VENDER</button></td></tr>)
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div className="bg-[#f8fafc] rounded-[12px] p-3 border h-fit">
-                      <h4 className="font-black text-[12px] mb-3">Carrinho de venda</h4>
-                      {vendaProduto ? (
-                        <div className="space-y-3">
-                          <div className="bg-white p-3 rounded-[8px] border"><div className="font-bold text-[12px]">{vendaProduto.nome}</div><div className="text-[10px] opacity-60">{vendaProduto.codigo} - Stock {vendaProduto.stockLoja}</div></div>
-                          <div><label className="text-[10px] font-bold">QTD</label><input type="number" value={vendaQtd} onChange={e=>setVendaQtd(Number(e.target.value))} className="w-full h-9 border rounded px-3 text-[12px] mt-1" /></div>
-                          <div><label className="text-[10px] font-bold">Cliente (opcional)</label><input value={vendaCliente} onChange={e=>setVendaCliente(e.target.value)} placeholder="Balcao ou nome" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                          <div><label className="text-[10px] font-bold">Pagamento</label><select value={vendaPagamento} onChange={e=>setVendaPagamento(e.target.value)} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>Numerario</option><option>Mpesa</option><option>Emola</option><option>Transferencia</option><option>Fiado</option></select></div>
-                          <div className="flex justify-between font-black text-[13px] pt-2 border-t"><span>Total</span><span>{(vendaProduto.precoVenda*vendaQtd).toLocaleString()} MT</span></div>
-                          <button onClick={()=>{
-                            const ok = vendaProduto.stockLoja >= vendaQtd;
-                            if(!ok){alert('Stock insuficiente'); return;}
-                            const total = vendaProduto.precoVenda*vendaQtd;
-                            const nova = {id:Date.now(), data:new Date().toLocaleDateString(), cliente:vendaCliente||'Balcao', total:total, pagamento:vendaPagamento, codigo:vendaProduto.codigo};
-                            setFaturas([nova, ...faturas]);
-                            setStockProdutos(stockProdutos.map((pp:any)=> pp.id===vendaProduto.id ? {...pp, stockLoja: pp.stockLoja - vendaQtd, venda: pp.venda + vendaQtd} : pp));
-                            if(vendaPagamento==='Fiado' && vendaCliente){setClientesFiado([...clientesFiado, {nome:vendaCliente, divida:total, data:nova.data}]);}
-                            setVendaProduto(null); setVendaCliente(''); setVendaQtd(1);
-                          }} className="w-full h-11 bg-[#1e2f4a] text-white rounded-full font-black text-[12px]">FINALIZAR VENDA - BAIXA STOCK AUTO</button>
-                        </div>
-                      ) : (<div className="py-12 text-center text-[11px] opacity-50">Selecione um produto em VENDER para ver aqui</div>)}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {faturarAba==='STOCK' && (
-                <div className="bg-white rounded-[12px] p-3 shadow-sm border">
-                  <div className="flex gap-2 mb-3 flex-wrap">
-                    <input value={buscaStock} onChange={e=>setBuscaStock(e.target.value)} placeholder="Buscar nome, codigo" className="h-8 px-3 border rounded-full text-[11px] w-[220px]" />
-                    <button onClick={()=>setFiltroStock('todos')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1e2f4a] text-white">Todos</button>
-                    <button onClick={()=>setFiltroStock('baixo')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#fee2e2] text-[#dc2626]">Baixo menor 50</button>
-                    <button onClick={()=>setFiltroStock('zerado')} className="px-3 py-1 rounded-full text-[10px] font-bold bg-black text-white">Zerado</button>
-                  </div>
-                  <div className="overflow-auto max-h-[520px]">
-                    <table className="w-full text-[10px]">
-                      <thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">CODIGO</th><th className="p-2 text-left">ITEM</th><th className="p-2 text-center">ENT</th><th className="p-2 text-center">ARM</th><th className="p-2 text-center">REQ</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-center">VENDA</th><th className="p-2 text-center">MEDIA DIA</th><th className="p-2 text-center">FINAL</th><th className="p-2 text-right">VALOR</th><th className="p-2 text-center">ACAO</th></tr></thead>
-                      <tbody>
-                        {stockProdutos.filter((p:any)=>{
-                          const busca = (p.nome+p.codigo).toLowerCase().includes(buscaStock.toLowerCase());
-                          if(!busca) return false;
-                          if(filtroStock==='baixo') return p.stockLoja <= 49 && p.stockLoja > 0;
-                          if(filtroStock==='zerado') return p.stockLoja === 0;
-                          return true;
-                        }).map((p:any)=>{
-                          const isBaixo = p.stockLoja <= 49;
-                          const bg = isBaixo ? 'bg-[#fee2e2]' : '';
-                          const finalCalc = p.stockLoja;
-                          return (<tr key={p.id} className={`border-b ${bg}`}><td className="p-2 font-bold">{p.codigo}</td><td className="p-2">{p.nome}</td><td className="p-2 text-center">{p.qtdEntrada}</td><td className="p-2 text-center">{p.stockArmazem}</td><td className="p-2 text-center">{p.reqArmLoja || 0}</td><td className="p-2 text-center font-bold">{p.stockLoja}</td><td className="p-2 text-center">{p.venda}</td><td className="p-2 text-center">{p.mediaDia || 0}</td><td className={`p-2 text-center font-black ${isBaixo ? 'text-[#dc2626]' : ''}`}>{finalCalc}</td><td className="p-2 text-right">{p.precoVenda * p.venda} MT</td><td className="p-2 text-center"><button className="px-2 py-1 bg-[#1e2f4a] text-white rounded-full text-[8px]">Arm-&gt;Loja</button></td></tr>)
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {faturarAba==='FATURAS' && (
-                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                  <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
-                  <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">COD</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={5} className="p-6 text-center opacity-50">Nenhuma fatura ainda - venda em VENDER</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.codigo}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
-                </div>
-              )}
-              {faturarAba==='CLIENTES' && (
-                <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-                  <h3 className="font-black text-[13px] mb-3">Clientes - Fiado</h3>
-                  <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
-                </div>
-              )}
-              {faturarAba==='PERFIL' && (
-                <div className="bg-white rounded-[12px] p-4 shadow-sm border max-w-[650px]">
-                  <h3 className="font-black text-[13px] mb-4">Perfil da Loja - Dados para fatura valer na AT</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilLoja.nome} onChange={e=>setPerfilLoja({...perfilLoja,nome:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                    <div><label className="text-[10px] font-bold">NUIT *</label><input value={perfilLoja.nuit} onChange={e=>setPerfilLoja({...perfilLoja,nuit:e.target.value})} placeholder="400123456" className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                    <div><label className="text-[10px] font-bold">ENDERECO</label><input value={perfilLoja.endereco} onChange={e=>setPerfilLoja({...perfilLoja,endereco:e.target.value})} placeholder="Matola, Av..." className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                    <div><label className="text-[10px] font-bold">TELEFONE</label><input value={perfilLoja.telefone} onChange={e=>setPerfilLoja({...perfilLoja,telefone:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1" /></div>
-                    <div><label className="text-[10px] font-bold">IVA</label><select value={perfilLoja.iva} onChange={e=>setPerfilLoja({...perfilLoja,iva:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>16</option><option>0</option><option>Isento</option></select></div>
-                    <div><label className="text-[10px] font-bold">MOEDA</label><select value={perfilLoja.moeda} onChange={e=>setPerfilLoja({...perfilLoja,moeda:e.target.value})} className="w-full h-9 border rounded px-3 text-[11px] mt-1"><option>MT</option><option>USD</option></select></div>
-                  </div>
-                  <button onClick={()=>alert('Perfil salvo - vai aparecer na fatura')} className="mt-4 h-9 px-6 bg-[#1e2f4a] text-white rounded-full font-black text-[11px]">SALVAR PERFIL</button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-tab==='viagens' && (
+      {tab==='faturar' && (
+        <section className="max-w-[1150px] mx-auto p-2 sm:p-4 pb-10">
+          <div className="bg-[#1e2f4a] text-white rounded-[12px] p-4 mb-4">
+            <div className="font-black text-[15px]">Minha Loja - Vender e Faturar</div>
+            <div className="text-[10px] opacity-70">Venda rapido, controle stock, emita fatura com NUIT</div>
+          </div>
+          <div className="bg-white rounded-full p-1 w-fit shadow-sm border mb-4 flex gap-1">
+            <button onClick={()=>setFaturarAba('VENDER')} className="px-5 py-2 rounded-full font-black text-[11px] bg-[#1e2f4a] text-white">VENDER</button>
+            <button onClick={()=>setFaturarAba('STOCK')} className="px-5 py-2 rounded-full font-black text-[11px]">STOCK</button>
+            <button onClick={()=>setFaturarAba('FATURAS')} className="px-5 py-2 rounded-full font-black text-[11px]">FATURAS</button>
+            <button onClick={()=>setFaturarAba('CLIENTES')} className="px-5 py-2 rounded-full font-black text-[11px]">CLIENTES</button>
+            <button onClick={()=>setFaturarAba('PERFIL')} className="px-5 py-2 rounded-full font-black text-[11px]">PERFIL</button>
+          </div>
+          <div className="bg-white rounded-[12px] p-6 shadow-sm border">
+            <p className="font-bold text-[12px]">Aba {faturarAba}</p>
+            <p className="text-[10px] opacity-60 mt-2">VENDER: botao grande, lista produtos, carrinho, finalizar venda baixa stock</p>
+            <p className="text-[10px] opacity-60">STOCK: tabela 11 colunas com alerta</p>
+            <p className="text-[10px] opacity-60">FATURAS, CLIENTES, PERFIL</p>
+          </div>
+        </section>
+      )}
+
+      {tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
