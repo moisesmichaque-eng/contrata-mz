@@ -1095,7 +1095,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <button onClick={()=>setFaturacaoTab('painel')} className={faturacaoTab==='painel' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>PAINEL 5.4k</button>
             </div>
           </div>
-          </div>
 
           {faturacaoTab==='faturacao' && (
           <div className="flex flex-col lg:flex-row gap-3">
