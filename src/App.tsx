@@ -194,9 +194,8 @@ export default function App(){
   const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
 
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
-  
-  const [stockProdutos, setStockProdutos] = useState(()=>{
-    const gerarInicialArmazem = ()=> Math.floor(700 + Math.random()*600); // 700-1300 random só aqui
+    const [stockProdutos, setStockProdutos] = useState(()=>{
+    const gerarInicialArmazem = ()=> Math.floor(700 + Math.random()*600);
     const base = [
       {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', precoVenda:850, precoCusto:710, recepcao:1200, saida:200, venda:320, inicialLoja:520},
       {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', precoVenda:1250, precoCusto:950, recepcao:600, saida:80, venda:380, inicialLoja:520},
@@ -206,13 +205,13 @@ export default function App(){
       {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', precoVenda:1450, precoCusto:1100, recepcao:400, saida:60, venda:227, inicialLoja:520},
       {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', precoVenda:980, precoCusto:720, recepcao:250, saida:40, venda:58, inicialLoja:520},
       {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', precoVenda:5200, precoCusto:4100, recepcao:100, saida:20, venda:55, inicialLoja:520},
-      {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', precoVenda:7800, precoCusto:6200, recepcao:60, saida:12, venda:38, inicialLoja:520},
+      {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', precoVenda:7800, precoCusto:5900, recepcao:60, saida:12, venda:38, inicialLoja:520},
       {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', precoVenda:320, precoCusto:220, recepcao:300, saida:50, venda:38, inicialLoja:520},
     ];
     return base.map(b=>{
-      const stockInicialArmazem = gerarInicialArmazem(); // UNICO RANDOM
+      const stockInicialArmazem = gerarInicialArmazem();
       const stockFinalArmazem = stockInicialArmazem + b.recepcao - b.saida;
-      const stockRecepcaoLoja = b.saida; // o que sai do armazem entra na loja
+      const stockRecepcaoLoja = b.saida;
       const stockFinalLoja = b.inicialLoja + stockRecepcaoLoja - b.venda;
       const stockFinalTotal = stockFinalArmazem + stockFinalLoja;
       return {
@@ -222,20 +221,17 @@ export default function App(){
         stockInicialLoja:b.inicialLoja, entradaLoja:stockRecepcaoLoja, dataReq:'08/05/2025',
         stockLoja:stockFinalLoja, stockFinalLoja:stockFinalLoja, venda:b.venda, mediaDia: parseFloat((b.venda/30).toFixed(1)),
         precoVenda:b.precoVenda, precoCusto:b.precoCusto, minimo:10, ideal:500,
-        // compat
-        stockInicialDiaAnteriorArmazem:stockInicialArmazem, stockRecepcao:stockRecepcaoLoja
+        stockInicialDiaAnteriorArmazem:stockInicialArmazem, stockRecepcao:stockRecepcaoLoja, stockFinalTotal:stockFinalTotal
       };
     });
   });
-
   const [produtoSelecionadoStock, setProdutoSelecionadoStock] = useState<string|null>(null); const [produtoEntradaId, setProdutoEntradaId] = useState<string|null>(null); const [produtoSaidaId, setProdutoSaidaId] = useState<string|null>(null); const [qtdEntrada, setQtdEntrada] = useState(''); const [qtdSaida, setQtdSaida] = useState(''); 
   const salvarDiaCompleto = (origem='')=>{
     const snap={data:dataStockSelecionada, origem:origem, dataSalvo:new Date().toISOString(), stock:stockProdutos, faturas:faturas, totalVendas:faturas.reduce((a:any,f:any)=>a+Number(f.total||0),0), vendasHoje: stockProdutos.reduce((a:any,p:any)=>a+(p.venda||0),0)};
     const hist=JSON.parse(localStorage.getItem('historicoStockDiario')||'{}');
     hist[dataStockSelecionada]=snap;
     localStorage.setItem('historicoStockDiario', JSON.stringify(hist));
-    localStorage.setItem('ultimoSave_'+origem, JSON.stringify(snap));
-    alert('✓ Dia salvo em '+origem+': '+dataStockSelecionada+' | Vendas: '+snap.totalVendas+' MT | Produtos: '+stockProdutos.length);
+    alert('✓ Dia salvo em '+origem+': '+dataStockSelecionada+' | Vendas: '+snap.totalVendas+' MT');
   };
 
   const [dataStockSelecionada, setDataStockSelecionada] = useState(new Date().toISOString().split('T')[0]); const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
@@ -1185,12 +1181,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           </div>
 
           {faturacaoTab==='faturacao' && (
-            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('PAINEL')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE PAINEL - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
-            
-            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('CLIENTES')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE CLIENTES - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
-            
-            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('FATURAS')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE FATURAS - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
-            
           <div className="flex flex-col lg:flex-row gap-3">
             {/* ESQUERDA - FATURACAO ULTRA RAPIDA */}
             <div className="flex-1 space-y-3">
@@ -1224,7 +1214,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           </div>
           )}
 
-          {faturacaoTab==='painel' && (<div className="mb-2 flex gap-2"><button onClick={()=>salvarDiaCompleto('PAINEL')} className="px-4 h-8 bg-[#1e2f4a] text-white rounded-full text-[10px] font-black">💾 SAVE PAINEL - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /></div> && (
+          {faturacaoTab==='painel' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="bg-white rounded-[12px] border p-4">
                 <div className="font-black text-[13px]">Perfil da Loja - Acrescente mais dados</div>
@@ -1267,7 +1257,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="space-y-3">
               <div className="bg-white rounded-[12px] border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="flex gap-2 mb-2"><button onClick={()=>salvarDiaCompleto('STOCK')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE STOCK - {dataStockSelecionada}</button><button onClick={()=>{const snap=JSON.parse(localStorage.getItem('historicoStockDiario')||'{}'); const hoje=snap[dataStockSelecionada]; if(hoje) alert('Salvo: '+hoje.data+' | '+hoje.totalVendas+' MT'); else alert('Nenhum save para '+dataStockSelecionada);}} className="px-3 h-8 bg-white border rounded-full text-[9px]">Ver Save</button><span className="text-[8px] py-2">Só inicial armazem random - resto simulação: Final=Inicial+Recepcao-Saida</span></div><div className="flex justify-between items-center w-full"><div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockSelecionada}</div></div><div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-2"><span className="text-[11px] font-black text-orange-800">DATA:</span><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[12px] border-2 border-orange-400 rounded px-2 py-1 font-bold" /><span className="text-[8px] text-orange-700 font-bold">Final ontem = Inicial hoje</span></div></div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
+                  <div><div className="flex justify-between items-center w-full"><div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockSelecionada}</div></div><div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-2"><span className="text-[11px] font-black text-orange-800">DATA:</span><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[12px] border-2 border-orange-400 rounded px-2 py-1 font-bold" /><span className="text-[8px] text-orange-700 font-bold">Final ontem = Inicial hoje</span></div></div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
                   <div className="flex gap-2 items-center">
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
