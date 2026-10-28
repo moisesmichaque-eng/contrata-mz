@@ -1244,36 +1244,78 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]"> PRECO UNIT</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
-                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
-                          const sf = p.noArmazem + p.stockLoja;
-                          let matchTipo = true;
-                          if(filtroTipoStock==='baixo') matchTipo = sf <= 49;
-                          else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
-                          else if(filtroTipoStock==='medio') matchTipo = sf >= 50 && sf <= 100;
-                          else if(filtroTipoStock==='alto') matchTipo = sf >= 101;
-                          return matchBusca && matchTipo;
+                    <div className="overflow-auto border rounded bg-white">
+                    <div className="flex bg-[#1e2f4a] text-white text-[8px] font-bold sticky top-0">
+                      <div className="w-[200px] p-2 border-r">ITEM / CODIGO</div>
+                      <div className="flex-1 flex">
+                        <div className="flex-1 bg-[#1e3a5f] text-center border-r">
+                          <div className="py-1 border-b text-[9px] bg-[#2b4c7e]">ARMAZEM</div>
+                          <div className="flex text-[7px]">
+                            <div className="flex-1 p-1 border-r">STOCK INICIAL<br/>DIA (final anterior)</div>
+                            <div className="w-[60px] p-1 border-r">RECEPCAO</div>
+                            <div className="flex-1 p-1">STOCK FINAL<br/>ARMAZEM</div>
+                          </div>
+                        </div>
+                        <div className="flex-[1.5] bg-[#14532d] text-center border-r">
+                          <div className="py-1 border-b text-[9px] bg-[#166534]">LOJA</div>
+                          <div className="flex text-[7px]">
+                            <div className="flex-1 p-1 border-r">STOCK INICIAL<br/>DIA ANTERIOR</div>
+                            <div className="flex-1 p-1 border-r">STOCK RECEPCAO<br/>REQUE ARMAZEM</div>
+                            <div className="w-[60px] p-1 border-r">VENDA<br/>HOJE</div>
+                            <div className="flex-1 p-1 border-r">STOCK FINAL<br/>LOJA</div>
+                            <div className="flex-1 p-1">STOCK FINAL<br/>TOTAL</div>
+                          </div>
+                        </div>
+                        <div className="w-[160px] bg-[#7c2d12] text-center">
+                          <div className="py-1 border-b text-[9px] bg-[#9a3412]">VALOR</div>
+                          <div className="flex text-[7px]">
+                            <div className="flex-1 p-1 border-r">PRECO<br/>PRODUTO</div>
+                            <div className="flex-1 p-1">TOTAL VALOR<br/>VENDAS DIA</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="divide-y">
+                      {stockProdutos.filter((p:any)=>{
+                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase());
+                          return matchBusca;
                         }).map((p:any)=>{
-                            const sf=p.noArmazem+p.stockLoja;
-                            const vv=p.venda*p.precoVenda;
-                            const isBaixo = sf <= 49;
-                            const rowBg = isBaixo ? 'bg-[#fee2e2]' : '';
-                            const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
-                            return (
-                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}>
-                                <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div>{p.nome}</div></td>
-                                <td className="text-center p-1.5 border">{p.dataEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.qtdEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.noArmazem}</td>
-                                <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
-                                <td className="text-center p-1.5 border">{p.dataReq}</td>
-                                <td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||(p as any).preco||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td>
-                                <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
-                                <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
-                                <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
-                              </tr>
-                            );
-                          })}</tbody></table>
+                        const stockInicialArmazem = (p as any).stockInicialArmazem ?? (p.noArmazem + ((p as any).entradaLoja||0));
+                        const recepcaoArmazem = (p as any).qtdEntrada || 0;
+                        const stockFinalArmazem = p.noArmazem;
+                        const stockInicialLoja = (p as any).stockInicialLoja ?? (p.stockLoja + p.venda);
+                        const stockRecepcaoLoja = (p as any).entradaLoja || 0;
+                        const vendaHoje = p.venda || 0;
+                        const stockFinalLoja = p.stockLoja;
+                        const stockFinalTotal = p.noArmazem + p.stockLoja;
+                        const preco = (p as any).precoVenda || (p as any).preco || 0;
+                        const totalVendasDia = vendaHoje * preco;
+                        return (
+                        <div key={p.id} className="flex text-[10px] hover:bg-[#f8fafc]">
+                          <div className="w-[200px] p-1 border-r truncate"><div className="font-bold text-[10px]">{p.nome}</div><div className="text-[8px] text-[#64748b]">{p.codigo} | {p.grupo} | {p.unidade}</div></div>
+                          <div className="flex-1 flex">
+                            <div className="flex-1 flex">
+                              <div className="flex-1 p-1 border-r text-center bg-blue-50/50">{stockInicialArmazem}</div>
+                              <div className="w-[60px] p-1 border-r text-center font-bold">{recepcaoArmazem}</div>
+                              <div className="flex-1 p-1 border-r text-center font-bold bg-[#1e2f4a] text-white">{stockFinalArmazem}</div>
+                            </div>
+                            <div className="flex-[1.5] flex">
+                              <div className="flex-1 p-1 border-r text-center">{stockInicialLoja}</div>
+                              <div className="flex-1 p-1 border-r text-center bg-green-50">{stockRecepcaoLoja}</div>
+                              <div className="w-[60px] p-1 border-r text-center font-bold text-[#dc2626]">{vendaHoje}</div>
+                              <div className="flex-1 p-1 border-r text-center font-bold">{stockFinalLoja}</div>
+                              <div className="flex-1 p-1 border-r text-center font-black bg-[#1e2f4a] text-white">{stockFinalTotal}</div>
+                            </div>
+                            <div className="w-[160px] flex">
+                              <div className="flex-1 p-1 border-r text-right">{preco} MT</div>
+                              <div className="flex-1 p-1 text-right font-bold text-[#166534]">{totalVendasDia.toLocaleString()} MT</div>
+                            </div>
+                          </div>
+                        </div>
+                        )
+                      })}
+                    </div>
+                    </div>
                   </div>
                 </div>
               </div>
