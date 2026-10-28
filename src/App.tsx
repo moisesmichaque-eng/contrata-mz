@@ -218,7 +218,7 @@ export default function App(){
   const [abaSaidaStock, setAbaSaidaStock] = useState<'transfer'|'venda'>('transfer');
 
     const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
-  const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockCodigo, setNovoStockCodigo] = useState(''); const [novoStockUnidade, setNovoStockUnidade] = useState('unidade'); const [novoStockGrupo, setNovoStockGrupo] = useState('Alimentacao'); const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); const [novoStockMin, setNovoStockMin] = useState('10'); const [novoProdPrecoEmbalagem, setNovoProdPrecoEmbalagem] = useState(''); const [novoProdPrecoCaixa, setNovoProdPrecoCaixa] = useState(''); const [novoProdPrecoSaco, setNovoProdPrecoSaco] = useState(''); const [novoProdPrecoAtacado, setNovoProdPrecoAtacado] = useState(''); const [novoStockUnidade, setNovoStockUnidade] = useState('unidade'); const [novoStockCodigo, setNovoStockCodigo] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
+    const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockCodigo, setNovoStockCodigo] = useState(''); const [novoStockUnidade, setNovoStockUnidade] = useState('unidade'); const [novoStockGrupo, setNovoStockGrupo] = useState('Alimentacao'); const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); const [novoStockMin, setNovoStockMin] = useState('10'); const [novoProdPrecoEmbalagem, setNovoProdPrecoEmbalagem] = useState(''); const [novoProdPrecoCaixa, setNovoProdPrecoCaixa] = useState(''); const [novoProdPrecoSaco, setNovoProdPrecoSaco] = useState(''); const [novoProdPrecoAtacado, setNovoProdPrecoAtacado] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Alimentacao'); const [logoLoja, setLogoLoja] = useState(''); const [logoLojaNome, setLogoLojaNome] = useState('');
   const [ivaTipo, setIvaTipo] = useState("16");
     const finalizarComWhatsApp = ()=>{
     try {
@@ -283,14 +283,6 @@ export default function App(){
   const [produtosBaseState, setProdutosBaseState] = useState(()=>{ try{ const v = localStorage.getItem("produtos_base"); return v? JSON.parse(v): PRODUTOS_BASE }catch(e){return PRODUTOS_BASE} });
   useEffect(()=>{ try{ localStorage.setItem("produtos_base", JSON.stringify(produtosBaseState)) }catch(e){} },[produtosBaseState]);
    const [mostrarNovoProd, setMostrarNovoProd] = useState(false);
-   const [novoProdNome, setNovoProdNome] = useState('');
-  const [novoProdPrecoUnidade, setNovoProdPrecoUnidade] = useState('');
-  const [novoProdPrecoEmbalagem, setNovoProdPrecoEmbalagem] = useState('');
-  const [novoProdPrecoCaixa, setNovoProdPrecoCaixa] = useState('');
-  const [novoProdPrecoSaco, setNovoProdPrecoSaco] = useState('');
-  const [novoProdPrecoAtacado, setNovoProdPrecoAtacado] = useState('');
-   const [novoProdPreco, setNovoProdPreco] = useState('');
-   const [novoProdCat, setNovoProdCat] = useState('');
  const totalDescFat = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
  const baseFat = subtotalBrutoFat - totalDescFat;
  const ivaFat = ivaTipo==='sem'?0: ivaTipo==='16'? baseFat*0.16 : baseFat*0.05;
