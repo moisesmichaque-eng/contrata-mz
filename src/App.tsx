@@ -194,7 +194,7 @@ export default function App(){
 
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
   const [stockProdutos, setStockProdutos] = useState([
-    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:200, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
+    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Construcao', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, recepcao:1200, saidaArmazem:200, saida:200, stockInicialArmazem:880, noArmazem:1880, stockFinalArmazem:1880, stockInicialLoja:520, entradaLoja:200, dataReq:'08/05/2025', stockLoja:400, stockFinalLoja:400, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500, stockFinalTotal:2280},
     {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:80, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
     {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:10, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
     {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:500, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
@@ -205,7 +205,7 @@ export default function App(){
     {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:12, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
     {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:50, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
   ] as any[]);
-  const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
+  const [dataStockSelecionada, setDataStockSelecionada] = useState(new Date().toISOString().split('T')[0]); const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
   const [showEntradaStock, setShowEntradaStock] = useState(false);
@@ -1252,7 +1252,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                           <div className="py-1 border-b text-[9px] bg-[#2b4c7e]">ARMAZEM</div>
                           <div className="flex text-[7px]">
                             <div className="flex-1 p-1 border-r">STOCK INICIAL<br/>DIA (final anterior)</div>
-                            <div className="w-[60px] p-1 border-r">RECEPCAO</div>
+                            <div className="w-[55px] p-1 border-r">RECEPCAO</div>
+                            <div className="w-[55px] p-1 border-r bg-orange-900/30">SAIDA<br/>REQ LOJA</div>
                             <div className="flex-1 p-1">STOCK FINAL<br/>ARMAZEM</div>
                           </div>
                         </div>
@@ -1280,14 +1281,17 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                           const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase());
                           return matchBusca;
                         }).map((p:any)=>{
-                        const stockInicialArmazem = (p as any).stockInicialArmazem ?? (p.noArmazem + ((p as any).entradaLoja||0));
-                        const recepcaoArmazem = (p as any).qtdEntrada || 0;
-                        const stockFinalArmazem = p.noArmazem;
-                        const stockInicialLoja = (p as any).stockInicialLoja ?? (p.stockLoja + p.venda);
-                        const stockRecepcaoLoja = (p as any).entradaLoja || 0;
+                        const stockInicialArmazem = (p as any).stockInicialArmazem ?? 880;
+                        const recepcaoArmazem = (p as any).qtdEntrada ?? (p as any).recepcao ?? 0;
+                        const saidaArmazem = (p as any).saidaArmazem ?? (p as any).entradaLoja ?? (p as any).saida ?? 0;
+                        const stockFinalArmazem = (p as any).stockFinalArmazem ?? (stockInicialArmazem + recepcaoArmazem - saidaArmazem);
+                        // Formula: stockFinalArmazem = inicial + recepcao - saida (ex: 880+1200-200=1880, 1880+0-10=1870)
+                        const stockInicialLoja = (p as any).stockInicialLoja ?? 520;
+                        const stockRecepcaoLoja = saidaArmazem; // reque do armazem = saida do armazem
                         const vendaHoje = p.venda || 0;
-                        const stockFinalLoja = p.stockLoja;
-                        const stockFinalTotal = p.noArmazem + p.stockLoja;
+                        // Nova formula: stockFinalLoja = inicial + recepcao - venda (inclui saida, nao recepcao loja embora valor e o mesmo)
+                        const stockFinalLoja = (p as any).stockFinalLoja ?? (stockInicialLoja + stockRecepcaoLoja - vendaHoje);
+                        const stockFinalTotal = stockFinalArmazem + stockFinalLoja;
                         const preco = (p as any).precoVenda || (p as any).preco || 0;
                         const totalVendasDia = vendaHoje * preco;
                         return (
@@ -1296,7 +1300,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                           <div className="flex-1 flex">
                             <div className="flex-1 flex">
                               <div className="flex-1 p-1 border-r text-center bg-blue-50/50">{stockInicialArmazem}</div>
-                              <div className="w-[60px] p-1 border-r text-center font-bold">{recepcaoArmazem}</div>
+                              <div className="w-[55px] p-1 border-r text-center font-bold">{recepcaoArmazem}</div>
+                              <div className="w-[55px] p-1 border-r text-center font-bold bg-orange-50 text-[#c2410c]">{saidaArmazem}</div>
                               <div className="flex-1 p-1 border-r text-center font-bold bg-[#1e2f4a] text-white">{stockFinalArmazem}</div>
                             </div>
                             <div className="flex-[1.5] flex">
