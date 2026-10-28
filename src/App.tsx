@@ -194,19 +194,51 @@ export default function App(){
   const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
 
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
-  const [stockProdutos, setStockProdutos] = useState([
-    {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Construcao', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, recepcao:1200, saidaArmazem:200, saida:200, stockInicialArmazem:880, noArmazem:1880, stockFinalArmazem:1880, stockInicialLoja:520, entradaLoja:200, dataReq:'08/05/2025', stockLoja:400, stockFinalLoja:400, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500, stockFinalTotal:2280},
-    {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:80, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
-    {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', marca:'Canadian Solar', grupo:'Solar', subGrupo:'Painel', fabricante:'Canadian', dataEntrada:'15/04/2025', qtdEntrada:80, noArmazem:12, entradaLoja:10, dataReq:'10/05/2025', stockLoja:10, venda:54, mediaDia:2.1, precoVenda:18500, precoCusto:14200, minimo:15, ideal:40},
-    {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', marca:'Local', grupo:'Blocos', subGrupo:'15cm', fabricante:'BlocMoz', dataEntrada:'01/05/2025', qtdEntrada:5000, noArmazem:3200, entradaLoja:500, dataReq:'07/05/2025', stockLoja:500, venda:1090, mediaDia:54.5, precoVenda:42, precoCusto:28, minimo:500, ideal:2000},
-    {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', marca:'Cin', grupo:'Tintas', subGrupo:'Plastica', fabricante:'Cin Mocambique', dataEntrada:'29/04/2025', qtdEntrada:150, noArmazem:28, entradaLoja:30, dataReq:'09/05/2025', stockLoja:30, venda:84, mediaDia:4.2, precoVenda:4250, precoCusto:3100, minimo:40, ideal:120},
-    {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', marca:'Tonon', grupo:'Cobertura', subGrupo:'Zinco', fabricante:'Tonon', dataEntrada:'20/04/2025', qtdEntrada:400, noArmazem:95, entradaLoja:60, dataReq:'06/05/2025', stockLoja:60, venda:227, mediaDia:9.1, precoVenda:1450, precoCusto:1100, minimo:60, ideal:250},
-    {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', marca:'Plastubos', grupo:'Canalizacao', subGrupo:'PVC', fabricante:'Plastubos', dataEntrada:'03/05/2025', qtdEntrada:250, noArmazem:140, entradaLoja:40, dataReq:'08/05/2025', stockLoja:40, venda:58, mediaDia:3.2, precoVenda:980, precoCusto:720, minimo:50, ideal:150},
-    {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', marca:'Gerdau', grupo:'Arames', subGrupo:'Farpado', fabricante:'Gerdau', dataEntrada:'18/04/2025', qtdEntrada:100, noArmazem:22, entradaLoja:20, dataReq:'05/05/2025', stockLoja:20, venda:55, mediaDia:2.2, precoVenda:5200, precoCusto:4100, minimo:20, ideal:60},
-    {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', marca:'MetalMoz', grupo:'Portas', subGrupo:'Metalica', fabricante:'MetalMoz', dataEntrada:'25/04/2025', qtdEntrada:60, noArmazem:8, entradaLoja:12, dataReq:'09/05/2025', stockLoja:12, venda:38, mediaDia:1.5, precoVenda:7800, precoCusto:5900, minimo:12, ideal:35},
-    {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', marca:'Fixer', grupo:'Fixacao', subGrupo:'Roscado', fabricante:'Fixer', dataEntrada:'05/05/2025', qtdEntrada:300, noArmazem:180, entradaLoja:50, dataReq:'10/05/2025', stockLoja:50, venda:38, mediaDia:3.8, precoVenda:320, precoCusto:210, minimo:80, ideal:200},
-  ] as any[]);
-  const [produtoSelecionadoStock, setProdutoSelecionadoStock] = useState<string|null>(null); const [produtoEntradaId, setProdutoEntradaId] = useState<string|null>(null); const [produtoSaidaId, setProdutoSaidaId] = useState<string|null>(null); const [qtdEntrada, setQtdEntrada] = useState(''); const [qtdSaida, setQtdSaida] = useState(''); const [dataStockSelecionada, setDataStockSelecionada] = useState(new Date().toISOString().split('T')[0]); const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
+  
+  const [stockProdutos, setStockProdutos] = useState(()=>{
+    const gerarInicialArmazem = ()=> Math.floor(700 + Math.random()*600); // 700-1300 random só aqui
+    const base = [
+      {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', precoVenda:850, precoCusto:710, recepcao:1200, saida:200, venda:320, inicialLoja:520},
+      {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', precoVenda:1250, precoCusto:950, recepcao:600, saida:80, venda:380, inicialLoja:520},
+      {id:'3', codigo:'PS-550W-CAN', nome:'Painel Solar 550W Canadian Bifacial', precoVenda:18500, precoCusto:15200, recepcao:80, saida:10, venda:54, inicialLoja:520},
+      {id:'4', codigo:'BLO-15-STD', nome:'Bloco Cimento 15x20x40 - Vazado', precoVenda:42, precoCusto:28, recepcao:5000, saida:500, venda:1090, inicialLoja:520},
+      {id:'5', codigo:'TIN-BR-20L', nome:'Tinta Plastica Branca 20L - Lavavel', precoVenda:4250, precoCusto:3100, recepcao:150, saida:30, venda:84, inicialLoja:520},
+      {id:'6', codigo:'ZIN-030-4M', nome:'Chapa Zinco 0.30mm x 4m - Galv', precoVenda:1450, precoCusto:1100, recepcao:400, saida:60, venda:227, inicialLoja:520},
+      {id:'7', codigo:'PVC-110-TUB', nome:'Tubo PVC 110mm 6m - Esgoto', precoVenda:980, precoCusto:720, recepcao:250, saida:40, venda:58, inicialLoja:520},
+      {id:'8', codigo:'ARM-500-FARP', nome:'Arame Farpado 500m - 1.6mm', precoVenda:5200, precoCusto:4100, recepcao:100, saida:20, venda:55, inicialLoja:520},
+      {id:'9', codigo:'POR-MET-80', nome:'Porta Metalica 0.80x2.10 - Esq', precoVenda:7800, precoCusto:6200, recepcao:60, saida:12, venda:38, inicialLoja:520},
+      {id:'10', codigo:'VAR-M12-1M', nome:'Varao Roscado M12x1m - Zincado', precoVenda:320, precoCusto:220, recepcao:300, saida:50, venda:38, inicialLoja:520},
+    ];
+    return base.map(b=>{
+      const stockInicialArmazem = gerarInicialArmazem(); // UNICO RANDOM
+      const stockFinalArmazem = stockInicialArmazem + b.recepcao - b.saida;
+      const stockRecepcaoLoja = b.saida; // o que sai do armazem entra na loja
+      const stockFinalLoja = b.inicialLoja + stockRecepcaoLoja - b.venda;
+      const stockFinalTotal = stockFinalArmazem + stockFinalLoja;
+      return {
+        id:b.id, codigo:b.codigo, nome:b.nome, marca:'', grupo:'', subGrupo:'', fabricante:'',
+        dataEntrada:'02/05/2025', qtdEntrada:b.recepcao, recepcao:b.recepcao, saidaArmazem:b.saida, saida:b.saida,
+        stockInicialArmazem:stockInicialArmazem, noArmazem:stockFinalArmazem, stockFinalArmazem:stockFinalArmazem,
+        stockInicialLoja:b.inicialLoja, entradaLoja:stockRecepcaoLoja, dataReq:'08/05/2025',
+        stockLoja:stockFinalLoja, stockFinalLoja:stockFinalLoja, venda:b.venda, mediaDia: parseFloat((b.venda/30).toFixed(1)),
+        precoVenda:b.precoVenda, precoCusto:b.precoCusto, minimo:10, ideal:500,
+        // compat
+        stockInicialDiaAnteriorArmazem:stockInicialArmazem, stockRecepcao:stockRecepcaoLoja
+      };
+    });
+  });
+
+  const [produtoSelecionadoStock, setProdutoSelecionadoStock] = useState<string|null>(null); const [produtoEntradaId, setProdutoEntradaId] = useState<string|null>(null); const [produtoSaidaId, setProdutoSaidaId] = useState<string|null>(null); const [qtdEntrada, setQtdEntrada] = useState(''); const [qtdSaida, setQtdSaida] = useState(''); 
+  const salvarDiaCompleto = (origem='')=>{
+    const snap={data:dataStockSelecionada, origem:origem, dataSalvo:new Date().toISOString(), stock:stockProdutos, faturas:faturas, totalVendas:faturas.reduce((a:any,f:any)=>a+Number(f.total||0),0), vendasHoje: stockProdutos.reduce((a:any,p:any)=>a+(p.venda||0),0)};
+    const hist=JSON.parse(localStorage.getItem('historicoStockDiario')||'{}');
+    hist[dataStockSelecionada]=snap;
+    localStorage.setItem('historicoStockDiario', JSON.stringify(hist));
+    localStorage.setItem('ultimoSave_'+origem, JSON.stringify(snap));
+    alert('✓ Dia salvo em '+origem+': '+dataStockSelecionada+' | Vendas: '+snap.totalVendas+' MT | Produtos: '+stockProdutos.length);
+  };
+
+  const [dataStockSelecionada, setDataStockSelecionada] = useState(new Date().toISOString().split('T')[0]); const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
   const [showEntradaStock, setShowEntradaStock] = useState(false);
@@ -1153,6 +1185,12 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           </div>
 
           {faturacaoTab==='faturacao' && (
+            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('PAINEL')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE PAINEL - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
+            
+            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('CLIENTES')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE CLIENTES - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
+            
+            <div className="mb-2 flex gap-2 items-center"><button onClick={()=>salvarDiaCompleto('FATURAS')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE FATURAS - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /><span className="text-[8px]">Gravar em cada tela</span></div>
+            
           <div className="flex flex-col lg:flex-row gap-3">
             {/* ESQUERDA - FATURACAO ULTRA RAPIDA */}
             <div className="flex-1 space-y-3">
@@ -1179,14 +1217,14 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="bg-[#111827] rounded-[12px] p-4 text-white">
                 <div className="flex justify-between items-center"><div className="font-bold text-[11px]">Resumo rapido - {lojaPerfil.nomeLoja}</div><span className="text-[7px] px-2 py-0.5 rounded bg-white/10">Supermercado-like - Stock auto</span></div>
                 <div className="mt-3 space-y-2 text-[10px]"><div className="flex justify-between"><span className="text-white/50">Cliente</span><span className="font-bold">{telFat||'+258 84 123 4567'}</span></div><div className="flex justify-between"><span className="text-white/50">Itens</span><span>{produtosFat.length} - QTD total {produtosFat.reduce((a,b)=>a+b.qtd,0)}</span></div><div className="flex justify-between"><span className="text-white/50">Loja</span><span>{lojaPerfil.nomeLoja}</span></div></div>
-                <button onClick={finalizarComWhatsApp} className="mt-4 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px] hover:bg-[#16a34a]">Finalizar Documento - Baixa Stock Auto + WhatsApp</button>
+                <div className="flex gap-2 mt-3"><button onClick={()=>salvarDiaCompleto('VENDER')} className="flex-1 h-9 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">💾 SAVE VENDER - {dataStockSelecionada}</button><button onClick={()=>{const d=new Date().toISOString().split('T')[0]; setDataStockSelecionada(d);}} className="px-3 h-9 bg-orange-100 border border-orange-400 rounded-full text-[8px] font-bold">DATA: {dataStockSelecionada}</button></div><button onClick={finalizarComWhatsApp} className="mt-3 w-full h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[11px] hover:bg-[#16a34a]">Finalizar Documento - Baixa Stock Auto + WhatsApp</button>
                 <div className="text-[8px] text-white/40 text-center mt-2">Telefone obrigatorio - Stock baixa automatica - IVA global</div>
               </div>
             </div>
           </div>
           )}
 
-          {faturacaoTab==='painel' && (
+          {faturacaoTab==='painel' && (<div className="mb-2 flex gap-2"><button onClick={()=>salvarDiaCompleto('PAINEL')} className="px-4 h-8 bg-[#1e2f4a] text-white rounded-full text-[10px] font-black">💾 SAVE PAINEL - {dataStockSelecionada}</button><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="h-8 px-3 border-2 border-orange-400 rounded text-[11px] font-bold" /></div> && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="bg-white rounded-[12px] border p-4">
                 <div className="font-black text-[13px]">Perfil da Loja - Acrescente mais dados</div>
@@ -1229,7 +1267,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="space-y-3">
               <div className="bg-white rounded-[12px] border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="flex justify-between items-center w-full"><div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockSelecionada}</div></div><div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-2"><span className="text-[11px] font-black text-orange-800">DATA:</span><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[12px] border-2 border-orange-400 rounded px-2 py-1 font-bold" /><span className="text-[8px] text-orange-700 font-bold">Final ontem = Inicial hoje</span></div></div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
+                  <div><div className="flex gap-2 mb-2"><button onClick={()=>salvarDiaCompleto('STOCK')} className="px-4 h-8 bg-[#166534] text-white rounded-full text-[10px] font-black">💾 SAVE STOCK - {dataStockSelecionada}</button><button onClick={()=>{const snap=JSON.parse(localStorage.getItem('historicoStockDiario')||'{}'); const hoje=snap[dataStockSelecionada]; if(hoje) alert('Salvo: '+hoje.data+' | '+hoje.totalVendas+' MT'); else alert('Nenhum save para '+dataStockSelecionada);}} className="px-3 h-8 bg-white border rounded-full text-[9px]">Ver Save</button><span className="text-[8px] py-2">Só inicial armazem random - resto simulação: Final=Inicial+Recepcao-Saida</span></div><div className="flex justify-between items-center w-full"><div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockSelecionada}</div></div><div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-2"><span className="text-[11px] font-black text-orange-800">DATA:</span><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[12px] border-2 border-orange-400 rounded px-2 py-1 font-bold" /><span className="text-[8px] text-orange-700 font-bold">Final ontem = Inicial hoje</span></div></div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
                   <div className="flex gap-2 items-center">
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
