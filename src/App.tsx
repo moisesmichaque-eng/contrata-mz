@@ -249,8 +249,20 @@ export default function App(){
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
+      // Atualiza stock: VENDA aumenta, STOCK LOJA diminui, STOCK FINAL LOJA e TOTAL recalcula, VALOR reflete
       produtosFat.forEach(p=>{
-        setStockProdutos(prev=>prev.map(s=>s.nome===p.nome?{...s, stockLoja: Math.max(0, ((s as any).stockLoja||0)-p.qtd)}:s as any));
+        setStockProdutos(prev=>prev.map(s=>{
+          if(s.nome===p.nome){
+            const qtdVendida = p.qtd;
+            const novaVenda = (s.venda||0) + qtdVendida;
+            const novoStockLoja = Math.max(0, (s.stockLoja||0) - qtdVendida);
+            const novoStockFinalLoja = novoStockLoja;
+            const novoStockFinalTotal = (s.stockFinalArmazem||s.noArmazem||0) + novoStockFinalLoja;
+            // total valor vendas dia = venda * preco
+            return {...s, stockLoja: novoStockLoja, venda: novaVenda, stockFinalLoja: novoStockFinalLoja, stockFinalTotal: novoStockFinalTotal} as any;
+          }
+          return s as any;
+        }));
       });
       setFaturas([{id:Date.now(), data:dataHoje, cliente:nomeCliente, tel:telFat, nuit:nuitFat, total: total.toFixed(0)}] as any);
       
