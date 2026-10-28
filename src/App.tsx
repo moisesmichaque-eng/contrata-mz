@@ -771,7 +771,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3 relative pb-4"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 left-0 text-[10px] font-black tracking-[2px] text-[#facc15]">TOTSHE</div></div>
+    <div className="flex items-center gap-2"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="text-[11px] font-black tracking-[2px] text-[#facc15]">TOTSHE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
       {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
       <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
