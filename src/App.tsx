@@ -1216,14 +1216,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="space-y-3">
               <div className="bg-white rounded-[12px] border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock e DIARIO - Inicial de hoje = Final de ontem | 1 Item 2 Entr Arm 3 Qtd 4 Armazem 5 Req 6 Data Req 7 Stock Loja 8 Venda 9 Media 10 Stock Final 11 Valor</div></div>
-                  <div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-3 shadow-md">
-                    <span className="text-[12px] font-black text-orange-800">DATA STOCK DIARIO:</span>
-                    <input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[13px] border-2 border-orange-400 rounded px-3 py-1 font-bold bg-white" />
-                    <div className="text-[9px] text-orange-700 font-bold leading-tight">Dia: {dataStockSelecionada}<br/>Final ontem = Inicial hoje</div>
-                  </div>
-                  <div className="flex gap-2 items-center">
-
+                  <div><div className="flex justify-between items-center w-full"><div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO</div><div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockSelecionada}</div></div><div className="bg-orange-50 border-2 border-orange-500 rounded-lg px-4 py-2 flex items-center gap-2"><span className="text-[11px] font-black text-orange-800">DATA:</span><input type="date" value={dataStockSelecionada} onChange={e=>setDataStockSelecionada(e.target.value)} className="text-[12px] border-2 border-orange-400 rounded px-2 py-1 font-bold" /><span className="text-[8px] text-orange-700 font-bold">Final ontem = Inicial hoje</span></div></div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
                   <div className="flex gap-2 items-center">
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1244,8 +1237,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
                       <button onClick={()=>setShowNovoStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center">+</span>Novo Item</button>
-                      <button onClick={()=>{ if(!produtoSelecionadoStock){ alert("Clique num produto na tabela - linha amarela"); return; } setProdutoEntradaId(produtoSelecionadoStock); setShowEntradaStock(true); }} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>{ if(!produtoSelecionadoStock){ alert("Clique num produto na tabela - linha amarela"); return; } setProdutoSaidaId(produtoSelecionadoStock); setShowSaidaStock(true); }} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>{ if(!produtoSelecionadoStock){ alert("Clique num produto na tabela a direita - fica amarelo"); return; } setProdutoEntradaId(produtoSelecionadoStock); setShowEntradaStock(true); }} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
+                      <button onClick={()=>{ if(!produtoSelecionadoStock){ alert("Clique num produto na tabela a direita - fica amarelo"); return; } setProdutoSaidaId(produtoSelecionadoStock); setShowSaidaStock(true); }} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
                       <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
