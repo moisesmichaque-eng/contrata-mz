@@ -1,4 +1,4 @@
-// VERSION 2026-10-28 20:00 - NOVO BUILD - DATA DIARIO TOPO LARANJA + SAVE DIARIO + VENDAS REFLETE STOCK + SELECAO AMARELA + RELATORIO INTERVALOS
+// VERSION 2026-10-28 22:06 - FIX BUILD 1190 - SO INICIAL ARMAZEM RANDOM 700-1300 RESTO SIMULACAO - VENDAS 320->520 REFLETE
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -1894,13 +1894,13 @@ Bilhete valido - Apresentar QR`;
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
               <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
               <p className="text-[10px] opacity-60 mb-3">Vendas com Finalizar Documento - Baixa Stock Auto</p>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={4} className="p-6 text-center opacity-50">Nenhuma fatura ainda</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
+              <table className="w-full text-[7px] md:text-[11px] stock-mobile"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={4} className="p-6 text-center opacity-50">Nenhuma fatura ainda</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
             </div>
           )}
           {faturacaoTab==='clientes' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
               <h3 className="font-black text-[13px] mb-3">Clientes - Fiado</h3>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
+              <table className="w-full text-[7px] md:text-[11px] stock-mobile"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
             </div>
           )}
                     ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
