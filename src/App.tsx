@@ -200,8 +200,7 @@ export default function App(){
     //:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
-  // FIFO helper - ordena por data entrada mais antiga
-  const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }); };
+  const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); try{ if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }catch(e){return 0;} }); };
   const [stockProdutos, setStockProdutos] = useState([
     {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:200, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
     {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:80, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
@@ -227,9 +226,8 @@ export default function App(){
   const [abaSaidaStock, setAbaSaidaStock] = useState<'transfer'|'venda'>('transfer');
 
     const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
+  const [novoStockBarcode, setNovoStockBarcode] = useState(''); const [novoStockDataEntrada, setNovoStockDataEntrada] = useState(new Date().toISOString().slice(0,10)); const [novoStockLocal, setNovoStockLocal] = useState('A1-01'); const [novoStockValidade, setNovoStockValidade] = useState(''); const [novoStockFornecedor, setNovoStockFornecedor] = useState(''); const [novoStockLote, setNovoStockLote] = useState('LOTE-'+Date.now().toString().slice(-6)); const [filtroFIFOData, setFiltroFIFOData] = useState('');
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
-  const [novoStockBarcode, setNovoStockBarcode] = useState(''); const [novoStockDataEntrada, setNovoStockDataEntrada] = useState(new Date().toISOString().slice(0,10)); const [novoStockLocal, setNovoStockLocal] = useState('A1-01'); const [novoStockValidade, setNovoStockValidade] = useState(''); const [novoStockFornecedor, setNovoStockFornecedor] = useState(''); const [novoStockLote, setNovoStockLote] = useState('LOTE-'+Date.now().toString().slice(-6));
-  const [filtroFIFOData, setFiltroFIFOData] = useState(''); const [loteSelecionadoFIFO, setLoteSelecionadoFIFO] = useState('');
   const [ivaTipo, setIvaTipo] = useState("16");
     const finalizarComWhatsApp = ()=>{
     try {
@@ -890,44 +888,13 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]; if(file){const reader=new FileReader(); reader.onload=(ev)=>{setNegocioCadastroForm({...negocioCadastroForm, logoData:ev.target?.result as any, logoNome:file.name})}; reader.readAsDataURL(file);}}} className="w-full h-10 px-2 rounded-[8px] border text-[10px] mt-1 text-white bg-white/10 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#facc15] file:text-black file:font-bold" /><div className="text-[8px] opacity-60 mt-1">PNG ou JPG ate 2MB - Aparece em facturas, recibos, orcamentos</div></div>
                       <div>{negocioCadastroForm.logoData && <div className="bg-white rounded-[8px] p-2 text-center"><img src={negocioCadastroForm.logoData as any} alt="logo preview" className="h-12 mx-auto object-contain" /><div className="text-[8px] text-black mt-1">{negocioCadastroForm.logoNome}</div></div>}</div>
                     </div>
-                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} const novoPerfilCompleto = {
-                        nomeLoja: negocioCadastroForm.nomeLoja,
-                        nome: negocioCadastroForm.nomeLoja,
-                        tel: negocioCadastroForm.tel,
-                        telefone: negocioCadastroForm.tel,
-                        nuit: negocioCadastroForm.nuit,
-                        endereco: negocioCadastroForm.endereco,
-                        provincia: negocioCadastroForm.provincia,
-                        distrito: negocioCadastroForm.distrito,
-                        ramo: negocioCadastroForm.ramo,
-                        ramoActividade: negocioCadastroForm.ramo,
-                        outroRamo: negocioCadastroForm.outroRamo,
-                        logoData: negocioCadastroForm.logoData,
-                        logoNome: negocioCadastroForm.logoNome,
-                        formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario',
-                        horario: negocioCadastroForm.horario||'08:00 - 18:00',
-                        responsavel: negocioCadastroForm.nomeLoja,
-                        email: '',
-                      };
-                      setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
-                      setPerfilLoja((prev:any)=>({...prev, ...novoPerfilCompleto}));
-                      setFaturacaoCadastroForm({nomeLoja: novoPerfilCompleto.nomeLoja, tel: novoPerfilCompleto.tel, password: negocioCadastroForm.password});
-                      // Limpar dados antigos - conta nova sem dados
-                      setStockProdutos([]);
-                      setProdutosFat([]);
-                      setFaturas([] as any);
-                      setNegocioLogado(true); 
-                      setFaturacaoLogado(true);
-                      alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Seu logo e dados ja aparecem em Faturacao e Recibos');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} const novoPerfilCompleto = { nomeLoja: negocioCadastroForm.nomeLoja, nome: negocioCadastroForm.nomeLoja, tel: negocioCadastroForm.tel, telefone: negocioCadastroForm.tel, nuit: negocioCadastroForm.nuit, endereco: negocioCadastroForm.endereco, provincia: negocioCadastroForm.provincia, distrito: negocioCadastroForm.distrito, ramo: negocioCadastroForm.ramo, ramoActividade: negocioCadastroForm.ramo, outroRamo: negocioCadastroForm.outroRamo, logoData: negocioCadastroForm.logoData, logoNome: negocioCadastroForm.logoNome, formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario', horario: negocioCadastroForm.horario||'08:00 - 18:00', responsavel: negocioCadastroForm.nomeLoja, email: '' }; setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto})); setPerfilLoja((prev:any)=>({...prev, ...novoPerfilCompleto})); setFaturacaoCadastroForm({nomeLoja: novoPerfilCompleto.nomeLoja, tel: novoPerfilCompleto.tel, password: negocioCadastroForm.password}); setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Seu logo e dados ja aparecem em Faturacao e Recibos');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <button onClick={()=>{const perfilLogin = { nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', nome: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel };
-                      setLojaPerfil((prev:any)=>({...prev, ...perfilLogin}));
-                      setPerfilLoja((prev:any)=>({...prev, ...perfilLogin}));
-                      setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                    <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   </div>
                 )}
               </div>
@@ -940,7 +907,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
             <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
             <div>
-              <div className="font-black text-[11px]">{(lojaPerfil as any).nomeLoja || (perfilLoja as any).nomeLoja || 'MINHA LOJA'} - CONTA INTERNA - Maputo1</div>
+              <div className="font-black text-[11px]">CONTA INTERNA - Maputo1</div>
               <div className="text-[8px] text-[#64748b]">Minha Ferragem Matola - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
             </div>
           </div>
@@ -976,7 +943,19 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
               <div className="flex justify-between items-center"><div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR • com logotipo</div><div className="flex gap-2 items-center"><span className="text-[9px] border px-2 py-1 rounded-full bg-white">Formato A5</span><label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked className="w-3 h-3"/>NUIT na fatura</label><button onClick={()=>{ if(produtosFat.length===0){alert('Adicione produtos'); return;} const novaFatura={id:'FT-'+Date.now(), cliente:nomeFat||'João Manhique', tel:telFat, nuit:nuitFat, itens:[...produtosFat], total:produtosFat.reduce((s,p)=>s+p.preco*p.qtd*(1-p.desc/100),0), data:new Date().toLocaleDateString('pt-MZ')}; setFaturas([...faturas,novaFatura]); alert('Fatura '+novaFatura.id+' guardada! Stock atualizado.'); setProdutosFat([]); }} className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black">SAVE - Guardar fatura</button></div></div>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[8px] font-bold text-[#92400e]">CLIENTE • TELEFONE DINÂMICO WHATSAPP</div><select value={negocioClienteSel} onChange={e=>{ setNegocioClienteSel(e.target.value); const parts=e.target.value.split(' - '); if(parts[2]) setTelFat(parts[2]); if(parts[0]) setNomeFat(parts[0]); }} className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white"><option>João Manhique - Obra Zimpeto - 258828765432</option><option>Michaque Mungoi - Casa 12 - 258841234567</option><option>Cliente Balcão - Sem NUIT - 258820000000</option></select><div className="mt-2 bg-[#fef3c7] border border-yellow-200 rounded-[6px] p-2 text-[8px] flex justify-between"><span>Tel dinâmico: <b>{telFat || '258828765432'}</b></span><span>NUIT: <b>{nuitFat || '--'}</b></span><span>• Retalho</span></div></div>
-                <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[8px] font-bold">LOJA EMISSORA</div><div className="mt-1 font-black text-[11px]">{perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[8px] text-[#64748b]">NUIT {perfilLoja.nuit || '401234567'} • {perfilLoja.telefone || '258 84 123 4567'}</div><div className="text-[8px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo</div></div>
+                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[10px] p-3 flex gap-3 items-start">
+                        {(lojaPerfil as any).logoData || (perfilLoja as any).logoData ? (
+                          <img src={(lojaPerfil as any).logoData || (perfilLoja as any).logoData} alt="logo" className="h-14 w-14 object-contain rounded-[8px] bg-white border p-1" />
+                        ) : (
+                          <div className="h-14 w-14 rounded-[8px] bg-black text-white grid place-items-center font-black">{((lojaPerfil as any).nomeLoja||'ML').slice(0,2).toUpperCase()}</div>
+                        )}
+                        <div className="flex-1">
+                          <div className="text-[9px] font-bold text-[#64748b]">LOJA EMISSORA - CONTA DONO - {(lojaPerfil as any).ramoActividade||''}</div>
+                          <div className="font-black text-[12px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Loja'}</div>
+                          <div className="text-[9px]">NUIT {(lojaPerfil as any).nuit || perfilLoja.nuit} • Tel {(lojaPerfil as any).tel || perfilLoja.telefone} • {(lojaPerfil as any).provincia}</div>
+                          <div className="text-[8px] opacity-70">{(lojaPerfil as any).endereco} { (lojaPerfil as any).distrito} {(lojaPerfil as any).logoData ? '• Logo OK' : ''}</div>
+                        </div>
+                      </div>
               </div>
               <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3"><div className="font-black text-[10px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[7px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo</span></div><div className="mt-2 grid grid-cols-3 gap-2"><div><div className="text-[7px] font-bold">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="w-full h-7 border rounded px-2 text-[9px]" /></div><div><div className="text-[7px] font-bold">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-7 border rounded px-2 text-[9px]" /></div><div><div className="text-[7px] font-bold">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-7 border rounded px-2 text-[9px]" /></div></div></div>
               <div className="mt-3 bg-white border rounded-[10px] p-3"><div className="font-black text-[10px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim - Clique para adicionar ao ITENS</span><span className="text-[7px] bg-yellow-100 px-2 py-1 rounded-full">{stockProdutos.length} produtos</span></div><div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-8 bg-[#f8fafc]"><span>🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="flex-1 text-[9px] outline-none bg-transparent" /></div><div className="mt-2 flex gap-1 flex-wrap">{stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,8).map(p=><button key={p.id} onClick={()=>{ const existe=produtosFat.find(x=>x.nome===p.nome); if(existe){ setProdutosFat(produtosFat.map(x=>x.nome===p.nome ? {...x, qtd:x.qtd+1} : x)); } else { setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda||850, desc:0, codigo:p.codigo}]); } }} className="bg-black text-white px-2 py-1 rounded-full text-[7px] hover:bg-[#facc15] hover:text-black">{p.nome} - {p.precoVenda||p.preco}MT - Stock:{p.noArmazem||p.stock}</button>)}</div></div>
@@ -1584,82 +1563,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 
 
                                 {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
-                
-{showNovoStock && (
-        <div className="fixed inset-0 bg-black/60 z-50 grid place-items-center p-4">
-          <div className="bg-white rounded-[14px] w-full max-w-[650px] p-5 border shadow-xl">
-            <div className="flex justify-between items-center"><div className="font-black text-[14px]">NOVO ITEM - Com Codigo de Barras + FIFO</div><button onClick={()=>setShowNovoStock(false)} className="h-8 w-8 rounded-full bg-black text-white">X</button></div>
-            <div className="mt-4 space-y-3">
-              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-[10px] p-3">
-                <div className="text-[10px] font-black">📷 CODIGO DE BARRAS - Scan para facilitar registo</div>
-                <div className="flex gap-2 mt-2">
-                  <input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="Leia com leitor ou digite EAN13 - Ex: 5601234567890" className="flex-1 h-10 px-3 rounded-[8px] border-2 border-yellow-400 text-[12px] bg-white font-mono" />
-                  <button onClick={()=>{if(novoStockBarcode){setNovoStockNome('Produto '+novoStockBarcode.slice(-6)); alert('Codigo '+novoStockBarcode+' lido! Agora complete nome e preco');}}} className="px-4 h-10 bg-black text-white rounded-[8px] text-[10px] font-black">Ler Codigo</button>
-                </div>
-                <div className="text-[8px] mt-1 opacity-60">Use leitor USB ou camera do celular - codigo vira ID automatico + busca preco</div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-[9px] font-bold">NOME PRODUTO *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
-                <div><label className="text-[9px] font-bold">CODIGO / SKU</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="CEM-42N-001" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1 font-mono bg-[#f8fafc]" /></div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-[9px] font-bold">DATA ENTRADA ARMAZEM * - FIFO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-300" /></div>
-                <div><label className="text-[9px] font-bold">LOCAL / PRATELEIRA</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
-                <div><label className="text-[9px] font-bold">VALIDADE</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1" /></div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-[9px] font-bold">QTD ENTRADA</label><input value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" type="number" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
-                <div><label className="text-[9px] font-bold">PRECO CUSTO</label><input value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="710" type="number" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
-                <div><label className="text-[9px] font-bold">PRECO VENDA *</label><input value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" type="number" className="w-full h-9 px-3 rounded-[8px] border-2 border-green-400 text-[12px] mt-1 bg-green-50" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-[9px] font-bold">CATEGORIA</label><select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1"><option>Cimento</option><option>Ferro</option><option>Blocos</option><option>Tintas</option><option>Cobertura</option><option>Canalizacao</option><option>Electricidade</option><option>Ferramentas</option><option>Solar</option><option>Outros</option></select></div>
-                <div><label className="text-[9px] font-bold">FORNECEDOR</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Cimpor, Arcelor, etc" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
-              </div>
-              <div className="bg-blue-50 border rounded-[8px] p-2 text-[8px]">FIFO: Produtos com data entrada mais antiga sao enviados primeiro para loja. Local: {novoStockLocal} | Validade controlada | Barcode: {novoStockBarcode||'N/A'}</div>
-              <div className="flex gap-2">
-                <button onClick={()=>{
-                  if(!novoStockNome || !novoStockPreco){alert('Preencha nome e preco venda'); return;}
-                  const novo = {
-                    id: Date.now().toString(),
-                    codigo: novoStockLote||'PROD-'+Date.now(),
-                    nome: novoStockNome,
-                    marca: novoStockCat,
-                    grupo: novoStockCat,
-                    subGrupo: novoStockCat,
-                    fabricante: novoStockFornecedor||'Fornecedor',
-                    dataEntrada: novoStockDataEntrada.split('-').reverse().join('/'),
-                    dataEntradaISO: novoStockDataEntrada,
-                    qtdEntrada: parseInt(novoStockQtd)||100,
-                    noArmazem: parseInt(novoStockQtd)||100,
-                    entradaLoja: 0,
-                    dataReq: '',
-                    stockLoja: 0,
-                    venda: 0,
-                    mediaDia: 0,
-                    precoVenda: parseFloat(novoStockPreco)||0,
-                    precoCusto: parseFloat(novoStockCusto)||0,
-                    minimo: 20,
-                    ideal: 100,
-                    barcode: novoStockBarcode,
-                    local: novoStockLocal,
-                    validade: novoStockValidade,
-                    fornecedor: novoStockFornecedor,
-                    lote: novoStockLote,
-                  } as any;
-                  setStockProdutos(prev=>[novo, ...prev]);
-                  setShowNovoStock(false);
-                  setNovoStockNome(''); setNovoStockPreco(''); setNovoStockQtd(''); setNovoStockBarcode(''); setNovoStockLote('LOTE-'+Date.now().toString().slice(-6));
-                  alert('Produto adicionado com FIFO! Data entrada: '+novoStockDataEntrada+' - Local: '+novoStockLocal);
-                }} className="flex-1 h-10 bg-black text-white rounded-[8px] font-black text-[11px]">Salvar Produto - FIFO + Barcode</button>
-                <button onClick={()=>setShowNovoStock(false)} className="px-5 h-10 bg-white border rounded-[8px] text-[11px]">Cancelar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showEntradaStock && (
+                {showEntradaStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
                       <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
