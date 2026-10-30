@@ -771,7 +771,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-auto object-contain bg-white rounded-full p-1" /><div className="hidden sm:block text-[9px] tracking-[1.5px] opacity-80">TOTSE</div></div>
+    <div className="flex items-center gap-3 relative pb-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 right-0 text-[10px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
       {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
       <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
@@ -788,63 +788,147 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       
       {tab==='negocio' && (
       <div className="max-w-[1400px] mx-auto p-3">
-        <div className="bg-white rounded-[12px] border p-4">
-          <div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-purple-100 rounded grid place-items-center">🏪</span> NEGOCIO - CONTA INTERNA LOJA - MINHA LOJA MAPUTO1 - IGUAL PROTOTIPO V3 - CADASTRO E LOGIN - TOPO PRINCIPAL</div>
-          <div className="text-[10px] text-[#64748b]">Nova parte no topo principal ao lado de ADM - exatamente o que tem no prototipo V3 com IVA - para entrar precisa cadastro e login - NAO dentro do administrador</div>
-          <div className="mt-4">
-            <div className="bg-[#f8fafc] border rounded-[10px] p-3 mb-3">
-              <div className="font-black text-[11px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[8px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo - Minha Ferragem</span></div>
-              <div className="text-[8px] text-[#64748b]">So telefone obrigatorio. Nome opcional para recibo rapido. Tempo alvo: 15s tipo supermercado.</div>
-              <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
-                <div><div className="text-[8px] font-bold">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="w-full h-9 border rounded-[6px] px-2 text-[11px]" /></div>
-                <div><div className="text-[8px] font-bold">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-9 border rounded-[6px] px-2 text-[11px]" /></div>
-                <div><div className="text-[8px] font-bold">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-9 border rounded-[6px] px-2 text-[11px]" /></div>
-              </div>
+        {/* HEADER ROXO IGUAL PROTOTIPO - CIRCULADO ROXO NA IMAGEM 1 */}
+        <div className="bg-white border rounded-[12px] p-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
+            <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
+            <div>
+              <div className="font-black text-[11px]">MINHA LOJA - CONTA INTERNA - Maputo1</div>
+              <div className="text-[8px] text-[#64748b]">Minha Ferragem Matola - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567</div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 space-y-3">
-                <div className="bg-white border-2 border-[#1e2f4a]/10 rounded-[12px] p-3">
-                  <div className="font-black text-[11px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim</span><span className="text-[8px] bg-yellow-100 px-2 py-1 rounded-full">10 produtos no stock</span></div>
-                  <div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-10 bg-[#f8fafc]"><span>🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="flex-1 text-[11px] outline-none bg-transparent" /></div>
-                  <div className="mt-2 flex gap-1 flex-wrap">
-                    {stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,8).map(p=><button key={p.id} onClick={()=>{ setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda||850, desc:0, stock:p.noArmazem||p.stock}]); }} className="bg-black text-white px-2.5 py-1 rounded-full text-[8px] hover:bg-[#1e2f4a]">{p.nome} - {p.precoVenda||p.preco}MT - Stock:{p.noArmazem||p.stock}</button>)}
-                  </div>
-                  <div className="mt-3 border rounded-[10px] overflow-hidden">
-                    <div className="grid grid-cols-5 bg-[#f8fafc] text-[8px] font-black p-2.5"><span>DESCRICAO</span><span>QTD</span><span>PRECO UNIT.</span><span>DESC %</span><span>SUBTOTAL</span></div>
-                    {produtosFat.length===0 && <div className="p-3 text-[10px] text-[#94a3b8] text-center">Nenhum produto - clique nos botoes pretos acima - Cimento, Ferro etc</div>}
-                    {produtosFat.map((p,i)=><div key={p.id} className="grid grid-cols-5 text-[10px] p-2 border-t items-center"><span className="font-bold text-[9px]">{p.nome}</span><span><input type="number" value={p.qtd} onChange={e=>{ const n=[...produtosFat]; n[i].qtd=Number(e.target.value); setProdutosFat(n); }} className="w-12 border rounded px-1 py-1 text-center" /></span><span className="font-bold">{p.preco} MT</span><span><input type="number" value={p.desc} onChange={e=>{ const n=[...produtosFat]; n[i].desc=Number(e.target.value); setProdutosFat(n); }} className="w-10 border rounded px-1 py-1 text-center" /></span><span className="font-black flex items-center gap-1">{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT <button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==p.id))} className="text-red-500 ml-1">x</button></span></div>)}
-                  </div>
-                  <div className="mt-3 text-right text-[11px] space-y-1 bg-[#f8fafc] rounded-[8px] p-3">
-                    <div>Subtotal bruto <span className="font-black">{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</span></div>
-                    <div className="text-red-600">Descontos <span className="font-black">- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</span></div>
-                    <div>Subtotal liquido <span className="font-black">{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</span></div>
-                    <div>IVA ({ivaTipo}%) <span className="font-black">{ivaTipo==='sem' ? 0 : (ivaTipo==='16' ? ((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0) : ((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0))} MT</span></div>
-                    <div className="font-black text-[13px] pt-1 border-t">TOTAL <span className="text-[#0f766e]">{(()=>{
-                      const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const desc=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const base=sub-desc; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?base*0.16:base*0.05; return (base+iva).toFixed(0); })()} MT</span></div>
-                  </div>
-                  <div className="mt-2"><div className="text-[8px] font-black">IVA NO RODAPE - GLOBAL</div><div className="mt-1 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1.5 rounded-full text-[9px] font-black' : 'bg-white border px-3 py-1.5 rounded-full text-[9px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1.5 rounded-full text-[9px] font-black' : 'bg-white border px-3 py-1.5 rounded-full text-[9px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1.5 rounded-full text-[9px] font-black' : 'bg-white border px-3 py-1.5 rounded-full text-[9px]'}>Com IVA 5%</button></div></div>
-                </div>
-                <div className="bg-[#fffbeb] border-2 border-yellow-200 rounded-[12px] p-3">
-                  <div className="flex justify-between items-center"><div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR com logotipo</div><div className="flex gap-2 items-center"><span className="text-[9px] border px-2 py-1 rounded bg-white">Formato A5</span><label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked/>NUIT na fatura</label><span className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-bold">SAVE</span></div></div>
-                  <div className="mt-3">
-                    <div className="font-black text-[10px] flex justify-between"><span>ITENS - DO STOCK</span><span className="bg-black text-white px-3 py-1 rounded-full text-[8px]">+ Adicionar produto</span></div>
-                    <div className="text-[8px] text-[#64748b] mt-1">CIM-001 - 5601234000011 - Stock Loja 200 | TIN-010 - 5601234000010 - Stock Loja 80 | FIFO First In First Out | Codigo barras / Codigo interno</div>
-                  </div>
-                  <div className="mt-3 flex gap-2"><button onClick={()=>finalizarComWhatsApp()} className="flex-1 h-11 bg-[#16a34a] text-white rounded-[10px] text-[10px] font-black">Enviar via WhatsApp para {telFat || '+258 84 123 4567'} - Finalizar Documento - Baixa Stock Auto</button><button className="px-5 h-11 bg-white border-2 rounded-[10px] text-[10px] font-bold">Pre-visualizar PDF</button></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-[8px] bg-[#f8fafc] border px-2 py-1 rounded-full">📅 sexta, 30/10 - Maputo</div>
+            <div className="text-[8px] bg-white border px-2 py-1 rounded-full flex items-center gap-1">⬆️ Logo</div>
+          </div>
+        </div>
+        {/* TABS INTERNOS - CIRCULADOS AMARELO ROXO NA IMAGEM 1 - Painel Faturar Vender Stock Clientes Fornecedores Caixa Turnos Relatorios */}
+        <div className="mt-3 bg-white border rounded-[12px] p-2">
+          <div className="flex gap-1 flex-wrap">
+            <button className="px-3 py-1.5 rounded-full bg-[#f8fafc] border text-[9px] flex items-center gap-1"><span>📊</span> Painel</button>
+            <button className="px-3 py-1.5 rounded-full bg-[#facc15] text-black border border-[#facc15] font-black text-[9px] flex items-center gap-1">🧾 Faturar</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>🛒</span> Vender</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>📦</span> Stock</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>👥</span> Clientes</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">Fornecedores</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">📦 Caixa & Turnos</button>
+            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">📊 Relatórios</button>
+          </div>
+          <div className="text-[8px] text-[#94a3b8] mt-2">Painel, Faturar (amarelo ativo), Vender, Stock, Clientes, Fornecedores, Caixa & Turnos, Relatórios - IGUAL PROTOTIPO CIRCULADO</div>
+        </div>
+        {/* CONTEUDO PRINCIPAL - 2 COLUNAS */}
+        <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="lg:col-span-2">
+            <div className="bg-white border rounded-[12px] p-3">
+              {/* TITULO + CONTROLS CIRCULADOS VERMELHO LARANJA - Formato A5 NUIT na fatura SAVE */}
+              <div className="flex justify-between items-center">
+                <div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR • com logotipo</div>
+                <div className="flex gap-2 items-center">
+                  <span className="text-[9px] border px-2 py-1 rounded-full bg-white">Formato A5</span>
+                  <label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked className="w-3 h-3"/>NUIT na fatura</label>
+                  <span className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black">SAVE</span>
                 </div>
               </div>
-              <div className="bg-[#f8fafc] border-2 rounded-[12px] p-3 h-fit sticky top-20">
-                <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRE-VISUALIZACAO A5 Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black">TOTSHE BRANDING</span></div>
-                <div className="mt-3 bg-white border rounded-[10px] p-3 shadow-sm">
-                  <div className="flex gap-2"><div className="w-10 bg-[#facc15] rounded grid place-items-center text-[8px] font-black">TOTSHE</div><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px]">LOGO</div><div><div className="font-black text-[9px]">{perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[6px] text-[#64748b]">Av. Uniao Africana, Parcela 312, Matola - Maputo - Tel {perfilLoja.telefone || '+258 84 123 4567'} - NUIT {perfilLoja.nuit || '401234567'}</div></div></div>
-                  <div className="mt-3 text-[8px]"><div className="font-bold">Fatura No FT 2025/1842 Cliente: {nomeFat || 'Joao Manhique - Obra Zimpeto'}</div><div>Data: {new Date().toLocaleDateString('pt-MZ')} - NUIT: {nuitFat || '--'} - Tel: {telFat}</div></div>
-                  <div className="mt-2 text-[7px] border-t pt-2"><div className="grid grid-cols-5 font-black"><span>Item</span><span>Qtd</span><span>Preco</span><span>Desc</span><span>Total</span></div>{produtosFat.slice(0,3).map(p=><div key={p.id} className="grid grid-cols-5"><span className="truncate">{p.nome.slice(0,15)}</span><span>{p.qtd}</span><span>{p.preco}MT</span><span>{p.desc}%</span><span>{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}</span></div>)}{produtosFat.length===0 && <><div className="grid grid-cols-5"><span>Cimento 50kg</span><span>2</span><span>850MT</span><span>0%</span><span>1700</span></div><div className="grid grid-cols-5"><span>Tinta Branca 20L</span><span>1</span><span>3850MT</span><span>5%</span><span>3657</span></div></>}</div>
-                  <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: {produtosFat.length? produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) : '5357.5'} MT</div><div>IVA 16%: {(produtosFat.length? (produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16 : 857.2).toFixed(0)} MT</div><div className="font-black text-[10px]">TOTAL: {(()=>{
-                    const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const desc=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const base=sub-desc; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?base*0.16:base*0.05; return produtosFat.length? (base+iva).toFixed(0) : '6214.7'; })()} MT</div></div>
-                  <div className="mt-3 flex justify-between items-center"><div className="text-[6px]">Processado por CONTRATA-MZ - maputo1 - Stock FIFO</div><div className="bg-[#facc15] px-2 py-1 rounded text-[6px] font-black">Documento valido - Obrigado!</div></div>
+              {/* CLIENTE + LOJA EMISSORA - CIRCULADOS AMARELO NA IMAGEM 1 */}
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-[#fffbeb] border border-yellow-100 rounded-[10px] p-3">
+                  <div className="text-[8px] font-bold text-[#92400e]">CLIENTE • TELEFONE DINÂMICO WHATSAPP</div>
+                  <select className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white">
+                    <option>João Manhique - Obra Zimpeto - 258828765432</option>
+                    <option>{nomeFat || 'Michaque Mungoi'} - {telFat || '258 84 123 4567'}</option>
+                  </select>
+                  <div className="mt-2 bg-[#fef3c7] border border-yellow-200 rounded-[6px] p-2 text-[8px] flex justify-between">
+                    <span>Tel dinâmico: <b>258828765432</b></span><span>NUIT: <b>--</b></span><span>• Retalho</span>
+                  </div>
                 </div>
-                <div className="mt-3 bg-[#f5f3ff] border-2 border-purple-300 rounded-[10px] p-3 text-[9px]"><div className="font-black">Igualzinho ao prototipo V3 - com IVA - TOPO PRINCIPAL</div><div className="text-[8px] mt-1">Dados comprador azul em cima, Produtos amarelo meio, ITENS verde, IVA amarelo em baixo, WhatsApp dinamico - Stock codigo barras, FIFO, Transferencia Matola/Maputo/Beira - TUDO no topo, NAO dentro admin</div></div>
+                <div className="bg-[#fffbeb] border border-yellow-100 rounded-[10px] p-3">
+                  <div className="text-[8px] font-bold text-[#92400e]">LOJA EMISSORA</div>
+                  <div className="mt-1 font-black text-[11px]">{perfilLoja.nome || 'Minha Ferragem Matola'}</div>
+                  <div className="text-[8px] text-[#64748b]">NUIT {perfilLoja.nuit || '401234567'} • {perfilLoja.telefone || '258 84 123 4567'}</div>
+                  <div className="text-[8px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo</div>
+                </div>
               </div>
+              {/* DADOS COMPRADOR ULTRA RAPIDO - EXTRA DO V3 - AZUL */}
+              <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3">
+                <div className="font-black text-[10px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[7px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo - Minha Ferragem</span></div>
+                <div className="text-[7px] text-[#64748b]">Só telefone obrigatório. Nome opcional para recibo rapido. Tempo alvo: 15s tipo supermercado.</div>
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  <div><div className="text-[7px] font-bold">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
+                  <div><div className="text-[7px] font-bold">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
+                  <div><div className="text-[7px] font-bold">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
+                </div>
+              </div>
+              {/* PRODUTOS E SERVICOS DO STOCK - AMARELO */}
+              <div className="mt-3 bg-white border rounded-[10px] p-3">
+                <div className="font-black text-[10px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim</span><span className="text-[7px] bg-yellow-100 px-2 py-1 rounded-full">10 produtos no stock</span></div>
+                <div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-8 bg-[#f8fafc]"><span className="text-[10px]">🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="flex-1 text-[9px] outline-none bg-transparent" /></div>
+                <div className="mt-2 flex gap-1 flex-wrap">
+                  {stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,6).map(p=><button key={p.id} onClick={()=>{ setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda||850, desc:0, stock:p.noArmazem||p.stock}]); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">{p.nome} - {p.precoVenda||p.preco}MT - Stock:{p.noArmazem||p.stock}</button>)}
+                </div>
+                <div className="mt-3 border rounded-[8px] overflow-hidden">
+                  <div className="grid grid-cols-5 bg-[#f8fafc] text-[7px] font-black p-2"><span>DESCRICAO</span><span>QTD</span><span>PRECO UNIT.</span><span>DESC %</span><span>SUBTOTAL</span></div>
+                  {produtosFat.length===0 && <div className="p-2 text-[9px] text-center text-[#94a3b8]">Saco Cimento 50kg - CMPOR QTD 3 850MT 0 2550MT - Bloco 15cm 40x20 QTD 20 42MT 5 798MT (exemplo)</div>}
+                  {produtosFat.map((p,i)=><div key={p.id} className="grid grid-cols-5 text-[9px] p-2 border-t"><span>{p.nome}</span><span>{p.qtd}</span><span>{p.preco} MT</span><span>{p.desc}%</span><span className="font-bold">{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT</span></div>)}
+                </div>
+                {/* TOTAIS COM IVA - AMARELO EM BAIXO CIRCULADO */}
+                <div className="mt-2 text-right text-[9px] space-y-1 bg-[#f8fafc] rounded p-2">
+                  <div>Subtotal bruto <b>{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</b></div>
+                  <div className="text-red-600">Descontos <b>- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</b></div>
+                  <div>Subtotal liquido <b>{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</b></div>
+                  <div>IVA ({ivaTipo}%) <b>{ivaTipo==='sem'?0:ivaTipo==='16'?((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0):((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0)} MT</b></div>
+                  <div className="font-black text-[11px]">TOTAL <span className="text-[#0f766e]">{(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</span></div>
+                </div>
+                <div className="mt-2 text-[7px] font-black">IVA NO RODAPE - GLOBAL</div>
+                <div className="mt-1 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div>
+              </div>
+              {/* ITENS - CIRCULADO VERDE NA IMAGEM 1 - Cimento Cimpor 50kg, Tinta Plastica Branca 20L */}
+              <div className="mt-3 bg-white border-2 border-green-200 rounded-[12px] p-3">
+                <div className="flex justify-between items-center"><div className="font-black text-[10px]">ITENS</div><button className="bg-black text-white px-3 py-1 rounded-full text-[8px] font-black">+ Adicionar</button></div>
+                <div className="mt-2 space-y-2">
+                  <div className="grid grid-cols-12 gap-1 items-center text-[9px]">
+                    <select className="col-span-4 border rounded px-1 py-1.5 text-[9px]"><option>Cimento Cimpor 50kg</option><option>Tinta Plastica Branca 20L</option><option>Bloco 15x20x40</option></select>
+                    <input type="number" defaultValue="2" className="col-span-2 border rounded px-2 py-1.5 text-center" />
+                    <input type="number" defaultValue="850" className="col-span-3 border rounded px-2 py-1.5 text-center" />
+                    <input type="number" defaultValue="0" className="col-span-2 border rounded px-2 py-1.5 text-center" />
+                    <button className="col-span-1">🗑️</button>
+                  </div>
+                  <div className="text-[7px] text-[#94a3b8]">CIM-001 - 5601234000011 - Stock Loja 200</div>
+                  <div className="grid grid-cols-12 gap-1 items-center text-[9px]">
+                    <select className="col-span-4 border rounded px-1 py-1.5 text-[9px]"><option>Tinta Plástica Branca 20L</option></select>
+                    <input type="number" defaultValue="1" className="col-span-2 border rounded px-2 py-1.5 text-center" />
+                    <input type="number" defaultValue="3850" className="col-span-3 border rounded px-2 py-1.5 text-center" />
+                    <input type="number" defaultValue="5" className="col-span-2 border rounded px-2 py-1.5 text-center" />
+                    <button className="col-span-1">🗑️</button>
+                  </div>
+                  <div className="text-[7px] text-[#94a3b8]">TIN-010 - 5601234000010 - Stock Loja 80</div>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <button onClick={()=>finalizarComWhatsApp()} className="flex-1 h-9 bg-[#16a34a] text-white rounded-[8px] text-[9px] font-black">Enviar via WhatsApp para {telFat || '258828765432'}</button>
+                  <button className="px-4 h-9 bg-white border rounded-[8px] text-[9px] font-bold">Pré-visualizar PDF</button>
+                </div>
+              </div>
+              {/* FOOTER STOCK INFO */}
+              <div className="mt-3 text-[7px] text-[#94a3b8] text-center">CONTRATA-MZ - Loja Interna maputo1 - Minha Ferragem Matola - Stock FIFO First In First Out - Código barras / código interno - Transferência Matola/Maputo/Beira - Sem referências externas - Prototype HTML - 2026-10-30</div>
+            </div>
+          </div>
+          {/* PRE-VISUALIZACAO A5 FATURA - DIREITA */}
+          <div className="bg-white border rounded-[12px] p-3 h-fit sticky top-3">
+            <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRÉ-VISUALIZAÇÃO A5 • Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black">TOTSHE BRANDING</span></div>
+            <div className="mt-3 bg-white border-2 rounded-[10px] p-3">
+              <div className="flex gap-2">
+                <div className="w-12 bg-[#facc15] rounded-[6px] grid place-items-center text-[8px] font-black p-1">TOTSHE</div>
+                <div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div>
+                <div><div className="font-black text-[10px]">Minha Ferragem Matola</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div>
+              </div>
+              <div className="mt-3 text-[8px] border-t pt-2"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: João Manhique - Obra Zimpeto</div><div>Data: 2026-10-30 - NUIT: -- - Tel: 258828765432</div></div>
+              <div className="mt-2 text-[7px] border rounded">
+                <div className="grid grid-cols-5 bg-[#f8fafc] font-black p-1.5"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div>
+                <div className="grid grid-cols-5 p-1.5 border-t"><span>Cimento Cimpor 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div>
+                <div className="grid grid-cols-5 p-1.5 border-t bg-[#f8fafc]"><span>Tinta Plástica Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div>
+              </div>
+              <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: 5357.5MT</div><div>IVA 16%: 857.2MT</div><div className="font-black text-[10px]">TOTAL: 6214.7 MT</div></div>
+              <div className="mt-3 flex justify-between items-center"><div className="text-[6px]">Processado por CONTRATA-MZ - maputo1</div><div className="bg-[#facc15] px-2 py-1 rounded text-[6px] font-black">Documento válido • Obrigado!</div></div>
             </div>
           </div>
         </div>
