@@ -793,8 +793,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
     <div className="flex items-center gap-3 relative pb-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 right-0 text-[10px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSHE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
-      {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
-      <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
+      
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
       <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
       <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
@@ -912,7 +911,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
         <div className="bg-white border rounded-[12px] p-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
-            <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
+            
             <div>
               <div className="font-black text-[11px]">CONTA INTERNA - {(lojaPerfil as any).provincia || 'Maputo'}1</div>
               <div className="text-[8px] text-[#64748b]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Ferragem Matola'} - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
@@ -957,7 +956,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                           <div className="h-14 w-14 rounded-[8px] bg-black text-white grid place-items-center font-black">{((lojaPerfil as any).nomeLoja||'ML').slice(0,2).toUpperCase()}</div>
                         )}
                         <div className="flex-1">
-                          <div className="text-[9px] font-bold text-[#64748b]">LOJA EMISSORA - CONTA DONO - {(lojaPerfil as any).ramoActividade||''}</div>
+                          <div className="text-[9px] font-bold text-[#64748b]">Zoes - {(lojaPerfil as any).ramoActividade||''}</div>
                           <div className="font-black text-[12px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Loja'}</div>
                           <div className="text-[9px]">NUIT {(lojaPerfil as any).nuit || perfilLoja.nuit} • Tel {(lojaPerfil as any).tel || perfilLoja.telefone} • {(lojaPerfil as any).provincia}</div>
                           <div className="text-[8px] opacity-70">{(lojaPerfil as any).endereco} { (lojaPerfil as any).distrito} {(lojaPerfil as any).logoData ? '• Logo OK' : ''}</div>
@@ -970,9 +969,9 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-3 h-fit sticky top-3">
-            <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRÉ-VISUALIZAÇÃO A5 • Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black">TOTSHE BRANDING</span></div>
+            <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRÉ-VISUALIZAÇÃO A5 • Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black"></span></div>
             <div className="mt-3 bg-white border-2 rounded-[10px] p-3">
-              <div className="flex gap-2"><div className="w-12 bg-[#facc15] rounded grid place-items-center text-[8px] font-black p-1">TOTSHE</div><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div><div><div className="font-black text-[10px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div></div>
+              <div className="flex gap-2"><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div><div><div className="font-black text-[10px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div></div>
               <div className="mt-3 text-[8px] border-t pt-2"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: {nomeFat || 'João Manhique - Obra Zimpeto'}</div><div>Data: {new Date().toLocaleDateString('pt-MZ')} - NUIT: {nuitFat || '--'} - Tel: {telFat}</div></div>
               <div className="mt-2 text-[7px] border rounded"><div className="grid grid-cols-5 bg-[#f8fafc] font-black p-1.5"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div>{produtosFat.slice(0,4).map(p=><div key={p.id} className="grid grid-cols-5 p-1.5 border-t"><span className="truncate">{p.nome.slice(0,14)}</span><span>{p.qtd}</span><span>{p.preco} MT</span><span>{p.desc}%</span><span>{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}</span></div>)}{produtosFat.length===0 && <><div className="grid grid-cols-5 p-1.5 border-t"><span>Cimento 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div><div className="grid grid-cols-5 p-1.5 border-t"><span>Tinta Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div></>}</div>
               <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: {produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) || '5357.5'} MT</div><div>IVA 16%: {((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0) || '857.2'} MT</div><div className="font-black text-[10px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0) || '6214.7';})()} MT</div></div>
