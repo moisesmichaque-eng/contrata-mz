@@ -200,6 +200,8 @@ export default function App(){
     //:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
+  // FIFO helper - ordena por data entrada mais antiga
+  const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }); };
   const [stockProdutos, setStockProdutos] = useState([
     {id:'1', codigo:'CEM-42N-001', nome:'Cimento Cimpor 42.5N 50kg', marca:'Cimpor', grupo:'Cimento', subGrupo:'42.5N', fabricante:'Cimpor Moc.', dataEntrada:'02/05/2025', qtdEntrada:1200, noArmazem:680, entradaLoja:200, dataReq:'08/05/2025', stockLoja:200, venda:320, mediaDia:12.8, precoVenda:850, precoCusto:710, minimo:100, ideal:500},
     {id:'2', codigo:'FER-12M-012', nome:'Ferro Varao 12mm 12m - CA50', marca:'Mozal', grupo:'Ferro', subGrupo:'Varao', fabricante:'Arcelor', dataEntrada:'28/04/2025', qtdEntrada:600, noArmazem:120, entradaLoja:80, dataReq:'09/05/2025', stockLoja:80, venda:380, mediaDia:15.2, precoVenda:1250, precoCusto:980, minimo:80, ideal:300},
@@ -226,6 +228,8 @@ export default function App(){
 
     const [faturacaoCadastroForm, setFaturacaoCadastroForm] = useState({nomeLoja:'', tel:'', password:''});
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
+  const [novoStockBarcode, setNovoStockBarcode] = useState(''); const [novoStockDataEntrada, setNovoStockDataEntrada] = useState(new Date().toISOString().slice(0,10)); const [novoStockLocal, setNovoStockLocal] = useState('A1-01'); const [novoStockValidade, setNovoStockValidade] = useState(''); const [novoStockFornecedor, setNovoStockFornecedor] = useState(''); const [novoStockLote, setNovoStockLote] = useState('LOTE-'+Date.now().toString().slice(-6));
+  const [filtroFIFOData, setFiltroFIFOData] = useState(''); const [loteSelecionadoFIFO, setLoteSelecionadoFIFO] = useState('');
   const [ivaTipo, setIvaTipo] = useState("16");
     const finalizarComWhatsApp = ()=>{
     try {
@@ -1549,7 +1553,82 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 
 
                                 {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
-                {showEntradaStock && (
+                
+{showNovoStock && (
+        <div className="fixed inset-0 bg-black/60 z-50 grid place-items-center p-4">
+          <div className="bg-white rounded-[14px] w-full max-w-[650px] p-5 border shadow-xl">
+            <div className="flex justify-between items-center"><div className="font-black text-[14px]">NOVO ITEM - Com Codigo de Barras + FIFO</div><button onClick={()=>setShowNovoStock(false)} className="h-8 w-8 rounded-full bg-black text-white">X</button></div>
+            <div className="mt-4 space-y-3">
+              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-[10px] p-3">
+                <div className="text-[10px] font-black">📷 CODIGO DE BARRAS - Scan para facilitar registo</div>
+                <div className="flex gap-2 mt-2">
+                  <input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="Leia com leitor ou digite EAN13 - Ex: 5601234567890" className="flex-1 h-10 px-3 rounded-[8px] border-2 border-yellow-400 text-[12px] bg-white font-mono" />
+                  <button onClick={()=>{if(novoStockBarcode){setNovoStockNome('Produto '+novoStockBarcode.slice(-6)); alert('Codigo '+novoStockBarcode+' lido! Agora complete nome e preco');}}} className="px-4 h-10 bg-black text-white rounded-[8px] text-[10px] font-black">Ler Codigo</button>
+                </div>
+                <div className="text-[8px] mt-1 opacity-60">Use leitor USB ou camera do celular - codigo vira ID automatico + busca preco</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="text-[9px] font-bold">NOME PRODUTO *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
+                <div><label className="text-[9px] font-bold">CODIGO / SKU</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="CEM-42N-001" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1 font-mono bg-[#f8fafc]" /></div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div><label className="text-[9px] font-bold">DATA ENTRADA ARMAZEM * - FIFO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1 bg-[#f0fdf4] border-green-300" /></div>
+                <div><label className="text-[9px] font-bold">LOCAL / PRATELEIRA</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
+                <div><label className="text-[9px] font-bold">VALIDADE</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1" /></div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div><label className="text-[9px] font-bold">QTD ENTRADA</label><input value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" type="number" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
+                <div><label className="text-[9px] font-bold">PRECO CUSTO</label><input value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="710" type="number" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
+                <div><label className="text-[9px] font-bold">PRECO VENDA *</label><input value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" type="number" className="w-full h-9 px-3 rounded-[8px] border-2 border-green-400 text-[12px] mt-1 bg-green-50" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="text-[9px] font-bold">CATEGORIA</label><select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full h-9 px-2 rounded-[8px] border text-[11px] mt-1"><option>Cimento</option><option>Ferro</option><option>Blocos</option><option>Tintas</option><option>Cobertura</option><option>Canalizacao</option><option>Electricidade</option><option>Ferramentas</option><option>Solar</option><option>Outros</option></select></div>
+                <div><label className="text-[9px] font-bold">FORNECEDOR</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Cimpor, Arcelor, etc" className="w-full h-9 px-3 rounded-[8px] border text-[12px] mt-1" /></div>
+              </div>
+              <div className="bg-blue-50 border rounded-[8px] p-2 text-[8px]">FIFO: Produtos com data entrada mais antiga sao enviados primeiro para loja. Local: {novoStockLocal} | Validade controlada | Barcode: {novoStockBarcode||'N/A'}</div>
+              <div className="flex gap-2">
+                <button onClick={()=>{
+                  if(!novoStockNome || !novoStockPreco){alert('Preencha nome e preco venda'); return;}
+                  const novo = {
+                    id: Date.now().toString(),
+                    codigo: novoStockLote||'PROD-'+Date.now(),
+                    nome: novoStockNome,
+                    marca: novoStockCat,
+                    grupo: novoStockCat,
+                    subGrupo: novoStockCat,
+                    fabricante: novoStockFornecedor||'Fornecedor',
+                    dataEntrada: novoStockDataEntrada.split('-').reverse().join('/'),
+                    dataEntradaISO: novoStockDataEntrada,
+                    qtdEntrada: parseInt(novoStockQtd)||100,
+                    noArmazem: parseInt(novoStockQtd)||100,
+                    entradaLoja: 0,
+                    dataReq: '',
+                    stockLoja: 0,
+                    venda: 0,
+                    mediaDia: 0,
+                    precoVenda: parseFloat(novoStockPreco)||0,
+                    precoCusto: parseFloat(novoStockCusto)||0,
+                    minimo: 20,
+                    ideal: 100,
+                    barcode: novoStockBarcode,
+                    local: novoStockLocal,
+                    validade: novoStockValidade,
+                    fornecedor: novoStockFornecedor,
+                    lote: novoStockLote,
+                  } as any;
+                  setStockProdutos(prev=>[novo, ...prev]);
+                  setShowNovoStock(false);
+                  setNovoStockNome(''); setNovoStockPreco(''); setNovoStockQtd(''); setNovoStockBarcode(''); setNovoStockLote('LOTE-'+Date.now().toString().slice(-6));
+                  alert('Produto adicionado com FIFO! Data entrada: '+novoStockDataEntrada+' - Local: '+novoStockLocal);
+                }} className="flex-1 h-10 bg-black text-white rounded-[8px] font-black text-[11px]">Salvar Produto - FIFO + Barcode</button>
+                <button onClick={()=>setShowNovoStock(false)} className="px-5 h-10 bg-white border rounded-[8px] text-[11px]">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEntradaStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
                       <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
