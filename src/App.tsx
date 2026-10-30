@@ -871,7 +871,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO - NEGOCIO</div>
-                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockDiario} | Mesmo que FATURAR > STOCK - Unificado</div>
+                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockDiario} | Mesmo que FATURAR STOCK Unificado</div>
                   </div>
                   <div className="flex flex-wrap gap-2 items-center">
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
