@@ -1,4 +1,4 @@
-// VERSION 2026-10-30 08:40 - ADMIN SUPERCOMPLETO EXACTO COMO PROTOTIPO BUSCA 5.4M 1124 ITENS 212 FATURAS 4 PARTES CLICAVEIS SO UMA TELA POR VEZ
+// VERSION 2026-10-30 09:30 - ADMIN 4 CORES DIFERENTES FLASH FIX - FATURAR AMARELO VIAGENS AZUL ENCONTRAR VERDE CONTRATOS PRETO - RELATORIOS
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -99,7 +99,131 @@ const MODELO_TAREFAS: any = {
 
 const CLAUSULAS = [ { id:1, titulo:"Dados das partes", short:"Quem contrata e quem faz" }, { id:2, titulo:"Objeto e tarefas", short:"O que sera feito" }, { id:3, titulo:"Horario e local", short:"Quando e onde" }, { id:4, titulo:"Salario e pagamento", short:"Quanto e como paga" }, { id:5, titulo:"Alimentacao e alojamento", short:"Beneficios" }, { id:6, titulo:"Folgas e ferias", short:"Descanso legal" }, { id:7, titulo:"Periodo experimental", short:"Teste inicial" }, { id:8, titulo:"Deveres do trabalhador", short:"Obrigacoes" }, { id:9, titulo:"Deveres do empregador", short:"Obrigacoes" }, { id:10, titulo:"Anexos (antes validade)", short:"Fotos e provas" }, { id:11, titulo:"Validade e assinaturas", short:"Assina no WhatsApp - PDF final partilhavel" }, ];
 
-export default function App(){
+export default 
+const AdminPrototipoExacto = ()=>{
+    const [lojaSel, setLojaSel] = React.useState(null);
+    const [viaturaSel, setViaturaSel] = React.useState(null);
+    const [searchLoja, setSearchLoja] = React.useState('');
+    const [filterLoja, setFilterLoja] = React.useState('Todas');
+    const [searchTrans, setSearchTrans] = React.useState('');
+    const [filterTrans, setFilterTrans] = React.useState('Todos');
+    const [activeParte, setActiveParte] = React.useState('FATURAR');
+    const lojas = [
+      {id:'L001', nome:'Minha Ferragem Matola', dono:'Nagi A.', tel:'+258 82 123 4567', total:'442k MT', faturas:23, stock:10, stockInicial:1124, status:'Ativa', cidade:'Matola', venda:'320 → 520', margem:'+62.5%', entrada:700, saida:320, vendasMes:520},
+      {id:'L002', nome:'Ferragem Central Maputo', dono:'Raul M.', tel:'+258 84 234 5678', total:'388k MT', faturas:19, stock:14, stockInicial:985, status:'Ativa', cidade:'Maputo', venda:'280 → 445', margem:'+58%', entrada:820, saida:285, vendasMes:445},
+      {id:'L003', nome:'Tintas & Cia Beira', dono:'João C.', tel:'+258 82 345 6789', total:'512k MT', faturas:31, stock:8, stockInicial:1230, status:'Ativa', cidade:'Beira', venda:'410 → 610', margem:'+71%', entrada:1100, saida:410, vendasMes:610},
+      {id:'L004', nome:'Material de Construção Beira', dono:'Amina S.', tel:'+258 84 456 7890', total:'298k MT', faturas:12, stock:22, stockInicial:742, status:'Inativa', cidade:'Beira', venda:'210 → 330', margem:'+57%', entrada:680, saida:210, vendasMes:330},
+      {id:'L005', nome:'Casa das Ferragens Xai-Xai', dono:'Carlos M.', tel:'+258 82 567 8901', total:'365k MT', faturas:17, stock:11, stockInicial:876, status:'Ativa', cidade:'Xai-Xai', venda:'300 → 480', margem:'+60%', entrada:790, saida:300, vendasMes:480},
+      {id:'L006', nome:'Ferragem Moderna Maputo', dono:'Fatima J.', tel:'+258 84 678 9012', total:'478k MT', faturas:26, stock:9, stockInicial:1189, status:'Ativa', cidade:'Maputo', venda:'350 → 540', margem:'+68%', entrada:950, saida:350, vendasMes:540},
+      {id:'L007', nome:'Distribuidora Sul Matola', dono:'Pedro L.', tel:'+258 82 789 0123', total:'410k MT', faturas:21, stock:13, stockInicial:1054, status:'Ativa', cidade:'Matola', venda:'310 → 495', margem:'+59%', entrada:880, saida:310, vendasMes:495},
+      {id:'L008', nome:'ConstruMax Beira', dono:'Sara T.', tel:'+258 84 890 1234', total:'256k MT', faturas:10, stock:25, stockInicial:715, status:'Inativa', cidade:'Beira', venda:'190 → 280', margem:'+47%', entrada:620, saida:190, vendasMes:280},
+      {id:'L009', nome:'Ferragens & Cia Tete', dono:'Luis N.', tel:'+258 82 901 2345', total:'534k MT', faturas:33, stock:7, stockInicial:1295, status:'Ativa', cidade:'Tete', venda:'430 → 650', margem:'+75%', entrada:1150, saida:430, vendasMes:650},
+      {id:'L010', nome:'Soluções Obras Nacala', dono:'Ines R.', tel:'+258 84 012 3456', total:'322k MT', faturas:15, stock:18, stockInicial:812, status:'Ativa', cidade:'Nacala', venda:'260 → 390', margem:'+50%', entrada:730, saida:260, vendasMes:390},
+    ];
+    const viaturas = [
+      {id:'T001', nome:'Nagi Trans', viatura:'Coaster', lugares:29, rotas:['Maputo-Beira','Maputo-Xai-Xai'], reservas:86, total:'442k MT', faturas:23, ganhos:'188k MT', tel:'+258 82 111 0001', status:'Ativo', historico:['Viatura 29 lugares registada','Contrato Maputo-Beira gerado','16 bilhetes reservados via web hoje']},
+      {id:'T002', nome:'Raul Hiace', viatura:'Hiace', lugares:15, rotas:['Maputo-Inhambane','Maputo-Beira'], reservas:54, total:'298k MT', faturas:14, ganhos:'124k MT', tel:'+258 84 222 0002', status:'Ativo', historico:['Hiace 15 lugares registado','Rota Inhambane adicionada','9 reservas web']},
+      {id:'T003', nome:'João Marcopolo', viatura:'Marcopolo', lugares:45, rotas:['Maputo-Nampula','Beira-Nampula'], reservas:112, total:'612k MT', faturas:31, ganhos:'298k MT', tel:'+258 82 333 0003', status:'Ativo', historico:['Marcopolo 45 lugares licenciado','Rota Nampula 2050km ativa','112 bilhetes via contrata-mz']},
+      {id:'T004', nome:'Amina Sprinter', viatura:'Sprinter', lugares:22, rotas:['Maputo-Tete'], reservas:68, total:'356k MT', faturas:18, ganhos:'156k MT', tel:'+258 84 444 0004', status:'Ativo', historico:['Sprinter 22 registada','10 viagens Tete','Taxa pontualidade 94%']},
+      {id:'T005', nome:'Carlos Coaster', viatura:'Coaster', lugares:29, rotas:['Beira-Chimoio','Beira-Maputo'], reservas:73, total:'378k MT', faturas:19, ganhos:'167k MT', tel:'+258 82 555 0005', status:'Inativo', historico:['Coaster 29 em manutenção','Rota Chimoio 24 viagens','73 reservas']},
+      {id:'T006', nome:'Fatima Hiace', viatura:'Hiace', lugares:18, rotas:['Maputo-Gaza'], reservas:41, total:'224k MT', faturas:11, ganhos:'92k MT', tel:'+258 84 666 0006', status:'Ativo', historico:['Hiace 18 nova','20 viagens Gaza','41 reservas web']},
+      {id:'T007', nome:'Pedro Marcopolo', viatura:'Marcopolo', lugares:50, rotas:['Maputo-Pemba','Nampula-Pemba'], reservas:134, total:'698k MT', faturas:36, ganhos:'342k MT', tel:'+258 82 777 0007', status:'Ativo', historico:['Marcopolo 50 - maior frota','5 viagens longas Pemba','134 bilhetes reservados']},
+    ];
+    const lojasFiltradas = lojas.filter(l=>{
+      const busca = searchLoja.toLowerCase();
+      const matchBusca = !busca || l.nome.toLowerCase().includes(busca) || l.dono.toLowerCase().includes(busca) || l.cidade.toLowerCase().includes(busca);
+      const matchStatus = filterLoja==='Todas' || l.status===filterLoja;
+      return matchBusca && matchStatus;
+    });
+    const transFiltradas = viaturas.filter(v=>{
+      const busca = searchTrans.toLowerCase();
+      const matchBusca = !busca || v.nome.toLowerCase().includes(busca) || v.viatura.toLowerCase().includes(busca);
+      const matchStatus = filterTrans==='Todos' || v.status===filterTrans;
+      return matchBusca && matchStatus;
+    });
+    const getBtnClass = (parte)=>{
+      const base = 'px-5 py-2 rounded-full font-black text-[11px] transition-all border';
+      if(activeParte===parte){
+        if(parte==='FATURAR') return base + ' bg-[#facc15] text-black border-[#facc15] shadow-[0_2px_10px_rgba(250,204,21,0.4)] scale-[1.05]';
+        if(parte==='VIAGENS') return base + ' bg-[#3b82f6] text-white border-[#3b82f6] shadow-[0_2px_10px_rgba(59,130,246,0.4)] scale-[1.05]';
+        if(parte==='ENCONTRAR') return base + ' bg-[#10b981] text-white border-[#10b981] shadow-[0_2px_10px_rgba(16,185,129,0.4)] scale-[1.05]';
+        if(parte==='CONTRATOS') return base + ' bg-[#1e293b] text-white border-[#1e293b] shadow-[0_2px_10px_rgba(30,41,59,0.4)] scale-[1.05]';
+      }
+      return base + ' bg-white text-[#64748b] border-[#e2e8f0] hover:bg-[#f8fafc]';
+    };
+    return (
+      <div className="w-full space-y-4">
+        <div className="bg-white border rounded-[12px] p-4">
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={()=>setActiveParte('FATURAR')} className={getBtnClass('FATURAR')}>FATURAR</button>
+            <button onClick={()=>setActiveParte('VIAGENS')} className={getBtnClass('VIAGENS')}>VIAGENS</button>
+            <button onClick={()=>setActiveParte('ENCONTRAR')} className={getBtnClass('ENCONTRAR')}>ENCONTRAR</button>
+            <button onClick={()=>setActiveParte('CONTRATOS')} className={getBtnClass('CONTRATOS')}>CONTRATOS</button>
+          </div>
+          <div className="text-[9px] text-[#94a3b8] mt-2">Clique numa parte - agora em cores diferentes: Amarelo=FATURAR, Azul=VIAGENS, Verde=ENCONTRAR, Preto=CONTRATOS - abre página só da parte selecionada - flash corrigido</div>
+        </div>
+
+        {activeParte==='FATURAR' && (
+          <div className="bg-white rounded-[12px] border p-4">
+            <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-yellow-100 rounded grid place-items-center">📦</span> FATURAR <span className="text-[9px] bg-yellow-400 text-black px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded-full">↗ +12%</div></div>
+            <div className="text-[10px] text-[#64748b]">50 LOJAS ATIVAS - CLIQUE PARA VER HISTÓRICO - RELATÓRIOS INCLUÍDOS</div>
+            <div className="mt-3 flex gap-2">
+              <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span className="text-[12px]">🔍</span><input value={searchLoja} onChange={e=>setSearchLoja(e.target.value)} placeholder="Buscar loja, dono, cidade..." className="flex-1 text-[11px] outline-none" /></div>
+              <select value={filterLoja} onChange={e=>setFilterLoja(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todas</option><option>Ativa</option><option>Inativa</option></select>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black text-[14px]">5.4M MT</div><div className="text-[8px] text-[#94a3b8]">+23 hoje | Relatório: Vendas últimos 5 dias 320→520 | Gráfico ↗</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">STOCK INICIAL</div><div className="font-black text-[14px]">1,124 itens</div><div className="text-[8px] text-[#94a3b8]">700-1300 random | Final ontem = Inicial hoje</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FATURAS</div><div className="font-black text-[14px]">212 total</div><div className="text-[8px] text-orange-600">+23 hoje | Ticket médio 2.4k</div></div>
+              <div className="bg-[#fffbeb] border-2 border-yellow-200 rounded-[10px] p-3"><div className="text-[9px] text-[#92400e] font-bold">RELATÓRIOS</div><div className="font-black text-[12px]">5 dias / 30 dias</div><div className="text-[8px]">Vendas totais, margem, stock final</div></div>
+            </div>
+            <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
+              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">LOJA</th><th className="p-2 text-left">DONO</th><th className="p-2 text-left">TEL</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">FATURAS</th><th className="p-2 text-center">STOCK</th><th className="p-2 text-center">STATUS</th></tr></thead><tbody>{lojasFiltradas.map(l=><tr key={l.id} onClick={()=>setLojaSel(l)} className="border-b hover:bg-yellow-50 cursor-pointer"><td className="p-2"><div className="font-bold">{l.nome}</div><div className="text-[8px] opacity-60">{l.id} • {l.cidade}</div></td><td className="p-2">{l.dono}</td><td className="p-2 text-[9px]">{l.tel}</td><td className="p-2 text-right"><div className="font-bold">{l.total}</div><div className="text-[8px] text-green-600">{l.margem}</div></td><td className="p-2 text-center"><span className="bg-[#1e2f4a] text-white px-2 py-1 rounded-full text-[8px]">{l.faturas}</span></td><td className="p-2 text-center">{l.stock}</td><td className="p-2 text-center"><span className={l.status==='Ativa' ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-[8px] font-bold' : 'bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-[8px]'}>{l.status}</span></td></tr>)}</tbody></table>
+            </div>
+            <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3 text-[10px]"><div className="font-black">RELATÓRIOS - FATURAR - Gráfico Vendas 320→520</div><div className="mt-2 flex gap-1 h-12 items-end">{[320,360,410,380,470,520,510].map((v,i)=><div key={i} className="flex-1 bg-yellow-400 rounded-t" style={{height: `${(v/520)*100}%`}}></div>)}</div><div className="text-[8px] text-[#94a3b8] mt-1">Seg Ter Qua Qui Sex Sáb Dom - Vendas totais 272k→442k MT - Relatório últimos 5 dias / 30 dias</div></div>
+            {lojaSel && <div className="mt-3 bg-[#fffbeb] border-2 border-yellow-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Histórico completo: {lojaSel.nome}</div><div className="text-[10px] mt-3 grid grid-cols-2 gap-3"><div><div className="text-[8px] text-[#64748b]">DONO</div><div className="font-bold">{lojaSel.dono} - {lojaSel.tel}</div></div><div><div className="text-[8px] text-[#64748b]">CIDADE</div><div className="font-bold">{lojaSel.cidade} - {lojaSel.id}</div></div><div><div className="text-[8px] text-[#64748b]">STOCK INICIAL ARMAZÉM RANDOM</div><div className="font-black">{lojaSel.stockInicial} itens (700-1300) - só esta coluna random</div></div><div><div className="text-[8px] text-[#64748b]">VENDA</div><div className="font-bold">{lojaSel.venda} - Margem {lojaSel.margem}</div></div><div><div className="text-[8px] text-[#64748b]">O QUE FEZ E FAZ</div><div>Entrada {lojaSel.entrada}, Saída {lojaSel.saida}, Vendas Mês {lojaSel.vendasMes}, Venda Hoje 320→520 reflete stock</div></div><div><div className="text-[8px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black">{lojaSel.total} - {lojaSel.faturas} faturas - Valor 272k→442k MT</div></div></div><button onClick={()=>setLojaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
+          </div>
+        )}
+
+        {activeParte==='VIAGENS' && (
+          <div className="bg-white rounded-[12px] border p-4">
+            <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-blue-100 rounded grid place-items-center">🚌</span> VIAGENS <span className="text-[9px] bg-blue-600 text-white px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded-full">7 ativos</div></div>
+            <div className="text-[10px] text-[#64748b]">7 TRANSPORTADORES - CLIQUE PARA VER TUDO SOBRE ELE - RELATÓRIOS VIAGENS</div>
+            <div className="mt-3 flex gap-2">
+              <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span>🔍</span><input value={searchTrans} onChange={e=>setSearchTrans(e.target.value)} placeholder="Buscar transportador, viatura..." className="flex-1 text-[11px] outline-none" /></div>
+              <select value={filterTrans} onChange={e=>setFilterTrans(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todos</option><option>Ativo</option><option>Inativo</option></select>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FROTA TOTAL</div><div className="font-black text-[13px]">7 viaturas</div><div className="text-[8px]">Coaster, Hiace, Marcopolo - Relatório frota</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">RESERVAS WEB</div><div className="font-black text-[13px]">588 bilhetes</div><div className="text-[8px]">via contrata-mz - 86% online</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">OCUPAÇÃO</div><div className="font-black text-[13px]">84% média</div><div className="text-[8px]">3.2 viagens/dia - Relatório ocupação</div></div>
+              <div className="bg-[#eff6ff] border-2 border-blue-200 rounded-[10px] p-3"><div className="text-[9px] text-[#1e40af] font-bold">RELATÓRIOS</div><div className="font-black text-[12px]">Rotas + Ganhos</div><div className="text-[8px]">Maputo-Beira 1180km etc</div></div>
+            </div>
+            <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
+              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-left">VIATURA</th><th className="p-2 text-center">LUGARES</th><th className="p-2 text-left">ROTAS</th><th className="p-2 text-center">RESERVAS</th><th className="p-2 text-right">TOTAL</th></tr></thead><tbody>{transFiltradas.map(t=><tr key={t.id} onClick={()=>setViaturaSel(t)} className="border-b hover:bg-blue-50 cursor-pointer"><td className="p-2"><div className="font-bold">{t.nome}</div><div className="text-[8px] opacity-60">{t.tel} - {t.id}</div></td><td className="p-2">{t.viatura}</td><td className="p-2 text-center"><span className="bg-black text-white px-2 py-1 rounded-full text-[8px]">{t.lugares}</span></td><td className="p-2"><div className="flex gap-1 flex-wrap">{t.rotas.map(r=><span key={r} className="bg-gray-100 px-1 py-0.5 rounded text-[7px]">{r}</span>)}</div></td><td className="p-2 text-center"><span className="bg-blue-600 text-white px-2 py-1 rounded-full text-[8px]">{t.reservas}</span><div className="text-[7px] text-[#94a3b8]">via web</div></td><td className="p-2 text-right"><div className="font-bold">{t.total}</div><div className="text-[8px]">{t.faturas} faturas - Ganhos {t.ganhos}</div></td></tr>)}</tbody></table>
+            </div>
+            <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3 text-[10px]"><div className="font-black">RELATÓRIOS - VIAGENS - Ocupação por rota</div><div className="mt-2 grid grid-cols-7 gap-1">{[84,76,92,81,79,73,95].map((o,i)=><div key={i} className="text-center"><div className="bg-blue-600 rounded-t" style={{height: `${o}%`}}><div className="h-12"></div></div><div className="text-[7px] mt-1">{o}%</div></div>)}</div><div className="text-[8px] text-[#94a3b8] mt-1">Maputo-Beira, Maputo-Xai-Xai, Maputo-Inhambane etc - Relatório rotas mais lucrativas</div></div>
+            {viaturaSel && <div className="mt-3 bg-[#eff6ff] border-2 border-blue-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Tudo sobre ele: {viaturaSel.nome} - {viaturaSel.viatura} {viaturaSel.lugares} lugares</div><div className="text-[10px] mt-3 space-y-2"><div><span className="font-bold">Rotas detalhadas:</span> {viaturaSel.rotasDetalhe.map(rd=><span key={rd.rota} className="ml-2 bg-white border px-2 py-1 rounded text-[9px]">{rd.rota} {rd.km}km {rd.viagens} viagens {rd.ocupacao}%</span>)}</div><div><span className="font-bold">Quantas faturas tem:</span> {viaturaSel.faturas} - Total {viaturaSel.total} - Ganhos {viaturaSel.ganhos}</div><div><span className="font-bold">Quantos reservaram bilhete usando o web:</span> {viaturaSel.reservas} bilhetes via contrata-mz</div><div className="bg-white border rounded-[8px] p-2 text-[9px]"><div className="font-bold">Tudo sobre ele / Histórico / Relatórios:</div>{viaturaSel.historico.map((h,i)=><div key={i}>• {h}</div>)}</div></div><button onClick={()=>setViaturaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
+          </div>
+        )}
+
+        {activeParte==='ENCONTRAR' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-emerald-100 rounded grid place-items-center">🔍</span> ENCONTRAR - PEDIDOS + PROFISSIONAIS - Taxa 85%</div><div className="text-[10px] text-[#64748b] mt-2">8 pedidos abertos hoje, 12 profissionais (3 online), Match 85% - lista de quem procura carpinteiro, pedreiro etc - Relatórios</div><div className="grid grid-cols-4 gap-3 mt-3"><div className="bg-slate-900 text-white rounded-[10px] p-3"><div className="text-[9px] opacity-60">Pedidos</div><div className="text-[18px] font-bold">8</div><div className="text-[8px] opacity-60">+2 hoje</div></div><div className="bg-white border rounded-[10px] p-3"><div className="text-[9px]">Profissionais</div><div className="text-[18px] font-bold">12</div><div className="text-[8px]">3 online</div></div><div className="bg-emerald-50 border rounded-[10px] p-3"><div className="text-[9px]">Taxa Match</div><div className="text-[18px] font-bold">85%</div><div className="text-[8px]">42min médio</div></div><div className="bg-[#f0fdf4] border-2 border-emerald-200 rounded-[10px] p-3"><div className="text-[9px] font-bold text-emerald-700">RELATÓRIOS</div><div className="text-[12px] font-bold">Conversão</div><div className="text-[8px]">8→6 fechados</div></div></div><div className="mt-3 border rounded-[8px] p-3 text-[10px] space-y-2"><div>Pedido #08 - Carpinteiro Maputo - Cliente: Carlos M. - Profissional: Nagi A. - Status: Pendente</div><div>Pedido #07 - Pedreiro Beira - Cliente: Amina S. - Profissional: João C. - Status: Em andamento</div><div>Pedido #06 - Electricista Matola - Cliente: Pedro L. - Profissional: Raul M. - Status: Fechado</div></div><div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3 text-[10px]"><div className="font-black">RELATÓRIOS - ENCONTRAR</div><div className="text-[8px] text-[#94a3b8] mt-1">Top profissões: Carpinteiro 40%, Pedreiro 30%, Electricista 20% - Tempo médio match 42min - Satisfação 4.8/5</div></div></div>
+          </div>
+        )}
+
+        {activeParte==='CONTRATOS' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-slate-800 rounded grid place-items-center text-white">📄</span> CONTRATOS - CLÁUSULAS + IDS + TRANSPORTADORES - ID 9618</div><div className="text-[10px] text-[#64748b] mt-2">11 cláusulas ativas, 4-10 abertas editáveis, BI + NUIT opcional, 3 transportadores nagi, raul, joao - Relatórios contratos</div><div className="mt-3 grid grid-cols-3 gap-3"><div className="bg-slate-900 text-white rounded-[10px] p-3"><div className="text-[9px] opacity-60">Cláusulas</div><div className="text-[18px] font-bold">11 ativas</div><div className="text-[8px] opacity-60">ID 9610 - 4-10 editáveis</div></div><div className="bg-white border rounded-[10px] p-3"><div className="text-[9px]">Transportadores</div><div className="text-[18px] font-bold">7</div><div className="text-[8px]">3 ativos hoje</div></div><div className="bg-[#f8fafc] border-2 border-slate-200 rounded-[10px] p-3"><div className="text-[9px] font-bold">RELATÓRIOS</div><div className="text-[12px] font-bold">11 contratos</div><div className="text-[8px]">Maputo-Beira etc</div></div></div><div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-[10px] p-3 text-[11px] font-bold">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS - ID 9618 - MOZ - Relatório cláusulas editadas</div><div className="mt-3 flex gap-2">{['nagi','raul','joao'].map(n=><div key={n} className="flex-1 bg-white border rounded-[8px] p-3 text-[12px] font-medium text-center">{n}<div className="text-[8px] text-[#94a3b8]">3 contratos - ID 9618</div></div>)}</div><div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3 text-[10px]"><div className="font-black">RELATÓRIOS - CONTRATOS</div><div className="text-[8px] text-[#94a3b8] mt-1">Contratos por rota: Maputo-Beira 40%, Maputo-Xai-Xai 20%, etc - Cláusulas mais editadas: 7 (NUIT), 8 (Pagamento), 9 (Cancelamento)</div></div></div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+
+function App(){
 
   // V16 FINAL - OBJECT DONE 7 - 15 PROVINCIAS SA - FOTO3 REAL - BUILD OK 100%
   const [provOrigemF, setProvOrigemF] = useState("Maputo Provincia");
@@ -235,110 +359,7 @@ export default function App(){
   };
 
   
-  const AdminPrototipoExacto = ()=>{
-    const [lojaSel, setLojaSel] = React.useState(null);
-    const [viaturaSel, setViaturaSel] = React.useState(null);
-    const [searchLoja, setSearchLoja] = React.useState('');
-    const [filterLoja, setFilterLoja] = React.useState('Todas');
-    const [searchTrans, setSearchTrans] = React.useState('');
-    const [filterTrans, setFilterTrans] = React.useState('Todos');
-    const [activeParte, setActiveParte] = React.useState('FATURAR');
-    const lojas = [
-      {id:'L001', nome:'Minha Ferragem Matola', dono:'Nagi A.', tel:'+258 82 123 4567', total:'442k MT', faturas:23, stock:10, stockInicial:1124, status:'Ativa', cidade:'Matola', venda:'320 → 520', margem:'+62.5%', entrada:700, saida:320, vendasMes:520},
-      {id:'L002', nome:'Ferragem Central Maputo', dono:'Raul M.', tel:'+258 84 234 5678', total:'388k MT', faturas:19, stock:14, stockInicial:985, status:'Ativa', cidade:'Maputo', venda:'280 → 445', margem:'+58%', entrada:820, saida:285, vendasMes:445},
-      {id:'L003', nome:'Tintas & Cia Beira', dono:'João C.', tel:'+258 82 345 6789', total:'512k MT', faturas:31, stock:8, stockInicial:1230, status:'Ativa', cidade:'Beira', venda:'410 → 610', margem:'+71%', entrada:1100, saida:410, vendasMes:610},
-      {id:'L004', nome:'Material de Construção Beira', dono:'Amina S.', tel:'+258 84 456 7890', total:'298k MT', faturas:12, stock:22, stockInicial:742, status:'Inativa', cidade:'Beira', venda:'210 → 330', margem:'+57%', entrada:680, saida:210, vendasMes:330},
-      {id:'L005', nome:'Casa das Ferragens Xai-Xai', dono:'Carlos M.', tel:'+258 82 567 8901', total:'365k MT', faturas:17, stock:11, stockInicial:876, status:'Ativa', cidade:'Xai-Xai', venda:'300 → 480', margem:'+60%', entrada:790, saida:300, vendasMes:480},
-      {id:'L006', nome:'Ferragem Moderna Maputo', dono:'Fatima J.', tel:'+258 84 678 9012', total:'478k MT', faturas:26, stock:9, stockInicial:1189, status:'Ativa', cidade:'Maputo', venda:'350 → 540', margem:'+68%', entrada:950, saida:350, vendasMes:540},
-      {id:'L007', nome:'Distribuidora Sul Matola', dono:'Pedro L.', tel:'+258 82 789 0123', total:'410k MT', faturas:21, stock:13, stockInicial:1054, status:'Ativa', cidade:'Matola', venda:'310 → 495', margem:'+59%', entrada:880, saida:310, vendasMes:495},
-      {id:'L008', nome:'ConstruMax Beira', dono:'Sara T.', tel:'+258 84 890 1234', total:'256k MT', faturas:10, stock:25, stockInicial:715, status:'Inativa', cidade:'Beira', venda:'190 → 280', margem:'+47%', entrada:620, saida:190, vendasMes:280},
-      {id:'L009', nome:'Ferragens & Cia Tete', dono:'Luis N.', tel:'+258 82 901 2345', total:'534k MT', faturas:33, stock:7, stockInicial:1295, status:'Ativa', cidade:'Tete', venda:'430 → 650', margem:'+75%', entrada:1150, saida:430, vendasMes:650},
-      {id:'L010', nome:'Soluções Obras Nacala', dono:'Ines R.', tel:'+258 84 012 3456', total:'322k MT', faturas:15, stock:18, stockInicial:812, status:'Ativa', cidade:'Nacala', venda:'260 → 390', margem:'+50%', entrada:730, saida:260, vendasMes:390},
-    ];
-    const viaturas = [
-      {id:'T001', nome:'Nagi Trans', viatura:'Coaster', lugares:29, rotas:['Maputo-Beira','Maputo-Xai-Xai'], reservas:86, total:'442k MT', faturas:23, ganhos:'188k MT', tel:'+258 82 111 0001', status:'Ativo', historico:['Viatura 29 lugares registada','Contrato Maputo-Beira gerado','16 bilhetes reservados via web hoje']},
-      {id:'T002', nome:'Raul Hiace', viatura:'Hiace', lugares:15, rotas:['Maputo-Inhambane','Maputo-Beira'], reservas:54, total:'298k MT', faturas:14, ganhos:'124k MT', tel:'+258 84 222 0002', status:'Ativo', historico:['Hiace 15 lugares registado','Rota Inhambane adicionada','9 reservas web']},
-      {id:'T003', nome:'João Marcopolo', viatura:'Marcopolo', lugares:45, rotas:['Maputo-Nampula','Beira-Nampula'], reservas:112, total:'612k MT', faturas:31, ganhos:'298k MT', tel:'+258 82 333 0003', status:'Ativo', historico:['Marcopolo 45 lugares licenciado','Rota Nampula 2050km ativa','112 bilhetes via contrata-mz']},
-      {id:'T004', nome:'Amina Sprinter', viatura:'Sprinter', lugares:22, rotas:['Maputo-Tete'], reservas:68, total:'356k MT', faturas:18, ganhos:'156k MT', tel:'+258 84 444 0004', status:'Ativo', historico:['Sprinter 22 registada','10 viagens Tete','Taxa pontualidade 94%']},
-      {id:'T005', nome:'Carlos Coaster', viatura:'Coaster', lugares:29, rotas:['Beira-Chimoio','Beira-Maputo'], reservas:73, total:'378k MT', faturas:19, ganhos:'167k MT', tel:'+258 82 555 0005', status:'Inativo', historico:['Coaster 29 em manutenção','Rota Chimoio 24 viagens','73 reservas']},
-      {id:'T006', nome:'Fatima Hiace', viatura:'Hiace', lugares:18, rotas:['Maputo-Gaza'], reservas:41, total:'224k MT', faturas:11, ganhos:'92k MT', tel:'+258 84 666 0006', status:'Ativo', historico:['Hiace 18 nova','20 viagens Gaza','41 reservas web']},
-      {id:'T007', nome:'Pedro Marcopolo', viatura:'Marcopolo', lugares:50, rotas:['Maputo-Pemba','Nampula-Pemba'], reservas:134, total:'698k MT', faturas:36, ganhos:'342k MT', tel:'+258 82 777 0007', status:'Ativo', historico:['Marcopolo 50 - maior frota','5 viagens longas Pemba','134 bilhetes reservados']},
-    ];
-    const lojasFiltradas = lojas.filter(l=>{
-      const busca = searchLoja.toLowerCase();
-      const matchBusca = !busca || l.nome.toLowerCase().includes(busca) || l.dono.toLowerCase().includes(busca) || l.cidade.toLowerCase().includes(busca);
-      const matchStatus = filterLoja==='Todas' || l.status===filterLoja;
-      return matchBusca && matchStatus;
-    });
-    const transFiltradas = viaturas.filter(v=>{
-      const busca = searchTrans.toLowerCase();
-      const matchBusca = !busca || v.nome.toLowerCase().includes(busca) || v.viatura.toLowerCase().includes(busca);
-      const matchStatus = filterTrans==='Todos' || v.status===filterTrans;
-      return matchBusca && matchStatus;
-    });
-    return (
-      <div className="w-full space-y-4">
-        <div className="bg-white border rounded-[12px] p-3">
-          <div className="flex gap-2">
-            {['FATURAR','VIAGENS','ENCONTRAR','CONTRATOS'].map(p=>(
-              <button key={p} onClick={()=>setActiveParte(p)} className={activeParte===p ? 'px-4 py-2 rounded-full bg-[#facc15] text-black font-black text-[11px]' : 'px-4 py-2 rounded-full bg-white border text-[#64748b] font-bold text-[11px]'}>{p}</button>
-            ))}
-          </div>
-          <div className="text-[9px] text-[#94a3b8] mt-2">Clique numa parte para abrir página de tudo que tem a ver apenas com a parte selecionada - não todas numa tela só</div>
-        </div>
-
-        {activeParte==='FATURAR' && (
-          <div className="bg-white rounded-[12px] border p-4">
-            <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-yellow-100 rounded grid place-items-center">📦</span> FATURAR <span className="text-[9px] bg-yellow-400 text-black px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded-full">↗ +12%</div></div>
-            <div className="text-[10px] text-[#64748b]">50 LOJAS ATIVAS - CLIQUE PARA VER HISTÓRICO</div>
-            <div className="mt-3 flex gap-2">
-              <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span className="text-[12px]">🔍</span><input value={searchLoja} onChange={e=>setSearchLoja(e.target.value)} placeholder="Buscar loja, dono, cidade..." className="flex-1 text-[11px] outline-none" /></div>
-              <select value={filterLoja} onChange={e=>setFilterLoja(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todas</option><option>Ativa</option><option>Inativa</option></select>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black text-[14px]">5.4M MT</div><div className="text-[8px] text-[#94a3b8]">+23 faturas hoje</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">STOCK INICIAL</div><div className="font-black text-[14px]">1,124 itens</div><div className="text-[8px] text-[#94a3b8]">700-1300 random</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FATURAS</div><div className="font-black text-[14px]">212 total</div><div className="text-[8px] text-orange-600">+23 hoje</div></div>
-            </div>
-            <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">LOJA</th><th className="p-2 text-left">DONO</th><th className="p-2 text-left">TEL</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">FATURAS</th><th className="p-2 text-center">STOCK</th><th className="p-2 text-center">STATUS</th></tr></thead><tbody>{lojasFiltradas.map(l=><tr key={l.id} onClick={()=>setLojaSel(l)} className="border-b hover:bg-yellow-50 cursor-pointer"><td className="p-2"><div className="font-bold">{l.nome}</div><div className="text-[8px] opacity-60">{l.id} • {l.cidade}</div></td><td className="p-2">{l.dono}</td><td className="p-2 text-[9px]">{l.tel}</td><td className="p-2 text-right"><div className="font-bold">{l.total}</div><div className="text-[8px] text-green-600">{l.margem}</div></td><td className="p-2 text-center"><span className="bg-[#1e2f4a] text-white px-2 py-1 rounded-full text-[8px]">{l.faturas}</span></td><td className="p-2 text-center">{l.stock}</td><td className="p-2 text-center"><span className={l.status==='Ativa' ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-[8px] font-bold' : 'bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-[8px]'}>{l.status}</span></td></tr>)}</tbody></table>
-            </div>
-            <div className="mt-2 text-[8px] text-[#94a3b8]">10 de 50 lojas - clique na linha para histórico completo →</div>
-            {lojaSel && <div className="mt-3 bg-[#fffbeb] border-2 border-yellow-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Histórico completo: {lojaSel.nome}</div><div className="text-[10px] mt-3 grid grid-cols-2 gap-3"><div><div className="text-[8px] text-[#64748b]">DONO</div><div className="font-bold">{lojaSel.dono} - {lojaSel.tel}</div></div><div><div className="text-[8px] text-[#64748b]">CIDADE</div><div className="font-bold">{lojaSel.cidade} - {lojaSel.id}</div></div><div><div className="text-[8px] text-[#64748b]">STOCK INICIAL ARMAZÉM RANDOM</div><div className="font-black">{lojaSel.stockInicial} itens (700-1300) - só esta coluna random</div></div><div><div className="text-[8px] text-[#64748b]">VENDA</div><div className="font-bold">{lojaSel.venda} - Margem {lojaSel.margem}</div></div><div><div className="text-[8px] text-[#64748b]">O QUE FEZ E FAZ</div><div>Entrada {lojaSel.entrada}, Saída {lojaSel.saida}, Vendas Mês {lojaSel.vendasMes}, Venda Hoje 320→520 reflete stock</div></div><div><div className="text-[8px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black">{lojaSel.total} - {lojaSel.faturas} faturas - Valor 272k→442k MT</div></div></div><button onClick={()=>setLojaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
-          </div>
-        )}
-
-        {activeParte==='VIAGENS' && (
-          <div className="bg-white rounded-[12px] border p-4">
-            <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-blue-100 rounded grid place-items-center">🚌</span> VIAGENS <span className="text-[9px] bg-blue-600 text-white px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded-full">7 ativos</div></div>
-            <div className="text-[10px] text-[#64748b]">7 TRANSPORTADORES - CLIQUE PARA VER TUDO SOBRE ELE</div>
-            <div className="mt-3 flex gap-2">
-              <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span>🔍</span><input value={searchTrans} onChange={e=>setSearchTrans(e.target.value)} placeholder="Buscar transportador, viatura..." className="flex-1 text-[11px] outline-none" /></div>
-              <select value={filterTrans} onChange={e=>setFilterTrans(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todos</option><option>Ativo</option><option>Inativo</option></select>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FROTA TOTAL</div><div className="font-black text-[13px]">7 viaturas</div><div className="text-[8px]">Coaster, Hiace, Marcopolo</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">RESERVAS WEB</div><div className="font-black text-[13px]">588 bilhetes</div><div className="text-[8px]">via contrata-mz</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">OCUPAÇÃO</div><div className="font-black text-[13px]">84% média</div><div className="text-[8px]">3.2 viagens/dia</div></div>
-            </div>
-            <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-left">VIATURA</th><th className="p-2 text-center">LUGARES</th><th className="p-2 text-left">ROTAS</th><th className="p-2 text-center">RESERVAS</th><th className="p-2 text-right">TOTAL</th></tr></thead><tbody>{transFiltradas.map(t=><tr key={t.id} onClick={()=>setViaturaSel(t)} className="border-b hover:bg-blue-50 cursor-pointer"><td className="p-2"><div className="font-bold">{t.nome}</div><div className="text-[8px] opacity-60">{t.tel} - {t.id}</div></td><td className="p-2">{t.viatura}</td><td className="p-2 text-center"><span className="bg-black text-white px-2 py-1 rounded-full text-[8px]">{t.lugares}</span></td><td className="p-2"><div className="flex gap-1 flex-wrap">{t.rotas.map(r=><span key={r} className="bg-gray-100 px-1 py-0.5 rounded text-[7px]">{r}</span>)}</div></td><td className="p-2 text-center"><span className="bg-blue-600 text-white px-2 py-1 rounded-full text-[8px]">{t.reservas}</span><div className="text-[7px] text-[#94a3b8]">via web</div></td><td className="p-2 text-right"><div className="font-bold">{t.total}</div><div className="text-[8px]">{t.faturas} faturas</div></td></tr>)}</tbody></table>
-            </div>
-            {viaturaSel && <div className="mt-3 bg-[#eff6ff] border-2 border-blue-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Tudo sobre ele: {viaturaSel.nome} - {viaturaSel.viatura} {viaturaSel.lugares} lugares</div><div className="text-[10px] mt-3 space-y-2"><div><span className="font-bold">Rotas:</span> {viaturaSel.rotasDetalhe.map(rd=><span key={rd.rota} className="ml-2">{rd.rota} {rd.km}km {rd.viagens} viagens {rd.ocupacao}% ocupação</span>)}</div><div><span className="font-bold">Quantas faturas tem:</span> {viaturaSel.faturas} - Total {viaturaSel.total} - Ganhos {viaturaSel.ganhos}</div><div><span className="font-bold">Quantos reservaram bilhete usando o web:</span> {viaturaSel.reservas} bilhetes via contrata-mz</div><div className="bg-white border rounded-[8px] p-2 text-[9px]"><div className="font-bold">Tudo sobre ele / Histórico:</div>{viaturaSel.historico.map((h,i)=><div key={i}>• {h}</div>)}</div></div><button onClick={()=>setViaturaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
-          </div>
-        )}
-
-        {activeParte==='ENCONTRAR' && (
-          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px]">ENCONTRAR - PEDIDOS + PROFISSIONAIS - Taxa 85%</div><div className="text-[10px] text-[#64748b] mt-2">8 pedidos abertos hoje, 12 profissionais (3 online), Match 85% - lista de quem procura carpinteiro, pedreiro etc</div><div className="grid grid-cols-3 gap-3 mt-3"><div className="bg-slate-900 text-white rounded-[10px] p-3"><div className="text-[9px] opacity-60">Pedidos</div><div className="text-[18px] font-bold">8</div></div><div className="bg-white border rounded-[10px] p-3"><div className="text-[9px]">Profissionais</div><div className="text-[18px] font-bold">12</div></div><div className="bg-emerald-50 border rounded-[10px] p-3"><div className="text-[9px]">Taxa</div><div className="text-[18px] font-bold">85%</div></div></div><div className="mt-3 border rounded-[8px] p-3 text-[10px]">Ex: Pedido #08 - Carpinteiro Maputo - Cliente: Carlos M. - Profissional: Nagi A. - Status: Pendente - Clique para ver tudo sobre este pedido</div></div>
-        )}
-
-        {activeParte==='CONTRATOS' && (
-          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px]">CONTRATOS - CLÁUSULAS + IDS + TRANSPORTADORES - ID 9618</div><div className="text-[10px] text-[#64748b] mt-2">11 cláusulas ativas, 4-10 abertas editáveis, BI + NUIT opcional, 3 transportadores nagi, raul, joao</div><div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-[10px] p-3 text-[11px] font-bold">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS - ID 9618 - MOZ</div><div className="mt-3 flex gap-2">{['nagi','raul','joao'].map(n=><div key={n} className="flex-1 bg-white border rounded-[8px] p-3 text-[12px] font-medium text-center">{n}<div className="text-[8px] text-[#94a3b8]">3 contratos</div></div>)}</div></div>
-        )}
-      </div>
-    );
-  };
-
+  
   const [dataStockSelecionada, setDataStockSelecionada] = useState(new Date().toISOString().split('T')[0]); const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
