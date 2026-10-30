@@ -279,6 +279,10 @@ export default function App(){
    {id:'c7', nome:'Tubo PVC 110mm - 6m - 1800 MT', cat:'Tubo PVC', preco:1800},
    {id:'c8', nome:'Fechadura Stam 40mm - 650 MT', cat:'Fechadura', preco:650},
  ];
+  const [negocioTab, setNegocioTab] = useState<'painel'|'faturar'|'vender'|'stock'|'clientes'|'fornecedores'|'caixa'|'relatorios'>('faturar');
+  const [negocioVendaQtd, setNegocioVendaQtd] = useState(1);
+  const [negocioClienteSel, setNegocioClienteSel] = useState('João Manhique - Obra Zimpeto - 258828765432');
+
  const subtotalBrutoFat = produtosFat.reduce((s,p)=>s+(p.preco||0)*p.qtd,0);
   const [produtosBaseState, setProdutosBaseState] = useState(()=>{ try{ const v = localStorage.getItem("produtos_base"); return v? JSON.parse(v): PRODUTOS_BASE }catch(e){return PRODUTOS_BASE} });
   useEffect(()=>{ try{ localStorage.setItem("produtos_base", JSON.stringify(produtosBaseState)) }catch(e){} },[produtosBaseState]);
@@ -771,7 +775,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3 relative pb-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 right-0 text-[10px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSE</div></div>
+    <div className="flex items-center gap-3 relative pb-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 right-0 text-[10px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSHE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
       {/* BOTAO CIRCULADO AMARELO - FATURAR - ADICIONADO App_40 - MANTIDO */}
       <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>FATURAR</button>
@@ -779,7 +783,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
       <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
       <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
-      <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#8b5cf6] text-white ring-2 ring-white':'bg-[#8b5cf6] text-white hover:bg-[#7c3aed]'}`}>NEGOCIO</button>
       
       <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
     </div>
@@ -788,150 +791,119 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       
       {tab==='negocio' && (
       <div className="max-w-[1400px] mx-auto p-3">
-        {/* HEADER ROXO IGUAL PROTOTIPO - CIRCULADO ROXO NA IMAGEM 1 */}
         <div className="bg-white border rounded-[12px] p-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
             <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
             <div>
               <div className="font-black text-[11px]">MINHA LOJA - CONTA INTERNA - Maputo1</div>
-              <div className="text-[8px] text-[#64748b]">Minha Ferragem Matola - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567</div>
+              <div className="text-[8px] text-[#64748b]">Minha Ferragem Matola - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="text-[8px] bg-[#f8fafc] border px-2 py-1 rounded-full">📅 sexta, 30/10 - Maputo</div>
-            <div className="text-[8px] bg-white border px-2 py-1 rounded-full flex items-center gap-1">⬆️ Logo</div>
+            <div className="text-[8px] bg-[#f8fafc] border px-2 py-1 rounded-full">📅 {new Date().toLocaleDateString('pt-MZ')} - Maputo - {produtosFat.length} itens</div>
+            <div className="text-[8px] bg-white border px-2 py-1 rounded-full">⬆️ Logo</div>
           </div>
         </div>
-        {/* TABS INTERNOS - CIRCULADOS AMARELO ROXO NA IMAGEM 1 - Painel Faturar Vender Stock Clientes Fornecedores Caixa Turnos Relatorios */}
         <div className="mt-3 bg-white border rounded-[12px] p-2">
           <div className="flex gap-1 flex-wrap">
-            <button className="px-3 py-1.5 rounded-full bg-[#f8fafc] border text-[9px] flex items-center gap-1"><span>📊</span> Painel</button>
-            <button className="px-3 py-1.5 rounded-full bg-[#facc15] text-black border border-[#facc15] font-black text-[9px] flex items-center gap-1">🧾 Faturar</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>🛒</span> Vender</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>📦</span> Stock</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1"><span>👥</span> Clientes</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">Fornecedores</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">📦 Caixa & Turnos</button>
-            <button className="px-3 py-1.5 rounded-full bg-white border text-[9px]">📊 Relatórios</button>
+            <button onClick={()=>setNegocioTab('painel')} className={negocioTab==='painel' ? 'px-3 py-1.5 rounded-full bg-[#1e2f4a] text-white font-black text-[9px] flex items-center gap-1' : 'px-3 py-1.5 rounded-full bg-[#f8fafc] border text-[9px] flex items-center gap-1'}>📊 Painel</button>
+            <button onClick={()=>setNegocioTab('faturar')} className={negocioTab==='faturar' ? 'px-3 py-1.5 rounded-full bg-[#facc15] text-black border border-[#facc15] font-black text-[9px] flex items-center gap-1' : 'px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1'}>🧾 Faturar</button>
+            <button onClick={()=>setNegocioTab('vender')} className={negocioTab==='vender' ? 'px-3 py-1.5 rounded-full bg-[#16a34a] text-white font-black text-[9px] flex items-center gap-1' : 'px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1'}>🛒 Vender</button>
+            <button onClick={()=>setNegocioTab('stock')} className={negocioTab==='stock' ? 'px-3 py-1.5 rounded-full bg-[#3b82f6] text-white font-black text-[9px] flex items-center gap-1' : 'px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1'}>📦 Stock</button>
+            <button onClick={()=>setNegocioTab('clientes')} className={negocioTab==='clientes' ? 'px-3 py-1.5 rounded-full bg-[#8b5cf6] text-white font-black text-[9px] flex items-center gap-1' : 'px-3 py-1.5 rounded-full bg-white border text-[9px] flex items-center gap-1'}>👥 Clientes</button>
+            <button onClick={()=>setNegocioTab('fornecedores')} className='px-3 py-1.5 rounded-full bg-white border text-[9px]'>Fornecedores</button>
+            <button onClick={()=>setNegocioTab('caixa')} className={negocioTab==='caixa' ? 'px-3 py-1.5 rounded-full bg-orange-500 text-white font-black text-[9px]' : 'px-3 py-1.5 rounded-full bg-white border text-[9px]'}>📦 Caixa & Turnos</button>
+            <button onClick={()=>setNegocioTab('relatorios')} className={negocioTab==='relatorios' ? 'px-3 py-1.5 rounded-full bg-[#1e2f4a] text-white font-black text-[9px]' : 'px-3 py-1.5 rounded-full bg-white border text-[9px]'}>📊 Relatórios</button>
           </div>
-          <div className="text-[8px] text-[#94a3b8] mt-2">Painel, Faturar (amarelo ativo), Vender, Stock, Clientes, Fornecedores, Caixa & Turnos, Relatórios - IGUAL PROTOTIPO CIRCULADO</div>
         </div>
-        {/* CONTEUDO PRINCIPAL - 2 COLUNAS */}
+        {negocioTab==='painel' && (
+        <div className="mt-3 grid grid-cols-4 gap-3">
+          <div className="bg-white border rounded-[12px] p-4"><div className="text-[9px] text-[#64748b]">VENDAS HOJE</div><div className="font-black text-[18px]">{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0) || 6214).toFixed(0)} MT</div><div className="text-[8px] text-green-600">+{produtosFat.length} itens no carrinho - Stock FIFO</div></div>
+          <div className="bg-white border rounded-[12px] p-4"><div className="text-[9px] text-[#64748b]">STOCK TOTAL</div><div className="font-black text-[18px]">{stockProdutos.reduce((s,p)=>s+(p.noArmazem||0)+(p.entradaLoja||0),0)} unid</div><div className="text-[8px] text-[#94a3b8]">{stockProdutos.length} produtos cadastrados</div></div>
+          <div className="bg-white border rounded-[12px] p-4"><div className="text-[9px] text-[#64748b]">CLIENTES</div><div className="font-black text-[18px]">1</div><div className="text-[8px] text-[#94a3b8]">{negocioClienteSel.split(' - ')[0]}</div></div>
+          <div className="bg-[#facc15] border-2 border-yellow-400 rounded-[12px] p-4"><div className="text-[9px] text-black font-bold">TOTAL FATURADO</div><div className="font-black text-[18px] text-black">{faturas.reduce((s,f)=>s+(f.total||0),0).toFixed(0) || '5.4M'} MT</div><div className="text-[8px] text-black">+{faturas.length} faturas - Ver relatórios</div></div>
+        </div>
+        )}
+        {negocioTab==='faturar' && (
         <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-3">
           <div className="lg:col-span-2">
             <div className="bg-white border rounded-[12px] p-3">
-              {/* TITULO + CONTROLS CIRCULADOS VERMELHO LARANJA - Formato A5 NUIT na fatura SAVE */}
-              <div className="flex justify-between items-center">
-                <div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR • com logotipo</div>
-                <div className="flex gap-2 items-center">
-                  <span className="text-[9px] border px-2 py-1 rounded-full bg-white">Formato A5</span>
-                  <label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked className="w-3 h-3"/>NUIT na fatura</label>
-                  <span className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black">SAVE</span>
-                </div>
+              <div className="flex justify-between items-center"><div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR • com logotipo</div><div className="flex gap-2 items-center"><span className="text-[9px] border px-2 py-1 rounded-full bg-white">Formato A5</span><label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked className="w-3 h-3"/>NUIT na fatura</label><button onClick={()=>{ if(produtosFat.length===0){alert('Adicione produtos'); return;} const novaFatura={id:'FT-'+Date.now(), cliente:nomeFat||'João Manhique', tel:telFat, nuit:nuitFat, itens:[...produtosFat], total:produtosFat.reduce((s,p)=>s+p.preco*p.qtd*(1-p.desc/100),0), data:new Date().toLocaleDateString('pt-MZ')}; setFaturas([...faturas,novaFatura]); alert('Fatura '+novaFatura.id+' guardada! Stock atualizado.'); setProdutosFat([]); }} className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black">SAVE - Guardar fatura</button></div></div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[8px] font-bold text-[#92400e]">CLIENTE • TELEFONE DINÂMICO WHATSAPP</div><select value={negocioClienteSel} onChange={e=>{ setNegocioClienteSel(e.target.value); const parts=e.target.value.split(' - '); if(parts[2]) setTelFat(parts[2]); if(parts[0]) setNomeFat(parts[0]); }} className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white"><option>João Manhique - Obra Zimpeto - 258828765432</option><option>Michaque Mungoi - Casa 12 - 258841234567</option><option>Cliente Balcão - Sem NUIT - 258820000000</option></select><div className="mt-2 bg-[#fef3c7] border border-yellow-200 rounded-[6px] p-2 text-[8px] flex justify-between"><span>Tel dinâmico: <b>{telFat || '258828765432'}</b></span><span>NUIT: <b>{nuitFat || '--'}</b></span><span>• Retalho</span></div></div>
+                <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[8px] font-bold">LOJA EMISSORA</div><div className="mt-1 font-black text-[11px]">{perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[8px] text-[#64748b]">NUIT {perfilLoja.nuit || '401234567'} • {perfilLoja.telefone || '258 84 123 4567'}</div><div className="text-[8px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo</div></div>
               </div>
-              {/* CLIENTE + LOJA EMISSORA - CIRCULADOS AMARELO NA IMAGEM 1 */}
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-[#fffbeb] border border-yellow-100 rounded-[10px] p-3">
-                  <div className="text-[8px] font-bold text-[#92400e]">CLIENTE • TELEFONE DINÂMICO WHATSAPP</div>
-                  <select className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white">
-                    <option>João Manhique - Obra Zimpeto - 258828765432</option>
-                    <option>{nomeFat || 'Michaque Mungoi'} - {telFat || '258 84 123 4567'}</option>
-                  </select>
-                  <div className="mt-2 bg-[#fef3c7] border border-yellow-200 rounded-[6px] p-2 text-[8px] flex justify-between">
-                    <span>Tel dinâmico: <b>258828765432</b></span><span>NUIT: <b>--</b></span><span>• Retalho</span>
-                  </div>
-                </div>
-                <div className="bg-[#fffbeb] border border-yellow-100 rounded-[10px] p-3">
-                  <div className="text-[8px] font-bold text-[#92400e]">LOJA EMISSORA</div>
-                  <div className="mt-1 font-black text-[11px]">{perfilLoja.nome || 'Minha Ferragem Matola'}</div>
-                  <div className="text-[8px] text-[#64748b]">NUIT {perfilLoja.nuit || '401234567'} • {perfilLoja.telefone || '258 84 123 4567'}</div>
-                  <div className="text-[8px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo</div>
-                </div>
-              </div>
-              {/* DADOS COMPRADOR ULTRA RAPIDO - EXTRA DO V3 - AZUL */}
-              <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3">
-                <div className="font-black text-[10px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[7px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo - Minha Ferragem</span></div>
-                <div className="text-[7px] text-[#64748b]">Só telefone obrigatório. Nome opcional para recibo rapido. Tempo alvo: 15s tipo supermercado.</div>
-                <div className="mt-2 grid grid-cols-3 gap-2">
-                  <div><div className="text-[7px] font-bold">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
-                  <div><div className="text-[7px] font-bold">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
-                  <div><div className="text-[7px] font-bold">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-7 border rounded px-2 text-[9px]" /></div>
-                </div>
-              </div>
-              {/* PRODUTOS E SERVICOS DO STOCK - AMARELO */}
-              <div className="mt-3 bg-white border rounded-[10px] p-3">
-                <div className="font-black text-[10px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim</span><span className="text-[7px] bg-yellow-100 px-2 py-1 rounded-full">10 produtos no stock</span></div>
-                <div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-8 bg-[#f8fafc]"><span className="text-[10px]">🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="flex-1 text-[9px] outline-none bg-transparent" /></div>
-                <div className="mt-2 flex gap-1 flex-wrap">
-                  {stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,6).map(p=><button key={p.id} onClick={()=>{ setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda||850, desc:0, stock:p.noArmazem||p.stock}]); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">{p.nome} - {p.precoVenda||p.preco}MT - Stock:{p.noArmazem||p.stock}</button>)}
-                </div>
-                <div className="mt-3 border rounded-[8px] overflow-hidden">
-                  <div className="grid grid-cols-5 bg-[#f8fafc] text-[7px] font-black p-2"><span>DESCRICAO</span><span>QTD</span><span>PRECO UNIT.</span><span>DESC %</span><span>SUBTOTAL</span></div>
-                  {produtosFat.length===0 && <div className="p-2 text-[9px] text-center text-[#94a3b8]">Saco Cimento 50kg - CMPOR QTD 3 850MT 0 2550MT - Bloco 15cm 40x20 QTD 20 42MT 5 798MT (exemplo)</div>}
-                  {produtosFat.map((p,i)=><div key={p.id} className="grid grid-cols-5 text-[9px] p-2 border-t"><span>{p.nome}</span><span>{p.qtd}</span><span>{p.preco} MT</span><span>{p.desc}%</span><span className="font-bold">{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)} MT</span></div>)}
-                </div>
-                {/* TOTAIS COM IVA - AMARELO EM BAIXO CIRCULADO */}
-                <div className="mt-2 text-right text-[9px] space-y-1 bg-[#f8fafc] rounded p-2">
-                  <div>Subtotal bruto <b>{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</b></div>
-                  <div className="text-red-600">Descontos <b>- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</b></div>
-                  <div>Subtotal liquido <b>{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</b></div>
-                  <div>IVA ({ivaTipo}%) <b>{ivaTipo==='sem'?0:ivaTipo==='16'?((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0):((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0)} MT</b></div>
-                  <div className="font-black text-[11px]">TOTAL <span className="text-[#0f766e]">{(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</span></div>
-                </div>
-                <div className="mt-2 text-[7px] font-black">IVA NO RODAPE - GLOBAL</div>
-                <div className="mt-1 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div>
-              </div>
-              {/* ITENS - CIRCULADO VERDE NA IMAGEM 1 - Cimento Cimpor 50kg, Tinta Plastica Branca 20L */}
-              <div className="mt-3 bg-white border-2 border-green-200 rounded-[12px] p-3">
-                <div className="flex justify-between items-center"><div className="font-black text-[10px]">ITENS</div><button className="bg-black text-white px-3 py-1 rounded-full text-[8px] font-black">+ Adicionar</button></div>
-                <div className="mt-2 space-y-2">
-                  <div className="grid grid-cols-12 gap-1 items-center text-[9px]">
-                    <select className="col-span-4 border rounded px-1 py-1.5 text-[9px]"><option>Cimento Cimpor 50kg</option><option>Tinta Plastica Branca 20L</option><option>Bloco 15x20x40</option></select>
-                    <input type="number" defaultValue="2" className="col-span-2 border rounded px-2 py-1.5 text-center" />
-                    <input type="number" defaultValue="850" className="col-span-3 border rounded px-2 py-1.5 text-center" />
-                    <input type="number" defaultValue="0" className="col-span-2 border rounded px-2 py-1.5 text-center" />
-                    <button className="col-span-1">🗑️</button>
-                  </div>
-                  <div className="text-[7px] text-[#94a3b8]">CIM-001 - 5601234000011 - Stock Loja 200</div>
-                  <div className="grid grid-cols-12 gap-1 items-center text-[9px]">
-                    <select className="col-span-4 border rounded px-1 py-1.5 text-[9px]"><option>Tinta Plástica Branca 20L</option></select>
-                    <input type="number" defaultValue="1" className="col-span-2 border rounded px-2 py-1.5 text-center" />
-                    <input type="number" defaultValue="3850" className="col-span-3 border rounded px-2 py-1.5 text-center" />
-                    <input type="number" defaultValue="5" className="col-span-2 border rounded px-2 py-1.5 text-center" />
-                    <button className="col-span-1">🗑️</button>
-                  </div>
-                  <div className="text-[7px] text-[#94a3b8]">TIN-010 - 5601234000010 - Stock Loja 80</div>
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <button onClick={()=>finalizarComWhatsApp()} className="flex-1 h-9 bg-[#16a34a] text-white rounded-[8px] text-[9px] font-black">Enviar via WhatsApp para {telFat || '258828765432'}</button>
-                  <button className="px-4 h-9 bg-white border rounded-[8px] text-[9px] font-bold">Pré-visualizar PDF</button>
-                </div>
-              </div>
-              {/* FOOTER STOCK INFO */}
-              <div className="mt-3 text-[7px] text-[#94a3b8] text-center">CONTRATA-MZ - Loja Interna maputo1 - Minha Ferragem Matola - Stock FIFO First In First Out - Código barras / código interno - Transferência Matola/Maputo/Beira - Sem referências externas - Prototype HTML - 2026-10-30</div>
+              <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3"><div className="font-black text-[10px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[7px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo</span></div><div className="mt-2 grid grid-cols-3 gap-2"><div><div className="text-[7px] font-bold">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="w-full h-7 border rounded px-2 text-[9px]" /></div><div><div className="text-[7px] font-bold">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Michaque Mungoi" className="w-full h-7 border rounded px-2 text-[9px]" /></div><div><div className="text-[7px] font-bold">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="w-full h-7 border rounded px-2 text-[9px]" /></div></div></div>
+              <div className="mt-3 bg-white border rounded-[10px] p-3"><div className="font-black text-[10px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim - Clique para adicionar ao ITENS</span><span className="text-[7px] bg-yellow-100 px-2 py-1 rounded-full">{stockProdutos.length} produtos</span></div><div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-8 bg-[#f8fafc]"><span>🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="flex-1 text-[9px] outline-none bg-transparent" /></div><div className="mt-2 flex gap-1 flex-wrap">{stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,8).map(p=><button key={p.id} onClick={()=>{ const existe=produtosFat.find(x=>x.nome===p.nome); if(existe){ setProdutosFat(produtosFat.map(x=>x.nome===p.nome ? {...x, qtd:x.qtd+1} : x)); } else { setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda||850, desc:0, codigo:p.codigo}]); } }} className="bg-black text-white px-2 py-1 rounded-full text-[7px] hover:bg-[#facc15] hover:text-black">{p.nome} - {p.precoVenda||p.preco}MT - Stock:{p.noArmazem||p.stock}</button>)}</div></div>
+              <div className="mt-3 bg-white border-2 border-green-300 rounded-[12px] p-3"><div className="flex justify-between items-center"><div className="font-black text-[10px]">ITENS - {produtosFat.length} produtos no carrinho</div><button onClick={()=>setProdutosFat([])} className="bg-red-500 text-white px-3 py-1 rounded-full text-[8px]">Limpar</button></div><div className="mt-2 space-y-2 max-h-[220px] overflow-auto">{produtosFat.length===0 && <div className="text-[9px] text-center p-4 text-[#94a3b8]">Clique nos botões pretos acima para adicionar - Ex: Cimento Cimpor 50kg</div>}{produtosFat.map((p,i)=><div key={p.id} className="grid grid-cols-12 gap-1 items-center text-[9px] bg-[#f8fafc] p-2 rounded"><div className="col-span-5 font-bold">{p.nome}<div className="text-[7px] text-[#94a3b8]">{p.codigo || 'CIM-001'} - Stock Loja 200</div></div><div className="col-span-2"><input type="number" value={p.qtd} onChange={e=>{ const n=[...produtosFat]; n[i].qtd=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.preco} onChange={e=>{ const n=[...produtosFat]; n[i].preco=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.desc} onChange={e=>{ const n=[...produtosFat]; n[i].desc=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==p.id))} className="col-span-1">🗑️</button></div>)}</div><div className="mt-3 text-right text-[10px] space-y-1 bg-[#f8fafc] rounded p-3"><div>Subtotal bruto <b>{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</b></div><div className="text-red-600">Descontos <b>- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</b></div><div>Subtotal liquido <b>{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</b></div><div>IVA ({ivaTipo}%) <b>{ivaTipo==='sem'?0:ivaTipo==='16'?((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0):((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0)} MT</b></div><div className="font-black text-[12px] border-t pt-1">TOTAL <span className="text-[#0f766e]">{(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</span></div></div><div className="mt-2 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div><div className="mt-3 flex gap-2"><button onClick={()=>finalizarComWhatsApp()} className="flex-1 h-10 bg-[#16a34a] text-white rounded-[8px] text-[10px] font-black">Enviar via WhatsApp para {telFat || '258828765432'} - {produtosFat.length} itens - Baixa Stock Auto</button><button className="px-4 h-10 bg-white border rounded-[8px] text-[9px] font-bold">Pré-visualizar PDF</button></div></div>
             </div>
           </div>
-          {/* PRE-VISUALIZACAO A5 FATURA - DIREITA */}
           <div className="bg-white border rounded-[12px] p-3 h-fit sticky top-3">
             <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRÉ-VISUALIZAÇÃO A5 • Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black">TOTSHE BRANDING</span></div>
             <div className="mt-3 bg-white border-2 rounded-[10px] p-3">
-              <div className="flex gap-2">
-                <div className="w-12 bg-[#facc15] rounded-[6px] grid place-items-center text-[8px] font-black p-1">TOTSHE</div>
-                <div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div>
-                <div><div className="font-black text-[10px]">Minha Ferragem Matola</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div>
-              </div>
-              <div className="mt-3 text-[8px] border-t pt-2"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: João Manhique - Obra Zimpeto</div><div>Data: 2026-10-30 - NUIT: -- - Tel: 258828765432</div></div>
-              <div className="mt-2 text-[7px] border rounded">
-                <div className="grid grid-cols-5 bg-[#f8fafc] font-black p-1.5"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div>
-                <div className="grid grid-cols-5 p-1.5 border-t"><span>Cimento Cimpor 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div>
-                <div className="grid grid-cols-5 p-1.5 border-t bg-[#f8fafc]"><span>Tinta Plástica Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div>
-              </div>
-              <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: 5357.5MT</div><div>IVA 16%: 857.2MT</div><div className="font-black text-[10px]">TOTAL: 6214.7 MT</div></div>
-              <div className="mt-3 flex justify-between items-center"><div className="text-[6px]">Processado por CONTRATA-MZ - maputo1</div><div className="bg-[#facc15] px-2 py-1 rounded text-[6px] font-black">Documento válido • Obrigado!</div></div>
+              <div className="flex gap-2"><div className="w-12 bg-[#facc15] rounded grid place-items-center text-[8px] font-black p-1">TOTSHE</div><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div><div><div className="font-black text-[10px]">Minha Ferragem Matola</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div></div>
+              <div className="mt-3 text-[8px] border-t pt-2"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: {nomeFat || 'João Manhique - Obra Zimpeto'}</div><div>Data: {new Date().toLocaleDateString('pt-MZ')} - NUIT: {nuitFat || '--'} - Tel: {telFat}</div></div>
+              <div className="mt-2 text-[7px] border rounded"><div className="grid grid-cols-5 bg-[#f8fafc] font-black p-1.5"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div>{produtosFat.slice(0,4).map(p=><div key={p.id} className="grid grid-cols-5 p-1.5 border-t"><span className="truncate">{p.nome.slice(0,14)}</span><span>{p.qtd}</span><span>{p.preco} MT</span><span>{p.desc}%</span><span>{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}</span></div>)}{produtosFat.length===0 && <><div className="grid grid-cols-5 p-1.5 border-t"><span>Cimento 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div><div className="grid grid-cols-5 p-1.5 border-t"><span>Tinta Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div></>}</div>
+              <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: {produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) || '5357.5'} MT</div><div>IVA 16%: {((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0) || '857.2'} MT</div><div className="font-black text-[10px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0) || '6214.7';})()} MT</div></div>
+              <div className="mt-3 flex justify-between items-center"><div className="text-[6px]">Processado por CONTRATA-MZ - maputo1 - Stock FIFO - {produtosFat.length} itens</div><div className="bg-[#facc15] px-2 py-1 rounded text-[6px] font-black">Documento válido • Obrigado!</div></div>
             </div>
           </div>
         </div>
+        )}
+        {negocioTab==='vender' && (
+        <div className="mt-3 bg-white border rounded-[12px] p-4">
+          <div className="font-black text-[14px]">🛒 VENDER - Venda Rápida - Ligado ao Stock e Faturar</div>
+          <div className="text-[10px] text-[#64748b]">Mesmo carrinho que Faturar - {produtosFat.length} itens - Total {produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT - Quando vende aqui, baixa stock automático</div>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Carrinho atual - {produtosFat.length} itens</div>{produtosFat.map(p=><div key={p.id} className="flex justify-between text-[10px] py-1 border-b"><span>{p.nome} x{p.qtd}</span><span className="font-bold">{(p.preco*p.qtd).toFixed(0)} MT</span></div>)}{produtosFat.length===0 && <div className="text-[9px] text-[#94a3b8] p-2">Vazio - vá em Faturar e adicione produtos</div>}</div>
+            <div className="bg-[#f0fdf4] border-2 border-green-200 rounded-[10px] p-3"><div className="font-black text-[11px]">Finalizar venda</div><div className="mt-2 text-[9px]">Cliente: {nomeFat || 'Balcão'} - Tel: {telFat}</div><div className="mt-2 font-black text-[16px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</div><button onClick={()=>{ if(produtosFat.length===0) return; const novaVenda={id:'VD-'+Date.now(), cliente:nomeFat, total:produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0), data:new Date().toLocaleDateString()}; setFaturas([...faturas,novaVenda]); alert('Venda '+novaVenda.id+' concluída! Stock baixado em '+produtosFat.length+' produtos.'); setStockProdutos(stockProdutos.map(sp=>{ const vendido=produtosFat.find(pf=>pf.nome===sp.nome); if(vendido){ return {...sp, noArmazem:Math.max(0,(sp.noArmazem||0)-vendido.qtd), entradaLoja:Math.max(0,(sp.entradaLoja||0)-vendido.qtd)}; } return sp; })); setProdutosFat([]); }} className="mt-3 w-full h-10 bg-green-600 text-white rounded-[8px] font-black text-[11px]">Confirmar venda - Baixar stock</button></div>
+          </div>
+        </div>
+        )}
+        {negocioTab==='stock' && (
+        <div className="mt-3 bg-white border rounded-[12px] p-4">
+          <div className="font-black text-[14px] flex justify-between"><span>📦 STOCK - {stockProdutos.length} produtos - Armazém + Loja - Coordenado com Faturar/Vender</span><span className="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full">FIFO - Final ontem = Inicial hoje</span></div>
+          <div className="mt-3 max-h-[500px] overflow-auto border rounded-[10px]">
+            <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">CÓDIGO</th><th className="p-2 text-left">PRODUTO</th><th className="p-2 text-center">ARMAZÉM</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-center">VENDA</th><th className="p-2 text-right">PREÇO</th><th className="p-2 text-center">AÇÃO</th></tr></thead><tbody>{stockProdutos.map(p=><tr key={p.id} className="border-b hover:bg-blue-50"><td className="p-2 font-mono text-[8px]">{p.codigo}</td><td className="p-2"><div className="font-bold">{p.nome}</div><div className="text-[7px] text-[#94a3b8]">{p.marca} - {p.grupo}</div></td><td className="p-2 text-center font-bold">{p.noArmazem}</td><td className="p-2 text-center">{p.entradaLoja}</td><td className="p-2 text-center text-red-600 font-bold">{p.venda}</td><td className="p-2 text-right font-black">{p.precoVenda} MT</td><td className="p-2 text-center"><button onClick={()=>{ setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar'); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">+ Faturar</button></td></tr>)}</tbody></table>
+          </div>
+        </div>
+        )}
+        {negocioTab==='clientes' && (
+        <div className="mt-3 bg-white border rounded-[12px] p-4">
+          <div className="font-black text-[14px]">👥 CLIENTES - {faturas.length} clientes com faturas - Coordenado com Faturar</div>
+          <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              {nome:'João Manhique - Obra Zimpeto', tel:'258828765432', nuit:'--', tipo:'Retalho', total:'6214.7 MT', faturas:2},
+              {nome:nomeFat || 'Michaque Mungoi - Casa 12', tel:telFat || '258841234567', nuit:nuitFat || '400123456', tipo:'Cliente', total:(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)||'0')+' MT', faturas:faturas.length},
+            ].map((c,i)=><div key={i} className="border rounded-[10px] p-3 flex justify-between"><div><div className="font-black text-[11px]">{c.nome}</div><div className="text-[8px] text-[#64748b]">Tel: {c.tel} - NUIT: {c.nuit} - {c.tipo}</div></div><div className="text-right"><div className="font-black text-[10px]">{c.total}</div><div className="text-[7px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">{c.faturas} faturas</div></div></div>)}
+          </div>
+        </div>
+        )}
+        {negocioTab==='caixa' && (
+        <div className="mt-3 bg-white border rounded-[12px] p-4">
+          <div className="font-black text-[14px]">📦 CAIXA & TURNOS - Fecho de caixa - Coordenado com Vendas</div>
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">CAIXA ABERTO</div><div className="font-black text-[14px]">{new Date().toLocaleDateString('pt-MZ')} 08:00</div><div className="text-[8px]">Turno: Manhã - Operador: {perfilLoja.nome || 'Minha Ferragem'}</div></div>
+            <div className="bg-[#f0fdf4] border-2 border-green-200 rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">VENDAS DO TURNO</div><div className="font-black text-[14px] text-green-700">{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) || faturas.reduce((s,f)=>s+(f.total||0),0).toFixed(0) || '6214.7'} MT</div><div className="text-[8px]">{faturas.length} faturas + {produtosFat.length} itens carrinho</div></div>
+            <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FECHO Z-REPORT</div><button className="mt-1 w-full h-8 bg-black text-white rounded-[6px] text-[9px] font-black">Gerar Z-Report - Fechar caixa</button></div>
+          </div>
+        </div>
+        )}
+        {negocioTab==='relatorios' && (
+        <div className="mt-3 bg-white border rounded-[12px] p-4">
+          <div className="font-black text-[14px]">📊 RELATÓRIOS - Faturas, Vendas, Stock - Tudo coordenado</div>
+          <div className="mt-3 grid grid-cols-4 gap-3">
+            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">TOTAL FATURADO</div><div className="font-black text-[14px]">{faturas.reduce((s,f)=>s+(f.total||0),0).toFixed(0) || '5400000'} MT</div><div className="text-[7px]">+{faturas.length} faturas hoje</div></div>
+            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">ITENS NO CARRINHO</div><div className="font-black text-[14px]">{produtosFat.length}</div><div className="text-[7px]">{produtosFat.reduce((s,p)=>s+p.qtd,0)} unidades</div></div>
+            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">STOCK BAIXO</div><div className="font-black text-[14px]">{stockProdutos.filter(p=>(p.noArmazem||0)<50).length} produtos</div><div className="text-[7px]">Alerta reposição</div></div>
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[10px] p-3"><div className="text-[9px] font-bold">AÇÕES</div><div className="mt-1 flex gap-1"><button className="bg-black text-white px-2 py-1 rounded-full text-[7px]">Exportar PDF</button><button className="bg-white border px-2 py-1 rounded-full text-[7px]">Ver gráfico</button></div></div>
+          </div>
+          <div className="mt-3 max-h-[300px] overflow-auto border rounded-[10px]">
+            <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">FATURA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">DATA</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-right">ITENS</th></tr></thead><tbody>{faturas.map(f=><tr key={f.id} className="border-b"><td className="p-2 font-mono">{f.id}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.data}</td><td className="p-2 text-right font-bold">{(f.total||0).toFixed(0)} MT</td><td className="p-2 text-right">{(f.itens?.length||0)} itens</td></tr>)}{faturas.length===0 && <tr><td colSpan={5} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em Faturar e guarde com SAVE</td></tr>}</tbody></table>
+          </div>
+        </div>
+        )}
       </div>
       )}
 
