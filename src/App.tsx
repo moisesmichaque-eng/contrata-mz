@@ -196,7 +196,8 @@ export default function App(){
   const [negocioLogado, setNegocioLogado] = useState(false);
   const [negocioAuthMode, setNegocioAuthMode] = useState<'cadastro'|'login'>('cadastro');
   const [negocioCadastroForm, setNegocioCadastroForm] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construção', outroRamo:'', logoData:'' as any, logoNome:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00'});
-  
+  // removed broken line
+    //:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const [stockProdutos, setStockProdutos] = useState([
@@ -896,14 +897,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                 )}
               </div>
             </div>
-            <div className="mt-3 bg-white rounded-[12px] border p-4">
-              <div className="font-bold text-[11px]">Como funciona - Cadastro simples - Porta de entrada Negocio</div>
-              <div className="mt-2 space-y-1 text-[9px] text-[#475569]">
-                <div>- Cadastro: nome loja, telefone, password, NUIT, endereco, provincia, ramo de actividade, logotipo - 10 segundos</div>
-                <div>- Logotipo incorporado vai aparecer em facturas, recibos, orcamentos, tudo que fizer na sua loja</div>
-                <div>- Ramo de actividade em lista enorme selecionavel: Ferragem, Construcao, Tintas, Serralharia, Carpintaria, Electricidade, Mecanica, Informatica, Papelaria, Grafica, Mercearia, Restaurante, Hotel, Transporte, Limpeza, Seguranca, Construcao Civil, Arquitectura, Contabilidade, Advocacia, Marketing, Design, Vestuario, Cabeleireiro, Farmacia, Agro-Pecuaria, Combustivel, Importacao, Comercio Geral, Servicos, Consultoria (Empresarial, TI, Financeira) e Outros</div>
-              </div>
-            </div>
           </div>
         ) : (
 <div className="max-w-[1400px] mx-auto p-3">
@@ -1063,10 +1056,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
         </div>
         )}
       </div>
-      )}
-
-
-      
         )
       )}
 
