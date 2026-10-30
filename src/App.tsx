@@ -890,13 +890,44 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]; if(file){const reader=new FileReader(); reader.onload=(ev)=>{setNegocioCadastroForm({...negocioCadastroForm, logoData:ev.target?.result as any, logoNome:file.name})}; reader.readAsDataURL(file);}}} className="w-full h-10 px-2 rounded-[8px] border text-[10px] mt-1 text-white bg-white/10 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#facc15] file:text-black file:font-bold" /><div className="text-[8px] opacity-60 mt-1">PNG ou JPG ate 2MB - Aparece em facturas, recibos, orcamentos</div></div>
                       <div>{negocioCadastroForm.logoData && <div className="bg-white rounded-[8px] p-2 text-center"><img src={negocioCadastroForm.logoData as any} alt="logo preview" className="h-12 mx-auto object-contain" /><div className="text-[8px] text-black mt-1">{negocioCadastroForm.logoNome}</div></div>}</div>
                     </div>
-                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:negocioCadastroForm.nomeLoja, tel:negocioCadastroForm.tel, nuit:negocioCadastroForm.nuit, endereco:negocioCadastroForm.endereco, provincia:negocioCadastroForm.provincia, distrito:negocioCadastroForm.distrito, ramoActividade:negocioCadastroForm.ramo, outroRamo:negocioCadastroForm.outroRamo, logoData:negocioCadastroForm.logoData, logoNome:negocioCadastroForm.logoNome, formaPag:negocioCadastroForm.formaPag, horario:negocioCadastroForm.horario}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} const novoPerfilCompleto = {
+                        nomeLoja: negocioCadastroForm.nomeLoja,
+                        nome: negocioCadastroForm.nomeLoja,
+                        tel: negocioCadastroForm.tel,
+                        telefone: negocioCadastroForm.tel,
+                        nuit: negocioCadastroForm.nuit,
+                        endereco: negocioCadastroForm.endereco,
+                        provincia: negocioCadastroForm.provincia,
+                        distrito: negocioCadastroForm.distrito,
+                        ramo: negocioCadastroForm.ramo,
+                        ramoActividade: negocioCadastroForm.ramo,
+                        outroRamo: negocioCadastroForm.outroRamo,
+                        logoData: negocioCadastroForm.logoData,
+                        logoNome: negocioCadastroForm.logoNome,
+                        formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario',
+                        horario: negocioCadastroForm.horario||'08:00 - 18:00',
+                        responsavel: negocioCadastroForm.nomeLoja,
+                        email: '',
+                      };
+                      setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
+                      setPerfilLoja((prev:any)=>({...prev, ...novoPerfilCompleto}));
+                      setFaturacaoCadastroForm({nomeLoja: novoPerfilCompleto.nomeLoja, tel: novoPerfilCompleto.tel, password: negocioCadastroForm.password});
+                      // Limpar dados antigos - conta nova sem dados
+                      setStockProdutos([]);
+                      setProdutosFat([]);
+                      setFaturas([] as any);
+                      setNegocioLogado(true); 
+                      setFaturacaoLogado(true);
+                      alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Seu logo e dados ja aparecem em Faturacao e Recibos');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                    <button onClick={()=>{const perfilLogin = { nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', nome: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel };
+                      setLojaPerfil((prev:any)=>({...prev, ...perfilLogin}));
+                      setPerfilLoja((prev:any)=>({...prev, ...perfilLogin}));
+                      setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   </div>
                 )}
               </div>
@@ -909,7 +940,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
             <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
             <div>
-              <div className="font-black text-[11px]">MINHA LOJA - CONTA INTERNA - Maputo1</div>
+              <div className="font-black text-[11px]">{(lojaPerfil as any).nomeLoja || (perfilLoja as any).nomeLoja || 'MINHA LOJA'} - CONTA INTERNA - Maputo1</div>
               <div className="text-[8px] text-[#64748b]">Minha Ferragem Matola - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
             </div>
           </div>
