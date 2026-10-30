@@ -192,11 +192,12 @@ export default function App(){
   const [clientesFiado, setClientesFiado] = useState<any[]>([]);
   const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
 
-  
   const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:'', ramoActividade:'Ferragem e Material de Construção', outroRamo:''});
   const [negocioLogado, setNegocioLogado] = useState(false);
   const [negocioAuthMode, setNegocioAuthMode] = useState<'cadastro'|'login'>('cadastro');
   const [negocioCadastroForm, setNegocioCadastroForm] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construção', outroRamo:'', logoData:'' as any, logoNome:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00'});
+  const [lojaPerfil_ORIGINAL_PLACEHOLDER] = [null];
+  const [, responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const [stockProdutos, setStockProdutos] = useState([
@@ -803,7 +804,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white">
               <div className="text-center">
                 <div className="h-12 w-12 rounded-[12px] bg-[#8b5cf6] text-white grid place-items-center font-black text-[20px] mx-auto">N</div>
-                <h2 className="text-[18px] font-black mt-3">Minha Loja - Porta de Entrada Negócio</h2>
+                <h2 className="text-[18px] font-black mt-3">Minha Loja - Porta de Entrada Negocio</h2>
                 <p className="text-[10px] opacity-70 mt-1">Cadastre sua loja em 10 segundos - Depois preencha mais dados da sua loja e incorpore logotipo que vai aparecer em facturas e tudo que fizer na sua loja</p>
                 <div className="flex justify-center gap-2 mt-4">
                   <button onClick={()=>setNegocioAuthMode('cadastro')} className={`px-5 py-1.5 rounded-full font-black text-[11px] ${negocioAuthMode==='cadastro' ? 'bg-[#facc15] text-black' : 'bg-white/20 text-white'}`}>CADASTRO SIMPLES</button>
@@ -821,60 +822,60 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                       <div><label className="text-[9px] font-bold opacity-80">NUIT</label><input value={negocioCadastroForm.nuit} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, nuit:e.target.value})} placeholder="400123456" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     </div>
-                    <div><label className="text-[9px] font-bold opacity-80">ENDEREÇO COMPLETO</label><input value={negocioCadastroForm.endereco} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, endereco:e.target.value})} placeholder="Av. Guerra Popular, Matola" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
+                    <div><label className="text-[9px] font-bold opacity-80">ENDERECO COMPLETO</label><input value={negocioCadastroForm.endereco} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, endereco:e.target.value})} placeholder="Av. Guerra Popular, Matola" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="text-[9px] font-bold opacity-80">PROVÍNCIA</label><select value={negocioCadastroForm.provincia} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, provincia:e.target.value})} className="w-full h-10 px-2 rounded-[8px] border text-[12px] mt-1 text-black"><option>Maputo Cidade</option><option>Maputo Província</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Niassa</option><option>Cabo Delgado</option></select></div>
+                      <div><label className="text-[9px] font-bold opacity-80">PROVINCIA</label><select value={negocioCadastroForm.provincia} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, provincia:e.target.value})} className="w-full h-10 px-2 rounded-[8px] border text-[12px] mt-1 text-black"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Niassa</option><option>Cabo Delgado</option></select></div>
                       <div><label className="text-[9px] font-bold opacity-80">DISTRITO</label><input value={negocioCadastroForm.distrito} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, distrito:e.target.value})} placeholder="KaMpfumo" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     </div>
-                    <div><label className="text-[9px] font-bold opacity-80">RAMO DE ACTIVIDADE * - Lista Selecionável</label>
+                    <div><label className="text-[9px] font-bold opacity-80">RAMO DE ACTIVIDADE * - Lista Selecionavel</label>
                       <select value={negocioCadastroForm.ramo} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, ramo:e.target.value})} className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black">
-                        <option>Ferragem e Material de Construção</option>
+                        <option>Ferragem e Material de Construcao</option>
                         <option>Loja de Tintas e Vernizes</option>
                         <option>Serralharia e Soldadura</option>
                         <option>Carpintaria e Marcenaria</option>
-                        <option>Vidraçaria e Alumínio</option>
-                        <option>Electricidade e Iluminação</option>
-                        <option>Canalização e Pichelaria</option>
-                        <option>Climatização e Frio</option>
-                        <option>Mecânica e Auto Peças</option>
-                        <option>Moto Peças e Bicicletas</option>
-                        <option>Informática e Telemóveis</option>
-                        <option>Electrónica e Eletrodomésticos</option>
+                        <option>Vidracaria e Aluminio</option>
+                        <option>Electricidade e Iluminacao</option>
+                        <option>Canalizacao e Pichelaria</option>
+                        <option>Climatizacao e Frio</option>
+                        <option>Mecanica e Auto Pecas</option>
+                        <option>Moto Pecas e Bicicletas</option>
+                        <option>Informatica e Telemoveis</option>
+                        <option>Electronica e Eletrodomesticos</option>
                         <option>Papelaria e Livraria</option>
-                        <option>Gráfica, Serigrafia e Publicidade</option>
+                        <option>Grafica, Serigrafia e Publicidade</option>
                         <option>Mercearia e Mini Mercado</option>
                         <option>Supermercado e Talho</option>
                         <option>Peixaria, Padaria, Pastelaria</option>
-                        <option>Restaurante, Bar, Café, Take Away</option>
+                        <option>Restaurante, Bar, Cafe, Take Away</option>
                         <option>Catering e Hotelaria</option>
-                        <option>Guest House, Pensão, Rent-a-Car</option>
-                        <option>Agência de Viagens e Transporte</option>
-                        <option>Logística, Mudanças, Limpeza, Jardinagem</option>
-                        <option>Segurança e Vigilância</option>
-                        <option>Construção Civil e Obras</option>
-                        <option>Remodelações e Arquitectura</option>
+                        <option>Guest House, Pensao, Rent-a-Car</option>
+                        <option>Agencia de Viagens e Transporte</option>
+                        <option>Logistica, Mudancas, Limpeza, Jardinagem</option>
+                        <option>Seguranca e Vigilancia</option>
+                        <option>Construcao Civil e Obras</option>
+                        <option>Remodelacoes e Arquitectura</option>
                         <option>Engenharia e Topografia</option>
                         <option>Contabilidade, Auditoria e Fiscalidade</option>
-                        <option>Advocacia e Consultoria Jurídica</option>
-                        <option>Seguros e Imobiliária</option>
-                        <option>Agência de Emprego e Formação</option>
-                        <option>Explicações e Centro de Cópias</option>
-                        <option>Marketing Digital e Design Gráfico</option>
-                        <option>Fotografia, Vídeo e Eventos</option>
-                        <option>Decoração, Florista e Vestuário</option>
-                        <option>Calçado, Boutique, Alfaiataria, Costura</option>
-                        <option>Cabeleireiro, Barbeiro, Estética, Spa</option>
-                        <option>Ginásio, Massagem, Saúde e Fitness</option>
-                        <option>Farmácia, Clínica, Laboratório</option>
-                        <option>Veterinária, Agro-Pecuária, Sementes, Rações</option>
-                        <option>Combustível, Lubrificantes, Gás, Carvão</option>
-                        <option>Sucata, Reciclagem, Importação, Exportação</option>
-                        <option>Comércio Geral</option>
-                        <option>Serviços Gerais</option>
+                        <option>Advocacia e Consultoria Juridica</option>
+                        <option>Seguros e Imobiliaria</option>
+                        <option>Agencia de Emprego e Formacao</option>
+                        <option>Explicacoes e Centro de Copias</option>
+                        <option>Marketing Digital e Design Grafico</option>
+                        <option>Fotografia, Video e Eventos</option>
+                        <option>Decoracao, Florista e Vestuario</option>
+                        <option>Calcado, Boutique, Alfaiataria, Costura</option>
+                        <option>Cabeleireiro, Barbeiro, Estetica, Spa</option>
+                        <option>Ginasio, Massagem, Saude e Fitness</option>
+                        <option>Farmacia, Clinica, Laboratorio</option>
+                        <option>Veterinaria, Agro-Pecuaria, Sementes, Racoes</option>
+                        <option>Combustivel, Lubrificantes, Gas, Carvao</option>
+                        <option>Sucata, Reciclagem, Importacao, Exportacao</option>
+                        <option>Comercio Geral</option>
+                        <option>Servicos Gerais</option>
                         <option>Consultoria Empresarial</option>
-                        <option>Consultoria Informática e TI</option>
+                        <option>Consultoria Informatica e TI</option>
                         <option>Consultoria Financeira</option>
-                        <option>Consultoria de Gestão e RH</option>
+                        <option>Consultoria de Gestao e RH</option>
                         <option>Outros - Especificar abaixo</option>
                       </select>
                     </div>
@@ -882,38 +883,31 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">ESPECIFIQUE OUTRO RAMO</label><input value={negocioCadastroForm.outroRamo} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, outroRamo:e.target.value})} placeholder="Ex: Consultoria em Energia Solar" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black bg-yellow-50" /></div>
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div><label className="text-[9px] font-bold opacity-80">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]; if(file){const reader=new FileReader(); reader.onload=(ev)=>{setNegocioCadastroForm({...negocioCadastroForm, logoData:ev.target?.result as any, logoNome:file.name})}; reader.readAsDataURL(file);}}} className="w-full h-10 px-2 rounded-[8px] border text-[10px] mt-1 text-white bg-white/10 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#facc15] file:text-black file:font-bold" /><div className="text-[8px] opacity-60 mt-1">PNG/JPG até 2MB - Aparece em facturas, recibos, orçamentos</div></div>
+                      <div><label className="text-[9px] font-bold opacity-80">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]; if(file){const reader=new FileReader(); reader.onload=(ev)=>{setNegocioCadastroForm({...negocioCadastroForm, logoData:ev.target?.result as any, logoNome:file.name})}; reader.readAsDataURL(file);}}} className="w-full h-10 px-2 rounded-[8px] border text-[10px] mt-1 text-white bg-white/10 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#facc15] file:text-black file:font-bold" /><div className="text-[8px] opacity-60 mt-1">PNG ou JPG ate 2MB - Aparece em facturas, recibos, orcamentos</div></div>
                       <div>{negocioCadastroForm.logoData && <div className="bg-white rounded-[8px] p-2 text-center"><img src={negocioCadastroForm.logoData as any} alt="logo preview" className="h-12 mx-auto object-contain" /><div className="text-[8px] text-black mt-1">{negocioCadastroForm.logoNome}</div></div>}</div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div><label className="text-[9px] font-bold opacity-80">FORMA DE PAGAMENTO</label><input value={negocioCadastroForm.formaPag} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, formaPag:e.target.value})} placeholder="M-Pesa, Numerário, Transferência" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                      <div><label className="text-[9px] font-bold opacity-80">HORÁRIO</label><input value={negocioCadastroForm.horario} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, horario:e.target.value})} placeholder="08:00 - 18:00" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    </div>
-                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:negocioCadastroForm.nomeLoja, tel:negocioCadastroForm.tel, nuit:negocioCadastroForm.nuit, endereco:negocioCadastroForm.endereco, provincia:negocioCadastroForm.provincia, distrito:negocioCadastroForm.distrito, ramoActividade:negocioCadastroForm.ramo, outroRamo:negocioCadastroForm.outroRamo, logoData:negocioCadastroForm.logoData, logoNome:negocioCadastroForm.logoNome, formaPag:negocioCadastroForm.formaPag, horario:negocioCadastroForm.horario}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negócio + Faturação</button>
+                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:negocioCadastroForm.nomeLoja, tel:negocioCadastroForm.tel, nuit:negocioCadastroForm.nuit, endereco:negocioCadastroForm.endereco, provincia:negocioCadastroForm.provincia, distrito:negocioCadastroForm.distrito, ramoActividade:negocioCadastroForm.ramo, outroRamo:negocioCadastroForm.outroRamo, logoData:negocioCadastroForm.logoData, logoNome:negocioCadastroForm.logoNome, formaPag:negocioCadastroForm.formaPag, horario:negocioCadastroForm.horario}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
-                    <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
                   </div>
                 )}
               </div>
             </div>
             <div className="mt-3 bg-white rounded-[12px] border p-4">
-              <div className="font-bold text-[11px]">Como funciona - Cadastro simples - Porta de entrada Negócio</div>
+              <div className="font-bold text-[11px]">Como funciona - Cadastro simples - Porta de entrada Negocio</div>
               <div className="mt-2 space-y-1 text-[9px] text-[#475569]">
-                <div>- Cadastro: nome loja, telefone, password, NUIT, endereço, província, ramo de actividade, logotipo - 10 segundos</div>
-                <div>- Logotipo incorporado vai aparecer em facturas, recibos, orçamentos, tudo que fizer na sua loja</div>
-                <div>- Ramo de actividade em lista enorme selecionável: Ferragem, Construção, Tintas, Serralharia, Carpintaria, Electricidade, Mecânica, Informática, Papelaria, Gráfica, Mercearia, Restaurante, Hotel, Transporte, Limpeza, Segurança, Construção Civil, Arquitectura, Contabilidade, Advocacia, Marketing, Design, Vestuário, Cabeleireiro, Farmácia, Agro-Pecuária, Combustível, Importação, Comércio Geral, Serviços, Consultoria (Empresarial, TI, Financeira) e Outros</div>
-                <div>- Depois de entrar: pode editar perfil completo - acrescentar NUIT, endereço, logo, forma pagamento, horário, ramo</div>
-                <div>- Dentro da conta: tem página de gestão de stock unificada - produtos, quantidade, preço, custo, alerta stock baixo, FIFO, Final ontem = Inicial hoje</div>
+                <div>- Cadastro: nome loja, telefone, password, NUIT, endereco, provincia, ramo de actividade, logotipo - 10 segundos</div>
+                <div>- Logotipo incorporado vai aparecer em facturas, recibos, orcamentos, tudo que fizer na sua loja</div>
+                <div>- Ramo de actividade em lista enorme selecionavel: Ferragem, Construcao, Tintas, Serralharia, Carpintaria, Electricidade, Mecanica, Informatica, Papelaria, Grafica, Mercearia, Restaurante, Hotel, Transporte, Limpeza, Seguranca, Construcao Civil, Arquitectura, Contabilidade, Advocacia, Marketing, Design, Vestuario, Cabeleireiro, Farmacia, Agro-Pecuaria, Combustivel, Importacao, Comercio Geral, Servicos, Consultoria (Empresarial, TI, Financeira) e Outros</div>
               </div>
             </div>
           </div>
         ) : (
-
+<div className="max-w-[1400px] mx-auto p-3">
         <div className="bg-white border rounded-[12px] p-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black text-[10px]">M1</div>
@@ -1073,7 +1067,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       )}
 
 
-      )}
+      
+        )
       )}
 
 
