@@ -99,6 +99,8 @@ const MODELO_TAREFAS: any = {
 const CLAUSULAS = [ { id:1, titulo:"Dados das partes", short:"Quem contrata e quem faz" }, { id:2, titulo:"Objeto e tarefas", short:"O que sera feito" }, { id:3, titulo:"Horario e local", short:"Quando e onde" }, { id:4, titulo:"Salario e pagamento", short:"Quanto e como paga" }, { id:5, titulo:"Alimentacao e alojamento", short:"Beneficios" }, { id:6, titulo:"Folgas e ferias", short:"Descanso legal" }, { id:7, titulo:"Periodo experimental", short:"Teste inicial" }, { id:8, titulo:"Deveres do trabalhador", short:"Obrigacoes" }, { id:9, titulo:"Deveres do empregador", short:"Obrigacoes" }, { id:10, titulo:"Anexos (antes validade)", short:"Fotos e provas" }, { id:11, titulo:"Validade e assinaturas", short:"Assina no WhatsApp - PDF final partilhavel" }, ];
 
 
+
+
 const AdminPrototipoExacto = ()=>{
     const [lojaSel, setLojaSel] = React.useState<any>(null);
     const [viaturaSel, setViaturaSel] = React.useState<any>(null);
@@ -107,6 +109,17 @@ const AdminPrototipoExacto = ()=>{
     const [searchTrans, setSearchTrans] = React.useState('');
     const [filterTrans, setFilterTrans] = React.useState('Todos');
     const [activeParte, setActiveParte] = React.useState('FATURAR');
+    const [isLoggedNegocio, setIsLoggedNegocio] = React.useState(false);
+    const [negocioEmail, setNegocioEmail] = React.useState('');
+    const [negocioSenha, setNegocioSenha] = React.useState('');
+    const [negocioNome, setNegocioNome] = React.useState('Minha Ferragem Matola');
+    const [negocioNuit, setNegocioNuit] = React.useState('401234567');
+    const [negocioTel, setNegocioTel] = React.useState('+258 84 123 4567');
+    const [clienteTel, setClienteTel] = React.useState('+258 84 123 4567');
+    const [clienteNome, setClienteNome] = React.useState('Michaque Mungoi');
+    const [clienteNuit, setClienteNuit] = React.useState('400123456');
+    const [searchProd, setSearchProd] = React.useState('');
+    const [ivaTipo, setIvaTipo] = React.useState('16');
     const lojas = [
       {id:'L001', nome:'Minha Ferragem Matola', dono:'Nagi A.', tel:'+258 82 123 4567', total:'442k MT', faturas:23, stock:10, stockInicial:1124, status:'Ativa', cidade:'Matola', venda:'320 → 520', margem:'+62.5%', entrada:700, saida:320, vendasMes:520},
       {id:'L002', nome:'Ferragem Central Maputo', dono:'Raul M.', tel:'+258 84 234 5678', total:'388k MT', faturas:19, stock:14, stockInicial:985, status:'Ativa', cidade:'Maputo', venda:'280 → 445', margem:'+58%', entrada:820, saida:285, vendasMes:445},
@@ -123,10 +136,18 @@ const AdminPrototipoExacto = ()=>{
       {id:'T001', nome:'Nagi Trans', viatura:'Coaster', lugares:29, rotas:['Maputo-Beira','Maputo-Xai-Xai'], reservas:86, total:'442k MT', faturas:23, ganhos:'188k MT', tel:'+258 82 111 0001', status:'Ativo', historico:['Viatura 29 lugares registada','Contrato Maputo-Beira gerado','16 bilhetes reservados via web hoje']},
       {id:'T002', nome:'Raul Hiace', viatura:'Hiace', lugares:15, rotas:['Maputo-Inhambane','Maputo-Beira'], reservas:54, total:'298k MT', faturas:14, ganhos:'124k MT', tel:'+258 84 222 0002', status:'Ativo', historico:['Hiace 15 lugares registado','Rota Inhambane adicionada','9 reservas web']},
       {id:'T003', nome:'João Marcopolo', viatura:'Marcopolo', lugares:45, rotas:['Maputo-Nampula','Beira-Nampula'], reservas:112, total:'612k MT', faturas:31, ganhos:'298k MT', tel:'+258 82 333 0003', status:'Ativo', historico:['Marcopolo 45 lugares licenciado','Rota Nampula 2050km ativa','112 bilhetes via contrata-mz']},
-      {id:'T004', nome:'Amina Sprinter', viatura:'Sprinter', lugares:22, rotas:['Maputo-Tete'], reservas:68, total:'356k MT', faturas:18, ganhos:'156k MT', tel:'+258 84 444 0004', status:'Ativo', historico:['Sprinter 22 registada','10 viagens Tete','Taxa pontualidade 94%']},
-      {id:'T005', nome:'Carlos Coaster', viatura:'Coaster', lugares:29, rotas:['Beira-Chimoio','Beira-Maputo'], reservas:73, total:'378k MT', faturas:19, ganhos:'167k MT', tel:'+258 82 555 0005', status:'Inativo', historico:['Coaster 29 em manutenção','Rota Chimoio 24 viagens','73 reservas']},
-      {id:'T006', nome:'Fatima Hiace', viatura:'Hiace', lugares:18, rotas:['Maputo-Gaza'], reservas:41, total:'224k MT', faturas:11, ganhos:'92k MT', tel:'+258 84 666 0006', status:'Ativo', historico:['Hiace 18 nova','20 viagens Gaza','41 reservas web']},
-      {id:'T007', nome:'Pedro Marcopolo', viatura:'Marcopolo', lugares:50, rotas:['Maputo-Pemba','Nampula-Pemba'], reservas:134, total:'698k MT', faturas:36, ganhos:'342k MT', tel:'+258 82 777 0007', status:'Ativo', historico:['Marcopolo 50 - maior frota','5 viagens longas Pemba','134 bilhetes reservados']},
+    ];
+    const produtosStock = [
+      {id:'P001', nome:'Cimento Cimpor 42.5N 50kg', preco:850, stock:400, codigo:'CIM-001', barras:'5601234000011'},
+      {id:'P002', nome:'Ferro Varão 12mm 12m', preco:1250, stock:220, codigo:'FER-012', barras:'5601234000012'},
+      {id:'P003', nome:'Bloco Cimento 15x20x40', preco:42, stock:70, codigo:'BLO-1520', barras:'5601234000013'},
+      {id:'P004', nome:'Tinta Plástica Branca 20L', preco:4250, stock:466, codigo:'TIN-010', barras:'5601234000014'},
+      {id:'P005', nome:'Chapa Zinco 0.30mm x 4m', preco:1450, stock:353, codigo:'CHA-304', barras:'5601234000015'},
+      {id:'P006', nome:'Tubo PVC 110mm 6m', preco:980, stock:502, codigo:'TUB-110', barras:'5601234000016'},
+      {id:'P007', nome:'Arame Farpado 500m', preco:3200, stock:485, codigo:'ARA-500', barras:'5601234000017'},
+      {id:'P008', nome:'Porta Metalica 0.80x2.10', preco:7800, stock:494, codigo:'POR-080', barras:'5601234000018'},
+      {id:'P009', nome:'Varão Roscado M12x1m', preco:320, stock:532, codigo:'VAR-M12', barras:'5601234000019'},
+      {id:'P010', nome:'Painel Solar 550W Canadian', preco:18500, stock:476, codigo:'PAI-550', barras:'5601234000020'},
     ];
     const lojasFiltradas = lojas.filter(l=>{
       const busca = searchLoja.toLowerCase();
@@ -144,6 +165,7 @@ const AdminPrototipoExacto = ()=>{
       const base = 'px-5 py-2 rounded-full font-black text-[11px] transition-all border';
       if(activeParte===parte){
         if(parte==='FATURAR') return base + ' bg-[#facc15] text-black border-[#facc15] shadow-[0_2px_10px_rgba(250,204,21,0.4)] scale-[1.05]';
+        if(parte==='NEGOCIO') return base + ' bg-[#8b5cf6] text-white border-[#8b5cf6] shadow-[0_2px_10px_rgba(139,92,246,0.4)] scale-[1.05]';
         if(parte==='VIAGENS') return base + ' bg-[#3b82f6] text-white border-[#3b82f6] shadow-[0_2px_10px_rgba(59,130,246,0.4)] scale-[1.05]';
         if(parte==='ENCONTRAR') return base + ' bg-[#10b981] text-white border-[#10b981] shadow-[0_2px_10px_rgba(16,185,129,0.4)] scale-[1.05]';
         if(parte==='CONTRATOS') return base + ' bg-[#1e293b] text-white border-[#1e293b] shadow-[0_2px_10px_rgba(30,41,59,0.4)] scale-[1.05]';
@@ -155,22 +177,23 @@ const AdminPrototipoExacto = ()=>{
         <div className="bg-white border rounded-[12px] p-4">
           <div className="flex gap-2 flex-wrap">
             <button onClick={()=>setActiveParte('FATURAR')} className={getBtnClass('FATURAR')}>FATURAR</button>
+            <button onClick={()=>setActiveParte('NEGOCIO')} className={getBtnClass('NEGOCIO')}>NEGOCIO</button>
             <button onClick={()=>setActiveParte('VIAGENS')} className={getBtnClass('VIAGENS')}>VIAGENS</button>
             <button onClick={()=>setActiveParte('ENCONTRAR')} className={getBtnClass('ENCONTRAR')}>ENCONTRAR</button>
             <button onClick={()=>setActiveParte('CONTRATOS')} className={getBtnClass('CONTRATOS')}>CONTRATOS</button>
           </div>
-          <div className="text-[9px] text-[#94a3b8] mt-2">Clique numa parte - agora em cores diferentes: Amarelo=FATURAR, Azul=VIAGENS, Verde=ENCONTRAR, Preto=CONTRATOS - abre página só da parte selecionada - flash corrigido</div>
+          <div className="text-[9px] text-[#94a3b8] mt-2">5 partes agora: FATURAR amarelo (50 lojas), NEGOCIO roxo (igual prototipo V3 com cadastro/login - conta interna loja), VIAGENS azul, ENCONTRAR verde, CONTRATOS preto - flash corrigido</div>
         </div>
         {activeParte==='FATURAR' && (
           <div className="bg-white rounded-[12px] border p-4">
             <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-yellow-100 rounded grid place-items-center">📦</span> FATURAR <span className="text-[9px] bg-yellow-400 text-black px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded-full">↗ +12%</div></div>
-            <div className="text-[10px] text-[#64748b]">50 LOJAS ATIVAS - CLIQUE PARA VER HISTÓRICO - RELATÓRIOS INCLUÍDOS</div>
+            <div className="text-[10px] text-[#64748b]">50 LOJAS ATIVAS - CLIQUE PARA VER HISTÓRICO - RELATÓRIOS INCLUÍDOS - NÃO MEXIDO</div>
             <div className="mt-3 flex gap-2">
               <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span className="text-[12px]">🔍</span><input value={searchLoja} onChange={e=>setSearchLoja(e.target.value)} placeholder="Buscar loja, dono, cidade..." className="flex-1 text-[11px] outline-none" /></div>
               <select value={filterLoja} onChange={e=>setFilterLoja(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todas</option><option>Ativa</option><option>Inativa</option></select>
             </div>
             <div className="mt-3 grid grid-cols-4 gap-3">
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black text-[14px]">5.4M MT</div><div className="text-[8px] text-[#94a3b8]">+23 hoje | Relatório: Vendas 320→520 | Gráfico ↗</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black text-[14px]">5.4M MT</div><div className="text-[8px] text-[#94a3b8]">+23 hoje | Relatório: Vendas 320→520</div></div>
               <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">STOCK INICIAL</div><div className="font-black text-[14px]">1,124 itens</div><div className="text-[8px] text-[#94a3b8]">700-1300 random | Final ontem = Inicial hoje</div></div>
               <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FATURAS</div><div className="font-black text-[14px]">212 total</div><div className="text-[8px] text-orange-600">+23 hoje | Ticket médio 2.4k</div></div>
               <div className="bg-[#fffbeb] border-2 border-yellow-200 rounded-[10px] p-3"><div className="text-[9px] text-[#92400e] font-bold">RELATÓRIOS</div><div className="font-black text-[12px]">5 dias / 30 dias</div><div className="text-[8px]">Vendas totais, margem, stock final</div></div>
@@ -178,35 +201,109 @@ const AdminPrototipoExacto = ()=>{
             <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
               <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">LOJA</th><th className="p-2 text-left">DONO</th><th className="p-2 text-left">TEL</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">FATURAS</th><th className="p-2 text-center">STOCK</th><th className="p-2 text-center">STATUS</th></tr></thead><tbody>{lojasFiltradas.map(l=><tr key={l.id} onClick={()=>setLojaSel(l)} className="border-b hover:bg-yellow-50 cursor-pointer"><td className="p-2"><div className="font-bold">{l.nome}</div><div className="text-[8px] opacity-60">{l.id} • {l.cidade}</div></td><td className="p-2">{l.dono}</td><td className="p-2 text-[9px]">{l.tel}</td><td className="p-2 text-right"><div className="font-bold">{l.total}</div><div className="text-[8px] text-green-600">{l.margem}</div></td><td className="p-2 text-center"><span className="bg-[#1e2f4a] text-white px-2 py-1 rounded-full text-[8px]">{l.faturas}</span></td><td className="p-2 text-center">{l.stock}</td><td className="p-2 text-center"><span className={l.status==='Ativa' ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-[8px] font-bold' : 'bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-[8px]'}>{l.status}</span></td></tr>)}</tbody></table>
             </div>
-            <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3 text-[10px]"><div className="font-black">RELATÓRIOS - FATURAR - Gráfico Vendas 320→520</div><div className="mt-2 flex gap-1 h-12 items-end">{[320,360,410,380,470,520,510].map((v,i)=><div key={i} className="flex-1 bg-yellow-400 rounded-t" style={{height: `${(v/520)*100}%`}}></div>)}</div><div className="text-[8px] text-[#94a3b8] mt-1">Seg Ter Qua Qui Sex Sáb Dom - Vendas totais 272k→442k MT - Relatório últimos 5 dias / 30 dias</div></div>
-            {lojaSel && <div className="mt-3 bg-[#fffbeb] border-2 border-yellow-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Histórico completo: {lojaSel.nome}</div><div className="text-[10px] mt-3 grid grid-cols-2 gap-3"><div><div className="text-[8px] text-[#64748b]">DONO</div><div className="font-bold">{lojaSel.dono} - {lojaSel.tel}</div></div><div><div className="text-[8px] text-[#64748b]">CIDADE</div><div className="font-bold">{lojaSel.cidade} - {lojaSel.id}</div></div><div><div className="text-[8px] text-[#64748b]">STOCK INICIAL ARMAZÉM RANDOM</div><div className="font-black">{lojaSel.stockInicial} itens (700-1300) - só esta coluna random</div></div><div><div className="text-[8px] text-[#64748b]">VENDA</div><div className="font-bold">{lojaSel.venda} - Margem {lojaSel.margem}</div></div><div><div className="text-[8px] text-[#64748b]">O QUE FEZ E FAZ</div><div>Entrada {lojaSel.entrada}, Saída {lojaSel.saida}, Vendas Mês {lojaSel.vendasMes}, Venda Hoje 320→520 reflete stock</div></div><div><div className="text-[8px] text-[#64748b]">TOTAL FATURADO</div><div className="font-black">{lojaSel.total} - {lojaSel.faturas} faturas - Valor 272k→442k MT</div></div></div><button onClick={()=>setLojaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
+            {lojaSel && <div className="mt-3 bg-[#fffbeb] border-2 border-yellow-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Histórico completo: {lojaSel.nome}</div><button onClick={()=>setLojaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
+          </div>
+        )}
+        {activeParte==='NEGOCIO' && (
+          <div className="bg-white rounded-[12px] border p-4">
+            <div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-purple-100 rounded grid place-items-center">🏪</span> NEGOCIO - CONTA INTERNA LOJA - IGUAL PROTOTIPO V3 - CADASTRO E LOGIN</div>
+            <div className="text-[10px] text-[#64748b]">Nova parte ao lado de VIAGENS - exatamente o que tem no prototipo V3 com IVA - para entrar precisa cadastro e login</div>
+            {!isLoggedNegocio ? (
+              <div className="mt-4 max-w-md mx-auto bg-[#f8fafc] border-2 border-purple-200 rounded-[12px] p-6">
+                <div className="font-black text-[14px] text-center">Entrar na sua loja - Cadastro e Login</div>
+                <div className="text-[10px] text-[#64748b] text-center mt-1">Crie conta ou entre para acessar sua loja interna igual prototipo</div>
+                <div className="mt-4 space-y-3">
+                  <input value={negocioEmail} onChange={e=>setNegocioEmail(e.target.value)} placeholder="Email - m.mungoi@gmail.com" className="w-full h-10 border rounded-[8px] px-3 text-[11px]" />
+                  <input value={negocioSenha} onChange={e=>setNegocioSenha(e.target.value)} type="password" placeholder="Senha" className="w-full h-10 border rounded-[8px] px-3 text-[11px]" />
+                  <input value={negocioNome} onChange={e=>setNegocioNome(e.target.value)} placeholder="Nome da loja - Minha Ferragem Matola" className="w-full h-10 border rounded-[8px] px-3 text-[11px]" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input value={negocioNuit} onChange={e=>setNegocioNuit(e.target.value)} placeholder="NUIT 401234567" className="h-10 border rounded-[8px] px-3 text-[11px]" />
+                    <input value={negocioTel} onChange={e=>setNegocioTel(e.target.value)} placeholder="Tel +258 84 123 4567" className="h-10 border rounded-[8px] px-3 text-[11px]" />
+                  </div>
+                  <button onClick={()=>setIsLoggedNegocio(true)} className="w-full h-11 bg-[#8b5cf6] text-white rounded-[8px] font-black text-[11px]">Entrar / Criar conta - Acessar loja</button>
+                  <div className="text-[9px] text-[#94a3b8] text-center">Ao entrar, verá exatamente o prototipo V3 com Dados comprador ultra rapido, Produtos Stock, ITENS, IVA totais</div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4">
+                <div className="flex justify-between items-center bg-[#f5f3ff] border border-purple-200 rounded-[10px] p-3">
+                  <div><div className="font-black text-[12px]">{negocioNome} - NUIT {negocioNuit}</div><div className="text-[9px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - {negocioTel} - Logado {negocioEmail || 'm.mungoi@gmail.com'}</div></div>
+                  <button onClick={()=>setIsLoggedNegocio(false)} className="px-3 py-1 bg-white border rounded-[6px] text-[9px]">Sair</button>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-4">
+                  <div className="col-span-2 space-y-3">
+                    <div className="bg-[#f8fafc] border rounded-[10px] p-3">
+                      <div className="font-black text-[11px] flex justify-between"><span>Dados do comprador - ultra rapido</span><span className="text-[8px] bg-green-100 text-green-700 px-2 py-1 rounded-full">Fluxo rapido ativo</span></div>
+                      <div className="text-[8px] text-[#64748b]">Só telefone obrigatório. Nome opcional para recibo rapido. Tempo alvo: 15s tipo supermercado.</div>
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        <div><div className="text-[8px] font-bold">TELEFONE / WHATSAPP *</div><input value={clienteTel} onChange={e=>setClienteTel(e.target.value)} className="w-full h-8 border rounded-[6px] px-2 text-[10px]" /></div>
+                        <div><div className="text-[8px] font-bold">NOME / EMPRESA (opcional)</div><input value={clienteNome} onChange={e=>setClienteNome(e.target.value)} className="w-full h-8 border rounded-[6px] px-2 text-[10px]" /></div>
+                        <div><div className="text-[8px] font-bold">NUIT (opcional)</div><input value={clienteNuit} onChange={e=>setClienteNuit(e.target.value)} className="w-full h-8 border rounded-[6px] px-2 text-[10px]" /></div>
+                      </div>
+                    </div>
+                    <div className="bg-white border rounded-[10px] p-3">
+                      <div className="font-black text-[11px] flex justify-between"><span>Produtos e Servicos - do Stock - IVA no fim</span><span className="text-[8px] bg-yellow-100 px-2 py-1 rounded-full">10 produtos</span></div>
+                      <div className="mt-2 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span className="text-[11px]">🔍</span><input value={searchProd} onChange={e=>setSearchProd(e.target.value)} placeholder="Digite Cimento - busca no stock" className="flex-1 text-[10px] outline-none" /></div>
+                      <div className="mt-2 flex gap-1 flex-wrap">{produtosStock.filter(p=>!searchProd || p.nome.toLowerCase().includes(searchProd.toLowerCase())).slice(0,6).map(p=><span key={p.id} className="bg-black text-white px-2 py-1 rounded-full text-[8px]">{p.nome} - {p.preco}MT - Stock:{p.stock}</span>)}</div>
+                      <div className="mt-3 border rounded-[8px] overflow-hidden">
+                        <div className="grid grid-cols-5 bg-[#f8fafc] text-[8px] font-bold p-2"><span>DESCRICAO</span><span>QTD</span><span>PRECO UNIT.</span><span>DESC %</span><span>SUBTOTAL</span></div>
+                        <div className="grid grid-cols-5 text-[9px] p-2 border-t"><span>Saco Cimento 50kg - CMPOR</span><span><span className="border px-2 py-1 rounded">3</span></span><span>850 MT</span><span><span className="border px-2 py-1 rounded">0</span></span><span className="font-bold">2550 MT</span></div>
+                        <div className="grid grid-cols-5 text-[9px] p-2 border-t"><span>Bloco 15cm - 40x20</span><span><span className="border px-2 py-1 rounded">20</span></span><span>42 MT</span><span><span className="border px-2 py-1 rounded">5</span></span><span className="font-bold">798 MT</span></div>
+                      </div>
+                    </div>
+                    <div className="bg-[#fffbeb] border rounded-[10px] p-3">
+                      <div className="flex justify-between items-center"><div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-yellow-400 rounded-full"></span>FATURAR com logotipo</div><div className="flex gap-2 items-center"><span className="text-[9px] border px-2 py-1 rounded bg-white">Formato A5</span><label className="text-[9px] flex items-center gap-1"><input type="checkbox" defaultChecked/>NUIT na fatura</label><span className="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-bold">SAVE</span></div></div>
+                      <div className="mt-3">
+                        <div className="font-black text-[10px] flex justify-between"><span>ITENS</span><span className="bg-black text-white px-2 py-1 rounded-full text-[8px]">+ Adicionar</span></div>
+                        <div className="mt-2 space-y-2">
+                          <div className="flex gap-2 items-center text-[9px]"><select className="border rounded px-1 py-1 text-[9px]"><option>Cimento Cimpor 50kg</option></select><span className="border px-2 py-1 rounded bg-white">2</span><span className="border px-2 py-1 rounded bg-white">850</span><span className="border px-2 py-1 rounded bg-white">0</span><span>🗑️</span></div>
+                          <div className="text-[7px] text-[#94a3b8]">CIM-001 - 5601234000011 - Stock Loja 200</div>
+                          <div className="flex gap-2 items-center text-[9px]"><select className="border rounded px-1 py-1 text-[9px]"><option>Tinta Plástica Branca 20L</option></select><span className="border px-2 py-1 rounded bg-white">1</span><span className="border px-2 py-1 rounded bg-white">3850</span><span className="border px-2 py-1 rounded bg-white">5</span><span>🗑️</span></div>
+                          <div className="text-[7px] text-[#94a3b8]">TIN-010 - 5601234000010 - Stock Loja 80</div>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-right text-[10px] space-y-1">
+                        <div>Subtotal bruto <span className="font-bold">3390 MT</span></div>
+                        <div className="text-red-600">Descontos <span className="font-bold">- 42 MT</span></div>
+                        <div>Subtotal liquido <span className="font-bold">3348 MT</span></div>
+                        <div>IVA (16%) <span className="font-bold">536 MT</span></div>
+                        <div className="font-black text-[12px]">TOTAL <span className="text-[#0f766e]">3884 MT</span></div>
+                      </div>
+                      <div className="mt-2 text-[8px] font-bold">IVA NO RODAPE - GLOBAL</div>
+                      <div className="mt-1 flex gap-2"><button onClick={()=>setIvaTipo('0')} className={ivaTipo==='0' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-green-600 text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div>
+                      <div className="mt-3 flex gap-2"><button className="flex-1 h-9 bg-green-600 text-white rounded-[8px] text-[9px] font-black">Enviar via WhatsApp para {clienteTel || '258828765432'}</button><button className="px-4 h-9 bg-white border rounded-[8px] text-[9px]">Pré-visualizar PDF</button></div>
+                    </div>
+                  </div>
+                  <div className="bg-[#f8fafc] border rounded-[10px] p-3 h-fit">
+                    <div className="flex justify-between items-center"><div className="font-black text-[9px]">PRÉ-VISUALIZAÇÃO A5 Fatura</div><span className="text-[7px] bg-yellow-400 text-black px-2 py-1 rounded-full">TOTSHE BRANDING</span></div>
+                    <div className="mt-3 bg-white border rounded-[8px] p-3">
+                      <div className="flex gap-2"><div className="w-8 bg-yellow-400 rounded grid place-items-center text-[8px] font-black">TOTSHE</div><div className="w-8 bg-gray-200 rounded grid place-items-center text-[7px]">LOGO</div><div><div className="font-black text-[8px]">{negocioNome}</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel {negocioTel} - NUIT {negocioNuit}</div></div></div>
+                      <div className="mt-2 text-[7px]"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: {clienteNome} - Obra Zimpeto</div><div>Data: 2026-10-30 - NUIT: {clienteNuit} - Tel: {clienteTel}</div></div>
+                      <div className="mt-2 text-[6px] border-t pt-1"><div className="grid grid-cols-5 font-bold"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div><div className="grid grid-cols-5"><span>Cimento Cimpor 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div><div className="grid grid-cols-5"><span>Tinta Plástica Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div></div>
+                      <div className="mt-2 text-right text-[6px]"><div>Subtotal: 5357.5MT</div><div>IVA 16%: 857.2MT</div><div className="font-black">TOTAL: 6214.7 MT</div></div>
+                      <div className="mt-2 flex justify-between"><div className="text-[5px]">Processado por CONTRATA-MZ - maputo1</div><div className="bg-yellow-400 px-2 py-1 rounded text-[5px] font-bold">Documento válido - Obrigado!</div></div>
+                    </div>
+                    <div className="mt-3 bg-[#f5f3ff] border border-purple-200 rounded-[8px] p-2 text-[8px]"><div className="font-black">Igualzinho ao prototipo V3 - com IVA</div><div className="text-[7px]">Dados comprador azul em cima, Produtos amarelo meio, ITENS verde, IVA amarelo em baixo, WhatsApp dinâmico {clienteTel}</div></div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {activeParte==='VIAGENS' && (
           <div className="bg-white rounded-[12px] border p-4">
-            <div className="flex justify-between items-center"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-blue-100 rounded grid place-items-center">🚌</span> VIAGENS <span className="text-[9px] bg-blue-600 text-white px-2 py-1 rounded-full">FOCO</span></div><div className="text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded-full">7 ativos</div></div>
-            <div className="text-[10px] text-[#64748b]">7 TRANSPORTADORES - CLIQUE PARA VER TUDO SOBRE ELE - RELATÓRIOS VIAGENS</div>
-            <div className="mt-3 flex gap-2">
-              <div className="flex-1 flex items-center gap-2 border rounded-[8px] px-3 h-9"><span>🔍</span><input value={searchTrans} onChange={e=>setSearchTrans(e.target.value)} placeholder="Buscar transportador, viatura..." className="flex-1 text-[11px] outline-none" /></div>
-              <select value={filterTrans} onChange={e=>setFilterTrans(e.target.value)} className="h-9 border rounded-[8px] px-3 text-[11px]"><option>Todos</option><option>Ativo</option><option>Inativo</option></select>
-            </div>
-            <div className="mt-3 grid grid-cols-4 gap-3">
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FROTA TOTAL</div><div className="font-black text-[13px]">7 viaturas</div><div className="text-[8px]">Coaster, Hiace, Marcopolo - Relatório frota</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">RESERVAS WEB</div><div className="font-black text-[13px]">588 bilhetes</div><div className="text-[8px]">via contrata-mz - 86% online</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">OCUPAÇÃO</div><div className="font-black text-[13px]">84% média</div><div className="text-[8px]">3.2 viagens/dia - Relatório ocupação</div></div>
-              <div className="bg-[#eff6ff] border-2 border-blue-200 rounded-[10px] p-3"><div className="text-[9px] text-[#1e40af] font-bold">RELATÓRIOS</div><div className="font-black text-[12px]">Rotas + Ganhos</div><div className="text-[8px]">Maputo-Beira 1180km etc</div></div>
-            </div>
+            <div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-blue-100 rounded grid place-items-center">🚌</span> VIAGENS - 7 TRANSPORTADORES - NÃO MEXIDO</div>
+            <div className="text-[10px] text-[#64748b]">7 viaturas - frota total - reservas web 588 - ocupação 84% - mantido igual</div>
             <div className="mt-3 max-h-[420px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-left">VIATURA</th><th className="p-2 text-center">LUGARES</th><th className="p-2 text-left">ROTAS</th><th className="p-2 text-center">RESERVAS</th><th className="p-2 text-right">TOTAL</th></tr></thead><tbody>{transFiltradas.map(t=><tr key={t.id} onClick={()=>setViaturaSel(t)} className="border-b hover:bg-blue-50 cursor-pointer"><td className="p-2"><div className="font-bold">{t.nome}</div><div className="text-[8px] opacity-60">{t.tel} - {t.id}</div></td><td className="p-2">{t.viatura}</td><td className="p-2 text-center"><span className="bg-black text-white px-2 py-1 rounded-full text-[8px]">{t.lugares}</span></td><td className="p-2"><div className="flex gap-1 flex-wrap">{t.rotas.map(r=><span key={r} className="bg-gray-100 px-1 py-0.5 rounded text-[7px]">{r}</span>)}</div></td><td className="p-2 text-center"><span className="bg-blue-600 text-white px-2 py-1 rounded-full text-[8px]">{t.reservas}</span><div className="text-[7px] text-[#94a3b8]">via web</div></td><td className="p-2 text-right"><div className="font-bold">{t.total}</div><div className="text-[8px]">{t.faturas} faturas - Ganhos {t.ganhos}</div></td></tr>)}</tbody></table>
+              <table className="w-full text-[10px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-left">VIATURA</th><th className="p-2 text-center">LUGARES</th><th className="p-2 text-left">ROTAS</th><th className="p-2 text-center">RESERVAS</th><th className="p-2 text-right">TOTAL</th></tr></thead><tbody>{transFiltradas.map(t=><tr key={t.id} onClick={()=>setViaturaSel(t)} className="border-b hover:bg-blue-50 cursor-pointer"><td className="p-2"><div className="font-bold">{t.nome}</div><div className="text-[8px] opacity-60">{t.tel}</div></td><td className="p-2">{t.viatura}</td><td className="p-2 text-center"><span className="bg-black text-white px-2 py-1 rounded-full text-[8px]">{t.lugares}</span></td><td className="p-2"><div className="flex gap-1 flex-wrap">{t.rotas.map(r=><span key={r} className="bg-gray-100 px-1 py-0.5 rounded text-[7px]">{r}</span>)}</div></td><td className="p-2 text-center"><span className="bg-blue-600 text-white px-2 py-1 rounded-full text-[8px]">{t.reservas}</span></td><td className="p-2 text-right"><div className="font-bold">{t.total}</div></td></tr>)}</tbody></table>
             </div>
-            {viaturaSel && <div className="mt-3 bg-[#eff6ff] border-2 border-blue-400 rounded-[10px] p-4"><div className="font-black text-[13px]">Tudo sobre ele: {viaturaSel.nome} - {viaturaSel.viatura} {viaturaSel.lugares} lugares</div><div className="text-[10px] mt-3 space-y-2"><div><span className="font-bold">Rotas detalhadas:</span> {viaturaSel.rotasDetalhe.map((rd:any)=><span key={rd.rota} className="ml-2 bg-white border px-2 py-1 rounded text-[9px]">{rd.rota} {rd.km}km {rd.viagens} viagens {rd.ocupacao}%</span>)}</div><div><span className="font-bold">Quantas faturas tem:</span> {viaturaSel.faturas} - Total {viaturaSel.total} - Ganhos {viaturaSel.ganhos}</div><div><span className="font-bold">Quantos reservaram bilhete usando o web:</span> {viaturaSel.reservas} bilhetes via contrata-mz</div><div className="bg-white border rounded-[8px] p-2 text-[9px]"><div className="font-bold">Tudo sobre ele / Histórico / Relatórios:</div>{viaturaSel.historico.map((h:string,i:number)=><div key={i}>• {h}</div>)}</div></div><button onClick={()=>setViaturaSel(null)} className="mt-3 w-full py-2 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Fechar detalhe</button></div>}
           </div>
         )}
         {activeParte==='ENCONTRAR' && (
-          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-emerald-100 rounded grid place-items-center">🔍</span> ENCONTRAR - PEDIDOS + PROFISSIONAIS - Taxa 85%</div><div className="text-[10px] text-[#64748b] mt-2">8 pedidos abertos hoje, 12 profissionais (3 online), Match 85% - lista de quem procura carpinteiro, pedreiro etc - Relatórios</div><div className="grid grid-cols-4 gap-3 mt-3"><div className="bg-slate-900 text-white rounded-[10px] p-3"><div className="text-[9px] opacity-60">Pedidos</div><div className="text-[18px] font-bold">8</div><div className="text-[8px] opacity-60">+2 hoje</div></div><div className="bg-white border rounded-[10px] p-3"><div className="text-[9px]">Profissionais</div><div className="text-[18px] font-bold">12</div><div className="text-[8px]">3 online</div></div><div className="bg-emerald-50 border rounded-[10px] p-3"><div className="text-[9px]">Taxa Match</div><div className="text-[18px] font-bold">85%</div><div className="text-[8px]">42min médio</div></div><div className="bg-[#f0fdf4] border-2 border-emerald-200 rounded-[10px] p-3"><div className="text-[9px] font-bold text-emerald-700">RELATÓRIOS</div><div className="text-[12px] font-bold">Conversão</div><div className="text-[8px]">8→6 fechados</div></div></div></div>
+          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px]">ENCONTRAR - PEDIDOS + PROFISSIONAIS - NÃO MEXIDO</div><div className="text-[10px] text-[#64748b] mt-2">8 pedidos abertos hoje, 12 profissionais, Match 85% - mantido igual</div></div>
         )}
         {activeParte==='CONTRATOS' && (
-          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px] flex items-center gap-2"><span className="w-6 h-6 bg-slate-800 rounded grid place-items-center text-white">📄</span> CONTRATOS - CLÁUSULAS + IDS + TRANSPORTADORES - ID 9618</div><div className="text-[10px] text-[#64748b] mt-2">11 cláusulas ativas, 4-10 abertas editáveis, BI + NUIT opcional, 3 transportadores nagi, raul, joao - Relatórios contratos</div><div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-[10px] p-3 text-[11px] font-bold">ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS - ID 9618 - MOZ - Relatório cláusulas editadas</div></div>
+          <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[14px]">CONTRATOS - CLÁUSULAS + IDS - NÃO MEXIDO</div><div className="text-[10px] text-[#64748b] mt-2">11 cláusulas ativas, BI e NUIT opcional, ID 9618 - mantido igual</div></div>
         )}
       </div>
     );
