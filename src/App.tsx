@@ -1673,8 +1673,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           </div>
         </div>
       )}
- className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">Codigo</label><input placeholder="Ex: CEM-..." className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Grupo</label><select className="w-full mt-1 h-8 border rounded px-2 text-[12px]"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option></select></div></div><div><label className="text-[11px] font-bold">Nome Produto</label><input placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowNovoStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>setShowNovoStock(false)} className="h-8 px-5 bg-[#2b4c7e] text-white rounded font-bold">Criar Produto</button></div></div></div>
-                  </div>
+</div>
                 )}
                 {showRelatorioStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
