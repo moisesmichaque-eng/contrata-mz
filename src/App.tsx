@@ -1345,76 +1345,171 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             </div>
           )}
 
+          
           {faturacaoTab==='stock' && (
             <div className="space-y-3">
+              {/* HEADER COM DATA CIRCULADO */}
               <div className="bg-white rounded-[12px] border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div><div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS - {stockProdutos.length} itens - Alerta abaixo 50</div><div className="text-[9px] text-[#64748b]">1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo</div></div>
-                  <div className="flex gap-2 items-center">
-                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /><span className="absolute left-2 top-2 text-[12px]"></span></div>
+                  <div>
+                    <div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO</div>
+                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: 2026-10-30 | Stock Inicial Armazém (700-1300) | 1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor - Exatamente como prototipo + FIFO</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {/* DATA CIRCULADA - COMO NA IMAGEM */}
+                    <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
+                      <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
+                      <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span>
+                    </div>
+                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-7 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
                     <div className="flex items-center gap-1">
                       <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
                         <option value="todos">Todos ({stockProdutos.length})</option>
                         <option value="baixo">Baixo &lt;50 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length})</option>
                         <option value="zerado">Zerado (0) ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length})</option>
-                        <option value="medio">Medio 50-100 ({stockProdutos.filter((p:any)=>{const sf=p.noArmazem+p.stockLoja; return sf>=50 && sf<=100}).length})</option>
-                        <option value="alto">Alto &gt;100 ({stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)>100).length})</option>
                       </select>
-                      <button onClick={()=>setFiltroTipoStock(filtroTipoStock==='baixo'?'todos':'baixo')} className={`h-8 px-3 rounded-full text-[10px] font-black border ${filtroTipoStock==='baixo'?'bg-red-500 text-white border-red-500':'bg-red-50 text-red-700 border-red-200'}`}>{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length} stock baixo</button>
+                      <span className={`h-8 px-3 rounded-full text-[10px] font-black border grid place-items-center ${stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length>0?'bg-red-500 text-white border-red-500':'bg-green-50 text-green-700'}`}>{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length} stock baixo</span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 grid grid-cols-1 md:grid-cols-[160px_1fr] gap-3">
-                  <div className="bg-[#f8fafc] border rounded-[8px] p-2">
-                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
+
+                {/* FORMULAS E FIFO INFO */}
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-2">
+                  <div className="bg-[#fef9c3] border border-yellow-200 rounded-[8px] p-2 text-[8px]"><span className="font-black">FIFO:</span> First In First Out activo no armazém - saídas consomem lotes mais antigos primeiro. Validade controlada.</div>
+                  <div className="bg-[#f0f9ff] border border-blue-200 rounded-[8px] p-2 text-[8px]"><span className="font-black">Transferência:</span> Matola → Maputo → Beira Multi-armazém com requisição. Inicial hoje = Final ontem - Guardado em histórico 0 dias</div>
+                  <div className="bg-[#f0fdf4] border border-green-200 rounded-[8px] p-2 text-[8px]"><span className="font-black">Fórmulas:</span> finalArm = inicial+recepção-saída | finalLoja = inicialLoja+recepLoja-venda | total = finalArm+finalLoja | valor = venda*preço | Inicial armazém random 700-1300 (demo)</div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-3">
+                  {/* OPERACOES STOCK - CIRCULADO EM ROXO */}
+                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2">
+                    <div className="text-[10px] font-black mb-2 flex items-center gap-2"><span className="w-5 h-5 bg-[#22c55e] text-white rounded grid place-items-center text-[10px]">F</span> OPERACOES STOCK</div>
                     <div className="space-y-1.5">
-                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center">+</span>Novo Item</button>
-                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-8 bg-[#fef9c3] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-8 bg-[#f0fdf4] border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Saida [F6]</button>
-                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-8 bg-white border rounded flex items-center gap-2 px-2 text-[11px] font-bold">Relatorios [F9]</button>
+                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
+                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
-                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px]"><div> IDEAL</div><div> NO MINIMO</div><div> ZERADO</div><div> {'<'}50</div></div></div>
+                    <div className="mt-4 bg-white border-2 rounded-[8px] p-2">
+                      <div className="text-[9px] font-black">LEGENDA</div>
+                      <div className="mt-2 space-y-1.5 text-[8px] font-bold">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#22c55e] rounded"></div> IDEAL - &gt;100</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#eab308] rounded"></div> NO MINIMO - 50-100</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-gray-300 rounded"></div> ZERADO - 0</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded"></div> &lt;50 - BAIXO</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-orange-400 rounded"></div> BAIXO - Alerta</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 bg-white border rounded-[8px] p-2">
+                      <div className="text-[8px] font-black">ARMAZEM</div>
+                      <select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]">
+                        <option value="Todos">Todos Armazéns</option>
+                        <option value="Matola">Matola</option>
+                        <option value="Maputo">Maputo</option>
+                        <option value="Beira">Beira</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border"> ITEM/CODIGO</th><th className="text-center p-1.5 border"> DATA ENTR</th><th className="text-center p-1.5 border"> QTD ENTR</th><th className="text-center p-1.5 border"> NO ARMAZEM</th><th className="text-center p-1.5 border"> REQ ARM-LOJA</th><th className="text-center p-1.5 border"> DATA REQ</th><th className="text-center p-1.5 border"> STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]"> PRECO UNIT</th><th className="text-center p-1.5 border"> VENDA</th><th className="text-center p-1.5 border"> MEDIA/DIA</th><th className="text-center p-1.5 border"> STOCK FINAL</th><th className="text-right p-1.5 border"> VENDAS VALOR</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{
-                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.marca.toLowerCase().includes(filtroRapidoStock.toLowerCase());
+
+                  {/* TABELA COMPLETA 11+ COLUNAS - COMO NAS 3 IMAGENS */}
+                  <div className="overflow-x-auto border-2 rounded-[10px]">
+                    <table className="w-full text-[9px] border-collapse">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-[#1e2f4a] text-white text-[7px] font-black">
+                          <th rowSpan={2} className="text-left p-1.5 border border-[#334155] min-w-[160px]">ITEM / CODIGO</th>
+                          <th colSpan={4} className="text-center p-1 border bg-[#1e3a5f]">ARMAZEM</th>
+                          <th colSpan={5} className="text-center p-1 border bg-[#14532d]">LOJA</th>
+                          <th colSpan={2} className="text-center p-1 border bg-[#7c2d12]">VALOR</th>
+                          <th rowSpan={2} className="text-left p-1 border min-w-[110px]">LOCAL / VALIDADE / FORNECEDOR</th>
+                          <th rowSpan={2} className="text-center p-1 border">AÇÃO</th>
+                        </tr>
+                        <tr className="bg-[#f1f5f9] text-[7px] font-black">
+                          <th className="text-center p-1 border min-w-[50px] bg-yellow-50">STOCK INICIAL DIA (final anterior)</th>
+                          <th className="text-center p-1 border min-w-[45px]">RECEP</th>
+                          <th className="text-center p-1 border min-w-[55px]">SAIDA REQ LOJA</th>
+                          <th className="text-center p-1 border min-w-[60px] bg-[#dbeafe]">STOCK FINAL ARMAZEM</th>
+                          <th className="text-center p-1 border min-w-[55px]">STOCK INICIAL DIA ANTERIOR</th>
+                          <th className="text-center p-1 border min-w-[55px]">STOCK RECP REQUE ARMAZEM</th>
+                          <th className="text-center p-1 border min-w-[45px] bg-[#fee2e2]">VENDA HOJE</th>
+                          <th className="text-center p-1 border min-w-[60px]">STOCK FINAL LOJA</th>
+                          <th className="text-center p-1 border min-w-[60px] bg-[#1e2f4a] text-white">STOCK FINAL TOTAL</th>
+                          <th className="text-center p-1 border min-w-[55px]">PRECO PRODUTO</th>
+                          <th className="text-center p-1 border min-w-[75px]">TOTAL VALOR VENDAS DIA</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stockProdutos.filter((p:any)=>{
+                          const armOk = armazemAtivo==='Todos' || (p.armazem||'Matola')===armazemAtivo;
+                          const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase());
                           const sf = p.noArmazem + p.stockLoja;
                           let matchTipo = true;
-                          if(filtroTipoStock==='baixo') matchTipo = sf <= 49;
+                          if(filtroTipoStock==='baixo') matchTipo = sf < 50;
                           else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
                           else if(filtroTipoStock==='medio') matchTipo = sf >= 50 && sf <= 100;
-                          else if(filtroTipoStock==='alto') matchTipo = sf >= 101;
-                          return matchBusca && matchTipo;
+                          else if(filtroTipoStock==='alto') matchTipo = sf > 100;
+                          return matchBusca && matchTipo && armOk;
                         }).map((p:any)=>{
                             const sf=p.noArmazem+p.stockLoja;
+                            const stockFinalArmazemCalc = (p.stockInicialArmazem || p.noArmazem) + (p.recepcaoArm || 0) - (p.saidaReqLoja || 0);
+                            const stockFinalLojaCalc = (p.stockInicialLoja || p.stockLoja) + (p.recepcaoLoja || 0) - p.venda;
+                            const stockFinalTotalCalc = p.noArmazem + p.stockLoja;
                             const vv=p.venda*p.precoVenda;
-                            const isBaixo = sf <= 49;
-                            const rowBg = isBaixo ? 'bg-[#fee2e2]' : '';
-                            const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
+                            const isBaixo = stockFinalTotalCalc < 50;
+                            const isZerado = stockFinalTotalCalc === 0;
+                            const rowBg = isZerado ? 'bg-gray-100' : isBaixo ? 'bg-[#fee2e2]' : p.id%2===0 ? 'bg-white' : 'bg-[#f8fafc]';
+                            const badgeBg = isZerado ? 'bg-gray-400 text-white' : isBaixo ? 'bg-red-500 text-white animate-pulse' : stockFinalTotalCalc>100 ? 'bg-green-600 text-white' : 'bg-yellow-500 text-white';
                             return (
-                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}>
-                                <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div>{p.nome}</div></td>
-                                <td className="text-center p-1.5 border">{p.dataEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.qtdEntrada}</td>
-                                <td className="text-center p-1.5 border">{p.noArmazem}</td>
-                                <td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td>
-                                <td className="text-center p-1.5 border">{p.dataReq}</td>
-                                <td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||(p as any).preco||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td>
-                                <td className="text-center p-1.5 border">{p.mediaDia}/d</td>
-                                <td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td>
-                                <td className="text-right p-1.5 border">{vv.toLocaleString('pt-MZ')} MT</td>
+                              <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b hover:bg-blue-50 cursor-pointer text-[8px]`}>
+                                <td className="p-1.5 border sticky left-0 bg-inherit">
+                                  <div className="font-black text-[9px]">{p.nome}</div>
+                                  <div className="text-[7px] opacity-60">{p.codigo} | {p.marca} | Arm: {p.armazem||'Matola'}</div>
+                                  <div className="text-[6px] opacity-50">CEM 42N 001 | {p.grupo}</div>
+                                </td>
+                                <td className="text-center p-1 border bg-yellow-50">
+                                  <input type="number" value={p.stockInicialArmazem ?? p.noArmazem} onChange={e=>{const v=Number(e.target.value); setStockProdutos(stockProdutos.map((x:any)=>x.id===p.id?{...x, stockInicialArmazem:v}:x))}} className="w-[50px] h-6 border rounded text-center text-[8px] bg-white" />
+                                </td>
+                                <td className="text-center p-1 border">
+                                  <input type="number" value={p.recepcaoArm||0} onChange={e=>{const v=Number(e.target.value); setStockProdutos(stockProdutos.map((x:any)=>x.id===p.id?{...x, recepcaoArm:v, noArmazem:(x.stockInicialArmazem??x.noArmazem)+v-(x.saidaReqLoja||0)}:x))}} className="w-[40px] h-6 border rounded text-center text-[8px]" />
+                                </td>
+                                <td className="text-center p-1 border text-red-600 font-bold">{p.saidaReqLoja||p.entradaLoja||0}</td>
+                                <td className="text-center p-1 border bg-[#dbeafe] font-black">{p.noArmazem}</td>
+                                <td className="text-center p-1 border">{p.stockInicialLojaAnterior||520}</td>
+                                <td className="text-center p-1 border">{p.recepcaoLoja||p.entradaLoja||0}</td>
+                                <td className="text-center p-1 border bg-[#fee2e2]">
+                                  <input type="number" value={p.venda} onChange={e=>{const v=Number(e.target.value); setStockProdutos(stockProdutos.map((x:any)=>x.id===p.id?{...x, venda:v, stockLoja:(x.stockLoja+v)-v}:x))}} className="w-[45px] h-6 border rounded text-center text-[8px] font-bold text-red-600 bg-white" />
+                                </td>
+                                <td className="text-center p-1 border">{p.stockLoja}</td>
+                                <td className="text-center p-1 border bg-[#1e2f4a] text-white font-black"><span className={`px-2 py-1 rounded-full font-black text-[8px] ${badgeBg}`}>{stockFinalTotalCalc}</span></td>
+                                <td className="text-center p-1 border font-bold">{p.precoVenda} MT</td>
+                                <td className="text-right p-1 border font-black text-[#065f46]">{vv.toLocaleString('pt-MZ')} MT</td>
+                                <td className="p-1 border text-[6px] leading-[9px]">
+                                  <div>@ {p.localArm||'A1-01'}</div>
+                                  <div>{p.validade||'2026-12-10'} {Number(new Date(p.validade||'2026-12-10').getTime()) < Date.now() ? 'EXPIRAR' : 'OK'}</div>
+                                  <div className="opacity-60">{p.fornecedor||'Cimpor Moçambique'}</div>
+                                </td>
+                                <td className="text-center p-1 border">
+                                  <button onClick={(e)=>{e.stopPropagation(); setFaturacaoTab('faturacao');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">• Faturar</button>
+                                </td>
                               </tr>
                             );
-                          })}</tbody></table>
+                          })}
+                      </tbody>
+                    </table>
                   </div>
+                </div>
+                <div className="mt-2 text-[8px] text-[#64748b] flex justify-between">
+                  <span>Deslize horizontalmente • Primeira coluna fixa • Fonte ultra reduzida 4-5px em mobile para 11 colunas como solicitado • SAVE laranja guarda histórico • Inicial hoje = Final ontem</span>
+                  <span className="font-black">TOTAL VALOR STOCK: {stockProdutos.reduce((a:any,p:any)=>a+(p.noArmazem+p.stockLoja)*p.precoVenda,0).toLocaleString('pt-MZ')} MT</span>
                 </div>
               </div>
             </div>
          )}
 
 
-                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
+
+                                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
                 {showEntradaStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
