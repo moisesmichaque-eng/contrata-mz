@@ -864,14 +864,56 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           </div>
         </div>
         )}
+        
         {negocioTab==='stock' && (
-        <div className="mt-3 bg-white border rounded-[12px] p-4">
-          <div className="font-black text-[14px] flex justify-between"><span>📦 STOCK - {stockProdutos.length} produtos - Armazém + Loja - Coordenado com Faturar/Vender</span><span className="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full">FIFO - Final ontem = Inicial hoje</span></div>
-          <div className="mt-3 max-h-[500px] overflow-auto border rounded-[10px]">
-            <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">CÓDIGO</th><th className="p-2 text-left">PRODUTO</th><th className="p-2 text-center">ARMAZÉM</th><th className="p-2 text-center">LOJA</th><th className="p-2 text-center">VENDA</th><th className="p-2 text-right">PREÇO</th><th className="p-2 text-center">AÇÃO</th></tr></thead><tbody>{stockProdutos.map(p=><tr key={p.id} className="border-b hover:bg-blue-50"><td className="p-2 font-mono text-[8px]">{p.codigo}</td><td className="p-2"><div className="font-bold">{p.nome}</div><div className="text-[7px] text-[#94a3b8]">{p.marca} - {p.grupo}</div></td><td className="p-2 text-center font-bold">{p.noArmazem}</td><td className="p-2 text-center">{p.entradaLoja}</td><td className="p-2 text-center text-red-600 font-bold">{p.venda}</td><td className="p-2 text-right font-black">{p.precoVenda} MT</td><td className="p-2 text-center"><button onClick={()=>{ setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar'); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">+ Faturar</button></td></tr>)}</tbody></table>
-          </div>
-        </div>
+            <div className="space-y-3 mt-3">
+              <div className="bg-white rounded-[12px] border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO - NEGOCIO</div>
+                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockDiario} | Mesmo que FATURAR > STOCK - Unificado</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
+                      <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
+                      <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span>
+                    </div>
+                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
+                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
+                    <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
+                      <option value="todos">Todos ({stockProdutos.length})</option>
+                      <option value="baixo">Baixo &lt;50</option>
+                      <option value="zerado">Zerado</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-2">
+                  <div className="bg-[#fef9c3] border border-yellow-200 rounded-[8px] p-2 text-[8px]"><b>FIFO:</b> First In First Out activo - saídas consomem lotes mais antigos. Validade controlada.</div>
+                  <div className="bg-[#f0f9ff] border border-blue-200 rounded-[8px] p-2 text-[8px]"><b>Transferência:</b> Matola → Maputo → Beira Multi-armazém com requisição. Inicial hoje = Final ontem</div>
+                  <div className="bg-[#f0fdf4] border border-green-200 rounded-[8px] p-2 text-[8px]"><b>Fórmulas:</b> finalArm = inicial+recepção-saída | finalLoja = inicialLoja+recepLoja-venda | total = finalArm+finalLoja</div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-3">
+                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit">
+                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
+                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
+                    </div>
+                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
+                    <div className="mt-3 bg-white border rounded p-2"><div className="text-[8px] font-black">ARMAZEM</div><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]"><option value="Todos">Todos</option><option value="Matola">Matola</option><option value="Maputo">Maputo</option><option value="Beira">Beira</option></select></div>
+                  </div>
+                  <div className="overflow-x-auto border-2 rounded-[10px]">
+                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border min-w-[150px]">ITEM/CODIGO</th><th className="text-center p-1.5 border">DATA ENTR</th><th className="text-center p-1.5 border">QTD ENTR</th><th className="text-center p-1.5 border bg-yellow-50">NO ARMAZEM</th><th className="text-center p-1.5 border">REQ ARM-LOJA</th><th className="text-center p-1.5 border">DATA REQ</th><th className="text-center p-1.5 border">STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]">PRECO UNIT</th><th className="text-center p-1.5 border">VENDA</th><th className="text-center p-1.5 border">MEDIA/DIA</th><th className="text-center p-1.5 border">STOCK FINAL</th><th className="text-right p-1.5 border">VENDAS VALOR</th><th className="text-left p-1.5 border">LOCAL/VALIDADE/FORNECEDOR</th><th className="text-center p-1.5 border">ACAO</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{const armOk = armazemAtivo==='Todos' || (p.armazem||'Matola')===armazemAtivo; const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo && armOk;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const rowBg = isBaixo ? 'bg-[#fee2e2]' : ''; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">+ Faturar</button></td></tr>);})}</tbody></table>
+                  </div>
+                </div>
+                <div className="mt-2 text-[8px] text-[#64748b] flex justify-between"><span>Deslize horizontalmente - Primeira coluna fixa - SAVE laranja guarda historico - Inicial hoje = Final ontem - Unificado FATURAR e NEGOCIO</span><span className="font-black">TOTAL: {stockProdutos.reduce((a:any,p:any)=>a+(p.noArmazem+p.stockLoja)*p.precoVenda,0).toLocaleString('pt-MZ')} MT</span></div>
+              </div>
+            </div>
         )}
+
         {negocioTab==='clientes' && (
         <div className="mt-3 bg-white border rounded-[12px] p-4">
           <div className="font-black text-[14px]">👥 CLIENTES - {faturas.length} clientes com faturas - Coordenado com Faturar</div>
