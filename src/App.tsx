@@ -1,4 +1,4 @@
-// VERSION 2026-10-30 06:10 - FORCA DIFF MOBILE ULTRA REDUZIDO 5px 6px MIN 800px SCROLL 11 COLUNAS - SO INICIAL RANDOM 700-1300 - VENDAS 320->520 REFLETE - BUILD FIX 1190
+// VERSION 2026-10-30 06:15 - ULTRA MINI 4px 5px SCALE 0.65 ZOOM 0.60 11 COLUNAS TELEFONE - FORCA DIFF
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -265,7 +265,7 @@ export default function App(){
       
       const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
       
-      const faturaHtml = '<html><head><meta charset="utf-8"><title>Fatura '+nomeCliente+'</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px}</style></head><body><div class="header"><h1>'+(perfilLoja.nome||'Minha Loja')+' - Vender e Faturar</h1><div>Data: '+dataHoje+' | Cliente: '+nomeCliente+' | Tel: '+telFat+' '+(nuitFat?'| NUIT: '+nuitFat:'')+'</div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>'+produtosFat.map(p=>'<tr><td>'+p.nome+'</td><td style="text-align:center">'+p.qtd+'</td><td style="text-align:right">'+p.preco+'MT</td><td style="text-align:center">'+p.desc+'%</td><td style="text-align:right;font-weight:bold">'+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT</td></tr>').join('')+'</tbody></table><div class="total">Subtotal: '+subtotal.toFixed(0)+'MT<br>Desconto: -'+desc.toFixed(0)+'MT<br>Subtotal liq: '+base.toFixed(0)+'MT<br>IVA: '+iva.toFixed(0)+'MT<br><strong style="font-size:18px">TOTAL: '+total.toFixed(0)+'MT</strong></div></body></html>';
+      const faturaHtml = '<html><head><meta charset="utf-8"><title>Fatura '+nomeCliente+'</title></head><body><div class="header"><h1>'+(perfilLoja.nome||'Minha Loja')+' - Vender e Faturar</h1><div>Data: '+dataHoje+' | Cliente: '+nomeCliente+' | Tel: '+telFat+' '+(nuitFat?'| NUIT: '+nuitFat:'')+'</div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>'+produtosFat.map(p=>'<tr><td>'+p.nome+'</td><td style="text-align:center">'+p.qtd+'</td><td style="text-align:right">'+p.preco+'MT</td><td style="text-align:center">'+p.desc+'%</td><td style="text-align:right;font-weight:bold">'+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT</td></tr>').join('')+'</tbody></table><div class="total">Subtotal: '+subtotal.toFixed(0)+'MT<br>Desconto: -'+desc.toFixed(0)+'MT<br>Subtotal liq: '+base.toFixed(0)+'MT<br>IVA: '+iva.toFixed(0)+'MT<br><strong style="font-size:18px">TOTAL: '+total.toFixed(0)+'MT</strong></div></body></html>';
       
       const blob = new Blob([faturaHtml], {type: 'text/html'});
       const url = URL.createObjectURL(blob);
@@ -626,20 +626,7 @@ useEffect(()=>{
  const gerarPDFInicial = () => {
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
-<style>
-body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px;background:#f8fafc}
-.header{background:#1e2f4a;color:white;padding:15px 20px;border-radius:12px;display:flex;align-items:center;gap:15px}
-.header h1{color:#d4a44a;margin:0;font-size:14px}
-.header-logo{background:white;border-radius:8px;padding:5px;width:70px;height:70px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:white}
-.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
-.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-@media print{.no-print{display:none} body{background:white}}
-</style>
+
 </head><body>
 <div class="header"><div class="header-logo">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="max-height:50px;max-width:60px;display:block;border-radius:4px;object-fit:contain" />` : `<div style="font-size:9px;color:#1e2f4a;font-weight:bold;text-align:center">${(formContrato.logoTipo || 'LOGO').substring(0,20)}</div>`}</div><div style="flex:1;text-align:left"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div style="font-size:10px;margin-top:4px">contrata-mz.vercel.app - ${formContrato.logoTipo || 'ESSE'} - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div></div>
 
@@ -707,21 +694,7 @@ ${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
    if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado na horizontal."); return; }
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000); const agora = new Date().toLocaleString("pt-MZ");
    const htmlFinal = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL 11 CLAUSULAS COMPLETAS - ${catName} - ID ${id} - ASSINATURAS HORIZONTAL</title>
-<style>
-body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:11px}
-.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
-.header h1{color:#d4a44a;margin:0;font-size:15px}
-.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}
-.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}
-.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}
-.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
-.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:220px}
-.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
-.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
-.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}
-.footer{background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:12px;margin-top:15px;font-size:10px}
-@media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
-</style>
+
 </head><body>
 <div class="header"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS </h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
 
@@ -802,7 +775,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 
  return (
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
-   <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
+   
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
     <div className="flex items-center gap-2"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="text-[11px] font-black tracking-[2px] text-[#facc15]">TOTSHE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
