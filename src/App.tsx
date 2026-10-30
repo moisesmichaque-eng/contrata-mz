@@ -190,9 +190,9 @@ export default function App(){
   const [faturarAba, setFaturarAba] = useState('VENDER');
   const [faturas, setFaturas] = useState<any[]>([]);
   const [clientesFiado, setClientesFiado] = useState<any[]>([]);
-  const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
+  const [perfilLoja, setPerfilLoja] = useState({nome:(lojaPerfil as any).nomeLoja || 'Zoes', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
 
-  const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:'Minha Ferragem', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:'', ramoActividade:'Ferragem e Material de Construção', outroRamo:''});
+  const [lojaPerfil, setLojaPerfil] = useState({nomeLoja:(lojaPerfil as any).nomeLoja || 'Zoes', responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:'', ramoActividade:'Ferragem e Material de Construção', outroRamo:''});
   const [negocioLogado, setNegocioLogado] = useState(false);
   const [negocioAuthMode, setNegocioAuthMode] = useState<'cadastro'|'login'>('cadastro');
   const [negocioCadastroForm, setNegocioCadastroForm] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construção', outroRamo:'', logoData:'' as any, logoNome:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00'});
@@ -243,10 +243,10 @@ export default function App(){
       const nomeCliente = nomeFat||'Cliente Balcao';
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
       
-      const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
+      const msg = '*'+(perfilLoja.nome||(lojaPerfil as any).nomeLoja || 'Zoes')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
       
       const logoHtml = (lojaPerfil as any).logoData || (perfilLoja as any).logoData ? `<img src="${(lojaPerfil as any).logoData || (perfilLoja as any).logoData}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${((lojaPerfil as any).nomeLoja || perfilLoja.nome || 'ML').slice(0,2).toUpperCase()}</div>`;
-      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Loja';
+      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nomeLoja || 'Zoes';
       const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
       const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
       const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
@@ -900,7 +900,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                   <div className="space-y-3">
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || 'Minha Ferragem', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                    <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || (lojaPerfil as any).nomeLoja || 'Zoes', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   </div>
                 )}
               </div>
@@ -914,7 +914,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div className="w-10 h-5 bg-[#facc15] rounded flex items-center justify-center text-black font-black text-[7px]">TOTSHE</div>
             <div>
               <div className="font-black text-[11px]">CONTA INTERNA - {(lojaPerfil as any).provincia || 'Maputo'}1</div>
-              <div className="text-[8px] text-[#64748b]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Ferragem Matola'} - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
+              <div className="text-[8px] text-[#64748b]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || '{(lojaPerfil as any).nomeLoja || 'Zoes'}'} - NUIT 401234567 - Av. União Africana, Parcela 312, Matola - Maputo - 258 84 123 4567 - Stock: {stockProdutos.length} produtos</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -957,7 +957,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                         )}
                         <div className="flex-1">
                           <div className="text-[9px] font-bold text-[#64748b]">LOJA EMISSORA - CONTA DONO - {(lojaPerfil as any).ramoActividade||''}</div>
-                          <div className="font-black text-[12px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Loja'}</div>
+                          <div className="font-black text-[12px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nomeLoja || 'Zoes'}</div>
                           <div className="text-[9px]">NUIT {(lojaPerfil as any).nuit || perfilLoja.nuit} • Tel {(lojaPerfil as any).tel || perfilLoja.telefone} • {(lojaPerfil as any).provincia}</div>
                           <div className="text-[8px] opacity-70">{(lojaPerfil as any).endereco} { (lojaPerfil as any).distrito} {(lojaPerfil as any).logoData ? '• Logo OK' : ''}</div>
                         </div>
@@ -971,7 +971,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
           <div className="bg-white border rounded-[12px] p-3 h-fit sticky top-3">
             <div className="flex justify-between items-center"><div className="font-black text-[10px]">PRÉ-VISUALIZAÇÃO A5 • Fatura</div><span className="text-[7px] bg-[#facc15] text-black px-2 py-1 rounded-full font-black">TOTSHE BRANDING</span></div>
             <div className="mt-3 bg-white border-2 rounded-[10px] p-3">
-              <div className="flex gap-2"><div className="w-12 bg-[#facc15] rounded grid place-items-center text-[8px] font-black p-1">TOTSHE</div><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div><div><div className="font-black text-[10px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Ferragem Matola'}</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div></div>
+              <div className="flex gap-2"><div className="w-12 bg-[#facc15] rounded grid place-items-center text-[8px] font-black p-1">TOTSHE</div><div className="w-10 h-10 bg-gray-100 rounded grid place-items-center text-[7px] border">LOGO</div><div><div className="font-black text-[10px]">{(lojaPerfil as any).nomeLoja || perfilLoja.nome || '{(lojaPerfil as any).nomeLoja || 'Zoes'}'}</div><div className="text-[6px] text-[#64748b]">Av. União Africana, Parcela 312, Matola - Maputo - Tel 258 84 123 4567 - NUIT 401234567</div></div></div>
               <div className="mt-3 text-[8px] border-t pt-2"><div className="font-bold">Fatura Nº FT 2025/1842 Cliente: {nomeFat || 'João Manhique - Obra Zimpeto'}</div><div>Data: {new Date().toLocaleDateString('pt-MZ')} - NUIT: {nuitFat || '--'} - Tel: {telFat}</div></div>
               <div className="mt-2 text-[7px] border rounded"><div className="grid grid-cols-5 bg-[#f8fafc] font-black p-1.5"><span>Item</span><span>Qtd</span><span>Preço</span><span>Desc</span><span>Total</span></div>{produtosFat.slice(0,4).map(p=><div key={p.id} className="grid grid-cols-5 p-1.5 border-t"><span className="truncate">{p.nome.slice(0,14)}</span><span>{p.qtd}</span><span>{p.preco} MT</span><span>{p.desc}%</span><span>{(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}</span></div>)}{produtosFat.length===0 && <><div className="grid grid-cols-5 p-1.5 border-t"><span>Cimento 50kg</span><span>2</span><span>850 MT</span><span>0%</span><span>1700.00</span></div><div className="grid grid-cols-5 p-1.5 border-t"><span>Tinta Branca 20L</span><span>1</span><span>3850 MT</span><span>5%</span><span>3657.50</span></div></>}</div>
               <div className="mt-2 text-right text-[8px] space-y-0.5"><div>Subtotal: {produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) || '5357.5'} MT</div><div>IVA 16%: {((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0) || '857.2'} MT</div><div className="font-black text-[10px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0) || '6214.7';})()} MT</div></div>
@@ -1003,7 +1003,16 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button><button onClick={()=>{
+                    const el = document.getElementById('fatura-preview-a5');
+                    if(!el){ alert('Sem fatura para PDF'); return; }
+                    const win = window.open('', '_blank');
+                    if(!win){ alert('Permita popups'); return; }
+                    win.document.write(`<html><head><title>Fatura ${(lojaPerfil as any).nomeLoja||'Zoes'}</title><style>body{font-family:Arial;padding:20px} table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:6px} th{background:#eee} .header{display:flex;gap:15px;align-items:center;border-bottom:2px solid #000;padding-bottom:10px}</style></head><body><div class="header">${(lojaPerfil as any).logoData ? '<img src="'+(lojaPerfil as any).logoData+'" style="width:80px;height:80px;object-fit:contain;border:1px solid #ddd;border-radius:8px" />' : '<div style="width:60px;height:60px;background:#000;color:#fff;display:grid;place-items:center;border-radius:50%">'+((lojaPerfil as any).nomeLoja||'Z').slice(0,2)+'</div>'}<div><h2>${(lojaPerfil as any).nomeLoja||'Zoes'}</h2><div>NUIT: ${(lojaPerfil as any).nuit||''}</div><div>${(lojaPerfil as any).endereco||''}</div></div></div>` + el.innerHTML + `<div style="margin-top:20px;text-align:right;font-weight:bold">TOTAL: ${document.getElementById('total-geral')?.innerText||''}</div></body></html>`);
+                    win.document.close();
+                    win.focus();
+                    setTimeout(()=>{ win.print(); }, 500);
+                  }} className="ml-2 h-7 px-4 bg-[#16a34a] text-white rounded-full text-[10px] font-black">📄 PDF</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1055,7 +1064,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
         <div className="mt-3 bg-white border rounded-[12px] p-4">
           <div className="font-black text-[14px]">📦 CAIXA & TURNOS - Fecho de caixa - Coordenado com Vendas</div>
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">CAIXA ABERTO</div><div className="font-black text-[14px]">{new Date().toLocaleDateString('pt-MZ')} 08:00</div><div className="text-[8px]">Turno: Manhã - Operador: {perfilLoja.nome || 'Minha Ferragem'}</div></div>
+            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">CAIXA ABERTO</div><div className="font-black text-[14px]">{new Date().toLocaleDateString('pt-MZ')} 08:00</div><div className="text-[8px]">Turno: Manhã - Operador: {perfilLoja.nome || (lojaPerfil as any).nomeLoja || 'Zoes'}</div></div>
             <div className="bg-[#f0fdf4] border-2 border-green-200 rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">VENDAS DO TURNO</div><div className="font-black text-[14px] text-green-700">{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0) || faturas.reduce((s,f)=>s+(f.total||0),0).toFixed(0) || '6214.7'} MT</div><div className="text-[8px]">{faturas.length} faturas + {produtosFat.length} itens carrinho</div></div>
             <div className="bg-[#fffbeb] border rounded-[10px] p-3"><div className="text-[9px] text-[#64748b]">FECHO Z-REPORT</div><button className="mt-1 w-full h-8 bg-black text-white rounded-[6px] text-[9px] font-black">Gerar Z-Report - Fechar caixa</button></div>
           </div>
@@ -1412,7 +1421,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                   </div>
-                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Minha Ferragem', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || (lojaPerfil as any).nomeLoja || 'Zoes', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
                   </>
                   )}
@@ -1432,7 +1441,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
             <div>
           {/* TOPO - COM TABS NOVOS INCLUINDO STOCK */}
           <div className="bg-white rounded-[12px] border p-2 mb-3 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">{lojaPerfil.nomeLoja||'Minha Loja'} - Vender e Faturar</div></div>
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#22c55e] text-white grid place-items-center font-black text-[12px]">F</div><div className="font-black text-[12px]">{lojaPerfil.nomeLoja||(lojaPerfil as any).nomeLoja || 'Zoes'} - Vender e Faturar</div></div>
             <div className="flex gap-1 bg-[#f1f5f9] rounded-full p-1 ml-2">
               <button onClick={()=>setFaturacaoTab('faturacao')} className={faturacaoTab==='faturacao' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>VENDER</button>
               <button onClick={()=>setFaturacaoTab('stock')} className={faturacaoTab==='stock' ? 'px-4 py-1.5 rounded-full font-black text-[10px] bg-[#1e2f4a] text-white' : 'px-4 py-1.5 rounded-full font-black text-[10px] text-[#64748b]'}>STOCK</button>
@@ -1529,7 +1538,16 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button><button onClick={()=>{
+                    const el = document.getElementById('fatura-preview-a5');
+                    if(!el){ alert('Sem fatura para PDF'); return; }
+                    const win = window.open('', '_blank');
+                    if(!win){ alert('Permita popups'); return; }
+                    win.document.write(`<html><head><title>Fatura ${(lojaPerfil as any).nomeLoja||'Zoes'}</title><style>body{font-family:Arial;padding:20px} table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:6px} th{background:#eee} .header{display:flex;gap:15px;align-items:center;border-bottom:2px solid #000;padding-bottom:10px}</style></head><body><div class="header">${(lojaPerfil as any).logoData ? '<img src="'+(lojaPerfil as any).logoData+'" style="width:80px;height:80px;object-fit:contain;border:1px solid #ddd;border-radius:8px" />' : '<div style="width:60px;height:60px;background:#000;color:#fff;display:grid;place-items:center;border-radius:50%">'+((lojaPerfil as any).nomeLoja||'Z').slice(0,2)+'</div>'}<div><h2>${(lojaPerfil as any).nomeLoja||'Zoes'}</h2><div>NUIT: ${(lojaPerfil as any).nuit||''}</div><div>${(lojaPerfil as any).endereco||''}</div></div></div>` + el.innerHTML + `<div style="margin-top:20px;text-align:right;font-weight:bold">TOTAL: ${document.getElementById('total-geral')?.innerText||''}</div></body></html>`);
+                    win.document.close();
+                    win.focus();
+                    setTimeout(()=>{ win.print(); }, 500);
+                  }} className="ml-2 h-7 px-4 bg-[#16a34a] text-white rounded-full text-[10px] font-black">📄 PDF</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
