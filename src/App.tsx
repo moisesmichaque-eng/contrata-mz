@@ -197,7 +197,6 @@ export default function App(){
   const [negocioAuthMode, setNegocioAuthMode] = useState<'cadastro'|'login'>('cadastro');
   const [negocioCadastroForm, setNegocioCadastroForm] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construção', outroRamo:'', logoData:'' as any, logoNome:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00'});
   
-  const [, responsavel:'', tel:'', email:'', nuit:'', provincia:'Maputo Cidade', distrito:'KaMpfumo', endereco:'', formaPag:'M-Pesa, Numerario', horario:'08:00 - 18:00', logoData:'' as any, logoNome:''});
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const [stockProdutos, setStockProdutos] = useState([
