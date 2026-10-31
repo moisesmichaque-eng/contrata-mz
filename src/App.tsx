@@ -1140,7 +1140,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1160,9 +1160,17 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit">
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
-                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
-                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowEntradaStock(true);
+                      }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowSaidaStock(true);
+                      }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
                       <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
@@ -1666,7 +1674,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1686,9 +1694,17 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit">
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
-                      <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
-                      <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
-                      <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowEntradaStock(true);
+                      }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowSaidaStock(true);
+                      }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
                       <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
