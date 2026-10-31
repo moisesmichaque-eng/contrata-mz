@@ -1058,7 +1058,19 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]; if(file){const reader=new FileReader(); reader.onload=(ev)=>{setNegocioCadastroForm({...negocioCadastroForm, logoData:ev.target?.result as any, logoNome:file.name})}; reader.readAsDataURL(file);}}} className="w-full h-10 px-2 rounded-[8px] border text-[10px] mt-1 text-white bg-white/10 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#facc15] file:text-black file:font-bold" /><div className="text-[8px] opacity-60 mt-1">PNG ou JPG ate 2MB - Aparece em facturas, recibos, orcamentos</div></div>
                       <div>{negocioCadastroForm.logoData && <div className="bg-white rounded-[8px] p-2 text-center"><img src={negocioCadastroForm.logoData as any} alt="logo preview" className="h-12 mx-auto object-contain" /><div className="text-[8px] text-black mt-1">{negocioCadastroForm.logoNome}</div></div>}</div>
                     </div>
-                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} const novoPerfilCompleto = { nomeLoja: negocioCadastroForm.nomeLoja, nome: negocioCadastroForm.nomeLoja, tel: negocioCadastroForm.tel, telefone: negocioCadastroForm.tel, nuit: negocioCadastroForm.nuit, endereco: negocioCadastroForm.endereco, provincia: negocioCadastroForm.provincia, distrito: negocioCadastroForm.distrito, ramo: negocioCadastroForm.ramo, ramoActividade: negocioCadastroForm.ramo, outroRamo: negocioCadastroForm.outroRamo, logoData: negocioCadastroForm.logoData, logoNome: negocioCadastroForm.logoNome, formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario', horario: negocioCadastroForm.horario||'08:00 - 18:00', responsavel: negocioCadastroForm.nomeLoja, email: '' }; 
+                    <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('❌ Preencha nome da loja, telefone e password - todos obrigatórios!'); return;}
+                        const telExist = negocioCadastroForm.tel.trim();
+                        const contaExist = localStorage.getItem(`lojaPerfil_${telExist}`) || localStorage.getItem(`conta_${telExist}`);
+                        if(contaExist){
+                          const dadosExist = JSON.parse(contaExist);
+                          alert(`❌ CONTA JÁ EXISTE!\n\nTelefone ${telExist} já cadastrado como ${dadosExist.nomeLoja}\n\nNão pode criar 2 contas com mesmo telefone.\nUse LOGIN com password ${dadosExist.password ? '***' : ''} para entrar.\n\nSe esqueceu password, contate suporte.`);
+                          return;
+                        }
+                        // Valida nome loja não pode ser qualquer coisa - mínimo 3 letras e não pode ser só números
+                        const nomeLojaValid = negocioCadastroForm.nomeLoja.trim();
+                        if(nomeLojaValid.length < 3){ alert('❌ Nome da loja deve ter pelo menos 3 letras! Ex: Zoes Ferragem'); return; }
+                        if(/^\d+$/.test(nomeLojaValid)){ alert('❌ Nome da loja não pode ser só números! Ex: Zoes Ferragem, SICPA Kenya LTD'); return; }
+                        if(/^(animal|teste|a{2,}|b{2,}|c{2,}|xxx|asdf)$/i.test(nomeLojaValid)){ alert('❌ Nome inválido! Use nome real da loja: Zoes, Bless, SICPA KENYA LTD, Nando Ferragem etc'); return; } const novoPerfilCompleto = { nomeLoja: negocioCadastroForm.nomeLoja, nome: negocioCadastroForm.nomeLoja, tel: negocioCadastroForm.tel, telefone: negocioCadastroForm.tel, nuit: negocioCadastroForm.nuit, endereco: negocioCadastroForm.endereco, provincia: negocioCadastroForm.provincia, distrito: negocioCadastroForm.distrito, ramo: negocioCadastroForm.ramo, ramoActividade: negocioCadastroForm.ramo, outroRamo: negocioCadastroForm.outroRamo, logoData: negocioCadastroForm.logoData, logoNome: negocioCadastroForm.logoNome, formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario', horario: negocioCadastroForm.horario||'08:00 - 18:00', responsavel: negocioCadastroForm.nomeLoja, email: '' }; 
 setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto})); 
         setPerfilLoja((prev:any)=>({...prev, ...novoPerfilCompleto}));
         // ISOLAMENTO DE CONTAS POR TELEFONE - FIX PRIVACIDADE
@@ -1115,7 +1127,38 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="space-y-3">
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
-                    <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: negocioCadastroForm.nomeLoja || 'Zoes', tel: negocioCadastroForm.tel}); setNegocioLogado(true); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                    <button onClick={()=>{
+                        const tel = negocioCadastroForm.tel?.trim();
+                        const pass = negocioCadastroForm.password?.trim();
+                        if(!tel || !pass){ alert('❌ Digite TELEFONE e PASSWORD cadastrados!'); return; }
+                        const contaSalva = localStorage.getItem(`lojaPerfil_${tel}`) || localStorage.getItem(`conta_${tel}`);
+                        if(!contaSalva){
+                          const listaContas = JSON.parse(localStorage.getItem('listaContas')||'[]');
+                          alert(`❌ CONTA NÃO ENCONTRADA!\n\nTelefone ${tel} nunca foi cadastrado.\n\nContas existentes: ${listaContas.length>0 ? listaContas.join(', ') : 'Nenhuma'}\n\nUse CADASTRO para criar conta nova.\nO sistema NÃO aceita qualquer nome ou número - só contas criadas!`);
+                          return;
+                        }
+                        const dadosConta = JSON.parse(contaSalva);
+                        if(dadosConta.password !== pass){
+                          alert(`❌ PASSWORD INCORRETA!\n\nTelefone ${tel} existe (${dadosConta.nomeLoja}), mas password não coincide.\n\nPassword cadastrada: ${dadosConta.password ? '***' : 'sem password'}\nVocê digitou: ${pass}\n\nDigite password correta da conta ${dadosConta.nomeLoja}!`);
+                          return;
+                        }
+                        // SUCESSO - Carrega conta isolada
+                        setLojaPerfil(dadosConta);
+                        setPerfilLoja(dadosConta);
+                        const stockSalvo = localStorage.getItem(`stock_produtos_${tel}`);
+                        const faturasSalvas = localStorage.getItem(`faturas_${tel}`);
+                        const clientesSalvos = localStorage.getItem(`clientes_${tel}`);
+                        const fornecedoresSalvos = localStorage.getItem(`fornecedores_${tel}`);
+                        setStockProdutos(stockSalvo ? JSON.parse(stockSalvo) : []);
+                        setFaturas(faturasSalvas ? JSON.parse(faturasSalvas) : []);
+                        setClientesFiado(clientesSalvos ? JSON.parse(clientesSalvos) : []);
+                        setDataStockDiario(new Date().toISOString().slice(0,10));
+                        localStorage.setItem('contaAtiva', tel);
+                        localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
+                        setNegocioLogado(true);
+                        setFaturacaoLogado(true);
+                        alert(`✅ LOGIN COM SUCESSO!\n\nBem-vindo ${dadosConta.nomeLoja}!\nTel: ${tel}\nNUIT: ${dadosConta.nuit||'sem NUIT'}\nProvíncia: ${dadosConta.provincia||''}\nRamo: ${dadosConta.ramoActividade||dadosConta.ramo||''}\nLogo: ${dadosConta.logoData ? 'Sim, com logo' : 'Sem logo'}\n\nStock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos SÓ SEUS!\nFaturas: ${(faturasSalvas ? JSON.parse(faturasSalvas).length : 0)}\n\nConta 100% isolada - Não mistura com Zoes, SICPA, Nando!`);
+                      }} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta (VALIDAÇÃO 100%)</button>
                   </div>
                 )}
               </div>
