@@ -1870,118 +1870,9 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {showNovoStock && (
-                  <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
-                      <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
-                        <span className="font-black text-[14px]">✅ Novo Item - Cadastro FUNCIONANDO</span>
-                        <button onClick={()=>setShowNovoStock(false)} className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded grid place-items-center font-black text-[16px]">X</button>
-                      </div>
-                      <div className="p-5 space-y-4">
-                        <div className="bg-yellow-50 border-2 border-yellow-400 rounded p-2 text-[10px] font-bold">⚠️ ESTE MODAL ESTÁ FUNCIONANDO - Se vê isto, o botão Novo Item funciona!</div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div><label className="text-[11px] font-black">Nome Produto *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-bold focus:border-blue-600" autoFocus /></div>
-                          <div><label className="text-[11px] font-black">Grupo</label><select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option><option>Tintas</option><option>Tubos</option><option>Electricidade</option><option>Outro</option></select></div>
-                        </div>
-                        
-                        <div className="bg-[#f0fdf4] border-2 border-[#22c55e] rounded-lg p-4 space-y-3">
-                          <div className="font-black text-[12px] text-[#166534] flex items-center gap-2">📦 ENTRADA - DADOS PARA FIFO (Primeiro a Entrar, Primeiro a Sair) - BARCODE OPCIONAL</div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Código de Barras (Opcional) - Ajuda venda rápida</label><input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="Ex: 5601234567890 - opcional" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white focus:border-green-600" /></div>
-                            <div><label className="text-[10px] font-black">Data Entrada na Loja/Armazém * - FIFO OBRIGATÓRIO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white font-black focus:border-green-600" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-3">
-                            <div><label className="text-[10px] font-black">Qtd Entrada *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-black focus:border-green-600" /></div>
-                            <div><label className="text-[10px] font-black">Local Armazém</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
-                            <div><label className="text-[10px] font-black">Lote</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="LOTE-123456" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Preço Custo *</label><input type="number" value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="700" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold" /></div>
-                            <div><label className="text-[10px] font-black">Preço Venda *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-black" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Fornecedor</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Ex: Cimpor, Mozal" className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
-                            <div><label className="text-[10px] font-black">Validade (opcional)</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
-                          </div>
-                          
-                          <div className="text-[9px] text-[#166534] bg-white p-2 rounded border-2 border-green-200 font-bold">💡 FIFO: Produto que entrou primeiro (data mais antiga) será levado primeiro do armazém para loja. Código de barras é opcional, mas facilita venda com scanner. Data entrada obrigatória para FIFO funcionar 100%!</div>
-                        </div>
-                        
-                        <div className="flex justify-end gap-3 pt-3 border-t-2">
-                          <button onClick={()=>setShowNovoStock(false)} className="h-11 px-6 border-2 rounded-lg text-[12px] font-black hover:bg-gray-100">Cancelar</button>
-                          <button onClick={()=>{
-                            console.log('Criar Produto clicked', novoStockNome, novoStockQtd);
-                            if(!novoStockNome || novoStockNome.trim().length<2){ alert('❌ Digite nome do produto! Ex: Cimento 42.5N'); return; }
-                            if(!novoStockQtd || Number(novoStockQtd)<=0){ alert('❌ Digite quantidade! Ex: 100'); return; }
-                            if(!novoStockDataEntrada){ alert('❌ Selecione data entrada - FIFO precisa data!'); return; }
-                            const novoId = Date.now().toString();
-                            const dataEnt = novoStockDataEntrada || new Date().toISOString().slice(0,10);
-                            const dataEntBR = dataEnt.split('-').reverse().join('/');
-                            const novoProduto = {
-                              id: novoId,
-                              codigo: novoStockBarcode || `COD-${novoId.slice(-6)}`,
-                              nome: novoStockNome.trim(),
-                              marca: novoStockFornecedor || 'Geral',
-                              grupo: novoStockCat,
-                              subGrupo: 'Geral',
-                              fabricante: novoStockFornecedor || 'Geral',
-                              dataEntrada: dataEntBR,
-                              dataEntradaISO: dataEnt,
-                              qtdEntrada: parseInt(novoStockQtd)||0,
-                              noArmazem: parseInt(novoStockQtd)||0,
-                              entradaLoja: 0,
-                              dataReq: '',
-                              stockLoja: 0,
-                              venda: 0,
-                              mediaDia: 0,
-                              precoVenda: parseFloat(novoStockPreco)||0,
-                              precoCusto: parseFloat(novoStockCusto)||0,
-                              minimo: 10,
-                              ideal: 50,
-                              barcode: novoStockBarcode || '',
-                              local: novoStockLocal || 'A1-01',
-                              lote: novoStockLote || `LOTE-${novoId.slice(-6)}`,
-                              validade: novoStockValidade || '',
-                              fornecedor: novoStockFornecedor || '',
-                              armazem: armazemAtivo==='Todos' ? 'Matola' : armazemAtivo
-                            };
-                            console.log('Novo produto', novoProduto);
-                            setStockProdutos(prev=>{
-                              const novaLista = [...prev, novoProduto] as any[];
-                              try{
-                                const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel;
-                                if(telAtiva){
-                                  localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novaLista));
-                                  localStorage.setItem(`stock_produtos_${telAtiva}_backup`, JSON.stringify(novaLista));
-                                }
-                                localStorage.setItem('stock_produtos', JSON.stringify(novaLista));
-                              }catch(e){ console.error(e); }
-                              return novaLista;
-                            });
-                            setNovoStockNome(''); setNovoStockQtd(''); setNovoStockBarcode(''); setNovoStockPreco(''); setNovoStockCusto(''); setNovoStockLocal('A1-01'); setNovoStockLote('LOTE-'+Date.now().toString().slice(-6)); setNovoStockFornecedor('');
-                            setShowNovoStock(false);
-                            setStockSelecionado(novoId);
-                            alert(`✅ Produto criado com SUCESSO!
-
-Nome: ${novoProduto.nome}
-Barcode: ${novoProduto.barcode||'Sem (opcional)'}
-Data Entrada: ${dataEntBR} (FIFO)
-Local: ${novoProduto.local}
-Qtd: ${novoProduto.qtdEntrada}
-Armazém: ${novoProduto.armazem}
-
-Agora tabela tem ${stockProdutos.length+1} itens!`);
-                          }} className="h-11 px-8 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-lg font-black text-[13px] shadow-lg">✅ CRIAR PRODUTO COM FIFO - FUNCIONA!</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                
+      {/* REMOVIDO MODAL ANTIGO - SUBSTITUIDO POR MINIMAL */}
+      
                 {showRelatorioStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[640px] border overflow-hidden"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Relatorios - Stock 11 Colunas - Alerta &lt;50</span><button onClick={()=>setShowRelatorioStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 grid grid-cols-3 gap-3"><div className="bg-[#f8fafc] border rounded p-3"><div className="text-[11px] text-[#64748b]">Total Itens</div><div className="text-[20px] font-bold">{stockProdutos.length}</div></div><div className="bg-[#fee2e2] border border-[#fca5a5] rounded p-3"><div className="text-[11px] text-[#991b1b] font-bold">Abaixo de 50</div><div className="text-[20px] font-bold text-[#991b1b]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length}</div></div><div className="bg-[#fecaca] border border-[#ef4444] rounded p-3"><div className="text-[11px] text-[#7f1d1d]">Zerados</div><div className="text-[20px] font-bold text-[#7f1d1d]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length}</div></div><div className="col-span-3 bg-[#eff6ff] border rounded p-3 flex justify-between"><div><div className="text-[11px] text-[#1e40af]">Soma Custo Arm+Loja</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+(b.noArmazem+b.stockLoja)*b.precoCusto,0).toFixed(0)} MT</div></div><div className="text-right"><div className="text-[11px] text-[#1e40af]">Total Vendas Valor</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+b.venda*b.precoVenda,0).toFixed(0)} MT</div></div></div></div><div className="p-3 border-t bg-[#f8fafc] flex justify-end"><button onClick={()=>setShowRelatorioStock(false)} className="h-8 px-4 bg-[#2b4c7e] text-white rounded">Fechar</button></div></div>
@@ -2436,119 +2327,98 @@ Bilhete valido - Apresentar QR`;
 
 
       
-      {/* FIX V3 - MODAL GLOBAL SEGURO - FECHAMENTO CORRETO */}
       {showNovoStock && (
-                  <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
-                      <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
-                        <span className="font-black text-[14px]">✅ Novo Item - Cadastro FUNCIONANDO</span>
-                        <button onClick={()=>setShowNovoStock(false)} className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded grid place-items-center font-black text-[16px]">X</button>
-                      </div>
-                      <div className="p-5 space-y-4">
-                        <div className="bg-yellow-50 border-2 border-yellow-400 rounded p-2 text-[10px] font-bold">⚠️ ESTE MODAL ESTÁ FUNCIONANDO - Se vê isto, o botão Novo Item funciona!</div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div><label className="text-[11px] font-black">Nome Produto *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-bold focus:border-blue-600" autoFocus /></div>
-                          <div><label className="text-[11px] font-black">Grupo</label><select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option><option>Tintas</option><option>Tubos</option><option>Electricidade</option><option>Outro</option></select></div>
-                        </div>
-                        
-                        <div className="bg-[#f0fdf4] border-2 border-[#22c55e] rounded-lg p-4 space-y-3">
-                          <div className="font-black text-[12px] text-[#166534] flex items-center gap-2">📦 ENTRADA - DADOS PARA FIFO (Primeiro a Entrar, Primeiro a Sair) - BARCODE OPCIONAL</div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Código de Barras (Opcional) - Ajuda venda rápida</label><input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="Ex: 5601234567890 - opcional" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white focus:border-green-600" /></div>
-                            <div><label className="text-[10px] font-black">Data Entrada na Loja/Armazém * - FIFO OBRIGATÓRIO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white font-black focus:border-green-600" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-3">
-                            <div><label className="text-[10px] font-black">Qtd Entrada *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-black focus:border-green-600" /></div>
-                            <div><label className="text-[10px] font-black">Local Armazém</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
-                            <div><label className="text-[10px] font-black">Lote</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="LOTE-123456" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Preço Custo *</label><input type="number" value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="700" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold" /></div>
-                            <div><label className="text-[10px] font-black">Preço Venda *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-black" /></div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><label className="text-[10px] font-black">Fornecedor</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Ex: Cimpor, Mozal" className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
-                            <div><label className="text-[10px] font-black">Validade (opcional)</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
-                          </div>
-                          
-                          <div className="text-[9px] text-[#166534] bg-white p-2 rounded border-2 border-green-200 font-bold">💡 FIFO: Produto que entrou primeiro (data mais antiga) será levado primeiro do armazém para loja. Código de barras é opcional, mas facilita venda com scanner. Data entrada obrigatória para FIFO funcionar 100%!</div>
-                        </div>
-                        
-                        <div className="flex justify-end gap-3 pt-3 border-t-2">
-                          <button onClick={()=>setShowNovoStock(false)} className="h-11 px-6 border-2 rounded-lg text-[12px] font-black hover:bg-gray-100">Cancelar</button>
-                          <button onClick={()=>{
-                            console.log('Criar Produto clicked', novoStockNome, novoStockQtd);
-                            if(!novoStockNome || novoStockNome.trim().length<2){ alert('❌ Digite nome do produto! Ex: Cimento 42.5N'); return; }
-                            if(!novoStockQtd || Number(novoStockQtd)<=0){ alert('❌ Digite quantidade! Ex: 100'); return; }
-                            if(!novoStockDataEntrada){ alert('❌ Selecione data entrada - FIFO precisa data!'); return; }
-                            const novoId = Date.now().toString();
-                            const dataEnt = novoStockDataEntrada || new Date().toISOString().slice(0,10);
-                            const dataEntBR = dataEnt.split('-').reverse().join('/');
-                            const novoProduto = {
-                              id: novoId,
-                              codigo: novoStockBarcode || `COD-${novoId.slice(-6)}`,
-                              nome: novoStockNome.trim(),
-                              marca: novoStockFornecedor || 'Geral',
-                              grupo: novoStockCat,
-                              subGrupo: 'Geral',
-                              fabricante: novoStockFornecedor || 'Geral',
-                              dataEntrada: dataEntBR,
-                              dataEntradaISO: dataEnt,
-                              qtdEntrada: parseInt(novoStockQtd)||0,
-                              noArmazem: parseInt(novoStockQtd)||0,
-                              entradaLoja: 0,
-                              dataReq: '',
-                              stockLoja: 0,
-                              venda: 0,
-                              mediaDia: 0,
-                              precoVenda: parseFloat(novoStockPreco)||0,
-                              precoCusto: parseFloat(novoStockCusto)||0,
-                              minimo: 10,
-                              ideal: 50,
-                              barcode: novoStockBarcode || '',
-                              local: novoStockLocal || 'A1-01',
-                              lote: novoStockLote || `LOTE-${novoId.slice(-6)}`,
-                              validade: novoStockValidade || '',
-                              fornecedor: novoStockFornecedor || '',
-                              armazem: armazemAtivo==='Todos' ? 'Matola' : armazemAtivo
-                            };
-                            console.log('Novo produto', novoProduto);
-                            setStockProdutos(prev=>{
-                              const novaLista = [...prev, novoProduto] as any[];
-                              try{
-                                const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel;
-                                if(telAtiva){
-                                  localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novaLista));
-                                  localStorage.setItem(`stock_produtos_${telAtiva}_backup`, JSON.stringify(novaLista));
-                                }
-                                localStorage.setItem('stock_produtos', JSON.stringify(novaLista));
-                              }catch(e){ console.error(e); }
-                              return novaLista;
-                            });
-                            setNovoStockNome(''); setNovoStockQtd(''); setNovoStockBarcode(''); setNovoStockPreco(''); setNovoStockCusto(''); setNovoStockLocal('A1-01'); setNovoStockLote('LOTE-'+Date.now().toString().slice(-6)); setNovoStockFornecedor('');
-                            setShowNovoStock(false);
-                            setStockSelecionado(novoId);
-                            alert(`✅ Produto criado com SUCESSO!
-
-Nome: ${novoProduto.nome}
-Barcode: ${novoProduto.barcode||'Sem (opcional)'}
-Data Entrada: ${dataEntBR} (FIFO)
-Local: ${novoProduto.local}
-Qtd: ${novoProduto.qtdEntrada}
-Armazém: ${novoProduto.armazem}
-
-Agora tabela tem ${stockProdutos.length+1} itens!`);
-                          }} className="h-11 px-8 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-lg font-black text-[13px] shadow-lg">✅ CRIAR PRODUTO COM FIFO - FUNCIONA!</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+        <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-[480px] border" onClick={e=>e.stopPropagation()}>
+            <div className="h-12 bg-[#1e2f4a] text-white px-4 flex items-center justify-between">
+              <span className="font-black text-[14px]">+ Novo Item - Adicionar Produto</span>
+              <button onClick={()=>setShowNovoStock(false)} className="w-8 h-8 bg-white/20 rounded grid place-items-center font-black">X</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="text-[11px] font-black">Nome do Produto *</label>
+                <input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-11 border-2 rounded-lg px-3 text-[14px] font-bold focus:border-blue-600 outline-none" autoFocus />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-black">Quantidade *</label>
+                  <input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="Ex: 100" className="w-full mt-1 h-11 border-2 rounded-lg px-3 text-[14px] font-black focus:border-green-600 outline-none" />
+                </div>
+                <div>
+                  <label className="text-[11px] font-black">Preço Venda (MT) *</label>
+                  <input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="Ex: 850" className="w-full mt-1 h-11 border-2 rounded-lg px-3 text-[14px] font-bold outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-black">Grupo</label>
+                  <select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full mt-1 h-10 border rounded-lg px-2 text-[12px] font-bold">
+                    <option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option><option>Tintas</option><option>Tubos</option><option>Electricidade</option><option>Outro</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black">Custo (opcional)</label>
+                  <input type="number" value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="700" className="w-full mt-1 h-10 border rounded-lg px-2 text-[12px]" />
+                </div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[10px] font-bold">
+                Vai aparecer na tabela ao lado assim que clicar em Criar
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t">
+                <button onClick={()=>setShowNovoStock(false)} className="h-11 px-6 border-2 rounded-lg text-[12px] font-black">Cancelar</button>
+                <button onClick={()=>{
+                  if(!novoStockNome || novoStockNome.trim().length<2){ alert('Digite o nome!'); return; }
+                  const qtd = parseInt(novoStockQtd)||0;
+                  if(qtd<=0){ alert('Digite quantidade!'); return; }
+                  const novoId = Date.now().toString();
+                  const dataEnt = new Date().toISOString().slice(0,10);
+                  const dataEntBR = dataEnt.split('-').reverse().join('/');
+                  const novoProduto = {
+                    id: novoId,
+                    codigo: `COD-${novoId.slice(-6)}`,
+                    nome: novoStockNome.trim(),
+                    marca: 'Geral',
+                    grupo: novoStockCat,
+                    subGrupo: 'Geral',
+                    fabricante: 'Geral',
+                    dataEntrada: dataEntBR,
+                    dataEntradaISO: dataEnt,
+                    qtdEntrada: qtd,
+                    noArmazem: qtd,
+                    entradaLoja: 0,
+                    dataReq: '',
+                    stockLoja: 0,
+                    venda: 0,
+                    mediaDia: 0,
+                    precoVenda: parseFloat(novoStockPreco)||0,
+                    precoCusto: parseFloat(novoStockCusto)||0,
+                    minimo: 10,
+                    ideal: 50,
+                    barcode: '',
+                    local: 'A1-01',
+                    lote: `LOTE-${novoId.slice(-6)}`,
+                    validade: '',
+                    fornecedor: '',
+                    armazem: armazemAtivo==='Todos' ? 'Matola' : armazemAtivo
+                  };
+                  setStockProdutos(prev=>{
+                    const novaLista = [...prev, novoProduto];
+                    try{
+                      const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel;
+                      if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novaLista)); }
+                      localStorage.setItem('stock_produtos', JSON.stringify(novaLista));
+                    }catch(e){}
+                    return novaLista;
+                  });
+                  setNovoStockNome(''); setNovoStockQtd(''); setNovoStockPreco(''); setNovoStockCusto('');
+                  setShowNovoStock(false);
+                  setStockSelecionado(novoId);
+                }} className="h-11 px-8 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-lg font-black text-[13px]">✅ CRIAR E MOSTRAR NA TABELA</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
 
 {tab==='admin' && (
