@@ -201,45 +201,7 @@ export default function App(){
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); try{ if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }catch(e){return 0;} }); };
-  
-  // AUTO CRIAR 1 ITEM NO STOCK PARA CADA CONTA - FIX DESGASTE
-  const criarStockInicialSeVazio = (tel:string, arm:string)=>{
-    try{
-      const key = `stock_produtos_${tel}`;
-      const existente = localStorage.getItem(key);
-      if(existente){
-        const arr = JSON.parse(existente);
-        if(arr && arr.length>0) return arr;
-      }
-      const id = Date.now().toString();
-      const hoje = new Date();
-      const iso = hoje.toISOString().slice(0,10);
-      const br = iso.split('-').reverse().join('/');
-      const itemInicial = {
-        id, codigo: `COD-${id.slice(-6)}`, nome: 'Exemplo - Cimento 42.5N 50kg', marca: 'Geral', grupo: 'Materiais', subGrupo: 'Geral', fabricante: 'Geral',
-        dataEntrada: br, dataEntradaISO: iso, qtdEntrada: 100, noArmazem: 100, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0,
-        precoVenda: 850, precoCusto: 700, minimo: 10, ideal: 50, barcode: '', local: 'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: '', fornecedor: 'Fornecedor Padrão', armazem: arm||'Matola'
-      };
-      const lista = [itemInicial];
-      localStorage.setItem(key, JSON.stringify(lista));
-      localStorage.setItem('stock_produtos', JSON.stringify(lista));
-      return lista;
-    }catch(e){ return null; }
-  };
-
-
   const [stockProdutos, setStockProdutos] = useState([] as any[]);
-
-  useEffect(()=>{
-    try{
-      const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any)?.tel || 'geral';
-      const lista = criarStockInicialSeVazio(telAtiva, armazemAtivo);
-      if(lista && stockProdutos.length===0){
-        setStockProdutos(lista);
-      }
-    }catch(e){}
-  },[negocioLogado, faturacaoLogado]);
-
   const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
@@ -416,10 +378,8 @@ export default function App(){
       setDataStockDiario(new Date().toISOString().slice(0,10));
       localStorage.setItem('contaAtiva', tel);
       localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
-      (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setNegocioLogado(true);
-      (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setFaturacaoLogado(true);
+      setNegocioLogado(true);
+      setFaturacaoLogado(true);
       alert(`Bem-vindo ${dadosConta.nomeLoja}!\nConta isolada carregada - Stock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos - só seus dados!`);
     }catch(e){
       console.error('Erro login', e);
@@ -1000,7 +960,6 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
       <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
-      <button onClick={()=>setTab('faturar')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='faturar'?'bg-[#facc15] text-black ring-2 ring-white':'bg-[#facc15] text-black'}`}>FATURAR</button>
       <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
       <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
       <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#8b5cf6] text-white ring-2 ring-white':'bg-[#8b5cf6] text-white hover:bg-[#7c3aed]'}`}>NEGOCIO</button>
@@ -1162,9 +1121,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           localStorage.removeItem('stock_produtos');
           localStorage.setItem('lojaPerfil', JSON.stringify(contaData));
         }catch(e){ console.error('Erro isolamento', e); }
-        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setNegocioLogado(true); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1198,10 +1155,8 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         setDataStockDiario(new Date().toISOString().slice(0,10));
                         localStorage.setItem('contaAtiva', tel);
                         localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
-                        (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setNegocioLogado(true);
-                        (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setFaturacaoLogado(true);
+                        setNegocioLogado(true);
+                        setFaturacaoLogado(true);
                         alert(`✅ LOGIN COM SUCESSO!\n\nBem-vindo ${dadosConta.nomeLoja}!\nTel: ${tel}\nNUIT: ${dadosConta.nuit||'sem NUIT'}\nProvíncia: ${dadosConta.provincia||''}\nRamo: ${dadosConta.ramoActividade||dadosConta.ramo||''}\nLogo: ${dadosConta.logoData ? 'Sim, com logo' : 'Sem logo'}\n\nStock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos SÓ SEUS!\nFaturas: ${(faturasSalvas ? JSON.parse(faturasSalvas).length : 0)}\n\nConta 100% isolada - Não mistura com Zoes, SICPA, Nando!`);
                       }} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta (VALIDAÇÃO 100%)</button>
                   </div>
@@ -1293,19 +1248,62 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
         )}
         
         {negocioTab==='stock' && (
-          <div className="max-w-[600px] mx-auto p-6 text-center">
-            <div className="bg-white rounded-[14px] p-8 shadow border-2 border-[#facc15]">
-              <div className="h-16 w-16 rounded-full bg-[#facc15] grid place-items-center mx-auto font-black text-[24px]">📦</div>
-              <h2 className="text-[18px] font-black mt-4">Stock agora fica no FATURAR</h2>
-              <p className="text-[12px] text-[#64748b] mt-2">Para simplificar e evitar tela branca, o Stock foi movido para FATURAR Stock</p>
-              <p className="text-[11px] text-[#64748b] mt-1">Lá você tem 1 produto por conta + botão + Novo Item funcionando 100%</p>
-              <button onClick={()=>{setTab('faturar'); setFaturacaoTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#facc15] text-black rounded-[10px] font-black text-[14px] hover:bg-[#eab308]">Ir para FATURAR Stock →</button>
-              <div className="mt-4 text-[10px] text-[#94a3b8]">NEGOCIO Stock desativado para evitar tela branca</div>
+            <div className="space-y-3 mt-3">
+              <div className="bg-white rounded-[12px] border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO - NEGOCIO</div>
+                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: {dataStockDiario} | Mesmo que FATURAR STOCK Unificado</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
+                      <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
+                      <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar</button>
+                    </div>
+                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
+                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
+                    <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
+                      <option value="todos">Todos ({stockProdutos.length})</option>
+                      <option value="baixo">Baixo &lt;50</option>
+                      <option value="zerado">Zerado</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-2">
+                  <div className="bg-[#fef9c3] border border-yellow-200 rounded-[8px] p-2 text-[8px]"><b>FIFO:</b> First In First Out activo - saídas consomem lotes mais antigos. Validade controlada.</div>
+                  <div className="bg-[#f0f9ff] border border-blue-200 rounded-[8px] p-2 text-[8px]"><b>Transferência:</b> Matola → Maputo → Beira Multi-armazém com requisição. Inicial hoje = Final ontem</div>
+                  <div className="bg-[#f0fdf4] border border-green-200 rounded-[8px] p-2 text-[8px]"><b>Fórmulas:</b> finalArm = inicial+recepção-saída | finalLoja = inicialLoja+recepLoja-venda | total = finalArm+finalLoja</div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-3">
+                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-10">
+                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowEntradaStock(true);
+                      }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowSaidaStock(true);
+                      }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
+                    </div>
+                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
+                    <div className="mt-3 bg-white border rounded p-2"><div className="text-[8px] font-black">ARMAZEM</div><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]"><option value="Todos">Todos</option><option value="Matola">Matola</option><option value="Maputo">Maputo</option><option value="Beira">Beira</option></select></div>
+                  </div>
+                  <div className="overflow-x-auto border-2 rounded-[10px]">
+                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border min-w-[150px]">ITEM/CODIGO</th><th className="text-center p-1.5 border">DATA ENTR</th><th className="text-center p-1.5 border">QTD ENTR</th><th className="text-center p-1.5 border bg-yellow-50">NO ARMAZEM</th><th className="text-center p-1.5 border">REQ ARM-LOJA</th><th className="text-center p-1.5 border">DATA REQ</th><th className="text-center p-1.5 border">STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]">PRECO UNIT</th><th className="text-center p-1.5 border">VENDA</th><th className="text-center p-1.5 border">MEDIA/DIA</th><th className="text-center p-1.5 border">STOCK FINAL</th><th className="text-right p-1.5 border">VENDAS VALOR</th><th className="text-left p-1.5 border">LOCAL/VALIDADE/FORNECEDOR</th><th className="text-center p-1.5 border">ACAO</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{const armOk = armazemAtivo==='Todos' || (p.armazem||'Matola')===armazemAtivo; const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo && armOk;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const rowBg = isBaixo ? 'bg-[#fee2e2]' : ''; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">+ Faturar</button></td></tr>);})}</tbody></table>
+                  </div>
+                </div>
+                <div className="mt-2 text-[8px] text-[#64748b] flex justify-between"><span>Deslize horizontalmente - Primeira coluna fixa - SAVE laranja guarda historico - Inicial hoje = Final ontem - Unificado FATURAR e NEGOCIO</span><span className="font-black">TOTAL: {stockProdutos.reduce((a:any,p:any)=>a+(p.noArmazem+p.stockLoja)*p.precoVenda,0).toLocaleString('pt-MZ')} MT</span></div>
+              </div>
             </div>
-          </div>
         )}
 
-        
         {negocioTab==='clientes' && (
         <div className="mt-3 bg-white border rounded-[12px] p-4">
           <div className="font-black text-[14px]">👥 CLIENTES - {faturas.length} clientes com faturas - Coordenado com Faturar</div>
@@ -1670,8 +1668,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div className="text-[8px] opacity-60">NUIT, endereco, logo - pode acrescentar depois no perfil</div>
                   </div>
-                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
+                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
                   </>
                   ) : (
                   <>
@@ -1679,8 +1676,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                   </div>
-                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Zoes', tel: faturacaoCadastroForm.tel}); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
-              setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Zoes', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
                   </>
                   )}
@@ -1814,7 +1810,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="bg-[#f0fdf4] border border-green-200 rounded-[8px] p-2 text-[8px]"><b>Fórmulas:</b> finalArm = inicial+recepção-saída | finalLoja = inicialLoja+recepLoja-venda | total = finalArm+finalLoja</div>
                 </div>
                 <div className="mt-3 grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-3">
-                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-[5]">
+                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-10">
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
                       <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
@@ -1874,7 +1870,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {false && ( /* OLD MODAL DESATIVADO - STOCK SO NO FATURAR */
+                {showNovoStock && (
                   <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
                       <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
@@ -2444,30 +2440,6 @@ Bilhete valido - Apresentar QR`;
           <AdminPanel />
         </div>
       )}
-
-        
-      {/* STOCK SO NO FATURAR - MODAL SEGURO SO APARECE EM FATURAR */}
-      {showNovoStock && tab==='faturar' && (
-        <div className="fixed inset-0 z-[99999] bg-black/70 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
-          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[480px] border-2 border-[#1e2f4a]" onClick={e=>e.stopPropagation()}>
-            <div className="h-[48px] bg-[#1e2f4a] text-white px-4 flex items-center justify-between"><span className="font-black text-[14px]">+ Novo Item - FATURAR Stock</span><button onClick={()=>setShowNovoStock(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button></div>
-            <div className="p-5 space-y-4">
-              <div><label className="text-[11px] font-black">Nome *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Cimento" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" autoFocus /></div>
-              <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-black outline-none" /></div><div><label className="text-[11px] font-black">Preço *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" /></div></div>
-              <div className="flex justify-end gap-2 pt-3 border-t"><button onClick={()=>setShowNovoStock(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
-                const nome=(novoStockNome||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
-                const q=parseInt(novoStockQtd||'0')||0; if(q<=0){ alert('Qtd!'); return; }
-                const pv=parseFloat(novoStockPreco||'0')||0; if(pv<=0){ alert('Preço!'); return; }
-                const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
-                const item={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode:'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
-                setStockProdutos((p:any[])=>{ const nl=[...p,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
-                setNovoStockNome(''); setNovoStockQtd(''); setNovoStockPreco(''); setShowNovoStock(false);
-              }} className="h-[44px] px-8 bg-[#22c55e] text-white rounded-[10px] font-black">✅ CRIAR</button></div>
-            </div>
-          </div>
-        </div>
-      )}
-
 
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">
           {faturacaoTab==='faturas' && (
