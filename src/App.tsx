@@ -219,137 +219,57 @@ export default function App(){
   const [showEntradaStock, setShowEntradaStock] = useState(false);
   const [showSaidaStock, setShowSaidaStock] = useState(false);
   
-  // ===== FUNCAO UNIVERSAL GERAR PDF - TODOS DOCUMENTOS =====
-  const gerarPDFFromElement = (elementId:string, titulo:string) => {
+  // ===== PDF COM LOGO - TODOS DOCUMENTOS - 31/10/2026 =====
+  const getLogoBase64 = ():string => {
+    try{
+      if((lojaPerfil as any)?.logoData) return (lojaPerfil as any).logoData;
+      const img1 = document.querySelector('#contrato-preview img') as any;
+      if(img1?.src) return img1.src;
+      const img2 = document.querySelector('img[alt="logo"]') as any;
+      if(img2?.src) return img2.src;
+      const img3 = document.querySelector('.logo-preview img') as any;
+      if(img3?.src) return img3.src;
+    }catch(e){}
+    return '';
+  };
+
+  const gerarPDFUniversal = (elementId:string, tituloDoc:string) => {
     const el = document.getElementById(elementId);
-    if(!el){ alert('Nenhum documento encontrado para gerar PDF: '+elementId); return; }
+    if(!el){ alert('Gere o documento primeiro: '+elementId); return; }
+    const logoSrc = getLogoBase64();
+    const logoHtml = logoSrc ? `<img src="${logoSrc}" style="width:75px;height:75px;object-fit:contain;background:#fff;border-radius:10px;padding:5px;border:1px solid #ddd" />` : `<div style="width:75px;height:75px;background:#000;color:#fff;display:grid;place-items:center;border-radius:10px;font-weight:bold;font-size:18px">${((lojaPerfil as any).nomeLoja||'Z').slice(0,2).toUpperCase()}</div>`;
     const win = window.open('', '_blank');
-    if(!win){ alert('Permita popups para gerar PDF'); return; }
-    const logoHtml = (lojaPerfil as any).logoData ? `<img src="${(lojaPerfil as any).logoData}" style="width:80px;height:80px;object-fit:contain;border:1px solid #ddd;border-radius:8px" />` : `<div style="width:70px;height:70px;background:#000;color:#fff;display:grid;place-items:center;border-radius:50%;font-weight:bold;font-size:20px">${((lojaPerfil as any).nomeLoja||'Z').slice(0,2).toUpperCase()}</div>`;
+    if(!win){ alert('Permita popups no navegador para gerar PDF'); return; }
     win.document.write(`
-      <html><head><title>${titulo} - ${(lojaPerfil as any).nomeLoja||'Zoes'}</title>
+      <html><head><title>${tituloDoc} - ${(lojaPerfil as any).nomeLoja||'Zoes'}</title>
       <style>
-        @page{ margin:15mm; }
-        body{ font-family:Arial, Helvetica, sans-serif; padding:20px; font-size:11px; color:#000; }
-        .header{ display:flex; gap:15px; align-items:center; border-bottom:2px solid #000; padding-bottom:12px; margin-bottom:15px; }
-        .header-info{ flex:1; }
-        .header-info h2{ margin:0; font-size:16px; }
-        .header-info div{ font-size:10px; margin-top:2px; }
-        table{ width:100%; border-collapse:collapse; margin-top:10px; }
-        th, td{ border:1px solid #999; padding:5px 6px; text-align:left; font-size:10px; }
-        th{ background:#f0f0f0; font-weight:bold; }
-        .total{ text-align:right; font-weight:bold; font-size:13px; margin-top:15px; border-top:2px solid #000; padding-top:8px; }
-        .footer{ margin-top:30px; text-align:center; font-size:8px; opacity:0.6; border-top:1px solid #ccc; padding-top:8px; }
-        @media print { body{ -webkit-print-color-adjust:exact; } }
+        @page{ margin:10mm; }
+        body{ font-family:Arial, sans-serif; padding:15px; font-size:10px; color:#111; line-height:1.4; }
+        .header-pdf{ display:flex; gap:12px; align-items:center; border:2px solid #1e2f4a; border-radius:10px; padding:10px; background:#f8fafc; margin-bottom:12px; }
+        .header-pdf h2{ margin:0; font-size:14px; color:#1e2f4a; }
+        .header-pdf .info{ font-size:9px; color:#475569; margin-top:2px; }
+        table{ width:100%; border-collapse:collapse; margin-top:8px; }
+        th,td{ border:1px solid #94a3b8; padding:4px 6px; font-size:9px; text-align:left; }
+        th{ background:#1e2f4a; color:#fff; }
+        .total{ text-align:right; font-weight:bold; font-size:12px; margin-top:12px; border-top:2px solid #000; padding-top:6px; }
+        .footer-pdf{ margin-top:20px; text-align:center; font-size:7px; color:#64748b; border-top:1px solid #e2e8f0; padding-top:6px; }
+        @media print{ body{ -webkit-print-color-adjust:exact; } }
       </style></head><body>
-      <div class="header">
+      <div class="header-pdf">
         ${logoHtml}
-        <div class="header-info">
-          <h2>${(lojaPerfil as any).nomeLoja||'Zoes'}</h2>
-          <div>NUIT: ${(lojaPerfil as any).nuit||'401234567'} | Tel: ${(lojaPerfil as any).tel||'258 84 123 4567'}</div>
-          <div>${(lojaPerfil as any).endereco||'Av. União Africana, Parcela 312, Matola'} - ${(lojaPerfil as any).provincia||'Maputo'}, ${(lojaPerfil as any).distrito||'Gaza'}</div>
-          <div>Ramo: ${(lojaPerfil as any).ramoActividade||(lojaPerfil as any).ramo||'Mercearia e Mini Mercado'}</div>
-        </div>
-        <div style="text-align:right">
-          <h3 style="margin:0">${titulo}</h3>
-          <div>Data: ${new Date().toLocaleDateString('pt-MZ')} ${new Date().toLocaleTimeString('pt-MZ')}</div>
-          <div>Nº: ${Date.now().toString().slice(-8)}</div>
+        <div style="flex:1">
+          <h2>${(lojaPerfil as any).nomeLoja||'Zoes'} - ${tituloDoc}</h2>
+          <div class="info">NUIT: ${(lojaPerfil as any).nuit||'401234567'} | Tel: ${(lojaPerfil as any).tel||'258 84 123 4567'} | ${ (lojaPerfil as any).endereco||'Av. União Africana, Parcela 312, Matola'} - ${(lojaPerfil as any).provincia||'Maputo'}</div>
+          <div class="info">${(lojaPerfil as any).ramoActividade||'Mercearia e Mini Mercado'} | Data: ${new Date().toLocaleDateString('pt-MZ')} ${new Date().toLocaleTimeString('pt-MZ')}</div>
         </div>
       </div>
       ${el.innerHTML}
-      <div class="footer">Documento processado por computador - TOTSHE - ${(lojaPerfil as any).nomeLoja||'Zoes'} - ${new Date().toLocaleDateString('pt-MZ')} - Este documento é válido sem assinatura</div>
+      <div class="footer-pdf">Documento processado por computador - TOTSHE - ${(lojaPerfil as any).nomeLoja||'Zoes'} - Válido sem carimbo - ${new Date().toLocaleString('pt-MZ')}</div>
       </body></html>
     `);
     win.document.close();
     win.focus();
-    setTimeout(()=>{ win.print(); }, 600);
-  };
-
-  const gerarPDFContrato = () => gerarPDFFromElement('contrato-preview', 'CONTRATO DE TRABALHO');
-  const gerarPDFFatura = () => gerarPDFFromElement('fatura-preview-a5', 'FATURA');
-  const gerarPDFRecibo = () => gerarPDFFromElement('recibo-preview', 'RECIBO');
-  
-  const gerarFaturaPDFComLogo = () => {
-    const preview = document.getElementById('fatura-preview-a5');
-    if(!preview){ alert('Gere fatura primeiro'); return; }
-    const win = window.open('', '_blank');
-    if(!win) return;
-    const logoSrc = (lojaPerfil as any).logoData || '';
-    const logoHtml = logoSrc ? `<img src="${logoSrc}" style="width:80px;height:80px;object-fit:contain;border:1px solid #ddd;border-radius:8px;background:#fff;padding:4px" />` : `<div style="width:70px;height:70px;background:#000;color:#fff;display:grid;place-items:center;border-radius:50%;font-weight:bold">${((lojaPerfil as any).nomeLoja||'Z').slice(0,2)}</div>`;
-    win.document.write(`
-      <html><head><title>Fatura - ${(lojaPerfil as any).nomeLoja||'Zoes'}</title>
-      <style>body{font-family:Arial;padding:20px;font-size:11px} .header{display:flex;gap:15px;align-items:center;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:15px} table{width:100%;border-collapse:collapse} th,td{border:1px solid #999;padding:6px;font-size:10px} th{background:#f0f0f0} .total{text-align:right;font-weight:bold;font-size:14px;margin-top:15px;border-top:2px solid #000;padding-top:8px}</style>
-      </head><body>
-      <div class="header">${logoHtml}<div><h2>${(lojaPerfil as any).nomeLoja||'Zoes'}</h2><div>NUIT: ${(lojaPerfil as any).nuit||''}</div><div>${(lojaPerfil as any).endereco||''} - ${(lojaPerfil as any).provincia||''}</div><div>Tel: ${(lojaPerfil as any).tel||''}</div></div><div style="margin-left:auto;text-align:right"><h3>FATURA</h3><div>${new Date().toLocaleDateString('pt-MZ')}</div></div></div>
-      ${preview.innerHTML}
-      </body></html>
-    `);
-    win.document.close();
-    win.focus();
-    setTimeout(()=>win.print(), 600);
-  };
-
-  const gerarPDFStock = () => gerarPDFFromElement('stock-tabela', 'RELATORIO STOCK FIFO');
-
-  
-  // ===== GERAR CONTRATO PDF FINAL COM LOGO - CORRIGIDO =====
-  const gerarContratoPDFFinalComLogo = () => {
-    const preview = document.getElementById('contrato-preview') || document.getElementById('preview-contrato');
-    let logoSrc = '';
-    // Tenta pegar logo de varios lugares
-    if((lojaPerfil as any).logoData) logoSrc = (lojaPerfil as any).logoData;
-    else if((window as any).logoTipoData) logoSrc = (window as any).logoTipoData;
-    else {
-      // Procura img dentro do preview
-      const imgEl = preview?.querySelector('img');
-      if(imgEl && (imgEl as any).src) logoSrc = (imgEl as any).src;
-    }
-    
-    // Pega dados do contrato do estado
-    const titulo = `CONTRATO ${(tipoContrato||'TRABALHO').toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF FINAL - ID ${Date.now().toString().slice(-6)}`;
-    
-    const win = window.open('', '_blank');
-    if(!win){ alert('Permita popups para gerar PDF'); return; }
-    
-    const logoHtml = logoSrc ? `<img src="${logoSrc}" style="width:70px;height:70px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;border:1px solid #ddd" />` : `<div style="width:70px;height:70px;background:#000;color:#fff;display:grid;place-items:center;border-radius:8px;font-weight:bold">LOGO</div>`;
-    
-    win.document.write(`
-      <html><head><title>${titulo}</title>
-      <style>
-        @page{ margin:12mm; }
-        body{ font-family:Arial, sans-serif; padding:15px; font-size:10px; color:#000; line-height:1.4; }
-        .header{ background:#1e2f4a; color:#facc15; padding:12px; border-radius:8px; display:flex; gap:12px; align-items:center; margin-bottom:12px; }
-        .header h2{ margin:0; font-size:13px; color:#facc15; }
-        .header div{ font-size:9px; color:#fff; opacity:0.9; }
-        .clausula{ border:1px solid #cbd5e1; border-radius:6px; margin-bottom:10px; overflow:hidden; }
-        .clausula-header{ background:#1e2f4a; color:#fff; padding:6px 10px; font-weight:bold; font-size:10px; }
-        .clausula-body{ padding:8px 10px; background:#f8fafc; }
-        .tarefas{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-        .tarefa{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:3px 8px; font-size:8px; }
-        .assinaturas{ display:flex; justify-content:space-around; margin-top:25px; border-top:2px solid #000; padding-top:15px; }
-        .assinatura{ text-align:center; width:40%; }
-        .linha{ border-top:1px solid #000; margin-top:40px; padding-top:5px; font-size:9px; }
-        @media print { body{ -webkit-print-color-adjust:exact; } }
-      </style></head><body>
-      <div class="header">
-        ${logoHtml}
-        <div style="flex:1">
-          <h2>${titulo}</h2>
-          <div>contrata-mz.vercel.app - ESSE - Data: ${new Date().toLocaleDateString('pt-MZ')} ${new Date().toLocaleTimeString('pt-MZ')} - ${clausulas.length||11} tarefas - ${lojaPerfil?.nomeLoja||'Zoes'}</div>
-          <div>NUIT: ${lojaPerfil?.nuit||'401866876'} | Tel: ${lojaPerfil?.tel||'258 84 123 4567'} | ${lojaPerfil?.endereco||'Xai-Xai'}</div>
-        </div>
-      </div>
-      ${preview ? preview.innerHTML : document.getElementById('contrato-preview')?.innerHTML || '<div>Sem preview - gere contrato primeiro</div>'}
-      <div class="assinaturas">
-        <div class="assinatura"><div class="linha">Assinatura do Contratante<br/>${(document.getElementById('contratante-nome') as any)?.value||'Contratante'}</div></div>
-        <div class="assinatura"><div class="linha">Assinatura do Trabalhador<br/>${(document.getElementById('trabalhador-nome') as any)?.value||'Trabalhador'}</div></div>
-      </div>
-      <div style="margin-top:15px;text-align:center;font-size:7px;opacity:0.5">Documento processado por computador - TOTSHE - ${lojaPerfil?.nomeLoja||'Zoes'} - Válido sem carimbo - ${new Date().toLocaleString('pt-MZ')}</div>
-      </body></html>
-    `);
-    win.document.close();
-    win.focus();
-    setTimeout(()=>{ win.print(); }, 800);
+    setTimeout(()=>{ win.print(); }, 700);
   };
 
   const [showNovoStock, setShowNovoStock] = useState(false);
@@ -388,7 +308,7 @@ export default function App(){
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || '';
       const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${nomeCliente} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;display:flex;gap:15px;align-items:center}.loja-info{flex:1}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}</style></head><body><div class="header">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura} - Vender e Faturar</div><div class="loja-dados">${ramoLojaFatura} | NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div style="margin-top:8px;font-size:11px;">Data: ${dataHoje} | Cliente: ${nomeCliente} | Tel: ${telFat}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
-      const blob = new Blob([document.getElementById('fatura-preview-a5')?.innerHTML||''], {type: 'text/html'}) /* PDF via print agora */;
+      const blob = new Blob([faturaHtml], {type: 'text/html'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -815,7 +735,7 @@ ${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
 </div>
 
 <div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL COM LOGO</button>
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL COM LOGO</button> <button onClick={()=>gerarPDFUniversal('contrato-preview','CONTRATO 11 CLAUSULAS COM LOGO')} className="ml-2 h-7 px-3 bg-red-600 text-white rounded-full text-[8px] font-black">📄 PDF COM LOGO</button>
 </div>
 </body></html>`;
    const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}.html`; a.click();
@@ -1134,7 +1054,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button><button onClick={()=>gerarPDFFatura()} className="ml-2 h-7 px-4 bg-red-600 text-white rounded-full text-[10px] font-black">📄 PDF FATURA</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1157,7 +1077,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
                       <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
                       <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
-                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button><button onClick={()=>gerarPDFStock()} className="w-full mt-2 h-8 bg-red-600 text-white rounded-[8px] text-[10px] font-black">📄 PDF STOCK</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
                     <div className="mt-3 bg-white border rounded p-2"><div className="text-[8px] font-black">ARMAZEM</div><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]"><option value="Todos">Todos</option><option value="Matola">Matola</option><option value="Maputo">Maputo</option><option value="Beira">Beira</option></select></div>
@@ -1504,7 +1424,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
      <div className={`${mostrarPreviewMobile?"block":"hidden"} lg:block bg-white rounded-[12px] border-2 border-[#1e2f4a] p-3 h-fit lg:sticky lg:top-[70px] order-3 min-w-0 w-full`}>
        <div className="flex justify-between items-center"><div className="text-[10px] font-bold uppercase">3 - Preview do contrato - {CATS[contratoSel]} - {formContrato.tarefas.length} tarefas - vendo o que esta a ser editado</div><button onClick={()=>setMostrarPreviewMobile(false)} className="xl:hidden w-6 h-6 bg-[#f1f0eb] rounded-full grid place-items-center text-[10px]">X</button></div>
        <div className="mt-3 max-h-[60vh] xl:h-[520px] overflow-y-auto overscroll-contain break-words [overflow-wrap:anywhere] bg-[#f8fafc] border rounded-xl p-3 text-[10px] font-mono leading-relaxed">{formContrato.logoData && (<div className="bg-white border-2 border-[#d4a44a] rounded-xl p-2 mb-3 flex items-center gap-2"><img src={formContrato.logoData} alt="Logo" className="max-h-[40px] max-w-[60px] block" /><div className="text-[9px] font-bold">{formContrato.logoTipo || 'Logo Empresa'}</div></div>)}CONTRATO {CATS[contratoSel].toUpperCase()} - 11 CLAUSULAS<br/><br/>1. DADOS: {formContrato.empNome} BI {formContrato.empBI} e {formContrato.trabNome} BI {formContrato.trabBI}<br/><br/>2. TAREFAS ({formContrato.tarefas.length}):<br/>{formContrato.tarefas.map((t:string,i:number)=>`${i+1}. ${t}`).join("<br/>")}<br/><br/>3. HORARIO: {formContrato.horarioInicio} as {formContrato.horarioFim} - {formContrato.localTrab}<br/><br/>4. SALARIO: {formContrato.valor} MZN - Dia {formContrato.diaPag} - {formContrato.formaPag} - Prazo {formContrato.prazo}<br/><br/>5. ALIMENTACAO: {formContrato.alimentacao} - {formContrato.alojamento} - {formContrato.transporte}<br/><br/>6. FOLGAS: {formContrato.folgas}<br/><br/>7. PERIODO: {formContrato.periodoExp}<br/><br/>8. DEVERES TRAB: {formContrato.deveresTrab.substring(0,100)}...<br/><br/>9. DEVERES EMP: {formContrato.deveresEmp.substring(0,100)}...<br/><br/>10. ANEXOS: {formContrato.anexos.length} ficheiros - Fotos BI, NUIT, M-Pesa<br/><br/>11. ASSINATURA: {formContrato.empNome} {assinaturaContratante.concordo?`CONCORDO em ${assinaturaContratante.data}`:"FALTA"} - {formContrato.trabNome} {assinaturaContratado.concordo?`CONCORDO em ${assinaturaContratado.data}`:"FALTA"}<br/><br/>FORMULARIO COMPLETO ABERTO</div>
-       <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL COM LOGO</button></div>
+       <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL COM LOGO</button> <button onClick={()=>gerarPDFUniversal('contrato-preview','CONTRATO 11 CLAUSULAS COM LOGO')} className="ml-2 h-7 px-3 bg-red-600 text-white rounded-full text-[8px] font-black">📄 PDF COM LOGO</button></div>
      </div>
     </div>
    </section>
@@ -1660,7 +1580,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button><button onClick={()=>gerarPDFFatura()} className="ml-2 h-7 px-4 bg-red-600 text-white rounded-full text-[10px] font-black">📄 PDF FATURA</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1683,7 +1603,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <button onClick={()=>setShowNovoStock(true)} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
                       <button onClick={()=>setShowEntradaStock(true)} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Entrada [F5]</button>
                       <button onClick={()=>setShowSaidaStock(true)} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Saida [F6]</button>
-                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button><button onClick={()=>gerarPDFStock()} className="w-full mt-2 h-8 bg-red-600 text-white rounded-[8px] text-[10px] font-black">📄 PDF STOCK</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
                     </div>
                     <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
                     <div className="mt-3 bg-white border rounded p-2"><div className="text-[8px] font-black">ARMAZEM</div><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]"><option value="Todos">Todos</option><option value="Matola">Matola</option><option value="Maputo">Maputo</option><option value="Beira">Beira</option></select></div>
