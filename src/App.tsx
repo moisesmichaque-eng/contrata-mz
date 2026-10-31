@@ -272,22 +272,16 @@ export default function App(){
       
       const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
       
-      const logoHtml = (lojaPerfil as any).logoData || (perfilLoja as any).logoData ? `<img src="${(lojaPerfil as any).logoData || (perfilLoja as any).logoData}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${((lojaPerfil as any).nomeLoja || perfilLoja.nome || 'ML').slice(0,2).toUpperCase()}</div>`;
-      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || 'Minha Loja';
+      const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || ''; const logoHtml = logoForFaturaReal ? `<img src="${logoForFaturaReal}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${((lojaPerfil as any).nomeLoja || perfilLoja.nome || 'ML').slice(0,2).toUpperCase()}</div>`;
+      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Zoes';
       const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
       const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
       const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
       const provLojaFatura = (lojaPerfil as any).provincia || '';
-      const ramoLojaFatura = (lojaPerfil as any).ramoActividade || '';
+      const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Mercearia e Mini Mercado';
       const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${nomeCliente} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;display:flex;gap:15px;align-items:center}.loja-info{flex:1}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}</style></head><body><div class="header">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura} - Vender e Faturar</div><div class="loja-dados">${ramoLojaFatura} | NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div style="margin-top:8px;font-size:11px;">Data: ${dataHoje} | Cliente: ${nomeCliente} | Tel: ${telFat}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
-      const blob = new Blob([faturaHtml], {type: 'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Fatura-'+nomeCliente.replace(/\s+/g,'_')+'-'+Date.now()+'.html';
-      document.body.appendChild(a);
-      a.click();
+      const win = window.open('', '_blank'); if(win){ win.document.write(faturaHtml); win.document.close(); win.focus(); setTimeout(()=>win.print(), 800); } return;;
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
