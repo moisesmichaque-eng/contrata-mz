@@ -224,9 +224,9 @@ export default function App(){
     if(!el || el.innerHTML.trim().length < 20){ alert('Adicione produtos na fatura primeiro!'); return; }
     const logoSrc = (lojaPerfil as any)?.logoData || '';
     const logoHtml = logoSrc ? `<img src="${logoSrc}" style="width:80px;height:80px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;border:1px solid #ddd" />` : `<div style="width:80px;height:80px;background:#000;color:#fff;display:grid;place-items:center;border-radius:8px;font-weight:bold">${((lojaPerfil as any).nomeLoja||'Z').slice(0,2)}</div>`;
-    const win = window.open('', '_blank');
-    if(!win){ alert('Permita popups'); return; }
-    win.document.write(`
+    const winFatura = window.open('', '_blank');
+    if(!winFatura){ alert('Permita popups'); return; }
+    winFatura.document.write(`
       <html><head><title>FATURA - ${(lojaPerfil as any).nomeLoja||'Zoes'}</title>
       <style>
         body{font-family:Arial;padding:15px;font-size:11px}
@@ -240,9 +240,9 @@ export default function App(){
       ${el.innerHTML}
       </body></html>
     `);
-    win.document.close();
-    win.focus();
-    setTimeout(()=>win.print(), 700);
+    winFatura.document.close();
+    winFatura.focus();
+    setTimeout(()=>winFatura.print(), 700);
   };
 
   const [showNovoStock, setShowNovoStock] = useState(false);
@@ -281,7 +281,7 @@ export default function App(){
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Mercearia e Mini Mercado';
       const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${nomeCliente} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;display:flex;gap:15px;align-items:center}.loja-info{flex:1}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}</style></head><body><div class="header">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura} - Vender e Faturar</div><div class="loja-dados">${ramoLojaFatura} | NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div style="margin-top:8px;font-size:11px;">Data: ${dataHoje} | Cliente: ${nomeCliente} | Tel: ${telFat}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
-      const win = window.open('', '_blank'); if(win){ win.document.write(faturaHtml); win.document.close(); win.focus(); setTimeout(()=>win.print(), 800); } return;;
+      const winPDF = window.open('', '_blank'); if(winPDF){ winPDF.document.write(faturaHtml); winPDF.document.close(); winPDF.focus(); setTimeout(()=>winPDF.print(), 800); } return;;
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
@@ -806,7 +806,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 <button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF FINAL COM ASSINATURAS - 11 CLAUSULAS - HORIZONTAL</button>
 </div>
 </body></html>`;
-   const win = window.open("", "_blank"); if(win){ win.document.write(htmlFinal); win.document.close(); win.focus(); setTimeout(()=>win.print(), 800); } return;
+   const winContrato = window.open('', '_blank'); if(winContrato){ winContrato.document.write(htmlFinal); winContrato.document.close(); winContrato.focus(); setTimeout(()=>winContrato.print(), 800); } return;
  };
 
  return (
