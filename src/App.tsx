@@ -1917,7 +1917,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {showNovoStock && (
+                {false && ( /* OLD MODAL DESATIVADO - CRASHA */
                   <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
                       <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
@@ -2489,33 +2489,31 @@ Bilhete valido - Apresentar QR`;
       )}
 
         
-      {/* FIX + NOVO ITEM - MINIMAL 100% SEGURO - 3 CAMPOS SO - NAO DA TELA BRANCA */}
+      {/* FIX DEFINITIVO + NOVO ITEM - UNICO MODAL - NAO CRASHA - V11 */}
       {showNovoStock && (
         <div className="fixed inset-0 z-[99999] bg-black/70 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
-          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[480px] border-2 border-[#1e2f4a] overflow-hidden" onClick={e=>e.stopPropagation()}>
+          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[480px] border-2 border-[#1e2f4a]" onClick={e=>e.stopPropagation()}>
             <div className="h-[48px] bg-[#1e2f4a] text-white px-4 flex items-center justify-between">
-              <span className="font-black text-[14px]">+ Novo Item</span>
+              <span className="font-black text-[14px]">+ Novo Item - NEGOCIO STOCK</span>
               <button onClick={()=>setShowNovoStock(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button>
             </div>
             <div className="p-5 space-y-4">
-              <div><label className="text-[11px] font-black">Nome *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Cimento 42.5N 50kg" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none focus:border-[#8b5cf6]" autoFocus /></div>
+              <div><label className="text-[11px] font-black">Nome do Produto *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" autoFocus /></div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-black outline-none" /></div>
-                <div><label className="text-[11px] font-black">Preço MT *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" /></div>
+                <div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-black outline-none" /></div>
+                <div><label className="text-[11px] font-black">Preço *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" /></div>
               </div>
               <div className="flex justify-end gap-2 pt-3 border-t">
-                <button onClick={()=>setShowNovoStock(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black text-[12px]">Cancelar</button>
+                <button onClick={()=>setShowNovoStock(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black">Cancelar</button>
                 <button onClick={()=>{
-                  try{
-                    if(!novoStockNome || novoStockNome.trim().length<2){ alert('Nome!'); return; }
-                    const q = parseInt(novoStockQtd)||0; if(q<=0){ alert('Qtd!'); return; }
-                    const pv = parseFloat(novoStockPreco)||0; if(pv<=0){ alert('Preço!'); return; }
-                    const id = Date.now().toString(); const iso = new Date().toISOString().slice(0,10); const br = iso.split('-').reverse().join('/');
-                    const np:any = { id, codigo: `COD-${id.slice(-6)}`, nome: novoStockNome.trim(), marca: 'Geral', grupo: 'Geral', subGrupo: 'Geral', fabricante: 'Geral', dataEntrada: br, dataEntradaISO: iso, qtdEntrada: q, noArmazem: q, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0, precoVenda: pv, precoCusto: parseFloat(novoStockCusto)||0, minimo: 10, ideal: 50, barcode: novoStockBarcode||'', local: 'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: novoStockValidade||'', fornecedor: novoStockFornecedor||'', armazem: 'Matola' };
-                    setStockProdutos((prev:any[])=>{ const nl=[...prev,np]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
-                    setNovoStockNome(''); setNovoStockQtd(''); setNovoStockPreco(''); setShowNovoStock(false);
-                  }catch(err){ alert('Erro '+(err as any).message); }
-                }} className="h-[44px] px-8 bg-[#22c55e] text-white rounded-[10px] font-black text-[13px]">✅ CRIAR</button>
+                  const nome = (novoStockNome||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
+                  const q = parseInt(novoStockQtd||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                  const pv = parseFloat(novoStockPreco||'0')||0; if(pv<=0){ alert('Preço!'); return; }
+                  const id = Date.now().toString(); const iso = new Date().toISOString().slice(0,10); const br = iso.split('-').reverse().join('/');
+                  const item = { id, codigo: `COD-${id.slice(-6)}`, nome, marca: 'Geral', grupo: 'Geral', subGrupo: 'Geral', fabricante: 'Geral', dataEntrada: br, dataEntradaISO: iso, qtdEntrada: q, noArmazem: q, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0, precoVenda: pv, precoCusto: 0, minimo: 10, ideal: 50, barcode: '', local: 'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: '', fornecedor: '', armazem: 'Matola' };
+                  setStockProdutos((p:any[])=>{ const nl=[...p,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                  setNovoStockNome(''); setNovoStockQtd(''); setNovoStockPreco(''); setShowNovoStock(false);
+                }} className="h-[44px] px-8 bg-[#22c55e] text-white rounded-[10px] font-black">✅ CRIAR</button>
               </div>
             </div>
           </div>
