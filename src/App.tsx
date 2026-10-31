@@ -218,60 +218,6 @@ export default function App(){
   const [stockSelecionado, setStockSelecionado] = useState('2');
   const [showEntradaStock, setShowEntradaStock] = useState(false);
   const [showSaidaStock, setShowSaidaStock] = useState(false);
-  
-  // ===== PDF COM LOGO - TODOS DOCUMENTOS - 31/10/2026 =====
-  const getLogoBase64 = ():string => {
-    try{
-      if((lojaPerfil as any)?.logoData) return (lojaPerfil as any).logoData;
-      const img1 = document.querySelector('#contrato-preview img') as any;
-      if(img1?.src) return img1.src;
-      const img2 = document.querySelector('img[alt="logo"]') as any;
-      if(img2?.src) return img2.src;
-      const img3 = document.querySelector('.logo-preview img') as any;
-      if(img3?.src) return img3.src;
-    }catch(e){}
-    return '';
-  };
-
-  const gerarPDFUniversal = (elementId:string, tituloDoc:string) => {
-    const el = document.getElementById(elementId);
-    if(!el){ alert('Gere o documento primeiro: '+elementId); return; }
-    const logoSrc = getLogoBase64();
-    const logoHtml = logoSrc ? `<img src="${logoSrc}" style="width:75px;height:75px;object-fit:contain;background:#fff;border-radius:10px;padding:5px;border:1px solid #ddd" />` : `<div style="width:75px;height:75px;background:#000;color:#fff;display:grid;place-items:center;border-radius:10px;font-weight:bold;font-size:18px">${((lojaPerfil as any).nomeLoja||'Z').slice(0,2).toUpperCase()}</div>`;
-    const win = window.open('', '_blank');
-    if(!win){ alert('Permita popups no navegador para gerar PDF'); return; }
-    win.document.write(`
-      <html><head><title>${tituloDoc} - ${(lojaPerfil as any).nomeLoja||'Zoes'}</title>
-      <style>
-        @page{ margin:10mm; }
-        body{ font-family:Arial, sans-serif; padding:15px; font-size:10px; color:#111; line-height:1.4; }
-        .header-pdf{ display:flex; gap:12px; align-items:center; border:2px solid #1e2f4a; border-radius:10px; padding:10px; background:#f8fafc; margin-bottom:12px; }
-        .header-pdf h2{ margin:0; font-size:14px; color:#1e2f4a; }
-        .header-pdf .info{ font-size:9px; color:#475569; margin-top:2px; }
-        table{ width:100%; border-collapse:collapse; margin-top:8px; }
-        th,td{ border:1px solid #94a3b8; padding:4px 6px; font-size:9px; text-align:left; }
-        th{ background:#1e2f4a; color:#fff; }
-        .total{ text-align:right; font-weight:bold; font-size:12px; margin-top:12px; border-top:2px solid #000; padding-top:6px; }
-        .footer-pdf{ margin-top:20px; text-align:center; font-size:7px; color:#64748b; border-top:1px solid #e2e8f0; padding-top:6px; }
-        @media print{ body{ -webkit-print-color-adjust:exact; } }
-      </style></head><body>
-      <div class="header-pdf">
-        ${logoHtml}
-        <div style="flex:1">
-          <h2>${(lojaPerfil as any).nomeLoja||'Zoes'} - ${tituloDoc}</h2>
-          <div class="info">NUIT: ${(lojaPerfil as any).nuit||'401234567'} | Tel: ${(lojaPerfil as any).tel||'258 84 123 4567'} | ${ (lojaPerfil as any).endereco||'Av. União Africana, Parcela 312, Matola'} - ${(lojaPerfil as any).provincia||'Maputo'}</div>
-          <div class="info">${(lojaPerfil as any).ramoActividade||'Mercearia e Mini Mercado'} | Data: ${new Date().toLocaleDateString('pt-MZ')} ${new Date().toLocaleTimeString('pt-MZ')}</div>
-        </div>
-      </div>
-      ${el.innerHTML}
-      <div class="footer-pdf">Documento processado por computador - TOTSHE - ${(lojaPerfil as any).nomeLoja||'Zoes'} - Válido sem carimbo - ${new Date().toLocaleString('pt-MZ')}</div>
-      </body></html>
-    `);
-    win.document.close();
-    win.focus();
-    setTimeout(()=>{ win.print(); }, 700);
-  };
-
   const [showNovoStock, setShowNovoStock] = useState(false);
   const [showRelatorioStock, setShowRelatorioStock] = useState(false);
   const [entradaQtdStock, setEntradaQtdStock] = useState(50);
@@ -308,13 +254,7 @@ export default function App(){
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || '';
       const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${nomeCliente} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;display:flex;gap:15px;align-items:center}.loja-info{flex:1}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}</style></head><body><div class="header">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura} - Vender e Faturar</div><div class="loja-dados">${ramoLojaFatura} | NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div style="margin-top:8px;font-size:11px;">Data: ${dataHoje} | Cliente: ${nomeCliente} | Tel: ${telFat}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
-      const blob = new Blob([faturaHtml], {type: 'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Fatura-'+nomeCliente.replace(/\s+/g,'_')+'-'+Date.now()+'.html';
-      document.body.appendChild(a);
-      a.click();
+      const winF = window.open('', '_blank'); if(winF){ const logoSrc = (lojaPerfil as any)?.logoData || ''; const logoH = logoSrc ? `<img src="${logoSrc}" style="width:70px;height:70px;object-fit:contain" />` : ''; winF.document.write(`<html><head><title>Fatura</title><style>body{font-family:Arial;padding:15px}</style></head><body><div style="display:flex;gap:10px">${logoH}<h2>FATURA - ${(lojaPerfil as any).nomeLoja||'Zoes'}</h2></div>${document.getElementById('fatura-preview-a5')?.innerHTML||''}</body></html>`); winF.document.close(); winF.focus(); setTimeout(()=>winF.print(), 700); } return;;
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
@@ -735,7 +675,7 @@ ${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
 </div>
 
 <div style="text-align:center;margin-top:20px" class="no-print">
-<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL COM LOGO</button> <button onClick={()=>gerarPDFUniversal('contrato-preview','CONTRATO 11 CLAUSULAS COM LOGO')} className="ml-2 h-7 px-3 bg-red-600 text-white rounded-full text-[8px] font-black">📄 PDF COM LOGO</button>
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL</button>
 </div>
 </body></html>`;
    const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}.html`; a.click();
@@ -747,6 +687,7 @@ ${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
  const gerarPDFFinal = () => {
    if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado na horizontal."); return; }
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000); const agora = new Date().toLocaleString("pt-MZ");
+   const logoForPDF = (lojaPerfil as any)?.logoData || (document.querySelector('img[src*="wezhai"]') as any)?.src || ''; const logoImgTag = logoForPDF ? `<img src="${logoForPDF}" style="width:75px;height:75px;object-fit:contain;background:#fff;border-radius:10px;padding:4px;border:1px solid #ddd" />` : `<div style="width:75px;height:75px;background:#000;color:#fff;display:grid;place-items:center;border-radius:10px;font-weight:bold">LOGO</div>`;
    const htmlFinal = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL 11 CLAUSULAS COMPLETAS - ${catName} - ID ${id} - ASSINATURAS HORIZONTAL</title>
 <style>
 body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:11px}
@@ -764,7 +705,7 @@ body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;
 @media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
 </style>
 </head><body>
-<div class="header"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS </h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div>
+<div class="header" style="display:flex;gap:12px;align-items:center"><div>${logoImgTag}</div><div><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS </h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div></div>
 
 <div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
 <b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
@@ -838,7 +779,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 <button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF FINAL COM ASSINATURAS - 11 CLAUSULAS - HORIZONTAL</button>
 </div>
 </body></html>`;
-   const blob = new Blob([htmlFinal], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-FINAL-11-CLAUSULAS-${catName}-ID-${id}-ASSINATURAS-HORIZONTAL.html`; a.click();
+   const win = window.open("", "_blank"); if(win){ win.document.write(htmlFinal); win.document.close(); win.focus(); setTimeout(()=>win.print(), 800); } return;
  };
 
  return (
@@ -1424,7 +1365,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
      <div className={`${mostrarPreviewMobile?"block":"hidden"} lg:block bg-white rounded-[12px] border-2 border-[#1e2f4a] p-3 h-fit lg:sticky lg:top-[70px] order-3 min-w-0 w-full`}>
        <div className="flex justify-between items-center"><div className="text-[10px] font-bold uppercase">3 - Preview do contrato - {CATS[contratoSel]} - {formContrato.tarefas.length} tarefas - vendo o que esta a ser editado</div><button onClick={()=>setMostrarPreviewMobile(false)} className="xl:hidden w-6 h-6 bg-[#f1f0eb] rounded-full grid place-items-center text-[10px]">X</button></div>
        <div className="mt-3 max-h-[60vh] xl:h-[520px] overflow-y-auto overscroll-contain break-words [overflow-wrap:anywhere] bg-[#f8fafc] border rounded-xl p-3 text-[10px] font-mono leading-relaxed">{formContrato.logoData && (<div className="bg-white border-2 border-[#d4a44a] rounded-xl p-2 mb-3 flex items-center gap-2"><img src={formContrato.logoData} alt="Logo" className="max-h-[40px] max-w-[60px] block" /><div className="text-[9px] font-bold">{formContrato.logoTipo || 'Logo Empresa'}</div></div>)}CONTRATO {CATS[contratoSel].toUpperCase()} - 11 CLAUSULAS<br/><br/>1. DADOS: {formContrato.empNome} BI {formContrato.empBI} e {formContrato.trabNome} BI {formContrato.trabBI}<br/><br/>2. TAREFAS ({formContrato.tarefas.length}):<br/>{formContrato.tarefas.map((t:string,i:number)=>`${i+1}. ${t}`).join("<br/>")}<br/><br/>3. HORARIO: {formContrato.horarioInicio} as {formContrato.horarioFim} - {formContrato.localTrab}<br/><br/>4. SALARIO: {formContrato.valor} MZN - Dia {formContrato.diaPag} - {formContrato.formaPag} - Prazo {formContrato.prazo}<br/><br/>5. ALIMENTACAO: {formContrato.alimentacao} - {formContrato.alojamento} - {formContrato.transporte}<br/><br/>6. FOLGAS: {formContrato.folgas}<br/><br/>7. PERIODO: {formContrato.periodoExp}<br/><br/>8. DEVERES TRAB: {formContrato.deveresTrab.substring(0,100)}...<br/><br/>9. DEVERES EMP: {formContrato.deveresEmp.substring(0,100)}...<br/><br/>10. ANEXOS: {formContrato.anexos.length} ficheiros - Fotos BI, NUIT, M-Pesa<br/><br/>11. ASSINATURA: {formContrato.empNome} {assinaturaContratante.concordo?`CONCORDO em ${assinaturaContratante.data}`:"FALTA"} - {formContrato.trabNome} {assinaturaContratado.concordo?`CONCORDO em ${assinaturaContratado.data}`:"FALTA"}<br/><br/>FORMULARIO COMPLETO ABERTO</div>
-       <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL COM LOGO</button> <button onClick={()=>gerarPDFUniversal('contrato-preview','CONTRATO 11 CLAUSULAS COM LOGO')} className="ml-2 h-7 px-3 bg-red-600 text-white rounded-full text-[8px] font-black">📄 PDF COM LOGO</button></div>
+       <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL</button></div>
      </div>
     </div>
    </section>
