@@ -983,12 +983,56 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div>{negocioCadastroForm.logoData && <div className="bg-white rounded-[8px] p-2 text-center"><img src={negocioCadastroForm.logoData as any} alt="logo preview" className="h-12 mx-auto object-contain" /><div className="text-[8px] text-black mt-1">{negocioCadastroForm.logoNome}</div></div>}</div>
                     </div>
                     <button onClick={()=>{if(!negocioCadastroForm.nomeLoja || !negocioCadastroForm.tel || !negocioCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} const novoPerfilCompleto = { nomeLoja: negocioCadastroForm.nomeLoja, nome: negocioCadastroForm.nomeLoja, tel: negocioCadastroForm.tel, telefone: negocioCadastroForm.tel, nuit: negocioCadastroForm.nuit, endereco: negocioCadastroForm.endereco, provincia: negocioCadastroForm.provincia, distrito: negocioCadastroForm.distrito, ramo: negocioCadastroForm.ramo, ramoActividade: negocioCadastroForm.ramo, outroRamo: negocioCadastroForm.outroRamo, logoData: negocioCadastroForm.logoData, logoNome: negocioCadastroForm.logoNome, formaPag: negocioCadastroForm.formaPag||'M-Pesa, Numerario', horario: negocioCadastroForm.horario||'08:00 - 18:00', responsavel: negocioCadastroForm.nomeLoja, email: '' }; 
-setLojaPerfil(novoPerfilCompleto as any); 
-        setPerfilLoja(novoPerfilCompleto as any);
-        // ISOLAMENTO TOTAL POR CONTA - COMO FACEBOOK - FIX VETO/ZOES
+setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto})); 
+        setPerfilLoja((prev:any)=>({...prev, ...novoPerfilCompleto}));
+        // ISOLAMENTO DE CONTAS POR TELEFONE - FIX PRIVACIDADE
+        try{
+          const telKey = (novoPerfilCompleto as any).tel || (novoPerfilCompleto as any).telefone || negocioCadastroForm.tel;
+          if(telKey){
+            localStorage.setItem(`lojaPerfil_${telKey}`, JSON.stringify(novoPerfilCompleto));
+            localStorage.setItem('contaAtiva', telKey);
+            // Salva lista de contas
+            const listaContas = JSON.parse(localStorage.getItem('listaContas')||'[]');
+            if(!listaContas.includes(telKey)) { listaContas.push(telKey); localStorage.setItem('listaContas', JSON.stringify(listaContas)); }
+          }
+          localStorage.setItem('lojaPerfil', JSON.stringify(novoPerfilCompleto));
+        }catch(e){ console.error('Erro ao salvar conta isolada', e); }
+ setFaturacaoCadastroForm({nomeLoja: novoPerfilCompleto.nomeLoja, tel: novoPerfilCompleto.tel, password: negocioCadastroForm.password});
+        // Ao logar, carrega apenas dados desta conta
+        try{
+          const telLogin = novoPerfilCompleto.tel;
+          const dadosSalvos = localStorage.getItem(`lojaPerfil_${telLogin}`);
+          if(dadosSalvos){
+            const dadosConta = JSON.parse(dadosSalvos);
+            // Garante que dados desta conta sobrescrevem qualquer mistura
+            setLojaPerfil(dadosConta);
+            setPerfilLoja(dadosConta);
+          }
+        }catch(e){}
+ 
+// ISOLAMENTO TOTAL POR CONTA - COMO FACEBOOK/WHATSAPP
         try{
           const telKey = novoPerfilCompleto.tel;
-          
+          // Salva conta com password
+          const contaData = { ...novoPerfilCompleto, password: negocioCadastroForm.password, dataCriacao: new Date().toISOString() };
+          localStorage.setItem(`lojaPerfil_${telKey}`, JSON.stringify(contaData));
+          localStorage.setItem(`conta_${telKey}`, JSON.stringify(contaData));
+          localStorage.setItem('contaAtiva', telKey);
+          // Salva lista de contas
+          const listaContas = JSON.parse(localStorage.getItem('listaContas')||'[]');
+          if(!listaContas.includes(telKey)) { listaContas.push(telKey); localStorage.setItem('listaContas', JSON.stringify(listaContas)); }
+          // Inicializa dados isolados desta conta - stock, faturas, clientes zerados
+          localStorage.setItem(`stock_produtos_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`faturas_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`clientes_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`fornecedores_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`produtos_fat_${telKey}`, JSON.stringify([]));
+          // Limpa dados globais antigos (evita mistura)
+          localStorage.removeItem('faturas');
+          localStorage.removeItem('produtos_fat');
+          localStorage.removeItem('stock_produtos');
+          localStorage.setItem('lojaPerfil', JSON.stringify(contaData));
+        }catch(e){ console.error('Erro isolamento', e); }
         setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
@@ -1664,59 +1708,12 @@ setLojaPerfil(novoPerfilCompleto as any);
                                 {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
                 {showEntradaStock && (
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[550px] border max-h-[90vh] overflow-y-auto">
-                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazém com FIFO</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center">X</button></div>
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
+                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
                       <div className="p-4 space-y-3">
-                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold bg-[#f8fafc] p-2 rounded border">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome} - Atual Arm: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem || 0}</div></div>
-                        
-                        <div className="bg-[#f0fdf4] border border-[#22c55e] rounded p-3 space-y-2">
-                          <div className="font-black text-[11px] text-[#166534]">📦 DADOS ENTRADA - FIFO (Primeiro a Entrar, Primeiro a Sair)</div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label className="text-[10px] font-bold">Código de Barras (Opcional)</label><input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="5601234567890 - opcional, ajuda venda rápida" className="w-full mt-1 h-8 border rounded px-2 text-[11px] bg-white" /></div>
-                            <div><label className="text-[10px] font-bold">Data Entrada na Loja/Armazém * - FIFO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full mt-1 h-8 border rounded px-2 text-[11px] bg-white font-bold" /></div>
-                          </div>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div><label className="text-[10px] font-bold">QTD Entrada *</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px] font-bold" /></div>
-                            <div><label className="text-[10px] font-bold">Local</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full mt-1 h-8 border rounded px-2 text-[10px]" /></div>
-                            <div><label className="text-[10px] font-bold">Lote</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="LOTE-..." className="w-full mt-1 h-8 border rounded px-2 text-[10px]" /></div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label className="text-[10px] font-bold">Fornecedor</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Ex: Cimpor" className="w-full mt-1 h-7 border rounded px-2 text-[10px]" /></div>
-                            <div><label className="text-[10px] font-bold">Validade (opcional)</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full mt-1 h-7 border rounded px-2 text-[10px]" /></div>
-                          </div>
-                          <div className="text-[9px] text-[#166534] bg-white p-1.5 rounded border">💡 FIFO: O que entrou primeiro (data mais antiga) sai primeiro. Código de barras opcional facilita venda rápida via scanner. Data entrada é obrigatória para FIFO correto.</div>
-                        </div>
-
-                        <div className="flex justify-end gap-2 pt-2 border-t">
-                          <button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[11px]">Cancelar</button>
-                          <button onClick={()=>{
-                            if(entradaQtdStock<=0){ alert('Digite quantidade'); return; }
-                            const dataEnt = novoStockDataEntrada || new Date().toISOString().slice(0,10);
-                            const dataEntBR = dataEnt.split('-').reverse().join('/');
-                            setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{
-                              ...p, 
-                              qtdEntrada: (p.qtdEntrada||0)+entradaQtdStock, 
-                              noArmazem: (p.noArmazem||0)+entradaQtdStock, 
-                              dataEntrada: dataEntBR,
-                              dataEntradaISO: dataEnt,
-                              barcode: novoStockBarcode || p.barcode || p.codigo,
-                              local: novoStockLocal || p.local || 'A1-01',
-                              lote: novoStockLote || p.lote || `LOTE-${Date.now().toString().slice(-6)}`,
-                              validade: novoStockValidade || p.validade || '',
-                              fornecedor: novoStockFornecedor || p.fornecedor || p.marca || ''
-                            }:p)); 
-                            // Salva por conta isolada
-                            try{
-                              const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel;
-                              if(telAtiva){
-                                const lista = stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:(p.qtdEntrada||0)+entradaQtdStock, noArmazem:(p.noArmazem||0)+entradaQtdStock, dataEntrada:dataEntBR, dataEntradaISO:dataEnt}:p);
-                                localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(lista));
-                              }
-                            }catch(e){}
-                            setShowEntradaStock(false);
-                            alert(`Entrada confirmada!\nQtd: ${entradaQtdStock}\nBarcode: ${novoStockBarcode||'Sem (opcional)'}\nData Entrada: ${dataEntBR} (FIFO)\nLocal: ${novoStockLocal}`);
-                          }} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[11px] font-bold">✅ Confirmar Entrada FIFO</button>
-                        </div>
+                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome}</div></div>
+                        <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">QTD Entrada</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data</label><input type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div></div>
+                        <div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[12px]">Cancelar</button><button onClick={()=>{setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:p.qtdEntrada+entradaQtdStock, noArmazem:p.noArmazem+entradaQtdStock, dataEntrada:new Date().toLocaleDateString('pt-MZ')}:p)); setShowEntradaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[12px] font-bold">Confirmar Entrada</button></div>
                       </div>
                     </div>
                   </div>
