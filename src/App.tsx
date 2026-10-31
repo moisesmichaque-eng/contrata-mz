@@ -251,6 +251,14 @@ export default function App(){
     if(!confirm('Tem certeza que deseja Sair da Conta?\n\nSeus dados ficarão salvos e você pode entrar novamente com seu telefone e password.')) return;
     try{
       // Limpa sessão ativa mas mantém contas salvas
+      const telAtivaLogout = localStorage.getItem('contaAtiva');
+      // Salva dados atuais desta conta antes de sair
+      if(telAtivaLogout){
+        try{
+          localStorage.setItem(`stock_produtos_${telAtivaLogout}`, JSON.stringify(stockProdutos));
+          localStorage.setItem(`faturas_${telAtivaLogout}`, JSON.stringify(faturas));
+        }catch(e){}
+      }
       localStorage.removeItem('contaAtiva');
       localStorage.removeItem('lojaPerfil');
       localStorage.removeItem('faturacao_logado');
@@ -269,6 +277,48 @@ export default function App(){
       console.error('Erro logout', e);
       setNegocioLogado(false);
       setFaturacaoLogado(false);
+    }
+  };
+
+  
+  // LOGIN COM ISOLAMENTO TOTAL - VERIFICA PASSWORD E CARREGA DADOS DA CONTA
+  const fazerLogin = () => {
+    try{
+      const tel = negocioCadastroForm.tel?.trim();
+      const pass = negocioCadastroForm.password?.trim();
+      if(!tel || !pass){ alert('Digite telefone e password'); return; }
+      // Verifica se conta existe
+      const contaSalva = localStorage.getItem(`lojaPerfil_${tel}`) || localStorage.getItem(`conta_${tel}`);
+      if(!contaSalva){
+        alert(`Conta não encontrada para telefone ${tel}\n\nCrie uma conta primeiro com CADASTRO SIMPLES`);
+        return;
+      }
+      const dadosConta = JSON.parse(contaSalva);
+      // Verifica password
+      if(dadosConta.password && dadosConta.password !== pass){
+        alert('Password incorreta!\n\nTelefone existe mas password não confere.');
+        return;
+      }
+      // Carrega dados isolados desta conta
+      const stockSalvo = localStorage.getItem(`stock_produtos_${tel}`);
+      const faturasSalvas = localStorage.getItem(`faturas_${tel}`);
+      const clientesSalvos = localStorage.getItem(`clientes_${tel}`);
+      const fornecedoresSalvos = localStorage.getItem(`fornecedores_${tel}`);
+      
+      setLojaPerfil(dadosConta);
+      setPerfilLoja(dadosConta);
+      setStockProdutos(stockSalvo ? JSON.parse(stockSalvo) : []);
+      setFaturas(faturasSalvas ? JSON.parse(faturasSalvas) : []);
+      setClientesFiado(clientesSalvos ? JSON.parse(clientesSalvos) : []);
+      setDataStockDiario(new Date().toISOString().slice(0,10));
+      localStorage.setItem('contaAtiva', tel);
+      localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
+      setNegocioLogado(true);
+      setFaturacaoLogado(true);
+      alert(`Bem-vindo ${dadosConta.nomeLoja}!\nConta isolada carregada - Stock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos - só seus dados!`);
+    }catch(e){
+      console.error('Erro login', e);
+      alert('Erro ao fazer login: ' + (e as any).message);
     }
   };
 
@@ -970,7 +1020,31 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
             setPerfilLoja(dadosConta);
           }
         }catch(e){}
- setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); localStorage.removeItem('faturas'); localStorage.removeItem('produtos_fat'); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Seu logo e dados ja aparecem em Faturacao e Recibos');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+ 
+// ISOLAMENTO TOTAL POR CONTA - COMO FACEBOOK/WHATSAPP
+        try{
+          const telKey = novoPerfilCompleto.tel;
+          // Salva conta com password
+          const contaData = { ...novoPerfilCompleto, password: negocioCadastroForm.password, dataCriacao: new Date().toISOString() };
+          localStorage.setItem(`lojaPerfil_${telKey}`, JSON.stringify(contaData));
+          localStorage.setItem(`conta_${telKey}`, JSON.stringify(contaData));
+          localStorage.setItem('contaAtiva', telKey);
+          // Salva lista de contas
+          const listaContas = JSON.parse(localStorage.getItem('listaContas')||'[]');
+          if(!listaContas.includes(telKey)) { listaContas.push(telKey); localStorage.setItem('listaContas', JSON.stringify(listaContas)); }
+          // Inicializa dados isolados desta conta - stock, faturas, clientes zerados
+          localStorage.setItem(`stock_produtos_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`faturas_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`clientes_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`fornecedores_${telKey}`, JSON.stringify([]));
+          localStorage.setItem(`produtos_fat_${telKey}`, JSON.stringify([]));
+          // Limpa dados globais antigos (evita mistura)
+          localStorage.removeItem('faturas');
+          localStorage.removeItem('produtos_fat');
+          localStorage.removeItem('stock_produtos');
+          localStorage.setItem('lojaPerfil', JSON.stringify(contaData));
+        }catch(e){ console.error('Erro isolamento', e); }
+        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1077,7 +1151,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1603,7 +1677,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black">💾 Save/Salvar</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
