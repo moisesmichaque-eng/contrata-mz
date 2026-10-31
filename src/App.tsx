@@ -201,7 +201,45 @@ export default function App(){
     const [dataStockDiario, setDataStockDiario] = useState(new Date().toISOString().slice(0,10));
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); try{ if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }catch(e){return 0;} }); };
+  
+  // AUTO CRIAR 1 ITEM NO STOCK PARA CADA CONTA - FIX DESGASTE
+  const criarStockInicialSeVazio = (tel:string, arm:string)=>{
+    try{
+      const key = `stock_produtos_${tel}`;
+      const existente = localStorage.getItem(key);
+      if(existente){
+        const arr = JSON.parse(existente);
+        if(arr && arr.length>0) return arr;
+      }
+      const id = Date.now().toString();
+      const hoje = new Date();
+      const iso = hoje.toISOString().slice(0,10);
+      const br = iso.split('-').reverse().join('/');
+      const itemInicial = {
+        id, codigo: `COD-${id.slice(-6)}`, nome: 'Exemplo - Cimento 42.5N 50kg', marca: 'Geral', grupo: 'Materiais', subGrupo: 'Geral', fabricante: 'Geral',
+        dataEntrada: br, dataEntradaISO: iso, qtdEntrada: 100, noArmazem: 100, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0,
+        precoVenda: 850, precoCusto: 700, minimo: 10, ideal: 50, barcode: '', local: 'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: '', fornecedor: 'Fornecedor Padrão', armazem: arm||'Matola'
+      };
+      const lista = [itemInicial];
+      localStorage.setItem(key, JSON.stringify(lista));
+      localStorage.setItem('stock_produtos', JSON.stringify(lista));
+      return lista;
+    }catch(e){ return null; }
+  };
+
+
   const [stockProdutos, setStockProdutos] = useState([] as any[]);
+
+  useEffect(()=>{
+    try{
+      const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any)?.tel || 'geral';
+      const lista = criarStockInicialSeVazio(telAtiva, armazemAtivo);
+      if(lista && stockProdutos.length===0){
+        setStockProdutos(lista);
+      }
+    }catch(e){}
+  },[negocioLogado, faturacaoLogado]);
+
   const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
@@ -378,8 +416,10 @@ export default function App(){
       setDataStockDiario(new Date().toISOString().slice(0,10));
       localStorage.setItem('contaAtiva', tel);
       localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
-      setNegocioLogado(true);
-      setFaturacaoLogado(true);
+      (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setNegocioLogado(true);
+      (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setFaturacaoLogado(true);
       alert(`Bem-vindo ${dadosConta.nomeLoja}!\nConta isolada carregada - Stock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos - só seus dados!`);
     }catch(e){
       console.error('Erro login', e);
@@ -1122,7 +1162,9 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           localStorage.removeItem('stock_produtos');
           localStorage.setItem('lojaPerfil', JSON.stringify(contaData));
         }catch(e){ console.error('Erro isolamento', e); }
-        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setNegocioLogado(true); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1156,8 +1198,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         setDataStockDiario(new Date().toISOString().slice(0,10));
                         localStorage.setItem('contaAtiva', tel);
                         localStorage.setItem('lojaPerfil', JSON.stringify(dadosConta));
-                        setNegocioLogado(true);
-                        setFaturacaoLogado(true);
+                        (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setNegocioLogado(true);
+                        (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setFaturacaoLogado(true);
                         alert(`✅ LOGIN COM SUCESSO!\n\nBem-vindo ${dadosConta.nomeLoja}!\nTel: ${tel}\nNUIT: ${dadosConta.nuit||'sem NUIT'}\nProvíncia: ${dadosConta.provincia||''}\nRamo: ${dadosConta.ramoActividade||dadosConta.ramo||''}\nLogo: ${dadosConta.logoData ? 'Sim, com logo' : 'Sem logo'}\n\nStock: ${(stockSalvo ? JSON.parse(stockSalvo).length : 0)} produtos SÓ SEUS!\nFaturas: ${(faturasSalvas ? JSON.parse(faturasSalvas).length : 0)}\n\nConta 100% isolada - Não mistura com Zoes, SICPA, Nando!`);
                       }} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta (VALIDAÇÃO 100%)</button>
                   </div>
@@ -1669,7 +1713,8 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div className="text-[8px] opacity-60">NUIT, endereco, logo - pode acrescentar depois no perfil</div>
                   </div>
-                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
+                  <button onClick={()=>{if(!faturacaoCadastroForm.nomeLoja || !faturacaoCadastroForm.tel || !faturacaoCadastroForm.password){alert('Preencha nome da loja, telefone e password'); return;} setLojaPerfil({...lojaPerfil, nomeLoja:faturacaoCadastroForm.nomeLoja, tel:faturacaoCadastroForm.tel}); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setFaturacaoLogado(true); setFaturacaoTab('faturacao');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar na faturacao</button>
                   </>
                   ) : (
                   <>
@@ -1677,7 +1722,8 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div><label className="text-[9px] font-bold opacity-80">TELEFONE / USERNAME *</label><input value={faturacaoCadastroForm.tel} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, tel:e.target.value})} placeholder="+258 84..." className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                     <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={faturacaoCadastroForm.password} onChange={e=>setFaturacaoCadastroForm({...faturacaoCadastroForm, password:e.target.value})} placeholder="Password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                   </div>
-                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Zoes', tel: faturacaoCadastroForm.tel}); setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
+                  <button onClick={()=>{setLojaPerfil({...lojaPerfil, nomeLoja: faturacaoCadastroForm.nomeLoja || 'Zoes', tel: faturacaoCadastroForm.tel}); (()=>{ try{ const t = (formLoja as any).tel || (lojaPerfil as any).tel || Date.now().toString(); const lst = criarStockInicialSeVazio(t, 'Matola'); if(lst) setStockProdutos(lst); }catch(e){} })();
+              setFaturacaoLogado(true);}} className="w-full mt-4 h-11 rounded-[8px] bg-[#facc15] text-black font-black text-[12px]">Entrar - Minha conta</button>
                   <div className="text-[8px] opacity-60 text-center mt-2">Use nagi / 123 para teste rapido</div>
                   </>
                   )}
