@@ -1297,10 +1297,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
             <div className="bg-white rounded-[14px] p-8 shadow border-2 border-[#facc15]">
               <div className="h-16 w-16 rounded-full bg-[#facc15] grid place-items-center mx-auto font-black text-[24px]">📦</div>
               <h2 className="text-[18px] font-black mt-4">Stock agora fica no FATURAR</h2>
-              <p className="text-[12px] text-[#64748b] mt-2">Para simplificar e evitar tela branca, o Stock foi movido para FATURAR > Stock</p>
+              <p className="text-[12px] text-[#64748b] mt-2">Para simplificar e evitar tela branca, o Stock foi movido para FATURAR Stock</p>
               <p className="text-[11px] text-[#64748b] mt-1">Lá você tem 1 produto por conta + botão + Novo Item funcionando 100%</p>
-              <button onClick={()=>{setTab('faturar'); setFaturacaoTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#facc15] text-black rounded-[10px] font-black text-[14px] hover:bg-[#eab308]">Ir para FATURAR > Stock →</button>
-              <div className="mt-4 text-[10px] text-[#94a3b8]">NEGOCIO Stock desativado para evitar tela branca ao clicar + ITEM</div>
+              <button onClick={()=>{setTab('faturar'); setFaturacaoTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#facc15] text-black rounded-[10px] font-black text-[14px] hover:bg-[#eab308]">Ir para FATURAR Stock →</button>
+              <div className="mt-4 text-[10px] text-[#94a3b8]">NEGOCIO Stock desativado para evitar tela branca</div>
             </div>
           </div>
         )}
