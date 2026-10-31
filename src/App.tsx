@@ -2488,6 +2488,39 @@ Bilhete valido - Apresentar QR`;
         </div>
       )}
 
+        
+      {/* FIX FINAL + NOVO ITEM - GLOBAL SEGURO - FUNCIONA EM NEGOCIO E FATURAR */}
+      {showNovoStock && (
+        <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-3" onClick={()=>setShowNovoStock(false)}>
+          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[560px] max-h-[90vh] overflow-hidden border-2 border-[#1e2f4a]" onClick={e=>e.stopPropagation()}>
+            <div className="h-[52px] bg-[#1e2f4a] text-white px-4 flex items-center justify-between">
+              <div className="flex items-center gap-2"><div className="h-8 w-8 rounded bg-[#22c55e] grid place-items-center font-black">+</div><span className="font-black text-[14px]">NOVO ITEM - Adicionar ao Stock</span></div>
+              <button onClick={()=>setShowNovoStock(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button>
+            </div>
+            <div className="p-4 space-y-3">
+              <div><label className="text-[11px] font-black">Nome do Produto *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-bold outline-none" autoFocus /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="text-[11px] font-black">Quantidade *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-black outline-none" /></div>
+                <div><label className="text-[11px] font-black">Preço Venda MT *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-bold outline-none" /></div>
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button onClick={()=>setShowNovoStock(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black text-[12px]">Cancelar</button>
+                <button onClick={()=>{
+                  if(!novoStockNome || novoStockNome.trim().length<2){ alert('Digite nome!'); return; }
+                  const qtd = parseInt(novoStockQtd)||0; if(qtd<=0){ alert('Digite qtd!'); return; }
+                  const pv = parseFloat(novoStockPreco)||0; if(pv<=0){ alert('Digite preço!'); return; }
+                  const id = Date.now().toString(); const iso = new Date().toISOString().slice(0,10); const br = iso.split('-').reverse().join('/');
+                  const np = { id, codigo: `COD-${id.slice(-6)}`, nome: novoStockNome.trim(), marca: 'Geral', grupo: novoStockCat||'Geral', subGrupo: 'Geral', fabricante: 'Geral', dataEntrada: br, dataEntradaISO: iso, qtdEntrada: qtd, noArmazem: qtd, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0, precoVenda: pv, precoCusto: parseFloat(novoStockCusto)||0, minimo: 10, ideal: 50, barcode: novoStockBarcode||'', local: novoStockLocal||'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: novoStockValidade||'', fornecedor: novoStockFornecedor||'', armazem: armazemAtivo==='Todos' ? 'Matola' : armazemAtivo };
+                  setStockProdutos(prev=>{ const nl=[...prev,np]; try{ const t=localStorage.getItem('contaAtiva')|| (lojaPerfil as any)?.tel||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                  setNovoStockNome(''); setNovoStockQtd(''); setNovoStockPreco(''); setNovoStockCusto(''); setShowNovoStock(false); setStockSelecionado(id);
+                }} className="h-[44px] px-8 bg-[#22c55e] text-white rounded-[10px] font-black text-[13px]">✅ CRIAR ITEM</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">
           {faturacaoTab==='faturas' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
