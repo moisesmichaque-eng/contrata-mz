@@ -245,6 +245,33 @@ export default function App(){
     setTimeout(()=>winFatura.print(), 700);
   };
 
+  
+  // ===== LOGOUT / SAIR DA CONTA - FIX MEMORIZACAO =====
+  const fazerLogout = () => {
+    if(!confirm('Tem certeza que deseja Sair da Conta?\n\nSeus dados ficarão salvos e você pode entrar novamente com seu telefone e password.')) return;
+    try{
+      // Limpa sessão ativa mas mantém contas salvas
+      localStorage.removeItem('contaAtiva');
+      localStorage.removeItem('lojaPerfil');
+      localStorage.removeItem('faturacao_logado');
+      // Limpa estados da sessão atual
+      setNegocioLogado(false);
+      setFaturacaoLogado(false);
+      setNegocioAuthMode('login');
+      // Limpa dados temporários da sessão (não apaga contas salvas por telefone)
+      setProdutosFat([]);
+      setStockSelecionado('2');
+      setFiltroRapidoStock('');
+      // Volta para login
+      setNegocioTab('painel');
+      alert('Você saiu da conta com sucesso!\nEntre novamente com seu telefone.');
+    }catch(e){
+      console.error('Erro logout', e);
+      setNegocioLogado(false);
+      setFaturacaoLogado(false);
+    }
+  };
+
   const [showNovoStock, setShowNovoStock] = useState(false);
   const [showRelatorioStock, setShowRelatorioStock] = useState(false);
   const [entradaQtdStock, setEntradaQtdStock] = useState(50);
@@ -967,7 +994,8 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="text-[8px] bg-[#f8fafc] border px-2 py-1 rounded-full">📅 {new Date().toLocaleDateString('pt-MZ')} - Maputo - {produtosFat.length} itens</div>
+            <button onClick={()=>fazerLogout()} className="h-7 px-4 bg-red-600 hover:bg-red-700 text-white rounded-full text-[9px] font-black flex items-center gap-1">🚪 Sair da Conta</button>
+            <div className="text-[8px] bg-[#f8fafc] border px-2 py-1 rounded-full">📅 {new Date().toLocaleDateString('pt-MZ')} - {(lojaPerfil as any).provincia || 'Gaza'} - {produtosFat.length} itens</div>
             
           </div>
         </div>
@@ -1376,7 +1404,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex-1">
                       <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                       <div className="flex gap-1 mt-1">
-                        <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">\uD83D\uDCCE Anexar Logo</button><button onClick={()=>{setNegocioLogado(false); setFaturacaoLogado(false);}} className="h-6 px-3 bg-red-600 text-white rounded-full text-[9px] font-black">Sair da Conta</button>
+                        <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">\uD83D\uDCCE Anexar Logo</button><button onClick={()=>fazerLogout()} className="h-6 px-3 bg-red-600 text-white rounded-full text-[9px] font-black">Sair da Conta</button>
                         <input id="inputLogoTipo" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name})); r.readAsDataURL(f); }}} />
                         <span className="text-[9px] text-gray-500">{formContrato.logoData ? ' Logo ok' : 'PNG/JPG'}</span>
                       </div>
@@ -1546,7 +1574,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div><label className="text-[8px] font-bold">FORMA PAGAMENTO</label><input value={lojaPerfil.formaPag} onChange={e=>setLojaPerfil({...lojaPerfil, formaPag:e.target.value})} placeholder="M-Pesa, Numerario, Banco" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
                     <div><label className="text-[8px] font-bold">HORARIO</label><input value={lojaPerfil.horario} onChange={e=>setLojaPerfil({...lojaPerfil, horario:e.target.value})} placeholder="08:00 - 18:00" className="w-full h-9 px-3 rounded-[8px] border text-[11px] mt-1" /></div>
                   </div>
-                  <div><label className="text-[8px] font-bold">LOGO DA LOJA - aparece no PDF e no topo</label><div className="flex gap-2 mt-1"><input value={lojaPerfil.logoNome} onChange={e=>setLojaPerfil({...lojaPerfil, logoNome:e.target.value})} placeholder="Nome para logo" className="flex-1 h-9 px-3 rounded-[8px] border text-[11px]" /><button onClick={()=>{const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>{const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=(ev:any)=>{setLojaPerfil({...lojaPerfil, logoData:ev.target.result, logoNome:file.name});}; reader.readAsDataURL(file);}}; input.click();}} className="px-4 h-9 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Anexar Logo</button><button onClick={()=>{setNegocioLogado(false); setFaturacaoLogado(false);}} className="h-6 px-3 bg-red-600 text-white rounded-full text-[9px] font-black">Sair da Conta</button></div>{lojaPerfil.logoData && <div className="mt-2 bg-white border rounded p-2 flex items-center gap-2"><img src={lojaPerfil.logoData} className="h-10 w-10 object-contain border rounded" /><span className="text-[9px]">{lojaPerfil.logoNome}</span></div>}</div>
+                  <div><label className="text-[8px] font-bold">LOGO DA LOJA - aparece no PDF e no topo</label><div className="flex gap-2 mt-1"><input value={lojaPerfil.logoNome} onChange={e=>setLojaPerfil({...lojaPerfil, logoNome:e.target.value})} placeholder="Nome para logo" className="flex-1 h-9 px-3 rounded-[8px] border text-[11px]" /><button onClick={()=>{const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>{const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=(ev:any)=>{setLojaPerfil({...lojaPerfil, logoData:ev.target.result, logoNome:file.name});}; reader.readAsDataURL(file);}}; input.click();}} className="px-4 h-9 bg-[#1e2f4a] text-white rounded-[8px] text-[10px] font-bold">Anexar Logo</button><button onClick={()=>fazerLogout()} className="h-6 px-3 bg-red-600 text-white rounded-full text-[9px] font-black">Sair da Conta</button></div>{lojaPerfil.logoData && <div className="mt-2 bg-white border rounded p-2 flex items-center gap-2"><img src={lojaPerfil.logoData} className="h-10 w-10 object-contain border rounded" /><span className="text-[9px]">{lojaPerfil.logoNome}</span></div>}</div>
                   <button onClick={()=>alert('Perfil atualizado! '+lojaPerfil.nomeLoja)} className="w-full h-10 bg-[#1e2f4a] text-white rounded-[8px] font-bold text-[11px] mt-3">Salvar Perfil Completo</button>
                 </div>
               </div>
