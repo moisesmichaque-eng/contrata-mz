@@ -270,6 +270,82 @@ export default function App(){
   };
 
   
+
+  // ===== FUNÇÃO EMERGÊNCIA - NOVO ITEM FUNCIONA MESMO SE MODAL CONGELAR =====
+  const criarNovoItemEmergencia = () => {
+    try{
+      console.log('EMERGENCIA - Criando novo item via prompt');
+      const nome = prompt('📦 NOVO ITEM - Nome do Produto *\nEx: Cimento 42.5N 50kg');
+      if(!nome || nome.trim().length<2){ alert('Nome obrigatório!'); return; }
+      
+      const barcode = prompt('Código de Barras (Opcional)\nEx: 5601234567890\nDeixe vazio se não tiver - é opcional para facilitar venda rápida');
+      
+      const dataEntrada = prompt('Data Entrada na Loja/Armazém * - FIFO (YYYY-MM-DD)\nEx: 2026-10-31\nO que entrou primeiro sai primeiro do armazém para loja', new Date().toISOString().slice(0,10));
+      if(!dataEntrada){ alert('Data obrigatória para FIFO!'); return; }
+      
+      const qtd = prompt('Qtd Entrada *\nEx: 100');
+      if(!qtd || Number(qtd)<=0){ alert('Qtd obrigatória!'); return; }
+      
+      const precoCusto = prompt('Preço Custo *\nEx: 700');
+      const precoVenda = prompt('Preço Venda *\nEx: 850');
+      const local = prompt('Local Armazém\nEx: A1-01', 'A1-01');
+      const fornecedor = prompt('Fornecedor\nEx: Cimpor', 'Geral');
+      
+      const novoId = Date.now().toString();
+      const dataEnt = dataEntrada || new Date().toISOString().slice(0,10);
+      let dataEntBR = dataEnt;
+      try{ const [y,m,d] = dataEnt.split('-'); dataEntBR = `${d}/${m}/${y}`; }catch(e){ dataEntBR = new Date().toLocaleDateString('pt-MZ'); }
+      
+      const novoProduto = {
+        id: novoId,
+        codigo: barcode || `COD-${novoId.slice(-6)}`,
+        nome: nome.trim(),
+        marca: fornecedor || 'Geral',
+        grupo: 'Geral',
+        subGrupo: 'Geral',
+        fabricante: fornecedor || 'Geral',
+        dataEntrada: dataEntBR,
+        dataEntradaISO: dataEnt,
+        qtdEntrada: parseInt(qtd)||0,
+        noArmazem: parseInt(qtd)||0,
+        entradaLoja: 0,
+        dataReq: '',
+        stockLoja: 0,
+        venda: 0,
+        mediaDia: 0,
+        precoVenda: parseFloat(precoVenda)||0,
+        precoCusto: parseFloat(precoCusto)||0,
+        minimo: 10,
+        ideal: 50,
+        barcode: barcode || '',
+        local: local || 'A1-01',
+        lote: `LOTE-${novoId.slice(-6)}`,
+        validade: '',
+        fornecedor: fornecedor || 'Geral',
+        armazem: 'Matola'
+      };
+      
+      setStockProdutos(prev=>{
+        const novaLista = [...prev, novoProduto] as any[];
+        try{
+          const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel || 'geral';
+          localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novaLista));
+          localStorage.setItem('stock_produtos_backup', JSON.stringify(novaLista));
+          localStorage.setItem('stock_produtos', JSON.stringify(novaLista));
+          console.log('Salvo em stock_produtos_'+telAtiva, novaLista.length);
+        }catch(e){ console.error('Erro salvar', e); }
+        return novaLista;
+      });
+      
+      setStockSelecionado(novoId);
+      alert(`✅✅✅ PRODUTO CRIADO COM SUCESSO VIA EMERGÊNCIA!\n\nNome: ${novoProduto.nome}\nBarcode: ${novoProduto.barcode||'Sem (opcional)'}\nData Entrada: ${dataEntBR} (FIFO)\nQtd: ${novoProduto.qtdEntrada}\nLocal: ${novoProduto.local}\nCusto: ${novoProduto.precoCusto}MT | Venda: ${novoProduto.precoVenda}MT\n\nAgora tabela tem ${stockProdutos.length+1} itens!\n\nSe modal normal não abria, use sempre este botão EMERGÊNCIA!`);
+      
+    }catch(err){
+      console.error('Erro emergência', err);
+      alert('Erro ao criar produto emergência: '+err);
+    }
+  };
+
   // LOGIN COM ISOLAMENTO TOTAL - VERIFICA PASSWORD E CARREGA DADOS DA CONTA
   const fazerLogin = () => {
     try{
