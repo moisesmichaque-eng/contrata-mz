@@ -2436,7 +2436,7 @@ Bilhete valido - Apresentar QR`;
 
 
       
-      {/* FIX V2 - MODAL GLOBAL SEGURO - MESMO CODIGO ORIGINAL QUE FUNCIONA */}
+      {/* FIX V3 - MODAL GLOBAL SEGURO - FECHAMENTO CORRETO */}
       {showNovoStock && (
                   <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
@@ -2548,6 +2548,7 @@ Agora tabela tem ${stockProdutos.length+1} itens!`);
                       </div>
                     </div>
                   </div>
+                )}
 
 
 {tab==='admin' && (
