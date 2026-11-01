@@ -432,14 +432,34 @@ export default function App(){
       const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
       const provLojaFatura = (lojaPerfil as any).provincia || '';
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Electricidade e Iluminacao';
-      const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${nomeCliente} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:10px;display:flex;gap:15px;align-items:center}.loja-info{flex:1}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}</style></head><body><div class="header">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura} - Vender e Faturar</div><div class="loja-dados">${ramoLojaFatura} | NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div style="margin-top:8px;font-size:11px;">Data: ${dataHoje} | Cliente: ${nomeCliente} | Tel: ${telFat}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
+      // NUMERO FACTURA - diferente para cada fatura: 01 + data hoje + contador
+      let numFatura = '01'; try{ const faturasSalvas = JSON.parse(localStorage.getItem('faturas_'+(localStorage.getItem('contaAtiva')||'geral'))||'[]'); numFatura = String(faturasSalvas.length+1).padStart(2,'0'); }catch(e){ try{ numFatura = String(Date.now()).slice(-4); }catch(e2){} }
+      const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
+      const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.loja-info{flex:1}.cliente-info{flex:1;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}.factura-num{font-size:14px;font-weight:900;color:#1e2f4a;background:#fef08a;border:1px solid #facc15;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:6px}</style></head><body><div class="header"><div style="display:flex;gap:15px;align-items:center;flex:1">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura}</div><div class="loja-dados">NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${ramoLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div class="factura-num">Factura Nº: ${numeroFacturaCompleto}</div></div></div><div class="cliente-info"><div style="font-weight:900;font-size:13px;margin-bottom:6px;">DADOS DO CLIENTE</div><div style="font-size:11px;">Nome: <b>${nomeCliente}</b></div><div style="font-size:11px;">Tel: ${telFat}</div><div style="font-size:11px;">NUIT: ${nuitFat||'-'}</div><div style="font-size:11px;margin-top:6px;">Data: ${dataHoje}</div><div style="font-size:10px;margin-top:4px;color:#64748b;">Factura: ${numeroFacturaCompleto}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
       const winPDF = window.open('', '_blank'); if(winPDF){ winPDF.document.write(faturaHtml); winPDF.document.close(); winPDF.focus(); setTimeout(()=>winPDF.print(), 800); } return;;
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
       produtosFat.forEach(p=>{
-        setStockProdutos(prev=>prev.map(s=>s.nome===p.nome?{...s, stockLoja: Math.max(0, ((s as any).stockLoja||0)-p.qtd)}:s as any));
+        setStockProdutos(prev=>{
+          const nl = prev.map((s:any)=>{
+            if(s.nome===p.nome || s.codigo===p.codigo){
+              const qtdVendida = p.qtd||0;
+              const novoStockLoja = Math.max(0, ((s as any).stockLoja||0)-qtdVendida);
+              const novaVenda = ((s as any).venda||0)+qtdVendida;
+              // Stock final = noArmazem + stockLoja
+              return {...s, stockLoja: novoStockLoja, venda: novaVenda, noArmazem: s.noArmazem};
+            }
+            return s;
+          });
+          try{
+            const t = localStorage.getItem('contaAtiva')||'geral';
+            localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl));
+            localStorage.setItem('stock_produtos', JSON.stringify(nl));
+          }catch(e){}
+          return nl;
+        });
       });
       setFaturas([{id:Date.now(), data:dataHoje, cliente:nomeCliente, tel:telFat, nuit:nuitFat, total: total.toFixed(0)}] as any);
       
@@ -2456,16 +2476,16 @@ Bilhete valido - Apresentar QR`;
       {showNovoFormNegocio && (
         <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoFormNegocio(false)}>
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[600px] border-2 border-[#1e2f4a] overflow-hidden max-h-[92vh] flex flex-col" onClick={e=>e.stopPropagation()}>
-            <div className="h-[56px] bg-[#8b5cf6] text-white px-5 flex items-center justify-between"><div><div className="font-black text-[15px]">+ Novo Item - NEGOCIO STOCK</div><div className="text-[10px] opacity-80">Entrada no armazem - FIFO</div></div><button onClick={()=>setShowNovoFormNegocio(false)} className="h-9 w-9 rounded-full bg-white/20 grid place-items-center font-black">X</button></div>
+            <div className="h-[56px] bg-[#8b5cf6] text-white px-5 flex items-center justify-between"><div><div className="font-black text-[15px]">+ Novo Item - NEGOCIO STOCK</div></div><button onClick={()=>setShowNovoFormNegocio(false)} className="h-9 w-9 rounded-full bg-white/20 grid place-items-center font-black">X</button></div>
             <div className="p-5 space-y-4 overflow-auto">
               <div className="bg-[#f8fafc] border-2 border-[#8b5cf6]/20 rounded-[10px] p-3 space-y-3">
-                <div><label className="text-[13px] font-black">Nome do Produto *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Agua 1.5l" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] outline-none" autoFocus /></div>
+                <div><label className="text-[13px] font-black">Nome *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Agua" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] outline-none" autoFocus /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#16a34a]">QTD ENTRADA ARMAZEM *</label><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#f0fdf4] outline-none" /></div>
+                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#16a34a]">QTD ENTRADA *</label><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#f0fdf4] outline-none" /></div>
                   <div className="bg-white border-2 border-[#f59e0b] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#d97706]">PRECO UNID *</label><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} placeholder="850" className="w-full mt-2 h-[48px] border-2 border-[#f59e0b] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#fffbeb] outline-none" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><label className="text-[11px] font-bold">Codigo Barras <span className="text-[9px] bg-[#94a3b8] text-white px-1.5 rounded">OPC</span></label><input value={novoFormBarcodeNeg} onChange={e=>setNovoFormBarcodeNeg(e.target.value)} placeholder="Opcional" className="w-full mt-1 h-[42px] border-2 border-dashed rounded-[10px] px-3 text-[13px]" /></div>
+                  <div><label className="text-[11px] font-bold">Barcode <span className="text-[9px] bg-[#94a3b8] text-white px-1.5 rounded">OPC</span></label><input value={novoFormBarcodeNeg} onChange={e=>setNovoFormBarcodeNeg(e.target.value)} placeholder="Opcional" className="w-full mt-1 h-[42px] border-2 border-dashed rounded-[10px] px-3 text-[13px]" /></div>
                   <div><label className="text-[11px] font-bold">Armazem *</label><select value={novoFormArmazemNeg} onChange={e=>setNovoFormArmazemNeg(e.target.value)} className="w-full mt-1 h-[42px] border-2 rounded-[10px] px-3 text-[13px] font-bold"><option>Matola</option><option>Maputo</option><option>Beira</option><option>Nampula</option><option>Tete</option><option>Outro</option></select></div>
                 </div>
                 <div className="bg-white border-2 border-[#e0f2fe] rounded-[10px] p-3"><label className="text-[11px] font-bold text-[#0284c7]">Validade Mes/Ano <span className="text-[9px] bg-[#e0f2fe] px-1.5 rounded">OPC</span></label><div className="grid grid-cols-2 gap-2 mt-2"><select value={novoFormValidadeMesNeg} onChange={e=>setNovoFormValidadeMesNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Mes</option><option value="01">01-Jan</option><option value="02">02-Fev</option><option value="03">03-Mar</option><option value="04">04-Abr</option><option value="05">05-Mai</option><option value="06">06-Jun</option><option value="07">07-Jul</option><option value="08">08-Ago</option><option value="09">09-Set</option><option value="10">10-Out</option><option value="11">11-Nov</option><option value="12">12-Dez</option></select><select value={novoFormValidadeAnoNeg} onChange={e=>setNovoFormValidadeAnoNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Ano</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div></div>
@@ -2492,20 +2512,17 @@ Bilhete valido - Apresentar QR`;
       {showEntradaStock && (
         <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowEntradaStock(false)}>
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[420px] border-2 border-[#facc15] overflow-hidden" onClick={e=>e.stopPropagation()}>
-            <div className="h-[52px] bg-[#fef08a] border-b-2 border-[#facc15] px-5 flex items-center justify-between">
-              <div className="font-black text-[13px]">📥 Entrada [F5] - Entrada Armazem</div>
-              <button onClick={()=>setShowEntradaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button>
-            </div>
+            <div className="h-[52px] bg-[#fef08a] border-b-2 border-[#facc15] px-5 flex items-center justify-between"><div className="font-black text-[13px]">Entrada [F5] - Armazem</div><button onClick={()=>setShowEntradaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button></div>
             <div className="p-5 space-y-3">
-              <div className="text-[11px] bg-[#f8fafc] p-2 rounded border">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Selecione na tabela'; })()}</b><br/>Armazem: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.armazem : '-'; })()}</b> | Data Entrada: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.dataEntrada : '-'; })()}</b> | FIFO</div>
-              <div className="text-[12px]">Stock Armazem atual: <b className="text-[#16a34a] text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()} unid</b> | Loja: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.stockLoja : 0; })()}</b></div>
-              <div><label className="text-[12px] font-black">Qtd a ENTRAR no Armazem *</label><input type="number" value={qtdEntradaTemp} onChange={e=>setQtdEntradaTemp(e.target.value)} placeholder="Ex: 50" className="w-full mt-1 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#f0fdf4] outline-none" autoFocus /></div>
+              <div className="text-[11px] bg-[#f8fafc] p-2 rounded border">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Selecione'; })()}</b></div>
+              <div className="text-[12px]">Armazem: <b className="text-[#16a34a] text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()}</b> | Loja: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.stockLoja : 0; })()}</b></div>
+              <div><label className="text-[12px] font-black">Qtd ENTRAR Armazem *</label><input type="number" value={qtdEntradaTemp} onChange={e=>setQtdEntradaTemp(e.target.value)} placeholder="50" className="w-full mt-1 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#f0fdf4] outline-none" autoFocus /></div>
               <div className="flex justify-end gap-2"><button onClick={()=>{ setShowEntradaStock(false); setQtdEntradaTemp(''); }} className="h-[42px] px-5 border-2 rounded-[10px] font-bold">Cancelar</button><button onClick={()=>{
-                const q=parseInt(qtdEntradaTemp||'0')||0; if(q<=0){ alert('Digite qtd!'); return; }
-                if(!stockSelecionado){ alert('Selecione produto clicando na linha amarela!'); return; }
+                const q=parseInt(qtdEntradaTemp||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                if(!stockSelecionado){ alert('Selecione produto!'); return; }
                 setStockProdutos((prev:any[])=>{ const nl=prev.map((p:any)=>{ if(p.id===stockSelecionado){ return {...p, noArmazem:(p.noArmazem||0)+q, qtdEntrada:(p.qtdEntrada||0)+q}; } return p; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setQtdEntradaTemp(''); setShowEntradaStock(false);
-              }} className="h-[42px] px-6 bg-[#facc15] border-2 border-black rounded-[10px] font-black">✅ ENTRADA ARMAZEM</button></div>
+              }} className="h-[42px] px-6 bg-[#facc15] border-2 border-black rounded-[10px] font-black">ENTRADA</button></div>
             </div>
           </div>
         </div>
@@ -2514,50 +2531,25 @@ Bilhete valido - Apresentar QR`;
       {showSaidaStock && (
         <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowSaidaStock(false)}>
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[460px] border-2 border-[#16a34a] overflow-hidden" onClick={e=>e.stopPropagation()}>
-            <div className="h-[52px] bg-[#bbf7d0] border-b-2 border-[#16a34a] px-5 flex items-center justify-between">
-              <div className="font-black text-[13px]">📤 Saida [F6] - Armazem → Loja (FIFO)</div>
-              <button onClick={()=>setShowSaidaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button>
-            </div>
+            <div className="h-[52px] bg-[#bbf7d0] border-b-2 border-[#16a34a] px-5 flex items-center justify-between"><div className="font-black text-[13px]">Saida [F6] - Armazem → Loja FIFO</div><button onClick={()=>setShowSaidaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button></div>
             <div className="p-5 space-y-3">
-              <div className="text-[11px] bg-[#fefce8] p-2 rounded border-2 border-[#facc15]">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Selecione'; })()}</b><br/>Armazem: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.armazem : '-'; })()}</b> | Data Entrada Armazem: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.dataEntrada+' ('+p.dataEntradaISO+') - FIFO' : '-'; })()}</b><br/><span className="text-[10px] text-[#16a34a] font-bold">FIFO: produtos que entraram primeiro saem primeiro do armazem para loja</span></div>
-              <div className="grid grid-cols-2 gap-2 text-[12px]">
-                <div>Armazem: <b className="text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()}</b></div>
-                <div>Loja: <b className="text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.stockLoja : 0; })()}</b></div>
-                <div>Final: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? (p.noArmazem+p.stockLoja) : 0; })()}</b></div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div><label className="text-[11px] font-black">Qtd Armazem → Loja *</label><input type="number" value={qtdSaidaTemp} onChange={e=>setQtdSaidaTemp(e.target.value)} placeholder="Ex: 20" className="w-full mt-1 h-[46px] border-2 border-[#16a34a] rounded-[10px] px-3 font-black text-[18px] text-center bg-[#f0fdf4] outline-none" autoFocus /></div>
-                <div><label className="text-[11px] font-black">Data Transferencia</label><input type="date" value={dataTransferencia} onChange={e=>setDataTransferencia(e.target.value)} className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 text-[13px] font-bold" /></div>
-              </div>
+              <div className="text-[11px] bg-[#fefce8] p-2 rounded border-2 border-[#facc15]">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Selecione'; })()}</b><br/>Data Entrada: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.dataEntrada+' - FIFO' : '-'; })()}</b></div>
+              <div className="grid grid-cols-2 gap-2 text-[12px]"><div>Armazem: <b className="text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()}</b></div><div>Loja: <b className="text-[16px]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.stockLoja : 0; })()}</b></div></div>
+              <div className="grid grid-cols-2 gap-2"><div><label className="text-[11px] font-black">Qtd Armazem → Loja *</label><input type="number" value={qtdSaidaTemp} onChange={e=>setQtdSaidaTemp(e.target.value)} placeholder="20" className="w-full mt-1 h-[46px] border-2 border-[#16a34a] rounded-[10px] px-3 font-black text-[18px] text-center bg-[#f0fdf4] outline-none" autoFocus /></div><div><label className="text-[11px] font-black">Data Transferencia</label><input type="date" value={dataTransferencia} onChange={e=>setDataTransferencia(e.target.value)} className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 text-[13px] font-bold" /></div></div>
               <div className="flex justify-end gap-2 pt-2"><button onClick={()=>{ setShowSaidaStock(false); setQtdSaidaTemp(''); }} className="h-[42px] px-5 border-2 rounded-[10px] font-bold">Cancelar</button><button onClick={()=>{
                 const q=parseInt(qtdSaidaTemp||'0')||0; if(q<=0){ alert('Qtd!'); return; }
-                const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); if(!p){ alert('Selecione produto clicando na linha!'); return; }
-                if((p.noArmazem||0) < q){ alert('Stock Armazem insuficiente! Tem '+p.noArmazem+' e quer transferir '+q+' para loja'); return; }
-                // FIFO CHECK - verifica se existe mesmo produto (mesmo nome) com dataEntrada mais antiga e com stock
+                const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); if(!p){ alert('Selecione produto!'); return; }
+                if((p.noArmazem||0) < q){ alert('Stock Armazem insuficiente! Tem '+p.noArmazem+' e quer transferir '+q); return; }
                 const mesmoNome = stockProdutos.filter((x:any)=> x.nome.toLowerCase()===p.nome.toLowerCase() && x.id!==p.id && (x.noArmazem||0)>0);
                 const maisAntigo = mesmoNome.filter((x:any)=> new Date(x.dataEntradaISO) < new Date(p.dataEntradaISO));
                 if(maisAntigo.length>0){
                   const maisVelho = maisAntigo.sort((a:any,b:any)=> new Date(a.dataEntradaISO).getTime() - new Date(b.dataEntradaISO).getTime())[0];
-                  const confirma = confirm('⚠️ FIFO ALERTA!\n\nExiste stock mais antigo do mesmo produto:\n'+maisVelho.codigo+' - '+maisVelho.nome+'\nEntrada: '+maisVelho.dataEntrada+' | Stock: '+maisVelho.noArmazem+'\n\nFIFO: deve sair o mais antigo primeiro!\n\nQuer mesmo transferir do produto SELECIONADO ('+p.codigo+' de '+p.dataEntrada+')?\n\nOK = Transferir mesmo assim\nCancelar = Escolher o mais antigo');
-                  if(!confirma){ setStockSelecionado(maisVelho.id); alert('Selecionado o mais antigo: '+maisVelho.codigo+' - Agora clique Saida F6 novamente'); return; }
+                  const confirma = confirm('FIFO ALERTA! Existe stock mais antigo: '+maisVelho.codigo+' Entrada: '+maisVelho.dataEntrada+' Stock: '+maisVelho.noArmazem+'\n\nQuer transferir do SELECIONADO mesmo assim?');
+                  if(!confirma){ setStockSelecionado(maisVelho.id); return; }
                 }
-                setStockProdutos((prev:any[])=>{ 
-                  const nl=prev.map((pp:any)=>{ 
-                    if(pp.id===stockSelecionado){ 
-                      const novoNoArmazem = (pp.noArmazem||0)-q;
-                      const novoStockLoja = (pp.stockLoja||0)+q;
-                      const novoEntradaLoja = (pp.entradaLoja||0)+q;
-                      const dataReqBR = dataTransferencia.split('-').reverse().join('/');
-                      return {...pp, noArmazem:novoNoArmazem, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, dataReq:dataReqBR, venda:(pp.venda||0)}; 
-                    } 
-                    return pp; 
-                  }); 
-                  try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} 
-                  return nl; 
-                });
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ const novoNoArmazem = (pp.noArmazem||0)-q; const novoStockLoja = (pp.stockLoja||0)+q; const novoEntradaLoja = (pp.entradaLoja||0)+q; const dataReqBR = dataTransferencia.split('-').reverse().join('/'); return {...pp, noArmazem:novoNoArmazem, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, dataReq:dataReqBR}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setQtdSaidaTemp(''); setShowSaidaStock(false);
-              }} className="h-[42px] px-5 bg-[#16a34a] text-white border-2 border-black rounded-[10px] font-black text-[12px]">✅ ARMAZEM → LOJA (FIFO)</button></div>
-              <div className="text-[9px] text-[#64748b] bg-[#f8fafc] p-2 rounded">Saida = Transferencia Armazem para Loja | Conta no Stock Final | FIFO por dataEntrada | Vai para recepcao loja</div>
+              }} className="h-[42px] px-5 bg-[#16a34a] text-white border-2 border-black rounded-[10px] font-black text-[12px]">ARMAZEM → LOJA (FIFO)</button></div>
             </div>
           </div>
         </div>
