@@ -435,31 +435,36 @@ export default function App(){
       // NUMERO FACTURA - diferente para cada fatura: 01 + data hoje + contador
       let numFatura = '01'; try{ const faturasSalvas = JSON.parse(localStorage.getItem('faturas_'+(localStorage.getItem('contaAtiva')||'geral'))||'[]'); numFatura = String(faturasSalvas.length+1).padStart(2,'0'); }catch(e){ try{ numFatura = String(Date.now()).slice(-4); }catch(e2){} }
       const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
-      const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.loja-info{flex:1}.cliente-info{flex:1;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}.factura-num{font-size:14px;font-weight:900;color:#1e2f4a;background:#fef08a;border:1px solid #facc15;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:6px}</style></head><body><div class="header"><div style="display:flex;gap:15px;align-items:center;flex:1">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura}</div><div class="loja-dados">NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${ramoLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div class="factura-num">Factura Nº: ${numeroFacturaCompleto}</div></div></div><div class="cliente-info"><div style="font-weight:900;font-size:13px;margin-bottom:6px;">DADOS DO CLIENTE</div><div style="font-size:11px;">Nome: <b>${nomeCliente}</b></div><div style="font-size:11px;">Tel: ${telFat}</div><div style="font-size:11px;">NUIT: ${nuitFat||'-'}</div><div style="font-size:11px;margin-top:6px;">Data: ${dataHoje}</div><div style="font-size:10px;margin-top:4px;color:#64748b;">Factura: ${numeroFacturaCompleto}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
+      const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.loja-info{flex:1}.cliente-info{flex:1;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}.factura-num{font-size:14px;font-weight:900;color:#1e2f4a;background:#fef08a;border:1px solid #facc15;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:6px}</style></head><body><div class="header"><div style="display:flex;gap:15px;align-items:center;flex:1">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura}</div><div class="loja-dados">NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${ramoLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div class="factura-num">Factura Nº: ${numeroFacturaCompleto}</div></div></div><div class="cliente-info"><div style="font-size:11px;">Nome: <b>${nomeCliente}</b></div><div style="font-size:11px;">Tel: ${telFat}</div><div style="font-size:11px;">NUIT: ${nuitFat||'-'}</div><div style="font-size:11px;margin-top:6px;">Data: ${dataHoje}</div><div style="font-size:10px;margin-top:4px;color:#64748b;">Factura: ${numeroFacturaCompleto}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
       const winPDF = window.open('', '_blank'); if(winPDF){ winPDF.document.write(faturaHtml); winPDF.document.close(); winPDF.focus(); setTimeout(()=>winPDF.print(), 800); } return;;
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
-      produtosFat.forEach(p=>{
-        setStockProdutos(prev=>{
-          const nl = prev.map((s:any)=>{
-            if(s.nome===p.nome || s.codigo===p.codigo){
-              const qtdVendida = p.qtd||0;
-              const novoStockLoja = Math.max(0, ((s as any).stockLoja||0)-qtdVendida);
-              const novaVenda = ((s as any).venda||0)+qtdVendida;
-              // Stock final = noArmazem + stockLoja
-              return {...s, stockLoja: novoStockLoja, venda: novaVenda, noArmazem: s.noArmazem};
+      // STOCK AUTOMATICO - VENDA REFLETE EM VENDA + VENDAS VALOR + STOCK FINAL
+      setStockProdutos((prevStock:any[])=>{
+        let nl = [...prevStock];
+        produtosFat.forEach((p:any)=>{
+          const idx = nl.findIndex((s:any)=> s.nome===p.nome || s.codigo===p.codigo || s.nome.toLowerCase()===p.nome.toLowerCase());
+          if(idx>=0){
+            const s = nl[idx];
+            const qtdVendida = Number(p.qtd)||0;
+            if(qtdVendida>0){
+              const novoStockLoja = Math.max(0, (s.stockLoja||0)-qtdVendida);
+              const novaVenda = (s.venda||0)+qtdVendida;
+              const novoFinal = (s.noArmazem||0)+novoStockLoja;
+              nl[idx] = {...s, stockLoja: novoStockLoja, venda: novaVenda, _vendasValor: novaVenda*(s.precoVenda||0), _stockFinal: novoFinal};
+              console.log(`VENDA AUTO: ${s.nome} - Loja ${s.stockLoja} -> ${novoStockLoja}, Venda ${s.venda} -> ${novaVenda}, Final ${novoFinal}`);
             }
-            return s;
-          });
-          try{
-            const t = localStorage.getItem('contaAtiva')||'geral';
-            localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl));
-            localStorage.setItem('stock_produtos', JSON.stringify(nl));
-          }catch(e){}
-          return nl;
+          }
         });
+        try{
+          const t = localStorage.getItem('contaAtiva')||'geral';
+          localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl));
+          localStorage.setItem('stock_produtos', JSON.stringify(nl));
+          localStorage.setItem('stock_produtos_backup', JSON.stringify(nl));
+        }catch(e){ console.error('Erro salvar stock venda', e); }
+        return nl;
       });
       setFaturas([{id:Date.now(), data:dataHoje, cliente:nomeCliente, tel:telFat, nuit:nuitFat, total: total.toFixed(0)}] as any);
       
@@ -1273,7 +1278,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           <div className="text-[10px] text-[#64748b]">Mesmo carrinho que Faturar - {produtosFat.length} itens - Total {produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT - Quando vende aqui, baixa stock automático</div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div className="border rounded-[10px] p-3"><div className="font-black text-[11px]">Carrinho atual - {produtosFat.length} itens</div>{produtosFat.map(p=><div key={p.id} className="flex justify-between text-[10px] py-1 border-b"><span>{p.nome} x{p.qtd}</span><span className="font-bold">{(p.preco*p.qtd).toFixed(0)} MT</span></div>)}{produtosFat.length===0 && <div className="text-[9px] text-[#94a3b8] p-2">Vazio - vá em Faturar e adicione produtos</div>}</div>
-            <div className="bg-[#f0fdf4] border-2 border-green-200 rounded-[10px] p-3"><div className="font-black text-[11px]">Finalizar venda</div><div className="mt-2 text-[9px]">Cliente: {nomeFat || 'Balcão'} - Tel: {telFat}</div><div className="mt-2 font-black text-[16px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</div><button onClick={()=>{ if(produtosFat.length===0) return; const novaVenda={id:'VD-'+Date.now(), cliente:nomeFat, total:produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0), data:new Date().toLocaleDateString()}; setFaturas([...faturas,novaVenda]); alert('Venda '+novaVenda.id+' concluída! Stock baixado em '+produtosFat.length+' produtos.'); setStockProdutos(stockProdutos.map(sp=>{ const vendido=produtosFat.find(pf=>pf.nome===sp.nome); if(vendido){ return {...sp, noArmazem:Math.max(0,(sp.noArmazem||0)-vendido.qtd), entradaLoja:Math.max(0,(sp.entradaLoja||0)-vendido.qtd)}; } return sp; })); setProdutosFat([]); }} className="mt-3 w-full h-10 bg-green-600 text-white rounded-[8px] font-black text-[11px]">Confirmar venda - Baixar stock</button></div>
+            <div className="bg-[#f0fdf4] border-2 border-green-200 rounded-[10px] p-3"><div className="font-black text-[11px]">Finalizar venda</div><div className="mt-2 text-[9px]">Cliente: {nomeFat || 'Balcão'} - Tel: {telFat}</div><div className="mt-2 font-black text-[16px]">TOTAL: {(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</div><button onClick={()=>{ if(produtosFat.length===0) return; const novaVenda={id:'VD-'+Date.now(), cliente:nomeFat, total:produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0), data:new Date().toLocaleDateString()}; setFaturas([...faturas,novaVenda]); alert('Venda '+novaVenda.id+' concluída! Stock baixado em '+produtosFat.length+' produtos.'); // atualizado no bloco unico acima setProdutosFat([]); }} className="mt-3 w-full h-10 bg-green-600 text-white rounded-[8px] font-black text-[11px]">Confirmar venda - Baixar stock</button></div>
           </div>
         </div>
         )}
