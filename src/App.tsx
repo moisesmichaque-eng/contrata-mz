@@ -203,16 +203,7 @@ export default function App(){
   const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); try{ if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }catch(e){return 0;} }); };
   const [stockProdutos, setStockProdutos] = useState([] as any[]);
 
-  const criarStockInicialSeVazio = (tel:string, arm:string)=>{
-    try{
-      const key = `stock_produtos_${tel}`;
-      const existente = localStorage.getItem(key);
-      if(existente){ const arr = JSON.parse(existente); if(arr && arr.length>0) return arr; }
-      const id = Date.now().toString(); const hoje = new Date(); const iso = hoje.toISOString().slice(0,10); const br = iso.split('-').reverse().join('/');
-      const itemInicial = { id, codigo: `COD-${id.slice(-6)}`, nome: 'Exemplo - Cimento 42.5N 50kg', marca: 'Geral', grupo: 'Materiais', subGrupo: 'Geral', fabricante: 'Geral', dataEntrada: br, dataEntradaISO: iso, qtdEntrada: 100, noArmazem: 100, entradaLoja: 0, dataReq: '', stockLoja: 0, venda: 0, mediaDia: 0, precoVenda: 850, precoCusto: 700, minimo: 10, ideal: 50, barcode: '', local: 'A1-01', lote: `LOTE-${id.slice(-6)}`, validade: '', fornecedor: 'Fornecedor Padrão', armazem: arm||'Matola' };
-      const lista = [itemInicial]; localStorage.setItem(key, JSON.stringify(lista)); localStorage.setItem('stock_produtos', JSON.stringify(lista)); return lista;
-    }catch(e){ return null; }
-  };
+  const criarStockInicialSeVazio = (tel:string, arm:string)=>{ try{ const k=`stock_produtos_${tel}`; const ex=localStorage.getItem(k); if(ex){ const arr=JSON.parse(ex); if(arr&&arr.length>0) return arr; } const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/'); const it={ id, codigo:`COD-${id.slice(-6)}`, nome:'Exemplo - Cimento 42.5N 50kg', marca:'Geral', grupo:'Materiais', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:100, noArmazem:100, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:850, precoCusto:700, minimo:10, ideal:50, barcode:'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'Fornecedor Padrao', armazem:arm||'Matola' }; const lista=[it]; localStorage.setItem(k, JSON.stringify(lista)); return lista; }catch(e){ return null; } };
   const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
@@ -1801,11 +1792,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           {faturacaoTab==='stock' && (
           <div className="max-w-[600px] mx-auto p-6 text-center">
             <div className="bg-white rounded-[14px] p-8 shadow border-2 border-[#8b5cf6]">
-              <div className="h-16 w-16 rounded-full bg-[#8b5cf6] grid place-items-center mx-auto font-black text-[24px] text-white">📦</div>
-              <h2 className="text-[18px] font-black mt-4">Stock agora fica no NEGOCIO</h2>
-              <p className="text-[12px] text-[#64748b] mt-2">O Stock foi movido para NEGOCIO Stock para simplificar</p>
-              <p className="text-[11px] text-[#64748b] mt-1">No final vamos remover FATURAR e ficar só com NEGOCIO</p>
-              <button onClick={()=>{setTab('negocio'); setNegocioTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black text-[14px]">Ir para NEGOCIO Stock →</button>
+              <div className="h-16 w-16 rounded-full bg-[#8b5cf6] grid place-items-center mx-auto font-black text-[24px] text-white">B</div>
+              <h2 className="text-[18px] font-black mt-4">Stock no NEGOCIO</h2>
+              <p className="text-[12px] text-[#64748b] mt-2">Stock foi movido para NEGOCIO Stock</p>
+              <button onClick={()=>{setTab('negocio'); setNegocioTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black text-[14px]">Ir para NEGOCIO Stock</button>
             </div>
           </div>
         )}
@@ -1829,43 +1819,27 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
 }
 
 
-// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULA
-      {/* NOVO FORMULARIO STOCK NEGOCIO - 100% SEGURO - NAO DA TELA BRANCA - V15 */}
+// ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
       {showNovoFormStockNegocio && (
         <div className="fixed inset-0 z-[99999] bg-black/70 flex items-center justify-center p-4" onClick={()=>setShowNovoFormStockNegocio(false)}>
-          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[520px] border-2 border-[#1e2f4a] overflow-hidden" onClick={e=>e.stopPropagation()}>
+          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[520px] border-2 border-[#1e2f4a]" onClick={e=>e.stopPropagation()}>
             <div className="h-[52px] bg-[#8b5cf6] text-white px-4 flex items-center justify-between">
-              <div className="flex items-center gap-2"><div className="h-8 w-8 rounded bg-white/20 grid place-items-center font-black">+</div><span className="font-black text-[14px]">NOVO ITEM - NEGOCIO STOCK</span></div>
+              <span className="font-black text-[14px]">NOVO ITEM - NEGOCIO STOCK</span>
               <button onClick={()=>setShowNovoFormStockNegocio(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button>
             </div>
             <div className="p-5 space-y-4">
-              <div><label className="text-[11px] font-black text-[#1e2f4a]">Nome do Produto *</label><input value={novoFormNome} onChange={e=>setNovoFormNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-[46px] border-2 border-[#e2e8f0] rounded-[10px] px-3 font-bold text-[14px] focus:border-[#8b5cf6] outline-none" autoFocus /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-[11px] font-black">Quantidade *</label><input type="number" value={novoFormQtd} onChange={e=>setNovoFormQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-black text-[14px] outline-none focus:border-[#8b5cf6]" /></div>
-                <div><label className="text-[11px] font-black">Preço Venda MT *</label><input type="number" value={novoFormPreco} onChange={e=>setNovoFormPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-bold text-[14px] outline-none focus:border-[#22c55e]" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-[10px] font-bold text-[#64748b]">Preço Custo</label><input type="number" value={novoFormCusto} onChange={e=>setNovoFormCusto(e.target.value)} placeholder="700" className="w-full mt-1 h-[40px] border rounded-[8px] px-3 text-[13px] outline-none" /></div>
-                <div><label className="text-[10px] font-bold text-[#64748b]">Código Barras</label><input value={novoFormBarcode} onChange={e=>setNovoFormBarcode(e.target.value)} placeholder="Opcional" className="w-full mt-1 h-[40px] border rounded-[8px] px-3 text-[13px] outline-none" /></div>
-              </div>
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <button onClick={()=>setShowNovoFormStockNegocio(false)} className="h-[46px] px-6 border-2 border-[#e2e8f0] rounded-[10px] font-black text-[12px] hover:bg-[#f8fafc]">Cancelar</button>
-                <button onClick={()=>{
-                  try{
-                    const nome=(novoFormNome||'').trim(); if(nome.length<2){ alert('Digite nome!'); return; }
-                    const q=parseInt(novoFormQtd||'0')||0; if(q<=0){ alert('Digite quantidade!'); return; }
-                    const pv=parseFloat(novoFormPreco||'0')||0; if(pv<=0){ alert('Digite preço!'); return; }
-                    const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
-                    const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:parseFloat(novoFormCusto||'0')||0, minimo:10, ideal:50, barcode:novoFormBarcode||'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
-                    setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
-                    setNovoFormNome(''); setNovoFormQtd(''); setNovoFormPreco(''); setNovoFormCusto(''); setNovoFormBarcode(''); setShowNovoFormStockNegocio(false); setStockSelecionado(id);
-                  }catch(err){ alert('Erro '+(err as any).message); }
-                }} className="h-[46px] px-8 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-[10px] font-black text-[13px] shadow">CRIAR ITEM</button>
-              </div>
+              <div><label className="text-[11px] font-black">Nome *</label><input value={novoFormNome} onChange={e=>setNovoFormNome(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold outline-none" autoFocus /></div>
+              <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoFormQtd} onChange={e=>setNovoFormQtd(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-black outline-none" /></div><div><label className="text-[11px] font-black">Preco *</label><input type="number" value={novoFormPreco} onChange={e=>setNovoFormPreco(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-bold outline-none" /></div></div>
+              <div className="flex justify-end gap-2 pt-4 border-t"><button onClick={()=>setShowNovoFormStockNegocio(false)} className="h-[46px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
+                const nome=(novoFormNome||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
+                const q=parseInt(novoFormQtd||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                const pv=parseFloat(novoFormPreco||'0')||0; if(pv<=0){ alert('Preco!'); return; }
+                const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
+                const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:parseFloat(novoFormCusto||'0')||0, minimo:10, ideal:50, barcode:novoFormBarcode||'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
+                setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); }catch(e){} return nl; });
+                setNovoFormNome(''); setNovoFormQtd(''); setNovoFormPreco(''); setShowNovoFormStockNegocio(false);
+              }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
             </div>
           </div>
         </div>
       )}
-
-
-        S
