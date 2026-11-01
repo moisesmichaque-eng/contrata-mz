@@ -582,7 +582,7 @@ export default function App(){
         y+=10;
         doc.setFontSize(6);
         doc.setFont('helvetica','normal');
-        doc.text(`Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + VENDER/FACTURAR - ${new Date().toLocaleString('pt-MZ')}`, 10, y);
+        doc.text(`Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + VENDER - ${new Date().toLocaleString('pt-MZ')}`, 10, y);
 
         doc.save(nomeArquivo);
       } catch(e){
@@ -1132,7 +1132,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
       <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
       <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
       <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
-      <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#facc15] text-black ring-2 ring-black font-black':'bg-[#facc15] text-black hover:bg-[#fde047] font-black'}`}>VENDER/FACTURAR</button>
+      <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#facc15] text-black ring-2 ring-black font-black':'bg-[#facc15] text-black hover:bg-[#fde047] font-black'}`}>VENDER</button>
       
       <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
     </div>
@@ -1589,20 +1589,101 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           </div>
         </div>
         )}
-        {negocioTab==='relatorios' && (
-        <div className="mt-3 bg-white border rounded-[12px] p-4">
-          <div className="font-black text-[14px]">📊 RELATÓRIOS - Faturas, Vendas, Stock - Tudo coordenado</div>
-          <div className="mt-3 grid grid-cols-4 gap-3">
-            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">TOTAL FATURADO</div><div className="font-black text-[14px]">{faturas.reduce((s,f)=>s+(f.total||0),0).toFixed(0) || '5400000'} MT</div><div className="text-[7px]">+{faturas.length} faturas hoje</div></div>
-            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">ITENS NO CARRINHO</div><div className="font-black text-[14px]">{produtosFat.length}</div><div className="text-[7px]">{produtosFat.reduce((s,p)=>s+p.qtd,0)} unidades</div></div>
-            <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div className="text-[9px]">STOCK BAIXO</div><div className="font-black text-[14px]">{stockProdutos.filter(p=>(p.noArmazem||0)<50).length} produtos</div><div className="text-[7px]">Alerta reposição</div></div>
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[10px] p-3"><div className="text-[9px] font-bold">AÇÕES</div><div className="mt-1 flex gap-1"><button className="bg-black text-white px-2 py-1 rounded-full text-[7px]">Exportar PDF</button><button className="bg-white border px-2 py-1 rounded-full text-[7px]">Ver gráfico</button></div></div>
+        
+{negocioTab==='relatorios' && (
+        <div className="mt-3 space-y-3">
+          <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-4">
+            <div className="flex justify-between items-center flex-wrap gap-2">
+              <div className="font-black text-[14px]">📊 RELATÓRIO POR TURNO - Fechar Turno / Dia</div>
+              <div className="flex gap-2 flex-wrap">
+                <button onClick={()=>{
+                  const t = localStorage.getItem('contaAtiva')||'geral';
+                  const ta = JSON.parse(localStorage.getItem(`turno_aberto_${t}`)||'null');
+                  if(ta){ alert('Turno ja aberto desde '+ta.inicio); return; }
+                  const novo = {id:'TURNO-'+Date.now(), inicio:new Date().toLocaleString('pt-MZ'), inicioISO:new Date().toISOString(), status:'aberto'};
+                  localStorage.setItem(`turno_aberto_${t}`, JSON.stringify(novo));
+                  alert('Turno aberto! '+novo.inicio);
+                  window.location.reload();
+                }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[10px] font-black">ABRIR TURNO</button>
+                <button onClick={async()=>{
+                  const t = localStorage.getItem('contaAtiva')||'geral';
+                  const turnoAberto = JSON.parse(localStorage.getItem(`turno_aberto_${t}`)||'null');
+                  if(!turnoAberto){ alert('Nenhum turno aberto!'); return; }
+                  const totalTurno = faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0);
+                  const resumo = 'RELATORIO TURNO - '+turnoAberto.id+' Inicio: '+turnoAberto.inicio+' Fim: '+new Date().toLocaleString('pt-MZ')+' Faturas: '+faturas.length+' Total: '+totalTurno.toFixed(0)+'MT';
+                  try{
+                    const loadJsPDF = ():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const script=document.createElement('script'); script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; script.onload=()=>{ setTimeout(()=>{ const jsPDF=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(jsPDF) resolve(jsPDF); else reject('jsPDF'); },300); }; script.onerror=()=>reject('Falha'); document.head.appendChild(script); }); };
+                    const jsPDF = await loadJsPDF();
+                    const doc = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+                    let y=10;
+                    doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.text('RELATORIO DE TURNO - '+(lojaPerfil as any).nomeLoja||'Loja',10,y);
+                    y+=6; doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.text('Turno: '+turnoAberto.id+' | Inicio: '+turnoAberto.inicio+' | Fim: '+new Date().toLocaleString('pt-MZ')+' | Total: '+totalTurno.toFixed(0)+'MT',10,y);
+                    y+=8; doc.setFont('helvetica','bold'); doc.setFillColor(241,245,249); doc.rect(10,y,277,6,'F'); doc.text('FATURA',12,y+4); doc.text('CLIENTE',35,y+4); doc.text('DATA',80,y+4); doc.text('TOTAL',110,y+4);
+                    y+=6; doc.setFont('helvetica','normal');
+                    faturas.slice(0,60).forEach((f:any)=>{ if(y>190){ doc.addPage(); y=10; } doc.text(String(f.id).substring(0,18),12,y+4); doc.text(String(f.cliente||'').substring(0,22),35,y+4); doc.text(String(f.data||''),80,y+4); doc.text((f.total||0).toFixed(0)+'MT',110,y+4); y+=5; });
+                    const nomeArq='Relatorio-Turno-'+turnoAberto.id+'-'+new Date().toISOString().slice(0,10)+'.pdf';
+                    doc.save(nomeArq);
+                    const csv='Relatorio Turno;'+turnoAberto.id+'\nFatura;Cliente;Data;Total\n'+faturas.map((f:any)=>f.id+';'+f.cliente+';'+f.data+';'+f.total).join('\n');
+                    const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
+                    const fechados=JSON.parse(localStorage.getItem('turnos_fechados_'+t)||'[]'); fechados.push({...turnoAberto,fim:new Date().toLocaleString('pt-MZ'),total:totalTurno,faturas:faturas.length,status:'fechado'}); localStorage.setItem('turnos_fechados_'+t,JSON.stringify(fechados)); localStorage.removeItem('turno_aberto_'+t);
+                    const telLoja=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+telLoja.replace(/\D/g,'').slice(-9)+'/?text='+encodeURIComponent(resumo); setTimeout(()=>{window.open(waUrl,'_blank');},800);
+                    alert('Turno fechado! PDF e Excel baixados! Total: '+totalTurno.toFixed(0)+'MT');
+                    window.location.reload();
+                  }catch(e){ alert('Erro: '+e); }
+                }} className="px-4 py-2 bg-red-600 text-white rounded-full text-[10px] font-black">FECHAR TURNO - PDF/Excel + Envia</button>
+                <button onClick={()=>{ const dia=new Date().toLocaleDateString('pt-MZ'); const totalDia=faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); alert('FECHAR DIA '+dia+'\nFaturas: '+faturas.length+'\nTotal: '+totalDia.toFixed(0)+'MT'); }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[10px] font-black">FECHAR DIA</button>
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-3 text-[9px]">
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>TURNO ATUAL</div><div className="font-black text-[11px]">{(()=>{ try{ const t=localStorage.getItem('contaAtiva')||'geral'; const ta=JSON.parse(localStorage.getItem('turno_aberto_'+t)||'null'); return ta?ta.inicio:'Nenhum - Abra turno'; }catch(e){return 'Erro';} })()}</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>TOTAL TURNO</div><div className="font-black text-[11px]">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div></div>
+              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>FATURAS TURNO</div><div className="font-black text-[11px]">{faturas.length} faturas</div></div>
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[10px] p-3"><div className="font-bold">ACOES</div><div className="mt-1 flex gap-1 flex-wrap"><button onClick={()=>{ const t=localStorage.getItem('contaAtiva')||'geral'; const tf=JSON.parse(localStorage.getItem('turnos_fechados_'+t)||'[]'); alert('Turnos: '+tf.length+'\n'+tf.map((x:any)=>x.id+' - '+x.total+'MT').join('\n')); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">Ver fechados</button></div></div>
+            </div>
           </div>
-          <div className="mt-3 max-h-[300px] overflow-auto border rounded-[10px]">
-            <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">FATURA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">DATA</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-right">ITENS</th></tr></thead><tbody>{faturas.map(f=><tr key={f.id} className="border-b"><td className="p-2 font-mono">{f.id}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.data}</td><td className="p-2 text-right font-bold">{(f.total||0).toFixed(0)} MT</td><td className="p-2 text-right">{(f.itens?.length||0)} itens</td></tr>)}{faturas.length===0 && <tr><td colSpan={5} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em Faturar e guarde com SAVE</td></tr>}</tbody></table>
+          <div className="bg-white border rounded-[12px] p-4">
+            <div className="font-black text-[12px]">FILTROS - Produto, Grupo, Data</div>
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              <div><div className="text-[8px] font-bold">PRODUTO</div><select id="filtroProdRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{stockProdutos.map((p:any)=><option key={p.id} value={p.nome}>{p.nome}</option>)}</select></div>
+              <div><div className="text-[8px] font-bold">GRUPO</div><select id="filtroGrupoRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{Array.from(new Set(stockProdutos.map((p:any)=>p.marca||p.grupo||'Geral'))).map((g:any)=><option key={g} value={g}>{g}</option>)}</select></div>
+              <div><div className="text-[8px] font-bold">DATA INICIO</div><input id="filtroDataIni" type="date" className="w-full h-8 border rounded-[6px] px-2 text-[9px]" /></div>
+              <div><div className="text-[8px] font-bold">DATA FIM</div><input id="filtroDataFim" type="date" className="w-full h-8 border rounded-[6px] px-2 text-[9px]" /></div>
+            </div>
+            <div className="mt-3 flex gap-2 flex-wrap">
+              <button onClick={async()=>{
+                const prod=(document.getElementById('filtroProdRel') as any)?.value||'';
+                const grupo=(document.getElementById('filtroGrupoRel') as any)?.value||'';
+                let filtradas=[...faturas];
+                if(prod){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); }
+                if(grupo){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(grupo.toLowerCase())); }
+                const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0);
+                alert('Filtro: '+prod+' | '+grupo+' | Faturas: '+filtradas.length+' | Total: '+total.toFixed(0)+'MT');
+                try{
+                  const loadJsPDF=():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const script=document.createElement('script'); script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; script.onload=()=>{ setTimeout(()=>{ const jsPDF=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(jsPDF) resolve(jsPDF); else reject('jsPDF'); },300); }; script.onerror=()=>reject('Falha'); document.head.appendChild(script); }); };
+                  const jsPDF=await loadJsPDF();
+                  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+                  let y=10; doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('RELATORIO FILTRADO - '+(prod||'Todos')+' - '+(grupo||'Todos'),10,y);
+                  y+=6; doc.setFontSize(8); doc.text('Faturas: '+filtradas.length+' | Total: '+total.toFixed(0)+'MT',10,y);
+                  y+=8; doc.setFont('helvetica','bold'); doc.setFillColor(241,245,249); doc.rect(10,y,277,6,'F'); doc.text('FATURA',12,y+4); doc.text('CLIENTE',40,y+4); doc.text('DATA',90,y+4); doc.text('TOTAL',120,y+4);
+                  y+=6; doc.setFont('helvetica','normal'); filtradas.slice(0,60).forEach((f:any)=>{ if(y>190){ doc.addPage(); y=10; } doc.text(String(f.id).substring(0,20),12,y+4); doc.text(String(f.cliente||'').substring(0,25),40,y+4); doc.text(String(f.data||''),90,y+4); doc.text((f.total||0).toFixed(0)+'MT',120,y+4); y+=5; });
+                  const nomeArq='Relatorio-Filtrado-'+(prod||'Todos')+'.pdf'.replace(/[^\w\-\.]/g,'_');
+                  doc.save(nomeArq);
+                  const csv='Relatorio;'+(prod||'Todos')+'\nFatura;Cliente;Data;Total\n'+filtradas.map((f:any)=>f.id+';'+f.cliente+';'+f.data+';'+f.total).join('\n');
+                  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
+                }catch(e){ alert('Erro: '+e); }
+              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF + Excel</button>
+              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const total=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())).reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const msg='RELATORIO - Produto:'+(prod||'Todos')+' | Total:'+total.toFixed(0)+'MT'; const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
+            </div>
+          </div>
+          <div className="bg-white border rounded-[12px] p-4">
+            <div className="font-black text-[11px]">LISTA FATURAS - Turno</div>
+            <div className="mt-3 max-h-[400px] overflow-auto border rounded-[10px]">
+              <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">FATURA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">DATA</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">ACAO</th></tr></thead><tbody>{faturas.map((f:any)=><tr key={f.id} className="border-b hover:bg-[#f8fafc]"><td className="p-2 font-mono">{String(f.id).substring(0,20)}</td><td className="p-2">{f.cliente}</td><td className="p-2">{f.data}</td><td className="p-2 text-right font-bold">{(Number(f.total)||0).toFixed(0)} MT</td><td className="p-2 text-center"><button onClick={()=>{ const csv='Fatura;'+f.id+';Cliente;'+f.cliente+';Total;'+f.total; const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='Fatura-'+f.id+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">Baixar</button></td></tr>)}{faturas.length===0 && <tr><td colSpan={5} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em VENDER</td></tr>}</tbody></table>
+            </div>
           </div>
         </div>
         )}
+
       </div>
         )
       )}
@@ -1909,7 +1990,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
 
 
       
-      {/* FATURAR REMOVIDO - MESMA COISA QUE VENDER/FACTURAR */}
+      {/* FATURAR REMOVIDO - MESMA COISA QUE VENDER */}
 
 {tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
