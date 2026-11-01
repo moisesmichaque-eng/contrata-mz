@@ -425,10 +425,10 @@ export default function App(){
       const telFull = '258'+telCliente;
       const nomeCliente = (nomeFat && nomeFat.trim().length>0) ? nomeFat.trim() : (telFat && telFat.trim().length>0 ? telFat.trim() : 'Cliente Balcao');
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
-      const dataFile = new Date().toISOString().slice(0,10);
       
       const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
 
+      const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || (lojaPerfil as any).logo || '';
       const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Zoes';
       const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
       const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
@@ -500,20 +500,39 @@ export default function App(){
         const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
         
         let y = 10;
+        // LOGO TIPO - tenta adicionar logo se existir
+        let logoAdded = false;
+        if(logoForFaturaReal && logoForFaturaReal.length>100){
+          try{
+            let imgData = logoForFaturaReal;
+            let format = 'PNG';
+            if(imgData.includes('data:image/jpeg')) format='JPEG';
+            else if(imgData.includes('data:image/png')) format='PNG';
+            else if(imgData.includes('data:image/jpg')) format='JPEG';
+            // Se nao tem data prefix, adiciona
+            if(!imgData.startsWith('data:')){
+              imgData = 'data:image/png;base64,'+imgData;
+            }
+            doc.addImage(imgData, format, 10, y, 15, 15);
+            logoAdded = true;
+          }catch(e){ console.log('Erro logo PDF', e); }
+        }
+        const textX = logoAdded ? 28 : 10;
+
         doc.setFontSize(12);
         doc.setFont('helvetica','bold');
-        doc.text(nomeLojaFatura, 10, y);
+        doc.text(nomeLojaFatura, textX, y+2);
         doc.setFontSize(8);
         doc.setFont('helvetica','normal');
-        doc.text(`NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}`, 10, y+4);
-        doc.text(`${ramoLojaFatura}`, 10, y+8);
-        doc.text(`${endLojaFatura} - ${provLojaFatura}`, 10, y+12);
+        doc.text(`NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}`, textX, y+6);
+        doc.text(`${ramoLojaFatura}`, textX, y+10);
+        doc.text(`${endLojaFatura} - ${provLojaFatura}`, textX, y+14);
         
         doc.setFontSize(9);
         doc.setFont('helvetica','bold');
         doc.setFillColor(254,240,138);
-        doc.rect(10, y+14, 60, 7, 'F');
-        doc.text(`Factura Nº: ${numeroFacturaCompleto}`, 12, y+18);
+        doc.rect(textX, y+16, 60, 7, 'F');
+        doc.text(`Factura Nº: ${numeroFacturaCompleto}`, textX+2, y+20);
 
         doc.setFontSize(8);
         doc.text(`Cliente: ${nomeCliente}`, 100, y, {align:'left'});
@@ -568,7 +587,8 @@ export default function App(){
         doc.save(nomeArquivo);
       } catch(e){
         console.error('Erro jsPDF, fallback HTML', e);
-        const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto}</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{text-align:right;line-height:1.8}</style></head><body><h2>${nomeLojaFatura}</h2><div>Factura Nº: ${numeroFacturaCompleto}</div><div>Cliente: ${nomeCliente} - Tel: ${telFat}</div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map((p:any)=>`<tr><td>${p.nome}</td><td>${p.qtd}</td><td>${p.preco}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="total">TOTAL: ${total.toFixed(0)}MT</div></body></html>`;
+        const logoHtml = logoForFaturaReal ? `<img src="${logoForFaturaReal}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${(nomeLojaFatura).slice(0,2).toUpperCase()}</div>`;
+        const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto}</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{text-align:right;line-height:1.8}.header{display:flex;gap:15px;align-items:center}</style></head><body><div class="header">${logoHtml}<div><h2>${nomeLojaFatura}</h2><div>NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}</div><div>Factura Nº: ${numeroFacturaCompleto}</div></div></div><div>Cliente: ${nomeCliente} - Tel: ${telFat}</div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map((p:any)=>`<tr><td>${p.nome}</td><td>${p.qtd}</td><td>${p.preco}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="total">TOTAL: ${total.toFixed(0)}MT</div></body></html>`;
         const blob = new Blob([faturaHtml], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
