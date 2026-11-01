@@ -1591,85 +1591,12 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
         )}
         
 
+
 {negocioTab==='relatorios' && (
         <div className="mt-3 space-y-3">
           <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-4">
-            <div className="flex justify-between items-center flex-wrap gap-2">
-              <div className="font-black text-[14px]">📊 RELATÓRIO POR TURNO - Fechar Turno / Dia</div>
-              <div className="flex gap-2 flex-wrap">
-                <button onClick={()=>{
-                  const t = localStorage.getItem('contaAtiva')||'geral';
-                  const ta = JSON.parse(localStorage.getItem(`turno_aberto_${t}`)||'null');
-                  if(ta){ alert('Turno ja aberto desde '+ta.inicio); return; }
-                  const novo = {id:'TURNO-'+Date.now(), inicio:new Date().toLocaleString('pt-MZ'), inicioISO:new Date().toISOString(), status:'aberto'};
-                  localStorage.setItem(`turno_aberto_${t}`, JSON.stringify(novo));
-                  alert('Turno aberto! '+novo.inicio);
-                  window.location.reload();
-                }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[10px] font-black">ABRIR TURNO</button>
-                <button onClick={async()=>{
-                  const t = localStorage.getItem('contaAtiva')||'geral';
-                  const turnoAberto = JSON.parse(localStorage.getItem(`turno_aberto_${t}`)||'null');
-                  if(!turnoAberto){ alert('Nenhum turno aberto!'); return; }
-                  const totalTurno = faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0);
-                  const totalVendasQtd = faturas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||1),0)||1),0);
-                  const totalStockFinal = stockProdutos.reduce((s:any,p:any)=>s+(p.stockFinalArmazem||p.noArmazem||0)+(p.stockFinalLoja||p.stockLoja||0),0);
-                  const resumo = 'RELATORIO TURNO - '+turnoAberto.id+' Inicio: '+turnoAberto.inicio+' Fim: '+new Date().toLocaleString('pt-MZ')+' Faturas: '+faturas.length+' Total: '+totalTurno.toFixed(0)+'MT';
-                  try{
-                    const loadJsPDF = ():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const script=document.createElement('script'); script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; script.onload=()=>{ setTimeout(()=>{ const jsPDF=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(jsPDF) resolve(jsPDF); else reject('jsPDF'); },300); }; script.onerror=()=>reject('Falha'); document.head.appendChild(script); }); };
-                    const jsPDF = await loadJsPDF();
-                    const doc = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
-                    let y=10;
-                    doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text('RELATORIO DE TURNO - '+(lojaPerfil as any).nomeLoja||'Loja - COM STOCK LOJA E VALOR',10,y);
-                    y+=5; doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text('Turno: '+turnoAberto.id+' | Inicio: '+turnoAberto.inicio+' | Fim: '+new Date().toLocaleString('pt-MZ')+' | Faturas: '+faturas.length+' | Total: '+totalTurno.toFixed(0)+'MT | Stock Final Total: '+totalStockFinal+' unid | Vendas Qtd: '+totalVendasQtd,10,y);
-                    y+=7;
-                    doc.setFontSize(6); doc.setFont('helvetica','bold');
-                    doc.setFillColor(59,130,246); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255);
-                    doc.text('DATA',11,y+4); doc.text('FATURA',22,y+4); doc.text('CLIENTE',40,y+4); doc.text('PRODUTO',65,y+4);
-                    doc.text('ST INI LJ',105,y+4); doc.text('RECEPCAO',120,y+4); doc.text('VENDA',135,y+4); doc.text('ST FIN LJ',148,y+4);
-                    doc.text('ST FINAL TOTAL',168,y+4); doc.text('PRECO UNIT',195,y+4); doc.text('TOTAL VALOR DIA',220,y+4);
-                    doc.setTextColor(0,0,0);
-                    y+=6; doc.setFont('helvetica','normal');
-                    faturas.slice(0,40).forEach((f:any)=>{
-                      if(y>185){ doc.addPage(); y=10; }
-                      const prod = f.itens?.[0]||{nome:'-', qtd:1, preco:f.total};
-                      const stock = stockProdutos.find((s:any)=> s.nome.toLowerCase().includes((prod.nome||'').toLowerCase().substring(0,5)) )||{stockInicialLoja:20, entradaLoja:0, venda:prod.qtd||1, stockFinalLoja:4, noArmazem:200, stockFinalArmazem:200};
-                      doc.text(String(f.data||'').substring(0,10),11,y+3);
-                      doc.text(String(f.id).substring(0,12),22,y+3);
-                      doc.text(String(f.cliente||'').substring(0,14),40,y+3);
-                      doc.text(String(prod.nome||f.cliente||'').substring(0,20),65,y+3);
-                      doc.text(String(stock.stockInicialLoja||stock.stockLoja||0),108,y+3);
-                      doc.text(String(stock.entradaLoja||0),122,y+3);
-                      doc.text(String(prod.qtd||stock.venda||0),137,y+3);
-                      doc.text(String(stock.stockFinalLoja||stock.stockLoja||0),150,y+3);
-                      const totalArmLoja=(stock.stockFinalArmazem||stock.noArmazem||0)+(stock.stockFinalLoja||0);
-                      doc.text(String(totalArmLoja),172,y+3);
-                      doc.text((prod.preco||f.total||0)+'MT',197,y+3);
-                      doc.text((Number(f.total)||0).toFixed(0)+'MT',222,y+3);
-                      y+=4;
-                    });
-                    y+=6; doc.setFont('helvetica','bold'); doc.text('TOTAIS TURNO: Faturas:'+faturas.length+' | Vendas Qtd:'+totalVendasQtd+' | Total Valor:'+totalTurno.toFixed(0)+'MT | Stock Final:'+totalStockFinal+' unid',10,y);
-                    const nomeArq='Relatorio-Turno-'+turnoAberto.id+'-'+new Date().toISOString().slice(0,10)+'.pdf';
-                    doc.save(nomeArq);
-                    const csv='Relatorio Turno;'+turnoAberto.id+';Inicio;'+turnoAberto.inicio+';Fim;'+new Date().toLocaleString('pt-MZ')+';Total;'+totalTurno.toFixed(0)+'MT;Stock Final;'+totalStockFinal+'\nData;Fatura;Cliente;Produto;ST INI LOJA;RECEPCAO;VENDA;ST FIN LOJA;ST FINAL TOTAL;PRECO UNIT;TOTAL VALOR DIA\n'+faturas.map((f:any)=>{ const p=f.itens?.[0]||{}; const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((p.nome||'').toLowerCase().substring(0,5)))||{}; return f.data+';'+f.id+';'+f.cliente+';'+(p.nome||'')+';'+(s.stockInicialLoja||0)+';'+(s.entradaLoja||0)+';'+(p.qtd||0)+';'+(s.stockFinalLoja||0)+';'+((s.stockFinalArmazem||s.noArmazem||0)+(s.stockFinalLoja||0))+';'+(p.preco||0)+';'+f.total; }).join('\n');
-                    const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
-                    const fechados=JSON.parse(localStorage.getItem('turnos_fechados_'+t)||'[]'); fechados.push({...turnoAberto,fim:new Date().toLocaleString('pt-MZ'),total:totalTurno,faturas:faturas.length,status:'fechado'}); localStorage.setItem('turnos_fechados_'+t,JSON.stringify(fechados)); localStorage.removeItem('turno_aberto_'+t);
-                    const telLoja=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+telLoja.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(resumo); setTimeout(()=>{window.open(waUrl,'_blank');},800);
-                    alert('Turno fechado! PDF com STOCK LOJA e VALOR baixado! Total: '+totalTurno.toFixed(0)+'MT');
-                    window.location.reload();
-                  }catch(e){ alert('Erro: '+e); }
-                }} className="px-4 py-2 bg-red-600 text-white rounded-full text-[10px] font-black">FECHAR TURNO - PDF/Excel + Envia</button>
-                <button onClick={()=>{ const dia=new Date().toLocaleDateString('pt-MZ'); const totalDia=faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); alert('FECHAR DIA '+dia+'\nFaturas: '+faturas.length+'\nTotal: '+totalDia.toFixed(0)+'MT'); }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[10px] font-black">FECHAR DIA</button>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-4 gap-3 text-[9px]">
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>TURNO ATUAL</div><div className="font-black text-[11px]">{(()=>{ try{ const t=localStorage.getItem('contaAtiva')||'geral'; const ta=JSON.parse(localStorage.getItem(`turno_aberto_${t}`)||'null'); return ta?ta.inicio:'Nenhum - Abra turno'; }catch(e){return 'Erro';} })()}</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>TOTAL TURNO</div><div className="font-black text-[11px]">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div></div>
-              <div className="bg-[#f8fafc] border rounded-[10px] p-3"><div>FATURAS TURNO</div><div className="font-black text-[11px]">{faturas.length} faturas</div></div>
-              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[10px] p-3"><div className="font-bold">ACOES</div><div className="mt-1 flex gap-1 flex-wrap"><button onClick={()=>{ const t=localStorage.getItem('contaAtiva')||'geral'; const tf=JSON.parse(localStorage.getItem('turnos_fechados_'+t)||'[]'); alert('Turnos: '+tf.length+'\n'+tf.map((x:any)=>x.id+' - '+x.total+'MT').join('\n')); }} className="bg-black text-white px-2 py-1 rounded-full text-[7px]">Ver fechados</button></div></div>
-            </div>
-          </div>
-          <div className="bg-white border rounded-[12px] p-4">
-            <div className="font-black text-[12px]">FILTROS - Produto, Grupo, Data (ultimos 5 dias, historico completo)</div>
+            <div className="font-black text-[13px]">📊 RELATÓRIO SIMPLES - Por Produto / Dia</div>
+            <div className="text-[9px] text-[#64748b] mt-1">Tabela: DATA | NOME PRODUTO | STOCK INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL - com totais no fim</div>
             <div className="mt-3 grid grid-cols-4 gap-3">
               <div><div className="text-[8px] font-bold">PRODUTO</div><select id="filtroProdRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{stockProdutos.map((p:any)=><option key={p.id} value={p.nome}>{p.nome}</option>)}</select></div>
               <div><div className="text-[8px] font-bold">GRUPO</div><select id="filtroGrupoRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{Array.from(new Set(stockProdutos.map((p:any)=>p.marca||p.grupo||'Geral'))).map((g:any)=><option key={g} value={g}>{g}</option>)}</select></div>
@@ -1685,78 +1612,90 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                 let filtradas=[...faturas];
                 if(prod){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); }
                 if(grupo){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(grupo.toLowerCase())); }
-                if(dIni){ try{ const ini=new Date(dIni); filtradas=filtradas.filter((f:any)=>{ try{ const parts=f.data?.split('/'); if(parts?.length===3){ const df=new Date(parts[2],parts[1]-1,parts[0]); return df>=ini; } return true; }catch(e){return true;} }); }catch(e){} }
-                if(dFim){ try{ const fim=new Date(dFim); filtradas=filtradas.filter((f:any)=>{ try{ const parts=f.data?.split('/'); if(parts?.length===3){ const df=new Date(parts[2],parts[1]-1,parts[0]); return df<=fim; } return true; }catch(e){return true;} }); }catch(e){} }
-                const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0);
-                const totalQtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0);
-                const stockSel = prod ? stockProdutos.find((p:any)=> p.nome.toLowerCase().includes(prod.toLowerCase())) : null;
-                const stockInfo = stockSel ? `Stock: INI LOJA ${stockSel.stockInicialLoja||0} | RECEPCAO ${stockSel.entradaLoja||0} | VENDA ${stockSel.venda||0} | FIN LOJA ${stockSel.stockFinalLoja||0} | FINAL TOTAL ${(stockSel.stockFinalArmazem||stockSel.noArmazem||0)+(stockSel.stockFinalLoja||0)} | PRECO ${stockSel.precoVenda||stockSel.preco||0}MT` : '';
-                alert('Filtro: '+(prod||'Todos')+' | '+(grupo||'Todos')+' | Datas: '+(dIni||'...')+' a '+(dFim||'...')+'\nFaturas: '+filtradas.length+'\nQtd Vendida: '+totalQtd+'\nTotal Valor: '+total.toFixed(0)+'MT\n'+stockInfo+'\n\nGerando PDF com colunas LOJA (azul) e VALOR (amarelo) + totais no fim');
+                if(dIni){ try{ const ini=new Date(dIni); filtradas=filtradas.filter((f:any)=>{ try{ const p=f.data?.split('/'); if(p?.length===3){ const df=new Date(p[2],p[1]-1,p[0]); return df>=ini; } return true;}catch(e){return true;} }); }catch(e){} }
+                if(dFim){ try{ const fim=new Date(dFim); filtradas=filtradas.filter((f:any)=>{ try{ const p=f.data?.split('/'); if(p?.length===3){ const df=new Date(p[2],p[1]-1,p[0]); return df<=fim; } return true;}catch(e){return true;} }); }catch(e){} }
+                if(filtradas.length===0){ alert('Nenhuma fatura no filtro'); return; }
                 try{
-                  const loadJsPDF=():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const script=document.createElement('script'); script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; script.onload=()=>{ setTimeout(()=>{ const jsPDF=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(jsPDF) resolve(jsPDF); else reject('jsPDF'); },300); }; script.onerror=()=>reject('Falha'); document.head.appendChild(script); }); };
+                  const loadJsPDF=():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=()=>{ setTimeout(()=>{ const j=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(j) resolve(j); else reject('jsPDF'); },300); }; s.onerror=()=>reject('Falha'); document.head.appendChild(s); }); };
                   const jsPDF=await loadJsPDF();
                   const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
                   let y=10;
-                  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text('RELATORIO FILTRADO - '+(prod||'Todos')+' | Grupo: '+(grupo||'Todos')+' | Datas: '+(dIni||'...')+' a '+(dFim||'...'),10,y);
-                  y+=5; doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.text('Faturas: '+filtradas.length+' | Qtd Vendida: '+totalQtd+' | Total Valor: '+total.toFixed(0)+'MT | Gerado: '+new Date().toLocaleString('pt-MZ')+' '+(stockInfo||''),10,y);
+                  doc.setFontSize(11); doc.setFont('helvetica','bold');
+                  doc.text('RELATORIO - DATA | PRODUTO | STOCK INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL',10,y);
+                  y+=5; doc.setFontSize(7); doc.setFont('helvetica','normal');
+                  doc.text('Filtro: '+(prod||'Todos')+' | Grupo: '+(grupo||'Todos')+' | De: '+(dIni||'...')+' Ate: '+(dFim||'...')+' | Faturas: '+filtradas.length+' | Gerado: '+new Date().toLocaleString('pt-MZ'),10,y);
                   y+=6;
-                  doc.setFontSize(5); doc.setFont('helvetica','bold');
-                  doc.setFillColor(59,130,246); doc.rect(10,y,277,5,'F'); doc.setTextColor(255,255,255);
-                  doc.text('DATA',11,y+3); doc.text('FATURA',22,y+3); doc.text('CLIENTE',38,y+3); doc.text('PRODUTO',58,y+3);
-                  doc.text('ST INI LJ',92,y+3); doc.text('RECEPCAO',106,y+3); doc.text('VENDA',121,y+3); doc.text('ST FIN LJ',133,y+3);
-                  doc.text('ST FINAL TOTAL',150,y+3); doc.text('PRECO UNIT',176,y+3); doc.text('TOTAL DIA',198,y+3);
+                  // cabecalho tabela
+                  doc.setFontSize(6); doc.setFont('helvetica','bold');
+                  doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255);
+                  doc.text('DATA',11,y+4);
+                  doc.text('NOME PRODUTO',28,y+4);
+                  doc.text('ST INICIAL',62,y+4);
+                  doc.text('RECEPCAO',85,y+4);
+                  doc.text('VENDAS',105,y+4);
+                  doc.text('CLIENTE',120,y+4);
+                  doc.text('QUANTI',158,y+4);
+                  doc.text('VALOR',173,y+4);
+                  doc.text('TOTAL LINHA',195,y+4);
                   doc.setTextColor(0,0,0);
-                  y+=5; doc.setFont('helvetica','normal');
-                  const porDia: any = {};
+                  y+=6; doc.setFont('helvetica','normal');
+                  let totalQuanti=0; let totalValorGeral=0;
                   filtradas.forEach((f:any)=>{
-                    const data=f.data||'Sem data';
-                    if(!porDia[data]) porDia[data]=[];
-                    porDia[data].push(f);
-                  });
-                  let totalGeralVenda=0; let totalGeralValor=0;
-                  Object.keys(porDia).sort().forEach((dataDia)=>{
-                    const lista=porDia[dataDia];
-                    let totalDiaQtd=0; let totalDiaValor=0;
-                    lista.forEach((f:any)=>{
-                      if(y>185){ doc.addPage(); y=10; }
-                      const prodItem=f.itens?.[0]||{nome:prod||'Produto', qtd:1, preco:f.total};
-                      const stock = stockProdutos.find((s:any)=> s.nome.toLowerCase().includes((prodItem.nome||prod||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:prodItem.qtd, stockFinalLoja:4, noArmazem:200, stockFinalArmazem:200, precoVenda:prodItem.preco};
-                      doc.text(String(dataDia).substring(0,10),11,y+3);
-                      doc.text(String(f.id).substring(0,10),22,y+3);
-                      doc.text(String(f.cliente||'').substring(0,12),38,y+3);
-                      doc.text(String(prodItem.nome||prod||'').substring(0,18),58,y+3);
-                      doc.text(String(stock.stockInicialLoja||stock.stockLoja||0),93,y+3);
-                      doc.text(String(stock.entradaLoja||0),107,y+3);
-                      doc.text(String(prodItem.qtd||0),122,y+3);
-                      doc.text(String(stock.stockFinalLoja||0),134,y+3);
-                      const totalArmLoja=(stock.stockFinalArmazem||stock.noArmazem||0)+(stock.stockFinalLoja||0);
-                      doc.text(String(totalArmLoja),151,y+3);
-                      doc.text((stock.precoVenda||stock.preco||prodItem.preco||0)+'MT',177,y+3);
-                      doc.text((f.total||0).toFixed(0)+'MT',199,y+3);
+                    const itens = f.itens && f.itens.length>0 ? f.itens : [{nome:prod||'Produto', qtd:1, preco:f.total}];
+                    itens.forEach((it:any)=>{
+                      if(y>185){ doc.addPage(); y=10; doc.setFont('helvetica','bold'); doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255); doc.text('DATA',11,y+4); doc.text('NOME PRODUTO',28,y+4); doc.text('ST INICIAL',62,y+4); doc.text('RECEPCAO',85,y+4); doc.text('VENDAS',105,y+4); doc.text('CLIENTE',120,y+4); doc.text('QUANTI',158,y+4); doc.text('VALOR',173,y+4); doc.text('TOTAL LINHA',195,y+4); doc.setTextColor(0,0,0); y+=6; doc.setFont('helvetica','normal'); }
+                      const stock = stockProdutos.find((s:any)=> s.nome.toLowerCase().includes((it.nome||prod||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0};
+                      const stInicial = stock.stockInicialLoja||stock.stockLoja||20;
+                      const recep = stock.entradaLoja||0;
+                      const vendas = stock.venda||it.qtd||0;
+                      const quanti = it.qtd||0;
+                      const valor = it.preco||stock.precoVenda||stock.preco||0;
+                      const totalLinha = quanti * valor;
+                      doc.text(String(f.data||'').substring(0,10),11,y+3);
+                      doc.text(String(it.nome||prod||'-').substring(0,22),28,y+3);
+                      doc.text(String(stInicial),63,y+3);
+                      doc.text(String(recep),86,y+3);
+                      doc.text(String(vendas),106,y+3);
+                      doc.text(String(f.cliente||'-').substring(0,20),120,y+3);
+                      doc.text(String(quanti),159,y+3);
+                      doc.text(String(Number(valor).toFixed(0))+'MT',173,y+3);
+                      doc.text(String(Number(totalLinha).toFixed(0))+'MT',196,y+3);
                       y+=4;
-                      totalDiaQtd+=Number(prodItem.qtd||0);
-                      totalDiaValor+=Number(f.total||0);
+                      totalQuanti+=Number(quanti)||0;
+                      totalValorGeral+=Number(totalLinha)||0;
                     });
-                    if(y>180){ doc.addPage(); y=10; }
-                    doc.setFont('helvetica','bold'); doc.text('TOTAL DIA '+dataDia+': Qtd '+totalDiaQtd+' | Valor '+totalDiaValor.toFixed(0)+'MT',58,y+3); doc.setFont('helvetica','normal'); y+=5;
-                    totalGeralVenda+=totalDiaQtd;
-                    totalGeralValor+=totalDiaValor;
                   });
-                  y+=3; doc.setFont('helvetica','bold'); doc.setFontSize(8);
-                  doc.text('TOTAIS GERAIS SELECIONADO: Qtd Vendida: '+totalGeralVenda+' | Valor Total: '+totalGeralValor.toFixed(0)+'MT | Faturas: '+filtradas.length+' | Produto: '+(prod||'Todos')+' | Stock Info: '+(stockInfo||' - '),10,y);
-                  const nomeArq='Relatorio-Filtrado-'+(prod||'Todos')+'-'+(dIni||'inicio')+'-a-'+(dFim||'fim')+'.pdf'.replace(/[^\w\-\.]/g,'_');
+                  y+=4; doc.setFont('helvetica','bold'); doc.setFontSize(8);
+                  doc.setFillColor(250,204,21); doc.rect(10,y,277,7,'F');
+                  doc.setTextColor(0,0,0);
+                  doc.text('TOTAIS: Qtd Total: '+totalQuanti+' | Valor Total Geral: '+totalValorGeral.toFixed(0)+'MT | Faturas: '+filtradas.length,12,y+5);
+                  const nomeArq='Relatorio-Simples-'+(prod||'Todos')+'-'+new Date().toISOString().slice(0,10)+'.pdf'.replace(/[^\w\-\.]/g,'_');
                   doc.save(nomeArq);
-                  const csv='Relatorio Filtrado;Produto;'+(prod||'Todos')+';Grupo;'+(grupo||'Todos')+';Datas;'+dIni+' a '+dFim+';Total Qtd;'+totalGeralVenda+';Total Valor;'+totalGeralValor.toFixed(0)+'MT\nData;Fatura;Cliente;Produto;ST INI LOJA;RECEPCAO;VENDA;ST FIN LOJA;ST FINAL TOTAL;PRECO UNIT;TOTAL VALOR DIA\n'+filtradas.map((f:any)=>{ const p=f.itens?.[0]||{}; const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((p.nome||prod||'').toLowerCase().substring(0,6)))||{}; return f.data+';'+f.id+';'+f.cliente+';'+(p.nome||prod||'')+';'+(s.stockInicialLoja||0)+';'+(s.entradaLoja||0)+';'+(p.qtd||0)+';'+(s.stockFinalLoja||0)+';'+((s.stockFinalArmazem||s.noArmazem||0)+(s.stockFinalLoja||0))+';'+(s.precoVenda||p.preco||0)+';'+f.total; }).join('\n')+'\nTOTAIS;; ; ; ; ;'+totalGeralVenda+';; ;'+totalGeralValor.toFixed(0)+'MT';
+                  // Excel
+                  const csv='DATA;NOME PRODUTO;STOCK INICIAL;RECEPCAO;VENDAS;CLIENTE;QUANTI;VALOR;TOTAL LINHA\n'+filtradas.map((f:any)=>{ const its=f.itens||[{nome:prod||'Produto', qtd:1, preco:f.total}]; return its.map((it:any)=>{ const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd}; return f.data+';'+(it.nome||'')+';'+(s.stockInicialLoja||20)+';'+(s.entradaLoja||0)+';'+(s.venda||it.qtd||0)+';'+(f.cliente||'')+';'+(it.qtd||0)+';'+(it.preco||0)+';'+((it.qtd||0)*(it.preco||0)); }).join('\n'); }).join('\n')+'\n;;;;;TOTAL;'+totalQuanti+';;'+totalValorGeral.toFixed(0)+'MT';
                   const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
+                  alert('Relatorio gerado! PDF tabela simples com TOTAL por linha + Excel. Totais: '+totalQuanti+' unid | '+totalValorGeral.toFixed(0)+'MT');
                 }catch(e){ alert('Erro: '+e); }
-              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF + Excel (LOJA + VALOR)</button>
-              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO - Produto:'+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length; const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
+              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF TABELA + Excel</button>
+              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length+'\n'+filtradas.slice(0,5).map((f:any)=>f.data+' | '+(f.itens?.[0]?.nome||prod)+' | '+(f.cliente||'')).join('\n'); const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-4">
-            <div className="font-black text-[11px]">LISTA FATURAS - Turno (com STOCK LOJA e VALOR)</div>
-            <div className="mt-3 max-h-[400px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[9px]"><thead className="bg-[#f8fafc] sticky top-0"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">FATURA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">PRODUTO</th><th className="p-2 text-center bg-blue-100">ST INI LJ</th><th className="p-2 text-center bg-blue-100">RECEPCAO</th><th className="p-2 text-center bg-blue-100">VENDA</th><th className="p-2 text-center bg-blue-100">ST FIN LJ</th><th className="p-2 text-center bg-yellow-100">ST FINAL TOTAL</th><th className="p-2 text-center bg-yellow-100">PRECO</th><th className="p-2 text-right bg-yellow-100">TOTAL DIA</th></tr></thead><tbody>{faturas.map((f:any)=>{ const p=f.itens?.[0]||{}; const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((p.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, stockFinalLoja:4, noArmazem:200, stockFinalArmazem:200, precoVenda:p.preco||0}; return <tr key={f.id} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-mono">{String(f.id).substring(0,12)}</td><td className="p-2">{f.cliente}</td><td className="p-2">{p.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||0}</td><td className="p-2 text-center bg-blue-50">{s.entradaLoja||0}</td><td className="p-2 text-center bg-blue-50 font-bold">{p.qtd||0}</td><td className="p-2 text-center bg-blue-50">{s.stockFinalLoja||0}</td><td className="p-2 text-center bg-yellow-50 font-bold">{(s.stockFinalArmazem||s.noArmazem||0)+(s.stockFinalLoja||0)}</td><td className="p-2 text-center bg-yellow-50">{s.precoVenda||p.preco||0}MT</td><td className="p-2 text-right bg-yellow-50 font-bold">{(Number(f.total)||0).toFixed(0)}MT</td></tr>; })}{faturas.length===0 && <tr><td colSpan={11} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em VENDER</td></tr>}</tbody><tfoot className="bg-[#1e2f4a] text-white font-black"><tr><td colSpan={6} className="p-2 text-right">TOTAIS SELECIONADO:</td><td className="p-2 text-center">{faturas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-center">{stockProdutos.reduce((s:any,p:any)=>s+(p.stockFinalArmazem||p.noArmazem||0)+(p.stockFinalLoja||0),0)}</td><td className="p-2"></td><td className="p-2 text-right">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
+            <div className="font-black text-[11px]">TABELA - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL</div>
+            <div className="mt-3 max-h-[500px] overflow-auto border rounded-[10px]">
+              <table className="w-full text-[9px]"><thead className="bg-[#1e2f4a] text-white sticky top-0"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-right">TOTAL LINHA</th></tr></thead><tbody>
+              {(() => {
+                const prodFiltro=(typeof document!=='undefined' ? (document.getElementById('filtroProdRel') as any)?.value : '')||'';
+                let lista:any[]=[]; faturas.forEach((f:any)=>{ const its=f.itens||[{nome:prodFiltro||'Produto', qtd:1, preco:f.total}]; its.forEach((it:any)=>{ lista.push({f,it}); }); });
+                if(lista.length===0) return <tr><td colSpan={9} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em VENDER</td></tr>;
+                return lista.slice(0,200).map((row:any,idx:number)=>{
+                  const f=row.f; const it=row.it;
+                  const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0, precoVenda:it.preco||0};
+                  const totalLinha=(it.qtd||0)*(it.preco||0);
+                  return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-bold">{it.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||20}</td><td className="p-2 text-center">{s.entradaLoja||0}</td><td className="p-2 text-center font-bold">{s.venda||it.qtd||0}</td><td className="p-2">{f.cliente||'-'}</td><td className="p-2 text-center">{it.qtd||0}</td><td className="p-2 text-center">{Number(it.preco||0).toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-50">{Number(totalLinha).toFixed(0)}MT</td></tr>;
+                });
+              })()}
+              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={6} className="p-2 text-right">TOTAIS GERAIS:</td><td className="p-2 text-center">{faturas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-right">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
             </div>
           </div>
         </div>
