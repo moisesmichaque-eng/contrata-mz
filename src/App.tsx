@@ -1424,7 +1424,47 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         <th className="text-center p-1.5 border bg-[#fef9c3]">PREÇO<br/>UNIT MT</th>
                         <th className="text-right p-1.5 border">TOTAL VENDAS<br/>VALOR DIA</th>
                       </tr>
-                    </thead><tbody>{stockProdutos.filter((p:any)=>{const armOk = armazemAtivo==='Todos' || (p.armazem||'Matola')===armazemAtivo; const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo && armOk;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const isSelected = p.id === stockSelecionado; const rowBg = isSelected ? 'bg-[#fef08a] ring-2 ring-[#facc15] ring-inset' : isBaixo ? 'bg-[#fee2e2]' : 'bg-white hover:bg-[#f8fafc] cursor-pointer'; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">+ Faturar</button></td></tr>);})}</tbody></table>
+                    </thead><tbody>{stockProdutos.filter((p:any)=>{
+                        const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase());
+                        const sf = p.noArmazem + p.stockLoja;
+                        let matchTipo = true;
+                        if(filtroTipoStock==='baixo') matchTipo = sf <= 49;
+                        else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
+                        return matchBusca && matchTipo;
+                      }).map((p:any)=>{
+                        const dataEnt = p.dataEntrada || '01/11/2026';
+                        const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? 1070);
+                        const entradaArm = Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 1000);
+                        const saidaArm = Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 70);
+                        const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
+                        const inicialLoja = Number((p as any).stockInicialLoja ?? 20);
+                        const recepLoja = Number((p as any).entradaLoja ?? saidaArm);
+                        const vendaQtd = Number(p.venda ?? 0);
+                        const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
+                        const finalTotal = finalArm + finalLoja;
+                        const precoUnit = Number((p as any).precoVenda||0);
+                        const totalVendasValor = vendaQtd * precoUnit;
+                        const isSelected = p.id === stockSelecionado;
+                        const rowBg = isSelected ? 'bg-[#fef08a] ring-2 ring-[#facc15] ring-inset' : 'bg-white hover:bg-[#f8fafc] cursor-pointer';
+                        return (
+                          <tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b text-[9px]`}>
+                            <td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[8px]">{p.nome}</div><div className="text-[6px] opacity-60">{p.armazem||'Matola'}</div></td>
+                            <td className="text-center p-1.5 border">{dataEnt}</td>
+                            <td className="text-center p-1.5 border bg-[#dbeafe] font-bold">{inicialArm}</td>
+                            <td className="text-center p-1.5 border">{entradaArm}</td>
+                            <td className="text-center p-1.5 border">-&gt; {saidaArm}</td>
+                            <td className="text-center p-1.5 border bg-[#fef3c7] font-black">{finalArm}</td>
+                            <td className="text-center p-1.5 border bg-[#dcfce7] font-bold">{inicialLoja}</td>
+                            <td className="text-center p-1.5 border bg-[#dcfce7]">{recepLoja}</td>
+                            <td className="text-center p-1.5 border bg-[#dcfce7] font-bold">{vendaQtd}</td>
+                            <td className="text-center p-1.5 border bg-[#dcfce7] font-black">{finalLoja}</td>
+                            <td className="text-center p-1.5 border bg-[#fef3c7] font-black">{finalTotal}</td>
+                            <td className="text-center font-bold bg-[#fef9c3]">{precoUnit} MT</td>
+                            <td className="text-right p-1.5 border font-bold">{totalVendasValor.toLocaleString('pt-MZ')} MT</td>
+                            <td className="p-1.5 border text-center"><button onClick={(e)=>{e.stopPropagation(); setFaturacaoTab('faturacao');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">+ Faturar</button></td>
+                          </tr>
+                        )
+                      })}</tbody></table>
                   </div>
                 </div>
                 <div className="mt-2 text-[8px] text-[#64748b] flex justify-between"><span>Deslize horizontalmente - Primeira coluna fixa - SAVE laranja guarda historico - Inicial hoje = Final ontem - Unificado FATURAR e NEGOCIO</span><span className="font-black">TOTAL: {stockProdutos.reduce((a:any,p:any)=>a+(p.noArmazem+p.stockLoja)*p.precoVenda,0).toLocaleString('pt-MZ')} MT</span></div>
