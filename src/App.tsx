@@ -412,7 +412,7 @@ export default function App(){
   const [novoStockBarcode, setNovoStockBarcode] = useState(''); const [novoStockDataEntrada, setNovoStockDataEntrada] = useState(new Date().toISOString().slice(0,10)); const [novoStockLocal, setNovoStockLocal] = useState('A1-01'); const [novoStockValidade, setNovoStockValidade] = useState(''); const [novoStockFornecedor, setNovoStockFornecedor] = useState(''); const [novoStockLote, setNovoStockLote] = useState('LOTE-'+Date.now().toString().slice(-6)); const [filtroFIFOData, setFiltroFIFOData] = useState('');
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
   const [ivaTipo, setIvaTipo] = useState("16");
-    const finalizarComWhatsApp = ()=>{
+    const finalizarComWhatsApp = async ()=>{
     try {
       if(produtosFat.length===0){alert('Adicione produtos do stock - clique nos botoes pretos Cimento, Ferro, etc'); return;}
       if(!telFat || telFat.replace(/\D/g,'').length<9){alert('Digite telefone/WhatsApp do cliente - ex: 840532899'); return;}
@@ -425,10 +425,10 @@ export default function App(){
       const telFull = '258'+telCliente;
       const nomeCliente = (nomeFat && nomeFat.trim().length>0) ? nomeFat.trim() : (telFat && telFat.trim().length>0 ? telFat.trim() : 'Cliente Balcao');
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
+      const dataFile = new Date().toISOString().slice(0,10);
       
       const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
-      
-      const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || ''; const logoHtml = logoForFaturaReal ? `<img src="${logoForFaturaReal}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${((lojaPerfil as any).nomeLoja || perfilLoja.nome || 'ML').slice(0,2).toUpperCase()}</div>`;
+
       const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Zoes';
       const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
       const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
@@ -437,11 +437,10 @@ export default function App(){
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Electricidade e Iluminacao';
       let numFatura = '01'; try{ const t=localStorage.getItem('contaAtiva')||'geral'; const cont=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0'); numFatura = String(cont+1).padStart(2,'0'); }catch(e){}
       const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
-      const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.loja-info{flex:1}.cliente-info{flex:1;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}.factura-num{font-size:14px;font-weight:900;color:#1e2f4a;background:#fef08a;border:1px solid #facc15;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:6px}</style></head><body><div class="header"><div style="display:flex;gap:15px;align-items:center;flex:1">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura}</div><div class="loja-dados">NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${ramoLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div class="factura-num">Factura Nº: ${numeroFacturaCompleto}</div></div></div><div class="cliente-info"><div style="font-weight:900;font-size:13px;margin-bottom:6px;"></div><div style="font-size:11px;">Nome: <b>${nomeCliente}</b></div><div style="font-size:11px;">Tel: ${telFat}</div><div style="font-size:11px;">NUIT: ${nuitFat||'-'}</div><div style="font-size:11px;margin-top:6px;">Data: ${dataHoje}</div><div style="font-size:10px;margin-top:4px;color:#64748b;">Factura: ${numeroFacturaCompleto}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
 
       const waUrl = 'https://wa.me/'+telFull+'?text='+encodeURIComponent(msg);
       const winWa = window.open(waUrl, '_blank');
-      
+
       setStockProdutos((prevStock:any[])=>{
         let nl=[...prevStock];
         produtosFat.forEach((p:any)=>{
@@ -478,17 +477,107 @@ export default function App(){
         localStorage.setItem(`faturas_${t}`, JSON.stringify(faturasExist));
       }catch(e){}
 
-      const nomeArquivo = `Fatura ${numeroFacturaCompleto} - ${nomeCliente}`.replace(/[^\w\-\s]/g,'').replace(/\s+/g,' ').trim() + '.html';
-      const blob = new Blob([faturaHtml], {type: 'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nomeArquivo;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>{
-        try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){}
-      }, 1500);
+      const nomeArquivo = `Fatura ${numeroFacturaCompleto} - ${nomeCliente}`.replace(/[^\w\-\s]/g,'').replace(/\s+/g,' ').trim() + '.pdf';
+
+      try{
+        const loadJsPDF = ():Promise<any> => {
+          return new Promise((resolve, reject)=>{
+            if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; }
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            script.onload = ()=>{ 
+              setTimeout(()=>{ 
+                const jsPDF = (window as any).jspdf?.jsPDF || (window as any).jsPDF; 
+                if(jsPDF) resolve(jsPDF); else reject('jsPDF nao carregou'); 
+              }, 300);
+            };
+            script.onerror = ()=>reject('Falha carregar jsPDF');
+            document.head.appendChild(script);
+          });
+        };
+
+        const jsPDF = await loadJsPDF();
+        const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+        
+        let y = 10;
+        doc.setFontSize(12);
+        doc.setFont('helvetica','bold');
+        doc.text(nomeLojaFatura, 10, y);
+        doc.setFontSize(8);
+        doc.setFont('helvetica','normal');
+        doc.text(`NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}`, 10, y+4);
+        doc.text(`${ramoLojaFatura}`, 10, y+8);
+        doc.text(`${endLojaFatura} - ${provLojaFatura}`, 10, y+12);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica','bold');
+        doc.setFillColor(254,240,138);
+        doc.rect(10, y+14, 60, 7, 'F');
+        doc.text(`Factura Nº: ${numeroFacturaCompleto}`, 12, y+18);
+
+        doc.setFontSize(8);
+        doc.text(`Cliente: ${nomeCliente}`, 100, y, {align:'left'});
+        doc.text(`Tel: ${telFat}`, 100, y+4, {align:'left'});
+        doc.text(`NUIT: ${nuitFat||'-'}`, 100, y+8, {align:'left'});
+        doc.text(`Data: ${dataHoje}`, 100, y+12, {align:'left'});
+        doc.text(`Factura: ${numeroFacturaCompleto}`, 100, y+16, {align:'left'});
+
+        y = 35;
+        doc.setFontSize(8);
+        doc.setFont('helvetica','bold');
+        doc.setFillColor(241,245,249);
+        doc.rect(10, y, 128, 6, 'F');
+        doc.text('DESCRICAO', 12, y+4);
+        doc.text('QTD', 75, y+4);
+        doc.text('PRECO', 85, y+4);
+        doc.text('DESC%', 100, y+4);
+        doc.text('SUBTOTAL', 115, y+4);
+
+        y += 6;
+        doc.setFont('helvetica','normal');
+        produtosFat.forEach((p:any)=>{
+          if(y>190){ doc.addPage(); y=10; }
+          doc.text(p.nome.substring(0,35), 12, y+4);
+          doc.text(String(p.qtd), 77, y+4, {align:'center'});
+          doc.text(`${p.preco}MT`, 90, y+4, {align:'right'});
+          doc.text(`${p.desc}%`, 102, y+4, {align:'center'});
+          const sub = (p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT';
+          doc.text(sub, 128, y+4, {align:'right'});
+          y+=5;
+        });
+
+        y+=2;
+        doc.setFont('helvetica','normal');
+        doc.text(`Subtotal: ${subtotal.toFixed(0)}MT`, 128, y, {align:'right'});
+        y+=4;
+        doc.text(`Desconto: -${desc.toFixed(0)}MT`, 128, y, {align:'right'});
+        y+=4;
+        doc.text(`Subtotal liq: ${base.toFixed(0)}MT`, 128, y, {align:'right'});
+        y+=4;
+        doc.text(`IVA (${ivaTipo}%): ${iva.toFixed(0)}MT`, 128, y, {align:'right'});
+        y+=6;
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(10);
+        doc.text(`TOTAL: ${total.toFixed(0)}MT`, 128, y, {align:'right'});
+
+        y+=10;
+        doc.setFontSize(6);
+        doc.setFont('helvetica','normal');
+        doc.text(`Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + VENDER/FACTURAR - ${new Date().toLocaleString('pt-MZ')}`, 10, y);
+
+        doc.save(nomeArquivo);
+      } catch(e){
+        console.error('Erro jsPDF, fallback HTML', e);
+        const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto}</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{text-align:right;line-height:1.8}</style></head><body><h2>${nomeLojaFatura}</h2><div>Factura Nº: ${numeroFacturaCompleto}</div><div>Cliente: ${nomeCliente} - Tel: ${telFat}</div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map((p:any)=>`<tr><td>${p.nome}</td><td>${p.qtd}</td><td>${p.preco}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="total">TOTAL: ${total.toFixed(0)}MT</div></body></html>`;
+        const blob = new Blob([faturaHtml], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nomeArquivo.replace('.pdf','.html');
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){} }, 1500);
+      }
 
       if(!winWa){
         setTimeout(()=>{ window.location.href = waUrl; }, 500);
@@ -1016,7 +1105,7 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-3 relative pb-3"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="absolute -bottom-1 right-0 text-[10px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSHE</div></div>
+    <div className="flex items-center gap-2"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="text-[14px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSHE</div></div>
         <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
       
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
