@@ -305,7 +305,7 @@ export default function App(){
         subGrupo: 'Geral',
         fabricante: fornecedor || 'Geral',
         dataEntrada: dataEntBR,
-        dataEntradaISO: dataEnt,
+        dataEntradaISO: dataEnt, stockInicialLoja: 0,
         qtdEntrada: parseInt(qtd)||0,
         noArmazem: parseInt(qtd)||0,
         entradaLoja: 0,
@@ -446,7 +446,7 @@ export default function App(){
             const s=nl[idx];
             const qtdVendida=Number(p.qtd)||0;
             if(qtdVendida>0){
-              const novoStockLoja=Math.max(0,(s.stockLoja||0)-qtdVendida);
+              const inicialS=(s.stockInicialLoja||0); const recepcaoS=(s.entradaLoja||0); const novaVendaS=(s.venda||0)+qtdVendida; const novoStockLoja=Math.max(0, inicialS + recepcaoS - novaVendaS); const novaVenda=novaVendaS;
               const novaVenda=(s.venda||0)+qtdVendida;
               nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVenda};
               console.log(`VENDA FATURAR: ${s.nome} Loja ${s.stockLoja}->${novoStockLoja} Venda ${s.venda}->${novaVenda}`);
@@ -1324,7 +1324,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     const s=nl[idx];
                     const qtdVendida=Number(p.qtd)||0;
                     if(qtdVendida>0){
-                      const novoStockLoja=Math.max(0,(s.stockLoja||0)-qtdVendida);
+                      const inicialS=(s.stockInicialLoja||0); const recepcaoS=(s.entradaLoja||0); const novaVendaS=(s.venda||0)+qtdVendida; const novoStockLoja=Math.max(0, inicialS + recepcaoS - novaVendaS); const novaVenda=novaVendaS;
                       const novaVenda=(s.venda||0)+qtdVendida;
                       nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVenda};
                     }
@@ -2029,7 +2029,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                               subGrupo: 'Geral',
                               fabricante: novoStockFornecedor || 'Geral',
                               dataEntrada: dataEntBR,
-                              dataEntradaISO: dataEnt,
+                              dataEntradaISO: dataEnt, stockInicialLoja: 0,
                               qtdEntrada: parseInt(novoStockQtd)||0,
                               noArmazem: parseInt(novoStockQtd)||0,
                               entradaLoja: 0,
@@ -2567,7 +2567,7 @@ Bilhete valido - Apresentar QR`;
                 let ano=''; try{ ano=novoFormValidadeAnoNeg||''; }catch(e){}
                 let validade=''; if(mes&&ano){ validade=mes+'/'+ano; }
                 let arm='Matola'; try{ arm=novoFormArmazemNeg||'Matola'; }catch(e){}
-                const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode, local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade, fornecedor:'', armazem:arm };
+                const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, stockInicialLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode, local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade, fornecedor:'', armazem:arm };
                 setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setNovoFormNomeNeg(''); setNovoFormQtdNeg(''); setNovoFormPrecoNeg(''); setNovoFormBarcodeNeg(''); setNovoFormValidadeMesNeg(''); setNovoFormValidadeAnoNeg(''); setNovoFormArmazemNeg('Matola'); setShowNovoFormNegocio(false); setStockSelecionado(id);
               }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
@@ -2614,7 +2614,7 @@ Bilhete valido - Apresentar QR`;
                   const confirma = confirm('FIFO ALERTA! Existe stock mais antigo: '+maisVelho.codigo+' Entrada: '+maisVelho.dataEntrada+' Stock: '+maisVelho.noArmazem+'\n\nQuer transferir do SELECIONADO mesmo assim?');
                   if(!confirma){ setStockSelecionado(maisVelho.id); return; }
                 }
-                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ const novoNoArmazem = (pp.noArmazem||0)-q; const novoStockLoja = (pp.stockLoja||0)+q; const novoEntradaLoja = (pp.entradaLoja||0)+q; const dataReqBR = dataTransferencia.split('-').reverse().join('/'); return {...pp, noArmazem:novoNoArmazem, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, dataReq:dataReqBR}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ const novoNoArmazem = (pp.noArmazem||0)-q; const novoEntradaLoja = (pp.entradaLoja||0)+q; const inicial = (pp.stockInicialLoja||0); const vendaAtual = (pp.venda||0); const novoStockLoja = inicial + novoEntradaLoja - vendaAtual; const dataReqBR = dataTransferencia.split('-').reverse().join('/'); return {...pp, noArmazem:novoNoArmazem, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, dataReq:dataReqBR}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setQtdSaidaTemp(''); setShowSaidaStock(false);
               }} className="h-[42px] px-5 bg-[#16a34a] text-white border-2 border-black rounded-[10px] font-black text-[12px]">ARMAZEM → LOJA (FIFO)</button></div>
             </div>
