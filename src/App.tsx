@@ -433,11 +433,49 @@ export default function App(){
       const provLojaFatura = (lojaPerfil as any).provincia || '';
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Electricidade e Iluminacao';
       // NUMERO FACTURA - diferente para cada fatura: 01 + data hoje + contador
-      let numFatura = '01'; try{ const faturasSalvas = JSON.parse(localStorage.getItem('faturas_'+(localStorage.getItem('contaAtiva')||'geral'))||'[]'); numFatura = String(faturasSalvas.length+1).padStart(2,'0'); }catch(e){ try{ numFatura = String(Date.now()).slice(-4); }catch(e2){} }
+      let numFatura = '01'; try{ const t=localStorage.getItem('contaAtiva')||'geral'; const cont=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0'); numFatura = String(cont+1).padStart(2,'0'); }catch(e){}
       const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
       const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto} - ${nomeLojaFatura}</title><style>body{font-family:Arial;padding:20px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{margin-top:20px;text-align:right;line-height:1.8}.header{border-bottom:2px solid #1e2f4a;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.loja-info{flex:1}.cliente-info{flex:1;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.loja-nome{font-size:18px;font-weight:900}.loja-dados{font-size:11px;color:#555;margin-top:4px}.factura-num{font-size:14px;font-weight:900;color:#1e2f4a;background:#fef08a;border:1px solid #facc15;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:6px}</style></head><body><div class="header"><div style="display:flex;gap:15px;align-items:center;flex:1">${logoHtml}<div class="loja-info"><div class="loja-nome">${nomeLojaFatura}</div><div class="loja-dados">NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}<br/>${ramoLojaFatura}<br/>${endLojaFatura} - ${provLojaFatura}</div><div class="factura-num">Factura Nº: ${numeroFacturaCompleto}</div></div></div><div class="cliente-info"><div style="font-weight:900;font-size:13px;margin-bottom:6px;"></div><div style="font-size:11px;">Nome: <b>${nomeCliente}</b></div><div style="font-size:11px;">Tel: ${telFat}</div><div style="font-size:11px;">NUIT: ${nuitFat||'-'}</div><div style="font-size:11px;margin-top:6px;">Data: ${dataHoje}</div><div style="font-size:10px;margin-top:4px;color:#64748b;">Factura: ${numeroFacturaCompleto}</div></div></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO UNIT</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td style="text-align:center">${p.qtd}</td><td style="text-align:right">${p.preco}MT</td><td style="text-align:center">${p.desc}%</td><td style="text-align:right;font-weight:bold">${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('') }</tbody></table><div class="total"><div>Subtotal: ${subtotal.toFixed(0)}MT</div><div>Desconto: -${desc.toFixed(0)}MT</div><div>Subtotal liq: ${base.toFixed(0)}MT</div><div>IVA (${ivaTipo}%): ${iva.toFixed(0)}MT</div><div style="font-weight:900;font-size:16px;margin-top:8px;">TOTAL: ${total.toFixed(0)}MT</div></div><div style="margin-top:30px;border-top:1px solid #ddd;padding-top:10px;font-size:9px;color:#888;">Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + NEGOCIO - ${new Date().toLocaleString('pt-MZ')}</div></body></html>`;
       
-      const winPDF = window.open('', '_blank'); if(winPDF){ winPDF.document.write(faturaHtml); winPDF.document.close(); winPDF.focus(); setTimeout(()=>winPDF.print(), 800); } return;;
+            // ===== STOCK AUTOMATICO - ATUALIZA ANTES DE IMPRIMIR =====
+      setStockProdutos((prevStock:any[])=>{
+        let nl=[...prevStock];
+        produtosFat.forEach((p:any)=>{
+          const idx=nl.findIndex((s:any)=> s.nome===p.nome || s.codigo===p.codigo || s.nome.toLowerCase()===p.nome.toLowerCase());
+          if(idx>=0){
+            const s=nl[idx];
+            const qtdVendida=Number(p.qtd)||0;
+            if(qtdVendida>0){
+              const novoStockLoja=Math.max(0,(s.stockLoja||0)-qtdVendida);
+              const novaVenda=(s.venda||0)+qtdVendida;
+              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVenda};
+              console.log(`VENDA FATURAR: ${s.nome} Loja ${s.stockLoja}->${novoStockLoja} Venda ${s.venda}->${novaVenda}`);
+            }
+          }
+        });
+        try{
+          const t=localStorage.getItem('contaAtiva')||'geral';
+          localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl));
+          localStorage.setItem('stock_produtos', JSON.stringify(nl));
+        }catch(e){}
+        return nl;
+      });
+
+      // NUMERO FACTURA - contador persistente
+      let numFaturaAtual='01';
+      try{
+        const t=localStorage.getItem('contaAtiva')||'geral';
+        let contador=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0');
+        contador+=1;
+        numFaturaAtual=String(contador).padStart(2,'0');
+        localStorage.setItem(`fatura_contador_${t}`, String(contador));
+        // Tambem salva fatura
+        const faturasExist=JSON.parse(localStorage.getItem(`faturas_${t}`)||'[]');
+        faturasExist.push({id:`FT-${numFaturaAtual}/${dataHoje}`, numero:numFaturaAtual, data:dataHoje, cliente:nomeCliente, total:total});
+        localStorage.setItem(`faturas_${t}`, JSON.stringify(faturasExist));
+      }catch(e){}
+
+      const winPDF = window.open('', '_blank'); if(winPDF){ winPDF.document.write(faturaHtml); winPDF.document.close(); winPDF.focus(); setTimeout(()=>winPDF.print(), 800); }
       document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
       
