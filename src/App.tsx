@@ -446,9 +446,13 @@ export default function App(){
             const s=nl[idx];
             const qtdVendida=Number(p.qtd)||0;
             if(qtdVendida>0){
-              const inicialS=(s.stockInicialLoja||0); const recepcaoS=(s.entradaLoja||0); const novaVendaS=(s.venda||0)+qtdVendida; const novoStockLoja=Math.max(0, inicialS + recepcaoS - novaVendaS); const novaVenda=novaVendaS;
-              const novaVenda=(s.venda||0)+qtdVendida;
-              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVenda};
+              const inicialLoja=s.stockInicialLoja||0;
+              const recepcao=s.entradaLoja||0;
+              const novaVendaCalc=(s.venda||0)+qtdVendida;
+              const novoStockLoja=Math.max(0, inicialLoja + recepcao - novaVendaCalc);
+              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVendaCalc};
+              console.log(`LOJA: Inicial ${inicialLoja} + Recepcao ${recepcao} - Venda ${novaVendaCalc} = Final ${novoStockLoja} para ${s.nome}`);
+            };
               console.log(`VENDA FATURAR: ${s.nome} Loja ${s.stockLoja}->${novoStockLoja} Venda ${s.venda}->${novaVenda}`);
             }
           }
@@ -1324,9 +1328,13 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     const s=nl[idx];
                     const qtdVendida=Number(p.qtd)||0;
                     if(qtdVendida>0){
-                      const inicialS=(s.stockInicialLoja||0); const recepcaoS=(s.entradaLoja||0); const novaVendaS=(s.venda||0)+qtdVendida; const novoStockLoja=Math.max(0, inicialS + recepcaoS - novaVendaS); const novaVenda=novaVendaS;
-                      const novaVenda=(s.venda||0)+qtdVendida;
-                      nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVenda};
+              const inicialLoja=s.stockInicialLoja||0;
+              const recepcao=s.entradaLoja||0;
+              const novaVendaCalc=(s.venda||0)+qtdVendida;
+              const novoStockLoja=Math.max(0, inicialLoja + recepcao - novaVendaCalc);
+              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVendaCalc};
+              console.log(`LOJA: Inicial ${inicialLoja} + Recepcao ${recepcao} - Venda ${novaVendaCalc} = Final ${novoStockLoja} para ${s.nome}`);
+            };
                     }
                   }
                 });
