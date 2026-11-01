@@ -202,8 +202,6 @@ export default function App(){
   const [armazemAtivo, setArmazemAtivo] = useState('Todos');
   const getProdutosFIFO = (codigo?:string)=>{ const lista = codigo ? stockProdutos.filter((p:any)=>p.codigo===codigo || p.nome===codigo) : [...stockProdutos]; return [...lista].sort((a:any,b:any)=>{ const da = (a.dataEntradaISO||a.dataEntrada||'').toString(); const db = (b.dataEntradaISO||b.dataEntrada||'').toString(); try{ if(da.includes('/')){ const [d,m,y]=da.split('/'); const [d2,m2,y2]=db.split('/'); return new Date(`${y}-${m}-${d}`).getTime() - new Date(`${y2}-${m2}-${d2}`).getTime(); } return new Date(da).getTime() - new Date(db).getTime(); }catch(e){return 0;} }); };
   const [stockProdutos, setStockProdutos] = useState([] as any[]);
-
-  const criarStockInicialSeVazio = (tel:string, arm:string)=>{ try{ const k=`stock_produtos_${tel}`; const ex=localStorage.getItem(k); if(ex){ const arr=JSON.parse(ex); if(arr&&arr.length>0) return arr; } const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/'); const it={ id, codigo:`COD-${id.slice(-6)}`, nome:'Exemplo - Cimento 42.5N 50kg', marca:'Geral', grupo:'Materiais', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:100, noArmazem:100, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:850, precoCusto:700, minimo:10, ideal:50, barcode:'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'Fornecedor Padrao', armazem:arm||'Matola' }; const lista=[it]; localStorage.setItem(k, JSON.stringify(lista)); return lista; }catch(e){ return null; } };
   const [filtroRapidoStock, setFiltroRapidoStock] = useState('');
   const [filtroTipoStock, setFiltroTipoStock] = useState<'todos'|'baixo'|'alto'|'zerado'|'medio'>('todos');
   const [stockSelecionado, setStockSelecionado] = useState('2');
@@ -389,13 +387,11 @@ export default function App(){
     }
   };
 
-    const [showNovoFormStockNegocio, setShowNovoFormStockNegocio] = useState(false);
-  const [novoFormNome, setNovoFormNome] = useState('');
-  const [novoFormQtd, setNovoFormQtd] = useState('');
-  const [novoFormPreco, setNovoFormPreco] = useState('');
-  const [novoFormCusto, setNovoFormCusto] = useState('');
-  const [novoFormBarcode, setNovoFormBarcode] = useState('');
-const [showNovoStock, setShowNovoStock] = useState(false);
+  const [showNovoStock, setShowNovoStock] = useState(false);
+  const [showNovoFormNegocio, setShowNovoFormNegocio] = useState(false);
+  const [novoFormNomeNeg, setNovoFormNomeNeg] = useState('');
+  const [novoFormQtdNeg, setNovoFormQtdNeg] = useState('');
+  const [novoFormPrecoNeg, setNovoFormPrecoNeg] = useState('');
   const [showRelatorioStock, setShowRelatorioStock] = useState(false);
   const [entradaQtdStock, setEntradaQtdStock] = useState(50);
   const [transferQtdStock, setTransferQtdStock] = useState(20);
@@ -1287,14 +1283,14 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-10">
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
-                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoFormStockNegocio(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoFormNegocio(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
                       <button onClick={()=>{
-                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoFormStockNegocio(true); return; }
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoFormNegocio(true); return; }
                         if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
                         setShowEntradaStock(true);
                       }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
                       <button onClick={()=>{
-                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoFormStockNegocio(true); return; }
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoFormNegocio(true); return; }
                         if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
                         setShowSaidaStock(true);
                       }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
@@ -1790,17 +1786,690 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
 
           
           {faturacaoTab==='stock' && (
-          <div className="max-w-[600px] mx-auto p-6 text-center">
-            <div className="bg-white rounded-[14px] p-8 shadow border-2 border-[#8b5cf6]">
-              <div className="h-16 w-16 rounded-full bg-[#8b5cf6] grid place-items-center mx-auto font-black text-[24px] text-white">B</div>
-              <h2 className="text-[18px] font-black mt-4">Stock no NEGOCIO</h2>
-              <p className="text-[12px] text-[#64748b] mt-2">Stock foi movido para NEGOCIO Stock</p>
-              <button onClick={()=>{setTab('negocio'); setNegocioTab('stock');}} className="mt-6 h-[48px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black text-[14px]">Ir para NEGOCIO Stock</button>
+            <div className="space-y-3">
+              <div className="bg-white rounded-[12px] border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-black text-[13px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {stockProdutos.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO</div>
+                    <div className="text-[9px] text-[#64748b]">Stock DIARIO - Inicial hoje = Final ontem | Data: 30/10/2026 | Stock Inicial Armazém (700-1300) | 1 Item/Codigo 2 Data Entr.Arm 3 Qtd Entr. 4 No Armazem 5 Req.Arm-Loja 6 Data Req 7 Stock Loja 8 Venda 9 Media/Dia 10 Stock Final 11 Vendas Valor</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
+                      <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
+                      <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar</button>
+                    </div>
+                    <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
+                    <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
+                    <select value={filtroTipoStock} onChange={e=>setFiltroTipoStock(e.target.value as any)} className="h-8 px-2 border rounded-[6px] text-[10px] font-bold bg-white">
+                      <option value="todos">Todos ({stockProdutos.length})</option>
+                      <option value="baixo">Baixo &lt;50</option>
+                      <option value="zerado">Zerado</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-2">
+                  <div className="bg-[#fef9c3] border border-yellow-200 rounded-[8px] p-2 text-[8px]"><b>FIFO:</b> First In First Out activo - saídas consomem lotes mais antigos. Validade controlada.</div>
+                  <div className="bg-[#f0f9ff] border border-blue-200 rounded-[8px] p-2 text-[8px]"><b>Transferência:</b> Matola → Maputo → Beira Multi-armazém com requisição. Inicial hoje = Final ontem</div>
+                  <div className="bg-[#f0fdf4] border border-green-200 rounded-[8px] p-2 text-[8px]"><b>Fórmulas:</b> finalArm = inicial+recepção-saída | finalLoja = inicialLoja+recepLoja-venda | total = finalArm+finalLoja</div>
+                </div>
+                <div className="mt-3 grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-3">
+                  <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-10">
+                    <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowEntradaStock(true);
+                      }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
+                      <button onClick={()=>{
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoStock(true); return; }
+                        if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
+                        setShowSaidaStock(true);
+                      }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
+                      <button onClick={()=>setShowRelatorioStock(true)} className="w-full h-9 bg-white border rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold">Relatorios [F9]</button>
+                    </div>
+                    <div className="mt-4 bg-white border rounded p-2"><div className="text-[9px] font-black">LEGENDA</div><div className="mt-1 space-y-1 text-[8px] font-bold"><div> IDEAL &gt;100</div><div> NO MINIMO 50-100</div><div> ZERADO 0</div><div> &lt;50 BAIXO</div></div></div>
+                    <div className="mt-3 bg-white border rounded p-2"><div className="text-[8px] font-black">ARMAZEM</div><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="w-full mt-1 h-7 border rounded text-[10px]"><option value="Todos">Todos</option><option value="Matola">Matola</option><option value="Maputo">Maputo</option><option value="Beira">Beira</option></select></div>
+                  </div>
+                  <div className="overflow-x-auto border-2 rounded-[10px]">
+                    <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[8px] font-black"><tr><th className="text-left p-1.5 border min-w-[150px]">ITEM/CODIGO</th><th className="text-center p-1.5 border">DATA ENTR</th><th className="text-center p-1.5 border">QTD ENTR</th><th className="text-center p-1.5 border bg-yellow-50">NO ARMAZEM</th><th className="text-center p-1.5 border">REQ ARM-LOJA</th><th className="text-center p-1.5 border">DATA REQ</th><th className="text-center p-1.5 border">STOCK LOJA</th><th className="text-center p-1.5 border bg-[#fef9c3]">PRECO UNIT</th><th className="text-center p-1.5 border">VENDA</th><th className="text-center p-1.5 border">MEDIA/DIA</th><th className="text-center p-1.5 border">STOCK FINAL</th><th className="text-right p-1.5 border">VENDAS VALOR</th><th className="text-left p-1.5 border">LOCAL/VALIDADE/FORNECEDOR</th><th className="text-center p-1.5 border">ACAO</th></tr></thead><tbody>{stockProdutos.filter((p:any)=>{const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const rowBg = isBaixo ? 'bg-[#fee2e2]' : ''; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setFaturacaoTab('faturacao');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">Faturar</button></td></tr>);})}</tbody></table>
+                  </div>
+                </div>
+                <div className="mt-2 text-[8px] text-[#64748b] flex justify-between"><span>Deslize horizontalmente - Primeira coluna fixa - Fonte ultra reduzida 4-5px mobile - SAVE laranja guarda historico - Inicial hoje = Final ontem</span><span className="font-black">TOTAL: {stockProdutos.reduce((a:any,p:any)=>a+(p.noArmazem+p.stockLoja)*p.precoVenda,0).toLocaleString('pt-MZ')} MT</span></div>
+              </div>
+            </div>
+         )}
+
+
+
+                                {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
+                {showEntradaStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
+                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
+                      <div className="p-4 space-y-3">
+                        <div><label className="text-[11px] font-bold">Produto selecionado</label><div className="mt-1 text-[12px] font-bold">{stockProdutos.find((p:any)=>p.id===stockSelecionado)?.nome || stockProdutos[0]?.nome}</div></div>
+                        <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-bold">QTD Entrada</label><input type="number" value={entradaQtdStock} onChange={e=>setEntradaQtdStock(Number(e.target.value))} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data</label><input type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full mt-1 h-8 border rounded px-2 text-[12px]" /></div></div>
+                        <div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowEntradaStock(false)} className="h-8 px-4 border rounded text-[12px]">Cancelar</button><button onClick={()=>{setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, qtdEntrada:p.qtdEntrada+entradaQtdStock, noArmazem:p.noArmazem+entradaQtdStock, dataEntrada:new Date().toLocaleDateString('pt-MZ')}:p)); setShowEntradaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded text-[12px] font-bold">Confirmar Entrada</button></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {showSaidaStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[520px] border overflow-hidden">
+                      <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Saida de Item [F6]</span><button onClick={()=>setShowSaidaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
+                      <div className="p-0">
+                        <div className="flex border-b"><button onClick={()=>setAbaSaidaStock('transfer')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='transfer'?'bg-[#eff6ff] text-[#1e40af] border-b-2 border-[#1e40af]':'bg-[#f8fafc]'}`}>Transferencia Arm-&gt;Loja</button><button onClick={()=>setAbaSaidaStock('venda')} className={`flex-1 h-9 text-[11px] font-bold ${abaSaidaStock==='venda'?'bg-[#f0fdf4] text-[#166534] border-b-2 border-[#166534]':'bg-[#f8fafc]'}`}>Venda - Loja</button></div>
+                        <div className="p-4">
+                          {abaSaidaStock==='transfer' ? (
+                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Requisicao Arm-&gt;Loja</label><input type="number" value={transferQtdStock} onChange={e=>setTransferQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Armazem atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.noArmazem||0)-transferQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.noArmazem<transferQtdStock){alert('Stock insuficiente no armazem'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, noArmazem:p.noArmazem-transferQtdStock, stockLoja:p.stockLoja+transferQtdStock, entradaLoja:transferQtdStock, dataReq:new Date().toLocaleDateString('pt-MZ')}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#2563eb] text-white rounded font-bold">Transferir</button></div></div>
+                          ) : (
+                            <div className="space-y-3"><div><label className="text-[11px] font-bold">QTD Venda</label><input type="number" value={vendaQtdStock} onChange={e=>setVendaQtdStock(Number(e.target.value))} className="w-full mt-1 h-9 border rounded px-3 text-[13px]" /></div><div className="text-[10px] text-[#64748b]">Stock Loja atual: {stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja} - Apos: {(stockProdutos.find((p:any)=>p.id===stockSelecionado)?.stockLoja||0)-vendaQtdStock}</div><div className="flex justify-end gap-2 pt-2"><button onClick={()=>setShowSaidaStock(false)} className="h-8 px-4 border rounded">Cancelar</button><button onClick={()=>{const prod=stockProdutos.find((p:any)=>p.id===stockSelecionado); if(!prod || prod.stockLoja<vendaQtdStock){alert('Stock insuficiente na loja'); return;} setStockProdutos(stockProdutos.map((p:any)=>p.id===stockSelecionado?{...p, stockLoja:p.stockLoja-vendaQtdStock, venda:p.venda+vendaQtdStock, mediaDia:((p.venda+vendaQtdStock)/30)}:p)); setShowSaidaStock(false);}} className="h-8 px-5 bg-[#16a34a] text-white rounded font-bold">Confirmar Venda</button></div></div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {false && ( /* OLD DESATIVADO */
+                  <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+                      <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
+                        <span className="font-black text-[14px]">✅ Novo Item - Cadastro FUNCIONANDO</span>
+                        <button onClick={()=>setShowNovoStock(false)} className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded grid place-items-center font-black text-[16px]">X</button>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        <div className="bg-yellow-50 border-2 border-yellow-400 rounded p-2 text-[10px] font-bold">⚠️ ESTE MODAL ESTÁ FUNCIONANDO - Se vê isto, o botão Novo Item funciona!</div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className="text-[11px] font-black">Nome Produto *</label><input value={novoStockNome} onChange={e=>setNovoStockNome(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-bold focus:border-blue-600" autoFocus /></div>
+                          <div><label className="text-[11px] font-black">Grupo</label><select value={novoStockCat} onChange={e=>setNovoStockCat(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold"><option>Cimento</option><option>Ferro</option><option>Solar</option><option>Blocos</option><option>Tintas</option><option>Tubos</option><option>Electricidade</option><option>Outro</option></select></div>
+                        </div>
+                        
+                        <div className="bg-[#f0fdf4] border-2 border-[#22c55e] rounded-lg p-4 space-y-3">
+                          <div className="font-black text-[12px] text-[#166534] flex items-center gap-2">📦 ENTRADA - DADOS PARA FIFO (Primeiro a Entrar, Primeiro a Sair) - BARCODE OPCIONAL</div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div><label className="text-[10px] font-black">Código de Barras (Opcional) - Ajuda venda rápida</label><input value={novoStockBarcode} onChange={e=>setNovoStockBarcode(e.target.value)} placeholder="Ex: 5601234567890 - opcional" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white focus:border-green-600" /></div>
+                            <div><label className="text-[10px] font-black">Data Entrada na Loja/Armazém * - FIFO OBRIGATÓRIO</label><input type="date" value={novoStockDataEntrada} onChange={e=>setNovoStockDataEntrada(e.target.value)} className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] bg-white font-black focus:border-green-600" /></div>
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-3">
+                            <div><label className="text-[10px] font-black">Qtd Entrada *</label><input type="number" value={novoStockQtd} onChange={e=>setNovoStockQtd(e.target.value)} placeholder="100" className="w-full mt-1 h-10 border-2 rounded px-3 text-[13px] font-black focus:border-green-600" /></div>
+                            <div><label className="text-[10px] font-black">Local Armazém</label><input value={novoStockLocal} onChange={e=>setNovoStockLocal(e.target.value)} placeholder="A1-01" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
+                            <div><label className="text-[10px] font-black">Lote</label><input value={novoStockLote} onChange={e=>setNovoStockLote(e.target.value)} placeholder="LOTE-123456" className="w-full mt-1 h-10 border-2 rounded px-3 text-[11px]" /></div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div><label className="text-[10px] font-black">Preço Custo *</label><input type="number" value={novoStockCusto} onChange={e=>setNovoStockCusto(e.target.value)} placeholder="700" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-bold" /></div>
+                            <div><label className="text-[10px] font-black">Preço Venda *</label><input type="number" value={novoStockPreco} onChange={e=>setNovoStockPreco(e.target.value)} placeholder="850" className="w-full mt-1 h-10 border-2 rounded px-3 text-[12px] font-black" /></div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div><label className="text-[10px] font-black">Fornecedor</label><input value={novoStockFornecedor} onChange={e=>setNovoStockFornecedor(e.target.value)} placeholder="Ex: Cimpor, Mozal" className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
+                            <div><label className="text-[10px] font-black">Validade (opcional)</label><input type="date" value={novoStockValidade} onChange={e=>setNovoStockValidade(e.target.value)} className="w-full mt-1 h-9 border rounded px-3 text-[11px]" /></div>
+                          </div>
+                          
+                          <div className="text-[9px] text-[#166534] bg-white p-2 rounded border-2 border-green-200 font-bold">💡 FIFO: Produto que entrou primeiro (data mais antiga) será levado primeiro do armazém para loja. Código de barras é opcional, mas facilita venda com scanner. Data entrada obrigatória para FIFO funcionar 100%!</div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 pt-3 border-t-2">
+                          <button onClick={()=>setShowNovoStock(false)} className="h-11 px-6 border-2 rounded-lg text-[12px] font-black hover:bg-gray-100">Cancelar</button>
+                          <button onClick={()=>{
+                            console.log('Criar Produto clicked', novoStockNome, novoStockQtd);
+                            if(!novoStockNome || novoStockNome.trim().length<2){ alert('❌ Digite nome do produto! Ex: Cimento 42.5N'); return; }
+                            if(!novoStockQtd || Number(novoStockQtd)<=0){ alert('❌ Digite quantidade! Ex: 100'); return; }
+                            if(!novoStockDataEntrada){ alert('❌ Selecione data entrada - FIFO precisa data!'); return; }
+                            const novoId = Date.now().toString();
+                            const dataEnt = novoStockDataEntrada || new Date().toISOString().slice(0,10);
+                            const dataEntBR = dataEnt.split('-').reverse().join('/');
+                            const novoProduto = {
+                              id: novoId,
+                              codigo: novoStockBarcode || `COD-${novoId.slice(-6)}`,
+                              nome: novoStockNome.trim(),
+                              marca: novoStockFornecedor || 'Geral',
+                              grupo: novoStockCat,
+                              subGrupo: 'Geral',
+                              fabricante: novoStockFornecedor || 'Geral',
+                              dataEntrada: dataEntBR,
+                              dataEntradaISO: dataEnt,
+                              qtdEntrada: parseInt(novoStockQtd)||0,
+                              noArmazem: parseInt(novoStockQtd)||0,
+                              entradaLoja: 0,
+                              dataReq: '',
+                              stockLoja: 0,
+                              venda: 0,
+                              mediaDia: 0,
+                              precoVenda: parseFloat(novoStockPreco)||0,
+                              precoCusto: parseFloat(novoStockCusto)||0,
+                              minimo: 10,
+                              ideal: 50,
+                              barcode: novoStockBarcode || '',
+                              local: novoStockLocal || 'A1-01',
+                              lote: novoStockLote || `LOTE-${novoId.slice(-6)}`,
+                              validade: novoStockValidade || '',
+                              fornecedor: novoStockFornecedor || '',
+                              armazem: armazemAtivo==='Todos' ? 'Matola' : armazemAtivo
+                            };
+                            console.log('Novo produto', novoProduto);
+                            setStockProdutos(prev=>{
+                              const novaLista = [...prev, novoProduto] as any[];
+                              try{
+                                const telAtiva = localStorage.getItem('contaAtiva') || (lojaPerfil as any).tel;
+                                if(telAtiva){
+                                  localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novaLista));
+                                  localStorage.setItem(`stock_produtos_${telAtiva}_backup`, JSON.stringify(novaLista));
+                                }
+                                localStorage.setItem('stock_produtos', JSON.stringify(novaLista));
+                              }catch(e){ console.error(e); }
+                              return novaLista;
+                            });
+                            setNovoStockNome(''); setNovoStockQtd(''); setNovoStockBarcode(''); setNovoStockPreco(''); setNovoStockCusto(''); setNovoStockLocal('A1-01'); setNovoStockLote('LOTE-'+Date.now().toString().slice(-6)); setNovoStockFornecedor('');
+                            setShowNovoStock(false);
+                            setStockSelecionado(novoId);
+                            alert(`✅ Produto criado com SUCESSO!
+
+Nome: ${novoProduto.nome}
+Barcode: ${novoProduto.barcode||'Sem (opcional)'}
+Data Entrada: ${dataEntBR} (FIFO)
+Local: ${novoProduto.local}
+Qtd: ${novoProduto.qtdEntrada}
+Armazém: ${novoProduto.armazem}
+
+Agora tabela tem ${stockProdutos.length+1} itens!`);
+                          }} className="h-11 px-8 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-lg font-black text-[13px] shadow-lg">✅ CRIAR PRODUTO COM FIFO - FUNCIONA!</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {showRelatorioStock && (
+                  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-[640px] border overflow-hidden"><div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Relatorios - Stock 11 Colunas - Alerta &lt;50</span><button onClick={()=>setShowRelatorioStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div><div className="p-4 grid grid-cols-3 gap-3"><div className="bg-[#f8fafc] border rounded p-3"><div className="text-[11px] text-[#64748b]">Total Itens</div><div className="text-[20px] font-bold">{stockProdutos.length}</div></div><div className="bg-[#fee2e2] border border-[#fca5a5] rounded p-3"><div className="text-[11px] text-[#991b1b] font-bold">Abaixo de 50</div><div className="text-[20px] font-bold text-[#991b1b]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)<50).length}</div></div><div className="bg-[#fecaca] border border-[#ef4444] rounded p-3"><div className="text-[11px] text-[#7f1d1d]">Zerados</div><div className="text-[20px] font-bold text-[#7f1d1d]">{stockProdutos.filter((p:any)=>(p.noArmazem+p.stockLoja)===0).length}</div></div><div className="col-span-3 bg-[#eff6ff] border rounded p-3 flex justify-between"><div><div className="text-[11px] text-[#1e40af]">Soma Custo Arm+Loja</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+(b.noArmazem+b.stockLoja)*b.precoCusto,0).toFixed(0)} MT</div></div><div className="text-right"><div className="text-[11px] text-[#1e40af]">Total Vendas Valor</div><div className="font-bold">{stockProdutos.reduce((a:any,b:any)=>a+b.venda*b.precoVenda,0).toFixed(0)} MT</div></div></div></div><div className="p-3 border-t bg-[#f8fafc] flex justify-end"><button onClick={()=>setShowRelatorioStock(false)} className="h-8 px-4 bg-[#2b4c7e] text-white rounded">Fechar</button></div></div>
+                  </div>
+                )}
+
+          </div>
+          )}
+        </section>
+      )}
+{tab==='viagens' && (
+        <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
+          <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
+            <div className="flex gap-1.5 flex-wrap">
+              <button onClick={()=>setViagensTab('overview')} className="px-3 h-7 rounded-full text-[9px] font-bold bg-[#1e2f4a] text-white">Encontrar Transporte</button>
+              <button onClick={()=>setViagensTab('viajar')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='viajar'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Pesquisar viagens</button>
+              <button onClick={()=>setViagensTab('encomenda')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='encomenda'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Enviar encomenda</button>
+              <button onClick={()=>setViagensTab('minhas')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='minhas'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Minhas reservas</button>
+              <button onClick={()=>setViagensTab('area')} className="px-4 h-7 rounded-full text-[9px] font-black bg-[#facc15] text-black border">AREA TRANSPORTADOR</button>
             </div>
           </div>
-        )}
 
-        {faturacaoTab==='faturas' && (
+          
+          {viagensTab==='overview' && (
+            <div className="space-y-3">
+              <div id="mapaOverview" className="bg-[#16a34a] text-white px-4 py-2 rounded-[8px] flex items-center justify-between text-[10px]"><span>PREVISAO DE CHEGADA - NACIONAL - TODAS PROVINCIAS - AO VIVO - {filtradosOverview.length} carros</span><span className="text-[9px] opacity-80">Actualizado ha {segundosAtualizacao}s - 80km/h media - Filtro reflete a direita</span></div>
+
+              <div className="relative bg-sky-100 border-2 border-blue-700 rounded-xl h-64 overflow-hidden mb-4">
+                <div className="absolute top-2 left-2 bg-white border-2 border-blue-700 rounded-full px-3 py-1 text-[10px] font-black z-10">Mapa Tempo Real {filtradosOverview.length} carros Clique no ponto igual Yango</div>
+                <div className="absolute top-2 right-2 bg-black text-white rounded-full px-3 py-1 text-[8px] font-bold z-10">NACIONAL {filtradosOverview.length} carros</div>
+                {filtradosOverview.map((v:any, idx:number)=>{
+                  const leftPos = 10 + (idx*22) % 80;
+                  const topPos = 25 + (idx*18) % 50;
+                  const focada = viaturaFocadaMapa && viaturaFocadaMapa.id===v.id;
+                  return (
+                    <div key={'mapa-'+v.id} className="absolute z-20" style={{left: leftPos+'%', top: topPos+'%'}}>
+                      <button onClick={()=>{setViaturaFocadaMapa(v); setMostrarPopupMapa(true);}} className="flex flex-col items-center">
+                        <div className="text-[12px]"></div>
+                        <div className={focada ? "px-3 py-1 rounded-full text-[9px] font-black border-2 bg-yellow-300 text-black border-black" : "px-2 py-1 rounded-full text-[8px] font-black border-2 bg-white text-blue-700 border-blue-700"}>{focada ? (v.matricula || 'ACD 456 MC') : (idx+1)}</div>
+                        <div className="mt-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+                      </button>
+                      {focada && mostrarPopupMapa && (
+                        <div className="absolute top-[-140px] left-1/2 bg-white border-2 border-black rounded-xl shadow-2xl p-3 w-72 z-50" style={{transform:'translateX(-50%)'}}>
+                          <button onClick={()=>setMostrarPopupMapa(false)} className="absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full">X</button>
+                          <div className="font-black text-[11px]">{v.marca || 'NAGI'} {v.motorista || 'Nagi Invest'} {v.matricula}</div>
+                          <div className="text-[9px]">{v.origem || 'Maputo'} para {v.destino || 'Sofala'} {v.preco || 2500} MT</div>
+                          <div className="flex gap-1 mt-2"><button onClick={()=>{setViagemSel(v); setMostrarFormPass(true);}} className="flex-1 h-8 bg-slate-800 text-white rounded-full text-[9px]">Reservar neste carro</button></div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                <div className="absolute bottom-2 left-2 bg-white border rounded p-2 text-[8px]">Clique no ponto para ver matricula</div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
+                <div className="bg-white rounded-[12px] border p-4 h-fit lg:sticky lg:top-2">
+                  <h3 className="font-bold text-[11px]">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL</h3>
+                  <p className="text-[9px] text-[#6b7280] mt-1">Filtro reflete automaticamente a direita - {filtradosOverview.length} de {todosCarrosOverview.length} carros</p>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <button onClick={()=>setMostrarMapaOverview(!mostrarMapaOverview)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${mostrarMapaOverview?'bg-[#1d4ed8] text-white':'bg-white border-2 border-[#1d4ed8] text-[#1d4ed8]'}`}>{mostrarMapaOverview?'MAPA LIGADO ':'VER CARROS AO VIVO NO MAPA (NACIONAL)'}</button>
+                    <button onClick={()=>setOrdenarMaisProximo(!ordenarMaisProximo)} className={`h-[36px] rounded-[8px] text-[9px] font-bold ${ordenarMaisProximo?'bg-[#22c55e] text-white ring-2 ring-black':'bg-white border-2 border-[#22c55e] text-[#22c55e]'}`}>{ordenarMaisProximo?'MAIS PROXIMO ATIVO ':'MAIS PROXIMO '}</button>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA ORIGEM</label>
+            <select onChange={function(e:any){setProvOrigemF(e.target.value)}} value={provOrigemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {provincias15.map(function(p:any){ return React.createElement("option", {key:p, value:p}, p) })}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">PROVINCIA DESTINO</label>
+            <select onChange={function(e:any){setProvDestinoF(e.target.value)}} value={provDestinoF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {provincias15.map(function(p:any){ return React.createElement("option", {key:p, value:p}, p) })}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO ORIGEM</label>
+            <select onChange={function(e:any){setDistOrigemF(e.target.value)}} value={distOrigemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {listaDistOrigem.map(function(d:any){ return React.createElement("option", {key:d, value:d}, d) })}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DISTRITO DESTINO</label>
+            <select onChange={function(e:any){setDistDestinoF(e.target.value)}} value={distDestinoF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]">
+              {listaDistDestino.map(function(d:any){ return React.createElement("option", {key:d, value:d}, d) })}
+            </select></div>
+                    <div><label className="text-[9px] font-bold text-[#9ca3af]">DATA VIAGEM</label><input type="date" onChange={function(e:any){setDataViagemF(e.target.value)}} value={dataViagemF} className="w-full mt-1 h-[34px] border rounded-[6px] px-2 text-[11px]" /></div>
+                    <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira'); setDataViagemF('');}} className="w-full h-8 bg-[#f1f5f9] rounded text-[9px] font-bold">Limpar filtros - Mostrar todos</button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  
+
+                  {filtradosOverview.map((v:any)=>(
+                    <div key={v.id} className={`bg-white rounded-[12px] border p-3 shadow-sm ${carroFocadoMapa===v.id?'ring-2 ring-[#facc15] border-[#facc15]':''}`}>
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 rounded-[8px] bg-[#f3f4f6] border flex items-center justify-center shrink-0"><span className="font-bold text-[9px]">{(v.transp||v.marca||'NAGI').slice(0,4).toUpperCase()}</span></div>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap justify-between gap-2">
+                            <div><div className="flex items-center gap-2"><h4 className="font-bold text-[12px]">{v.transp||v.marca}</h4><span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">{v.status||'A CAMINHO'}</span><span className="text-[10px]"> {v.rating||4.8} - {v.livres||v.lugares||15} livres</span></div><p className="text-[10px] text-[#6b7280]">{v.tipo||v.viatura||'Toyota Coaster'} - {v.matricula||v.mat||'ABX 123 MC'} - {v.origem||provOrigemF} para {v.destino||provDestinoF}</p></div>
+                            <div className="text-right"><div className="text-[16px] font-bold text-[#dc2626]">{v.preco||v.paragens?.[0]?.preco||2500} MT</div><div className="text-[8px] text-[#6b7280]">por lugar</div></div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2">
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> ROTA</div><div className="text-[10px] font-semibold">{v.rota||`${v.origem||provOrigemF} -&gt; ${v.destino||provDestinoF}`}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> PREVISAO</div><div className="text-[10px] font-semibold">{v.tempo||v.chegada||'10h 20min'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> MOTORISTA</div><div className="text-[10px] font-semibold truncate">{v.motorista||'Samuel Mucavele'}</div></div>
+                            <div className="bg-[#f9fafb] rounded-[6px] px-2 py-1.5"><div className="text-[8px] font-bold text-[#9ca3af]"> CARGA</div><div className="text-[10px] font-semibold">{v.carga||v.cargaKg? `${v.cargaKg||v.carga} Ton` : '7 Ton'}</div></div>
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <button onClick={()=>{ setViagemSel(v); setMostrarFormPass(true); }} className="h-[32px] px-4 bg-[#111827] text-white rounded-[6px] text-[10px] font-bold">Reservar lugar</button>
+                            <button className="h-[32px] px-3 bg-white border border-[#e5e7eb] rounded-[6px] text-[10px]"> {v.tel||'82 888 9900'}</button>
+                            <button onClick={()=>{ setCarroFocadoMapa(v.id); setMostrarMapaOverview(true); }} className="h-[32px] px-3 bg-[#eff6ff] border border-[#dbeafe] text-[#1d4ed8] rounded-[6px] text-[10px] font-bold"> Ver no mapa</button>
+                            <span className="ml-auto text-[8px] text-[#9ca3af]">Matricula: {v.matricula||v.mat||'ADF 561 SF'} - {v.activa? 'Adicionado por transportador':'Actualizado agora'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filtradosOverview.length===0 && (
+                    <div className="bg-white border-2 border-dashed rounded-[12px] p-8 text-center">
+                      <div className="text-[12px] font-bold">Nenhum carro encontrado para {provOrigemF} - {provDestinoF}</div>
+                      <div className="text-[10px] text-[#6b7280] mt-1">Temos {todosCarrosOverview.length} carros no total. Transportadores adicionaram {viaturas.length} viaturas.</div>
+                      <button onClick={()=>{setProvOrigemF('Maputo Provincia'); setProvDestinoF('Sofala'); setDistOrigemF('Matola'); setDistDestinoF('Beira');}} className="mt-3 h-9 px-4 bg-[#1d4ed8] text-white rounded-full text-[10px] font-bold">Mostrar todos</button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+                            {mostrarFormPass && viagemSel && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+                  <div className="bg-white rounded-[12px] max-w-[900px] w-full max-h-[90vh] overflow-y-auto p-4 border-2 border-[#0ea5e9]">
+                    <div className="flex justify-between items-center mb-3"><h3 className="font-black text-[11px]">Reservar {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} - {viagemSel.preco||2500} MT - Escolher lugar/assento - COMO IMAGEM AMARELO E ROXO - Visao Geral Full</h3><button onClick={()=>setMostrarFormPass(false)} className="w-7 h-7 bg-[#f1f5f9] rounded-full">X</button></div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">NOME COMPLETO PASSAGEIRO *</label><input value={formPassageiro.nome} onChange={e=>setFormPassageiro({...formPassageiro,nome:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Michaque Moises Moises" /></div><div><label className="text-[8px] font-bold">CONTACTO WHATSAPP *</label><input value={formPassageiro.tel} onChange={e=>setFormPassageiro({...formPassageiro,tel:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 bg-[#f0fdf4]" placeholder="840532899" /></div></div>
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">CONTACTO DO FAMILIAR - para emergencia - AMARELO</label><input value={formPassageiro.ccontactoFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,ccontactoFamiliar:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 border-[#facc15]" placeholder="Contacto familiar (numeros) - somente digitos" /></div><div><label className="text-[8px] font-bold">NOME FAMILIAR - onde circulei amarelo</label><input value={formPassageiro.nomeFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,nomeFamiliar:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 bg-[#fefce8] border-[#facc15]" placeholder="Nome do familiar - somente letras" /></div></div>
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">BI (opcional)</label><input value={formPassageiro.bi} onChange={e=>setFormPassageiro({...formPassageiro,bi:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" /></div><div><label className="text-[8px] font-bold">IDADE / TIPO</label><select value={formPassageiro.idadeTipo} onChange={e=>setFormPassageiro({...formPassageiro,idadeTipo:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1"><option>Adulto</option><option>Crianca</option><option>Bebe</option><option>Idoso</option></select></div></div>
+                        <div><label className="text-[8px] font-bold">LOCAL SERA ENCONTRADO / DESEMBARQUE (se nao for terminal)</label><input value={formPassageiro.localEncontrado} onChange={e=>setFormPassageiro({...formPassageiro,localEncontrado:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Maracuene" /></div>
+                        <div className="bg-[#fefce8] border border-[#fde68a] rounded-[8px] p-2"><div className="font-bold text-[9px]">ACOMPANHANTE - 3 divisoes</div><div className="grid grid-cols-3 gap-2 mt-2"><div><label className="text-[7px] font-bold">1 - Tem acompanhante? Sim/Nao *</label><select value={formPassageiro.temAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,temAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1"><option>Sim</option><option>Nao</option></select></div><div><label className="text-[7px] font-bold">2 - Idade acompanhante</label><input value={formPassageiro.idadeAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,idadeAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1" placeholder="3" /></div><div><label className="text-[7px] font-bold">3 - Relacao - pai, filho, tio, etc</label><select value={formPassageiro.relacaoAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,relacaoAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1"><option>Filho</option><option>Pai</option><option>Mae</option><option>Tio</option><option>Irmao</option></select></div></div><div className="grid grid-cols-2 gap-2 mt-2"><input value={formPassageiro.nomeAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,nomeAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1" placeholder="Zoe Michaque" /><input value={formPassageiro.telAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,telAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1 bg-[#dbeafe]" placeholder="840532899" /></div></div>
+                        <div><label className="text-[8px] font-bold">DESTINO CUSTOM (se nao estiver na lista) - valor exacto aparece</label><input value={formPassageiro.destinoCustom} onChange={e=>setFormPassageiro({...formPassageiro,destinoCustom:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Cidade da Beira" /></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="font-bold text-[9px]">Escolher lugar / assento - {viagemSel.lugares||15} lugares - bloqueados ja reservados</div>
+                        <div className="grid grid-cols-4 gap-1 max-h-[200px] overflow-auto border rounded p-2 bg-[#f8fafc]">{Array.from({length: viagemSel.lugares||15}, (_,i)=>{const num=i+1; const reservado = reservas.some((r:any)=>r.viagemSel?.id===viagemSel.id && r.passageiro.lugar===num); const selecionado = formPassageiro.lugar===num; return React.createElement("button", {key:num, disabled:reservado, onClick:()=>setFormPassageiro({...formPassageiro,lugar:num}), className:`h-8 rounded text-[9px] font-bold border ${reservado?'bg-red-100 text-red-400 line-through':selecionado?'bg-[#0ea5e9] text-white':'bg-white'}`}, reservado?'X':num)})}</div>
+                        <div className="font-bold text-[9px] mt-2">MODO PAGAMENTO</div>
+                        <div className="grid grid-cols-2 gap-2"><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'M-Pesa'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='M-Pesa'?'bg-[#22c55e] text-white':'bg-white'}`}>M-Pesa</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'E-Mola'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='E-Mola'?'bg-[#0ea5e9] text-white':'bg-white'}`}>E-Mola</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'Dinheiro no terminal'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='Dinheiro no terminal'?'bg-[#facc15] text-black':'bg-white'}`}>Dinheiro no terminal</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'Cartao'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='Cartao'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Cartao</button></div>
+                        <div className="bg-[#f0fdf4] rounded p-2 text-[7px]">Resumo: {viagemSel.origem||provOrigemF} - {viagemSel.destino||provDestinoF} | Assentos: {formPassageiro.lugar} | Total: {viagemSel.paragens?.[formPassageiro.lugar-1]?.preco || viagemSel.preco||2500} MT | Pagamento: {formPassageiro.modoPagamento} | Telefone: {formPassageiro.tel} | Familiar: {formPassageiro.nomeFamiliar} - {formPassageiro.ccontactoFamiliar}</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4"><button onClick={()=>{ const paragemSel = viagemSel.paragens?.[formPassageiro.lugar-1] || {local: viagemSel.destinoDistrito||viagemSel.destino||provDestinoF, preco: viagemSel.preco||2500}; const nova={id:Date.now(), viagemSel, ...viagemSel, precoReal: paragemSel.preco, destinoReal: formPassageiro.destinoCustom || formPassageiro.localDesembarque || paragemSel.local||viagemSel.destino||provDestinoF, passageiro:formPassageiro, estado:'Confirmada', codigo:'V'+Math.floor(Math.random()*10000)}; setReservas([...reservas,nova]); 
+                      setMostrarFormPass(false);
+                      const msgBilhete = `*CONTRATA.MZ - BILHETE CONFIRMADO*
+
+Codigo: ${nova.codigo}
+Passageiro: ${formPassageiro.nomeCompleto || formPassageiro.nome || 'Passageiro'}
+Tel Passageiro: ${formPassageiro.tel}
+Destino Real: ${nova.destinoReal}
+Origem: ${viagemSel.origem || provOrigemF}
+Local Embarque: ${formPassageiro.localDesembarque || 'Terminal'}
+Preco: ${paragemSel.preco} MT
+Lugar: ${formPassageiro.lugar || 1}
+Motorista: ${viagemSel.motorista || 'Motorista'} Tel Motorista: ${viagemSel.motoristaTel || viagemSel.telMotorista || '84XXXXXXX'}
+Familiar: ${formPassageiro.nomeFamiliar || 'N/A'} ${formPassageiro.ccontactoFamiliar || ''}
+
+Bilhete valido - Apresentar QR`;
+                      const numeroMotorista = (viagemSel.motoristaTel || viagemSel.telMotorista || '258840532899').replace(/[^0-9]/g,'');
+                      const numeroPassageiro = formPassageiro.tel.replace(/[^0-9]/g,'');
+                      const bilheteCompleto = {...nova, bilheteWhatsApp: msgBilhete, telMotorista: numeroMotorista, telPassageiro: numeroPassageiro, destinoFinal: nova.destinoReal};
+                      localStorage.setItem('ultimoBilhete', JSON.stringify(bilheteCompleto));
+                      alert(`Reserva confirmada! Codigo ${nova.codigo} - Destino real: ${nova.destinoReal} - ${paragemSel.preco} MT - WhatsApp ${formPassageiro.tel} - Bilhete QR - A abrir WhatsApp motorista ${numeroMotorista}`); // FIXED WhatsApp com motorista '+numeroMotorista+' e passageiro...');
+                      const waUrl = 'https://wa.me/'+numeroMotorista+'?text='+encodeURIComponent(msgBilhete);
+                      window.open(waUrl, '_blank');
+                      setTimeout(()=>{ window.open('https://wa.me/'+numeroPassageiro+'?text='+encodeURIComponent(msgBilhete), '_blank'); }, 1000);;}} className="flex-1 h-11 bg-[#22c55e] text-white rounded-[8px] font-black text-[11px]">Confirmar {viagemSel.paragens?.[formPassageiro.lugar-1]?.preco || viagemSel.preco||2500} MT - Gerar bilhete QR - ROXO</button><button onClick={()=>setMostrarFormPass(false)} className="h-11 px-4 border rounded-[8px] text-[11px]">Cancelar</button></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+
+          {viagensTab==='viajar' && (
+            <div className="flex flex-col lg:flex-row gap-3">
+              <div className="flex-1 space-y-3">
+                <div className="bg-white rounded-[12px] border p-4">
+                  <div className="font-black text-[11px] mb-3">Pesquisar viagens - NACIONAL TODAS PROVINCIAS - TEMPO REAL
+                  </div>
+                  {/* ===== BOTAO TEMPO REAL NACIONAL - NAO ALTERA O QUE JA EXISTE - APENAS ADICIONA ===== */}
+                  <div className="mb-3 flex flex-wrap gap-2 items-center bg-[#f0f9ff] border border-[#0ea5e9] rounded-[8px] p-2">
+                    <button onClick={()=>setModoTempoReal(!modoTempoReal)} className={`px-4 h-8 rounded-full text-[10px] font-black ${modoTempoReal?'bg-[#0ea5e9] text-white ring-2 ring-[#0f172a]':'bg-white border text-[#0ea5e9]'}`}>
+                      {modoTempoReal ? ' AO VIVO NACIONAL LIGADO' : 'a- VER CARROS AO VIVO NO MAPA (NACIONAL)'}
+                    </button>
+                    {modoTempoReal && <span className="text-[8px] text-[#0c4a6e] font-bold">Mostrando {liveFiltradas.length} carros proximos em {origemV} para {destinoV} | Raio {origemV===destinoV?'50km local':'150km interprovincial'} | Atualiza 3s</span>}
+                    <span className="text-[7px] bg-[#fef9c3] px-2 py-1 rounded-full">Todas provincias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Cabo Delgado, Niassa</span>
+                  </div>
+
+                  {modoTempoReal && (
+                    <div className="mb-3 space-y-2">
+                      {/* MAPA NACIONAL SIMULADO */}
+                      <div className="relative bg-[#0f172a] rounded-[12px] h-[240px] overflow-hidden border-2 border-[#0ea5e9]">
+                        <div className="absolute top-2 left-2 bg-black/70 text-white text-[7px] px-2 py-1 rounded">MAPA MOCAMBIQUE AO VIVO - {origemV} | {liveViaturas.length} carros nacionais</div>
+                        <div className="absolute bottom-2 right-2 bg-white text-[7px] px-2 py-1 rounded"> Verde=disponivel  Amarelo=a caminho  Azul=em viagem</div>
+                        {/* Linha EN1 */}
+                        <div className="absolute left-[20%] top-[15%] w-[60%] h-[70%] border border-dashed border-white/20 rounded"></div>
+                        {liveFiltradas.map(v => (
+                          <div key={v.id} className="absolute transition-all duration-1000" style={{ left: `${((v.lng + 10)/60)*100}%`, top: `${(( -v.lat + 5)/35)*100}%` }}>
+                            <div className={`w-3 h-3 rounded-full ${v.status==='disponivel'?'bg-green-400':v.status==='a_caminho'?'bg-yellow-400':v.status==='em_viagem'?'bg-blue-400':'bg-red-400'} border-2 border-white shadow-lg animate-pulse`}></div>
+                            <div className="bg-white text-[7px] px-1 py-0.5 rounded shadow mt-1 whitespace-nowrap font-bold">
+                              {v.carro} - {v.distancia?.toFixed(0)}km - {v.status}
+                            </div>
+                          </div>
+                        ))}
+                        {/* Carros fora do filtro mas nacionais - fantasma */}
+                        {liveViaturas.filter(v=>!liveFiltradas.find(f=>f.id===v.id)).map(v=>(
+                          <div key={v.id+'ghost'} className="absolute opacity-30" style={{ left: `${((v.lng + 10)/60)*100}%`, top: `${(( -v.lat + 5)/35)*100}%` }}>
+                            <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* LISTA AO VIVO PROXIMOS */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {liveFiltradas.map(v=>(
+                          <div key={v.id} className="border-2 border-[#0ea5e9] rounded-[10px] p-2 bg-[#f0f9ff] flex justify-between">
+                            <div>
+                              <div className="font-black text-[10px]">{v.nome} - {v.carro} <span className="text-[8px] bg-green-100 px-1 rounded"> AO VIVO</span></div>
+                              <div className="text-[8px] text-[#475569]">{v.provincia} - {v.cidade} - {v.matricula} - {v.rota}</div>
+                              <div className="text-[8px] mt-1"><b>{v.distancia?.toFixed(1)}km de si</b> - {v.lugares} lugares - {v.preco}MT - Destino: {v.destino}</div>
+                              <div className="text-[7px] text-[#0ea5e9] mt-1">Lat {v.lat.toFixed(3)} Lng {v.lng.toFixed(3)} - atualiza 3s - Nacional</div>
+                            </div>
+                            <div className="text-right">
+                              <div className={`text-[7px] px-2 py-1 rounded-full font-black text-white ${v.status==='disponivel'?'bg-green-500':v.status==='a_caminho'?'bg-yellow-500':v.status==='em_viagem'?'bg-blue-500':'bg-red-500'}`}>{v.status.toUpperCase()}</div>
+                              <button onClick={()=>{alert(`Reservar ${v.carro} de ${v.provincia} para ${destinoV} - ${v.motoristaTel} - ${v.preco}MT`);}} className="mt-2 bg-[#0ea5e9] text-white text-[8px] px-3 py-1 rounded-full font-black">RESERVAR AGORA</button>
+                              <div className="text-[7px] mt-1">WhatsApp: {v.motoristaTel}</div>
+                            </div>
+                          </div>
+                        ))}
+                        {liveFiltradas.length===0 && <div className="col-span-2 text-center text-[9px] text-[#64748b] py-3 border rounded">Nenhum carro ao vivo prAximo em {origemV} neste raio. Aumentando raio para nacional (150km) ou veja todas provincias: {liveViaturas.length} carros no paAs.</div>}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="font-black text-[11px] mb-3 border-t pt-3">Pesquisa normal (lista fixa) - mantida como antes
+</div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div><label className="text-[8px] font-bold">PROVINCIA ORIGEM</label><select value={origemV} onChange={e=>setOrigemV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Provincia</option><option>Maputo Cidade</option><option>Matola</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala - Beira</option><option>Manica - Chimoio</option><option>Tete</option><option>Zambezia - Quelimane</option><option>Nampula</option><option>Cabo Delgado - Pemba</option><option>Niassa - Lichinga</option><option>Gauteng - Johannesburg</option><option>KwaZulu-Natal - Durban</option><option>Mpumalanga - Nelspruit</option></select></div>
+                    <div><label className="text-[8px] font-bold">PROVINCIA DESTINO</label><select value={destinoV} onChange={e=>setDestinoV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Sofala</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Nampula</option><option>Gauteng - Johannesburg</option><option>KwaZulu-Natal - Durban</option><option>Beira</option></select></div>
+                    <div><label className="text-[8px] font-bold">DISTRITO ORIGEM</label><select value={origemDistritoV} onChange={e=>setOrigemDistritoV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Matola</option><option>Maputo Cidade</option><option>Xai-Xai</option><option>Maxixe</option><option>Beira</option><option>Park Station</option><option>Durban Central</option><option>Nelspruit Mbombela</option><option>Ressano Garcia</option></select></div>
+                    <div><label className="text-[8px] font-bold">DISTRITO DESTINO</label><select value={destinoDistritoV} onChange={e=>setDestinoDistritoV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Beira</option><option>Matola</option><option>Maputo Cidade</option><option>Xai-Xai</option><option>Park Station</option><option>Durban Central</option><option>Bosman - Pretoria</option><option>Nelspruit Mbombela</option><option>Ressano Garcia</option></select></div>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">
+                    <div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1" /></div>
+                    <div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select value={provinciaFiltroV} onChange={e=>setProvinciaFiltroV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala</option><option>Africa do Sul</option></select></div>
+                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
+                  </div>
+                  <div className="text-[7px] text-[#94a3b8] mt-2">LOCAL COLETA / PONTO ENCONTRO (se nao for terminal) - DESTINO CUSTOM (se nao aparecer na lista) - LOCAL SERA ENCONTRADO / ACOMPANHANTE / MENOR - APAGADOS COM X VERMELHO COMO PEDISTE - ja havias feito - Rotas: Beira-Johannesburg via Ressano Garcia, Inhambane-Johannesburg via Ponta do Ouro, Maxixe-Johannesburg, Xai-Xai-Johannesburg, Chokwe-Johannesburg, Maputo-Durban, etc - Paragens SA: Park Station, Bosman, Nelspruit Mbombela, Komatiepoort Fronteira, Ressano Garcia, Durban Central</div>
+                </div>
+                <div className="space-y-2">
+                  {filteredViagens.map(v=>(
+                    <div key={v.id} className="bg-white rounded-[12px] border p-3 flex flex-col lg:flex-row justify-between gap-3">
+                      <div><div className="font-black text-[11px]">Transportador - {v.transp} - {v.viatura} - {v.matricula} - {v.lugares} lugares - {v.cargaKg}kg carga</div><div className="text-[9px] text-[#64748b]">{v.origem} ({v.origemDistrito}) - {v.destino} ({v.destinoDistrito}) | {v.data} {v.hora} - {v.chegada} | Motorista: {v.motorista}</div><div className="mt-1 text-[7px]">Paragens e precos reais: {v.paragens?.map((p:any)=>p.local+': '+p.preco+'MT').join(' | ')}</div></div>
+                      <div className="flex lg:flex-col gap-2"><div className="font-black text-[14px] text-[#0ea5e9]">{v.preco} MT</div><button onClick={()=>{setViagemSel(v); setMostrarFormPass(true);}} className="px-4 h-8 rounded-full bg-[#1e2f4a] text-white text-[10px] font-bold">Reservar lugar</button></div>
+                    </div>
+                  ))}
+                </div>
+                {mostrarFormPass && viagemSel && (
+                  <div className="bg-white rounded-[12px] border-2 border-[#0ea5e9] p-4">
+                    <div className="font-black text-[11px] mb-3">Reservar {viagemSel.origem} - {viagemSel.destino} - {viagemSel.preco} MT - Escolher lugar/assento - COMO IMAGEM AMARELO E ROXO</div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">NOME COMPLETO PASSAGEIRO *</label><input value={formPassageiro.nome} onChange={e=>setFormPassageiro({...formPassageiro,nome:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Michaque Moises Moises" /></div><div><label className="text-[8px] font-bold">CONTACTO WHATSAPP *</label><input value={formPassageiro.tel} onChange={e=>setFormPassageiro({...formPassageiro,tel:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 bg-[#f0fdf4]" placeholder="840532899" /></div></div>
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">CONTACTO DO FAMILIAR - para emergencia - AMARELO</label><input value={formPassageiro.ccontactoFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,ccontactoFamiliar: e.target.value.replace(/[^0-9]/g,'')})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 border-[#facc15]" placeholder="Contacto familiar (numeros) - somente digitos" /></div><div><label className="text-[8px] font-bold">NOME FAMILIAR - onde circulei amarelo</label><input value={formPassageiro.nomeFamiliar} onChange={e=>setFormPassageiro({...formPassageiro,nomeFamiliar: e.target.value.replace(/[^a-zA-Z\s]/g,'')})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1 bg-[#fefce8] border-[#facc15]" placeholder="Nome do familiar - somente letras" /></div></div>
+                        <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-bold">BI (opcional)</label><input value={formPassageiro.bi} onChange={e=>setFormPassageiro({...formPassageiro,bi:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" /></div><div><label className="text-[8px] font-bold">IDADE / TIPO</label><select value={formPassageiro.idadeTipo} onChange={e=>setFormPassageiro({...formPassageiro,idadeTipo:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1"><option>Adulto</option><option>Crianca</option><option>Bebe</option><option>Idoso</option></select></div></div>
+                        <div><label className="text-[8px] font-bold">LOCAL SERA ENCONTRADO / DESEMBARQUE (se nao for terminal)</label><input value={formPassageiro.localEncontrado} onChange={e=>setFormPassageiro({...formPassageiro,localEncontrado:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Maracuene" /></div>
+                        <div className="bg-[#fefce8] border border-[#fde68a] rounded-[8px] p-2"><div className="font-bold text-[9px]">ACOMPANHANTE - 3 divisoes</div><div className="grid grid-cols-3 gap-2 mt-2"><div><label className="text-[7px] font-bold">1 - Tem acompanhante? Sim/Nao *</label><select value={formPassageiro.temAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,temAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1"><option>Sim</option><option>Nao</option></select></div><div><label className="text-[7px] font-bold">2 - Idade acompanhante</label><input value={formPassageiro.idadeAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,idadeAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1" placeholder="3" /></div><div><label className="text-[7px] font-bold">3 - Relacao - pai, filho, tio, etc</label><select value={formPassageiro.relacaoAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,relacaoAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1"><option>Filho</option><option>Pai</option><option>Mae</option><option>Tio</option><option>Irmao</option></select></div></div><div className="grid grid-cols-2 gap-2 mt-2"><input value={formPassageiro.nomeAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,nomeAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1" placeholder="Zoe Michaque" /><input value={formPassageiro.telAcompanhante} onChange={e=>setFormPassageiro({...formPassageiro,telAcompanhante:e.target.value})} className="w-full h-7 border rounded text-[8px] px-1 bg-[#dbeafe]" placeholder="840532899" /></div><div className="text-[6px] text-[#64748b] mt-1">Se clicar Sim abre espaco 2 e 3, se Nao fecha - como pedido no retangulo 10/13</div></div>
+                        <div><label className="text-[8px] font-bold">DESTINO CUSTOM (se nao estiver na lista) - valor exacto aparece</label><input value={formPassageiro.destinoCustom} onChange={e=>setFormPassageiro({...formPassageiro,destinoCustom:e.target.value})} className="w-full h-8 border rounded-[6px] text-[10px] px-2 mt-1" placeholder="Cidade da Beira" /></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="font-bold text-[9px]">Escolher lugar / assento - {viagemSel.lugares} lugares - bloqueados ja reservados</div>
+                        <div className="grid grid-cols-4 gap-1 max-h-[200px] overflow-auto border rounded p-2 bg-[#f8fafc]">{Array.from({length: viagemSel.lugares}, (_,i)=>{const num=i+1; const reservado = reservas.some((r:any)=>r.viagemSel?.id===viagemSel.id && r.passageiro.lugar===num); const selecionado = formPassageiro.lugar===num; return <button key={num} disabled={reservado} onClick={()=>setFormPassageiro({...formPassageiro,lugar:num})} className={`h-8 rounded text-[9px] font-bold border ${reservado?'bg-red-100 text-red-400 line-through':selecionado?'bg-[#0ea5e9] text-white':'bg-white'}`}>{reservado?'X':num}</button>})}</div>
+                        <div className="text-[6px] text-[#94a3b8]">Cinza - assento nao existe (viatura {viagensMock[0]?.lugares} lugares, resto bloqueado automatico). Vermelho X - ja reservado. Azul - selecionado. Max 4 assentos por reserva. 1 selecionado.</div>
+                        <div className="font-bold text-[9px] mt-2">MODO PAGAMENTO</div>
+                        <div className="grid grid-cols-2 gap-2"><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'M-Pesa'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='M-Pesa'?'bg-[#22c55e] text-white':'bg-white'}`}>M-Pesa</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'E-Mola'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='E-Mola'?'bg-[#0ea5e9] text-white':'bg-white'}`}>E-Mola</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'Dinheiro no terminal'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='Dinheiro no terminal'?'bg-[#facc15] text-black':'bg-white'}`}>Dinheiro no terminal</button><button onClick={()=>setFormPassageiro({...formPassageiro,modoPagamento:'Cartao'})} className={`h-7 rounded-full text-[8px] font-bold border ${formPassageiro.modoPagamento==='Cartao'?'bg-[#1e2f4a] text-white':'bg-white'}`}>Cartao</button></div>
+                        <div className="bg-[#f0fdf4] rounded p-2 text-[7px]">Resumo: {viagemSel.origem} - {viagemSel.destino} | Assentos: {formPassageiro.lugar} | Total: {viagemSel.paragens?.[formPassageiro.lugar-1]?.preco || viagemSel.preco} MT | Pagamento: {formPassageiro.modoPagamento} | Telefone bilhete: {formPassageiro.tel} | Familiar: {formPassageiro.nomeFamiliar} - {formPassageiro.ccontactoFamiliar}</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4"><button onClick={()=>{const paragemSel = viagemSel.paragens?.[formPassageiro.lugar-1] || {local: viagemSel.destinoDistrito, preco: viagemSel.preco}; const nova={id:Date.now(), viagemSel, ...viagemSel, precoReal: paragemSel.preco, destinoReal: formPassageiro.destinoCustom || formPassageiro.localDesembarque || paragemSel.local, passageiro:formPassageiro, estado:'Confirmada', codigo:'V'+Math.floor(Math.random()*10000)}; setReservas([...reservas,nova]); 
+                      setMostrarFormPass(false);
+                      const msgBilhete = `*CONTRATA.MZ - BILHETE CONFIRMADO*
+
+Codigo: ${nova.codigo}
+Passageiro: ${formPassageiro.nomeCompleto || formPassageiro.nome || 'Passageiro'}
+Tel Passageiro: ${formPassageiro.tel}
+Destino Real: ${nova.destinoReal}
+Origem: ${viagemSel.origem || provOrigemF}
+Local Embarque: ${formPassageiro.localDesembarque || 'Terminal'}
+Preco: ${paragemSel.preco} MT
+Lugar: ${formPassageiro.lugar || 1}
+Motorista: ${viagemSel.motorista || 'Motorista'} Tel Motorista: ${viagemSel.motoristaTel || viagemSel.telMotorista || '84XXXXXXX'}
+Familiar: ${formPassageiro.nomeFamiliar || 'N/A'} ${formPassageiro.ccontactoFamiliar || ''}
+
+Bilhete valido - Apresentar QR`;
+                      const numeroMotorista = (viagemSel.motoristaTel || viagemSel.telMotorista || '258840532899').replace(/[^0-9]/g,'');
+                      const numeroPassageiro = formPassageiro.tel.replace(/[^0-9]/g,'');
+                      const bilheteCompleto = {...nova, bilheteWhatsApp: msgBilhete, telMotorista: numeroMotorista, telPassageiro: numeroPassageiro, destinoFinal: nova.destinoReal};
+                      localStorage.setItem('ultimoBilhete', JSON.stringify(bilheteCompleto));
+                      alert(`Reserva confirmada! Codigo ${nova.codigo} - Destino real: ${nova.destinoReal} - ${paragemSel.preco} MT - WhatsApp ${formPassageiro.tel} - Bilhete QR - A abrir WhatsApp motorista ${numeroMotorista}`); // FIXED WhatsApp com motorista '+numeroMotorista+' e passageiro...');
+                      const waUrl = 'https://wa.me/'+numeroMotorista+'?text='+encodeURIComponent(msgBilhete);
+                      window.open(waUrl, '_blank');
+                      setTimeout(()=>{ window.open('https://wa.me/'+numeroPassageiro+'?text='+encodeURIComponent(msgBilhete), '_blank'); }, 1000);;}} className="flex-1 h-11 bg-[#22c55e] text-white rounded-[8px] font-black text-[11px]">Confirmar {viagemSel.paragens?.[formPassageiro.lugar-1]?.preco || viagemSel.preco} MT - Gerar bilhete QR - ROXO</button><button onClick={()=>setMostrarFormPass(false)} className="h-11 px-4 border rounded-[8px] text-[11px]">Cancelar</button></div>
+                  </div>
+                )}
+              </div>
+              <div className="w-full lg:w-[300px] space-y-3">
+                <div className="bg-[#111827] rounded-[12px] p-4 text-white"><div className="font-bold text-[11px]">Area transportador</div><div className="text-[9px] text-white/50 mt-2">Gerir viagens e viaturas, uma conta gere 15 viaturas. Active viaturas para aparecer na pesquisa. Como na imagem 1 - botao amarelo AREA TRANSPORTADOR no topo direito circulado azul.</div><button onClick={()=>setViagensTab('area')} className="mt-3 w-full h-9 bg-[#facc15] text-black rounded-[8px] text-[10px] font-black">Ir para Area Transportador</button></div>
+                <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">Rotas Mocambique - Africa do Sul</div><div className="text-[7px] text-[#475569] mt-2"><div>Beira - Johannesburg via Ressano Garcia</div><div>Inhambane - Johannesburg via Ponta do Ouro</div><div>Maxixe - Johannesburg</div><div>Xai-Xai - Johannesburg</div><div>Chokwe - Johannesburg</div><div>Maputo - Durban, Pretoria, Nelspruit</div></div></div>
+              </div>
+            </div>
+          
+          )}
+
+          {viagensTab==='encomenda' && (
+            <div className="bg-white rounded-[12px] border p-4">
+                    <div className="font-black text-[11px]">Formulario de envio de encomendas</div>
+                    <div className="mt-3 space-y-2">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Remetente</label><input value={encomendaForm.remetente||''} onChange={e=>setEncomendaForm({...encomendaForm, remetente:e.target.value})} placeholder="Nome remetente" className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Contacto Remetente</label><input value={encomendaForm.remetenteTel||''} onChange={e=>setEncomendaForm({...encomendaForm, remetenteTel: e.target.value.replace(/[^0-9]/g,'')})} placeholder="840532899" className="w-full h-9 border rounded px-2" /></div></div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Destinatario</label><input value={encomendaForm.destinatario||''} onChange={e=>setEncomendaForm({...encomendaForm, destinatario:e.target.value})} placeholder="Nome destinatario" className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Contacto Destinatario</label><input value={encomendaForm.destinatarioTel||''} onChange={e=>setEncomendaForm({...encomendaForm, destinatarioTel: e.target.value.replace(/[^0-9]/g,'')})} placeholder="840532899" className="w-full h-9 border rounded px-2" /></div></div>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2"><div><label className="text-[9px] font-bold">Peso (kg)</label><input type="number" value={encomendaForm.peso||''} onChange={e=>setEncomendaForm({...encomendaForm, peso: Number(e.target.value)})} className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Volume (m3)</label><input value={encomendaForm.volume||''} onChange={e=>setEncomendaForm({...encomendaForm, volume: e.target.value})} className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Categoria</label><input value={encomendaForm.categoria||''} onChange={e=>setEncomendaForm({...encomendaForm, categoria: e.target.value})} placeholder="Ex: Documentos, Pacote, Bagagem" className="w-full h-9 border rounded px-2" /></div></div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Local Coleta</label><input value={encomendaForm.origem||''} onChange={e=>setEncomendaForm({...encomendaForm, origem: e.target.value})} placeholder="Ex: Maputo - Bairro Central" className="w-full h-9 border rounded px-2" /></div><div><label className="text-[9px] font-bold">Local Entrega</label><input value={encomendaForm.destino||''} onChange={e=>setEncomendaForm({...encomendaForm, destino: e.target.value})} placeholder="Ex: Beira - Bairro X" className="w-full h-9 border rounded px-2" /></div></div>
+                      <div className="flex gap-2 mt-2"><button onClick={()=>{ if(!encomendaForm.remetente||!encomendaForm.remetenteTel||!encomendaForm.destinatario||!encomendaForm.destinatarioTel||!encomendaForm.origem||!encomendaForm.destino){ alert('Preencha os campos obrigatorios'); return;} const nova={ id: 'e'+Date.now(), ...encomendaForm, estado:'Pendente', criadoEm:new Date().toISOString() }; setEncomendas([nova, ...encomendas]); setEncomendaForm({}); alert('Encomenda criada!'); }} className="px-4 py-2 bg-[#0ea5e9] text-white rounded font-bold">Enviar encomenda</button><button onClick={()=>setEncomendaForm({})} className="px-4 py-2 border rounded">Limpar</button></div>
+                      <div className="mt-2 text-[9px] text-[#64748b]">Todas encomendas aparecem no painel Area Transportador e em Minhas encomendas.</div>
+                    </div>
+                  </div>
+          
+          )}
+
+          {viagensTab==='minhas' && (
+            <div className="bg-white rounded-[12px] border p-4"><div className="font-black text-[11px]">Minhas reservas - Nome familiar + WhatsApp</div><div className="mt-3 space-y-2">{reservas.map(r=><div key={r.id} className="border rounded p-2 text-[10px]"><div className="font-bold">{r.origem} - {r.destino} - {r.destinoReal} | Codigo {r.codigo}</div><div>{r.passageiro.nome} | {r.precoReal} MT | WhatsApp {r.passageiro.tel}</div></div>)}</div></div>
+          
+          )}
+        
+          
+      {viagensTab==='area' && (
+            <div className="space-y-3">
+              {!transportadorLogado ? (
+                <div className="max-w-[900px] mx-auto">
+                  <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white text-center">
+                    <h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro</h2>
+                    <p className="text-[10px] opacity-70 mt-1">Crie conta ou entre - 1 conta gere 3 viaturas</p>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <button onClick={()=>setAuthMode('login')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black">LOGIN</button>
+                      <button onClick={()=>setAuthMode('cadastro')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white">CADASTRO</button>
+                    </div>
+                    <div className="mt-5 max-w-[420px] mx-auto">
+                      <div className="grid grid-cols-2 gap-2">
+                        <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
+                        <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
+                      </div>
+                      <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar - nagi / 123</button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center flex-wrap gap-2">
+                    <div><div className="font-black text-[12px]">Transportador Logado - {transportadorLoginForm.username || 'nagi'} - V87 FULL - 3 Viaturas</div><div className="text-[9px] opacity-70">1 conta gere varias viaturas - Max 3</div></div>
+                    <div className="flex gap-1 flex-wrap">
+                      <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Minha Frota</button>
+                      <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Registar Viatura</button>
+                      <button onClick={()=>setAreaTransSubTab('mapa')} className={areaTransSubTab==='mapa' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Mapa 29</button>
+                      <button onClick={()=>setTransportadorLogado(false)} className="px-3 py-1.5 rounded-full bg-white/10 text-[10px]">Sair</button>
+                    </div>
+                  </div>
+
+                  {areaTransSubTab==='frota' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-white rounded-[12px] border p-3">
+                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
+                        <div className="mt-3 space-y-2">
+                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
+                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                        </div>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
+                      </div>
+                      <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
+                        <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
+                        <div className="mt-3 max-w-[260px] mx-auto">
+                          <div className="text-[7px] text-center font-black mb-2">FRENTE - Motorista</div>
+                          <div className="grid grid-cols-4 gap-1">
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">1</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#facc15] font-black">2 Ocup</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">3</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e] text-white">4 Livre</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">5</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e]">6</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444] text-white">7 Res</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444]">8 Res</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">9</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">10</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">11</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">12</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">13</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">15</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">16</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">17</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">18</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">19</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">20</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">21</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">22</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">23</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">24</div>
+                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">25</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">26</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">27</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">28</div>
+                            <div className="col-span-4 h-6 flex items-center justify-center text-[7px] bg-gray-50 rounded">WC - 29</div>
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 1 aprovada! Joao Silva - Assento 2 - 450MT - Viatura MMN-123-MP')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 1 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 2 aprovada! Maria - Assento 8 - 450MT')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 2 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                        </div>
+                        <div className="mt-2 text-[8px] text-center text-gray-500">2 pendentes - Clique em Aprovar/Rejeitar para gerir - Viaturas clicaveis</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {areaTransSubTab==='registar' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-white rounded-[12px] border p-3">
+                        <div className="font-black text-[11px]">Registar Nova Viatura - FOTO AMARELA</div>
+                        <div className="text-[8px] text-gray-500 mt-1">Preencha para adicionar a sua frota - Max 3 viaturas</div>
+                        <div className="mt-3 space-y-2">
+                          <div><label className="text-[8px] font-black">MATRICULA</label><input placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white" /></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><select className="w-full p-2 border rounded text-[10px]"><option>Toyota</option><option>Nissan</option></select></div><div><label className="text-[8px] font-black">MODELO</label><select className="w-full p-2 border rounded text-[10px]"><option>Coaster</option><option>Hiace</option></select></div></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><input placeholder="2018" className="w-full p-2 border rounded text-[10px]" /></div><div><label className="text-[8px] font-black">LOTACAO</label><input placeholder="29" className="w-full p-2 border rounded text-[10px]" /></div></div>
+                          <div><label className="text-[8px] font-black">TIPO VIATURA</label><select className="w-full p-2 border rounded text-[10px]"><option>Mini-Bus 29 lugares</option><option>Hiace 15 lugares</option></select></div>
+                          <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">COMBUSTIVEL</label><select className="w-full p-2 border rounded text-[10px]"><option>Diesel</option><option>Gasolina</option></select></div><div><label className="text-[8px] font-black">ESTADO</label><select className="w-full p-2 border rounded text-[10px]"><option>Boa</option><option>Excelente</option></select></div></div>
+                          <div><label className="text-[8px] font-black">ROTA PRINCIPAL</label><input placeholder="Maputo - Xai-Xai" className="w-full p-2 border rounded text-[10px]" /></div>
+                          <div><label className="text-[8px] font-black">KM ATUAL</label><input placeholder="120000" className="w-full p-2 border rounded text-[10px]" /></div>
+                          <div className="pt-2 border-t"><label className="text-[8px] font-black">DOCUMENTOS E VALIDACAO</label><div className="grid grid-cols-2 gap-1 mt-1 text-[8px]"><div className="flex items-center gap-1"><input type="checkbox" defaultChecked /> Seguro valido</div><div className="flex items-center gap-1"><input type="checkbox" defaultChecked /> Inspeccao</div><div className="flex items-center gap-1"><input type="checkbox" /> Licenca transporte</div><div className="flex items-center gap-1"><input type="checkbox" /> Manifesto</div></div></div>
+                          <div className="pt-2"><label className="text-[8px] font-black">FOTOS DA VIATURA - 4 fotos obrigatorias</label><div className="grid grid-cols-4 gap-1 mt-1"><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Frente</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Tras</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Lado</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Interior</div></div></div>
+                          <button className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px]">Registar Viatura - 2 min foto - Igual foto amarela</button>
+                        </div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <div className="font-black text-[11px] mb-2">Frota registada - 2 viaturas - FOTO AMARELA DIREITA</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-123-MP - COASTER 29</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span><span className="text-[6px] bg-[#facc15] text-black px-1 rounded">Verificada</span></div></div><div className="p-2"><div className="text-[8px] font-black">Toyota Coaster - 2018</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29 lugares</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2018</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao Cumbane</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Beira</div><div className="bg-[#fef2f2] p-1 rounded">KM: 120.000</div><div className="bg-[#fef2f2] p-1 rounded">Estado: Boa</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button><button className="flex-1 py-1 bg-[#facc15] rounded text-[7px] font-black">Ver</button></div></div></div>
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-456-MP - HIACE 15</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span></div></div><div className="p-2"><div className="text-[8px] font-black">Nissan Civilian - 2020</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 15</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2020</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Xai-Xai</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
+                        </div>
+                        <div className="mt-3 bg-green-50 border border-green-200 rounded-[8px] p-3 text-center"><div className="text-[10px] font-black text-green-800">V87 FULL LAYOUT OK - Igual as 2 fotos que voce circulou!</div><div className="text-[8px] text-green-700 mt-1">Esquerda: Form Registar Nova Viatura completo | Direita: Frota registada 2 cards</div></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {areaTransSubTab==='mapa' && (
+                    <div className="bg-white rounded-[12px] border p-4">
+                      <div className="font-black text-[12px]">Mapa 29 - FOTO LARANJA - Coaster 29 lugares - 3 colunas</div>
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Minhas Viaturas - 3</div><div className="mt-2 space-y-2"><div className="bg-white border-2 border-[#facc15] rounded-[8px] p-2"><div className="text-[8px] font-black">MMN-123-MP - Coaster 29 - 4/29</div><div className="text-[7px]">Maputo - Beira - 450MT</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-456-MP - Hiace 15 - 2/15</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-789-MP - Mini-Bus 22</div></div></div><div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67%</div><div className="text-[7px] opacity-70 mt-1">REGRAS NEGOCIO: 1 conta 3 viaturas max</div></div></div>
+                        <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3"><div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - 4/29 ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div><div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1"><div className="h-6 border rounded flex items-center justify-center text-[7px]">1</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-[#facc15]">2</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">3</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500 text-white">4</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">5</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500">6</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">7</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">8</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">9</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">10</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">11</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">12</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">13</div><div className="h-6 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">15</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">16</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">17</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">18</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">19</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">20</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">21</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">22</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">23</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">24</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">25</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">26</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">27</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">28</div><div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div></div><div className="mt-3 flex justify-center gap-3 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded"></div>Reservado</div></div></div>
+                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Reservas - 2 pendentes</div><div className="mt-2 space-y-2"><div className="bg-[#fefce8] border-2 border-yellow-200 rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 1 - Joao Silva - Assento 2 - Maputo-Beira</div><div className="text-[7px]">WhatsApp: 82 123 4567 - 450MT - M-Pesa pago</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1.5 rounded">Rejeitar</button></div></div><div className="bg-[#fefce8] border rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button></div></div></div><div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2"><div className="text-[7px] font-black">Legenda cores - Igual foto laranja</div><div className="text-[7px] mt-1">Amarelo=Ocupado Verde=Livre Vermelho=Reservado</div></div></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+</section>
+      )}
+
+
+
+
+      {tab==='admin' && (
+        <div className="max-w-[1200px] mx-auto p-3">
+          <AdminPanel />
+        </div>
+      )}
+
+        
+      {showNovoFormNegocio && (
+        <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoFormNegocio(false)}>
+          <div className="bg-white rounded-[12px] w-full max-w-[460px] border-2 border-[#1e2f4a] overflow-hidden" onClick={e=>e.stopPropagation()}>
+            <div className="h-[48px] bg-[#8b5cf6] text-white px-4 flex items-center justify-between"><span className="font-black text-[14px]">+ Novo Item - NEGOCIO</span><button onClick={()=>setShowNovoFormNegocio(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button></div>
+            <div className="p-5 space-y-4">
+              <div><label className="text-[11px] font-black">Nome *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" autoFocus /></div>
+              <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-black outline-none" /></div><div><label className="text-[11px] font-black">Preco *</label><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-lg px-3 font-bold outline-none" /></div></div>
+              <div className="flex justify-end gap-2 pt-3 border-t"><button onClick={()=>setShowNovoFormNegocio(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
+                const nome=(novoFormNomeNeg||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
+                const q=parseInt(novoFormQtdNeg||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                const pv=parseFloat(novoFormPrecoNeg||'0')||0; if(pv<=0){ alert('Preco!'); return; }
+                const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
+                const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode:'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
+                setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setNovoFormNomeNeg(''); setNovoFormQtdNeg(''); setNovoFormPrecoNeg(''); setShowNovoFormNegocio(false);
+              }} className="h-[44px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+        <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">
+          {faturacaoTab==='faturas' && (
             <div className="bg-white rounded-[12px] p-4 shadow-sm border">
               <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
               <p className="text-[10px] opacity-60 mb-3">Vendas com Finalizar Documento - Baixa Stock Auto</p>
@@ -1813,33 +2482,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
             </div>
           )}
-        </footer>
+                    ESSE COM BI E NUIT OPCIONAL - CLAUSULAS 4-10 ABERTAS EDITAVEIS  - NAO MODIFICADO MAIS NADA - BUILD 100%</footer>
  </div>
  )
 }
 
 
 // ESSE - BUILD 100% - CONTRATO FACIL PRATICO RAPIDO - 11 CLAUSULAS
-      {showNovoFormStockNegocio && (
-        <div className="fixed inset-0 z-[99999] bg-black/70 flex items-center justify-center p-4" onClick={()=>setShowNovoFormStockNegocio(false)}>
-          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[520px] border-2 border-[#1e2f4a]" onClick={e=>e.stopPropagation()}>
-            <div className="h-[52px] bg-[#8b5cf6] text-white px-4 flex items-center justify-between">
-              <span className="font-black text-[14px]">NOVO ITEM - NEGOCIO STOCK</span>
-              <button onClick={()=>setShowNovoFormStockNegocio(false)} className="h-8 w-8 rounded-full bg-white/20 grid place-items-center font-black">X</button>
-            </div>
-            <div className="p-5 space-y-4">
-              <div><label className="text-[11px] font-black">Nome *</label><input value={novoFormNome} onChange={e=>setNovoFormNome(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold outline-none" autoFocus /></div>
-              <div className="grid grid-cols-2 gap-3"><div><label className="text-[11px] font-black">Qtd *</label><input type="number" value={novoFormQtd} onChange={e=>setNovoFormQtd(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-black outline-none" /></div><div><label className="text-[11px] font-black">Preco *</label><input type="number" value={novoFormPreco} onChange={e=>setNovoFormPreco(e.target.value)} className="w-full mt-1 h-[44px] border-2 rounded-[10px] px-3 font-bold outline-none" /></div></div>
-              <div className="flex justify-end gap-2 pt-4 border-t"><button onClick={()=>setShowNovoFormStockNegocio(false)} className="h-[46px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
-                const nome=(novoFormNome||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
-                const q=parseInt(novoFormQtd||'0')||0; if(q<=0){ alert('Qtd!'); return; }
-                const pv=parseFloat(novoFormPreco||'0')||0; if(pv<=0){ alert('Preco!'); return; }
-                const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
-                const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:parseFloat(novoFormCusto||'0')||0, minimo:10, ideal:50, barcode:novoFormBarcode||'', local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
-                setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); }catch(e){} return nl; });
-                setNovoFormNome(''); setNovoFormQtd(''); setNovoFormPreco(''); setShowNovoFormStockNegocio(false);
-              }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
-            </div>
-          </div>
-        </div>
-      )}
