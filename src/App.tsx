@@ -1332,8 +1332,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               const novoStockLoja=Math.max(0, inicialLoja + recepcao - novaVendaCalc);
               nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVendaCalc};
               console.log(`LOJA: Inicial ${inicialLoja} + Recepcao ${recepcao} - Venda ${novaVendaCalc} = Final ${novoStockLoja} para ${s.nome}`);
-            };
-                    }
+            }
                   }
                 });
                 try{
