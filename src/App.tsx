@@ -306,6 +306,9 @@ export default function App(){
         fabricante: fornecedor || 'Geral',
         dataEntrada: dataEntBR,
         dataEntradaISO: dataEnt, stockInicialLoja: 0,
+        stockInicialArmazem: parseInt(qtd)||0,
+        recepcaoArmazem: parseInt(qtd)||0,
+        saidaArmazem: 0,
         qtdEntrada: parseInt(qtd)||0,
         noArmazem: parseInt(qtd)||0,
         entradaLoja: 0,
@@ -1401,19 +1404,25 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="overflow-x-auto border-2 rounded-[10px]">
                     <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[7px] font-black">
                       <tr>
-                        <th className="text-left p-1.5 border min-w-[120px]">ITEM/CODIGO</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">STOCK INICIAL ARMAZEM<br/>(final ontem)</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">RECEPÇÃO<br/>ARMAZEM</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">SAÍDA<br/>ARM-&gt;LOJA</th>
-                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL ARMAZEM<br/>Inicial+Recep-Saida</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">STOCK INICIAL LOJA<br/>(final ontem)</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">RECEPÇÃO<br/>vem do armazem</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">VENDA<br/>hoje</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white font-black">STOCK FINAL LOJA<br/>Inicial+Recep-Venda</th>
-                        <th className="text-center p-1.5 border bg-[#f59e0b] text-white">STOCK FINAL TOTAL<br/>ARM+LOJA</th>
-                        <th className="text-center p-1.5 border bg-[#fef9c3]">PREÇO UNIT</th>
-                        <th className="text-right p-1.5 border bg-[#f59e0b] text-white">TOTAL VENDAS VALOR DIA</th>
-                        <th className="text-center p-1.5 border">ACAO</th>
+                        <th rowSpan={2} className="text-left p-1.5 border min-w-[130px]">ITEM/CODIGO</th>
+                        <th colSpan={5} className="text-center p-2 border bg-[#3b82f6] text-white text-[8px]">ARMAZEM - 5 COLUNAS</th>
+                        <th colSpan={4} className="text-center p-2 border bg-[#22c55e] text-white text-[8px]">LOJA - 4 COLUNAS</th>
+                        <th colSpan={3} className="text-center p-2 border bg-[#f59e0b] text-white text-[8px]">VALOR</th>
+                        <th rowSpan={2} className="text-center p-1.5 border">ACAO</th>
+                      </tr>
+                      <tr className="bg-[#f1f5f9] text-[6px] font-black">
+                        <th className="text-center p-1.5 border">DATA<br/>ENTRADA</th>
+                        <th className="text-center p-1.5 border bg-[#dbeafe]">STOCK INICIAL<br/>ARMAZEM<br/>(fecho anterior)</th>
+                        <th className="text-center p-1.5 border">ENTRADA<br/>RECEPÇÃO</th>
+                        <th className="text-center p-1.5 border">SAÍDA<br/>ARM-&gt;LOJA</th>
+                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL<br/>ARMAZEM<br/>Inicial+Ent-Saida</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">STOCK INICIAL<br/>LOJA<br/>(fecho anterior)</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">RECEPÇÃO<br/>vem do<br/>armazem</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">VENDA<br/>hoje<br/>(qtd)</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7] font-black">STOCK FINAL<br/>LOJA<br/>Inicial+Recep-Venda</th>
+                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL<br/>TOTAL<br/>ARM+LOJA</th>
+                        <th className="text-center p-1.5 border bg-[#fef9c3]">PREÇO<br/>UNIT MT</th>
+                        <th className="text-right p-1.5 border">TOTAL VENDAS<br/>VALOR DIA</th>
                       </tr>
                     </thead><tbody>{stockProdutos.filter((p:any)=>{const armOk = armazemAtivo==='Todos' || (p.armazem||'Matola')===armazemAtivo; const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo && armOk;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const isSelected = p.id === stockSelecionado; const rowBg = isSelected ? 'bg-[#fef08a] ring-2 ring-[#facc15] ring-inset' : isBaixo ? 'bg-[#fee2e2]' : 'bg-white hover:bg-[#f8fafc] cursor-pointer'; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setProdutosFat([...produtosFat, {id:Date.now()+p.id, nome:p.nome, qtd:1, preco:p.precoVenda, desc:0, codigo:p.codigo}]); setNegocioTab('faturar');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">+ Faturar</button></td></tr>);})}</tbody></table>
                   </div>
@@ -1951,19 +1960,25 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="overflow-x-auto border-2 rounded-[10px]">
                     <table className="w-full text-[10px] border"><thead className="bg-[#f1f5f9] text-[7px] font-black">
                       <tr>
-                        <th className="text-left p-1.5 border min-w-[120px]">ITEM/CODIGO</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">STOCK INICIAL ARMAZEM<br/>(final ontem)</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">RECEPÇÃO<br/>ARMAZEM</th>
-                        <th className="text-center p-1.5 border bg-[#3b82f6] text-white">SAÍDA<br/>ARM-&gt;LOJA</th>
-                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL ARMAZEM<br/>Inicial+Recep-Saida</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">STOCK INICIAL LOJA<br/>(final ontem)</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">RECEPÇÃO<br/>vem do armazem</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white">VENDA<br/>hoje</th>
-                        <th className="text-center p-1.5 border bg-[#22c55e] text-white font-black">STOCK FINAL LOJA<br/>Inicial+Recep-Venda</th>
-                        <th className="text-center p-1.5 border bg-[#f59e0b] text-white">STOCK FINAL TOTAL<br/>ARM+LOJA</th>
-                        <th className="text-center p-1.5 border bg-[#fef9c3]">PREÇO UNIT</th>
-                        <th className="text-right p-1.5 border bg-[#f59e0b] text-white">TOTAL VENDAS VALOR DIA</th>
-                        <th className="text-center p-1.5 border">ACAO</th>
+                        <th rowSpan={2} className="text-left p-1.5 border min-w-[130px]">ITEM/CODIGO</th>
+                        <th colSpan={5} className="text-center p-2 border bg-[#3b82f6] text-white text-[8px]">ARMAZEM - 5 COLUNAS</th>
+                        <th colSpan={4} className="text-center p-2 border bg-[#22c55e] text-white text-[8px]">LOJA - 4 COLUNAS</th>
+                        <th colSpan={3} className="text-center p-2 border bg-[#f59e0b] text-white text-[8px]">VALOR</th>
+                        <th rowSpan={2} className="text-center p-1.5 border">ACAO</th>
+                      </tr>
+                      <tr className="bg-[#f1f5f9] text-[6px] font-black">
+                        <th className="text-center p-1.5 border">DATA<br/>ENTRADA</th>
+                        <th className="text-center p-1.5 border bg-[#dbeafe]">STOCK INICIAL<br/>ARMAZEM<br/>(fecho anterior)</th>
+                        <th className="text-center p-1.5 border">ENTRADA<br/>RECEPÇÃO</th>
+                        <th className="text-center p-1.5 border">SAÍDA<br/>ARM-&gt;LOJA</th>
+                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL<br/>ARMAZEM<br/>Inicial+Ent-Saida</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">STOCK INICIAL<br/>LOJA<br/>(fecho anterior)</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">RECEPÇÃO<br/>vem do<br/>armazem</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7]">VENDA<br/>hoje<br/>(qtd)</th>
+                        <th className="text-center p-1.5 border bg-[#dcfce7] font-black">STOCK FINAL<br/>LOJA<br/>Inicial+Recep-Venda</th>
+                        <th className="text-center p-1.5 border bg-[#fef3c7] font-bold">STOCK FINAL<br/>TOTAL<br/>ARM+LOJA</th>
+                        <th className="text-center p-1.5 border bg-[#fef9c3]">PREÇO<br/>UNIT MT</th>
+                        <th className="text-right p-1.5 border">TOTAL VENDAS<br/>VALOR DIA</th>
                       </tr>
                     </thead><tbody>{stockProdutos.filter((p:any)=>{const matchBusca = !filtroRapidoStock || p.nome.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || p.codigo.toLowerCase().includes(filtroRapidoStock.toLowerCase()) || (p.marca||'').toLowerCase().includes(filtroRapidoStock.toLowerCase()); const sf = p.noArmazem + p.stockLoja; let matchTipo = true; if(filtroTipoStock==='baixo') matchTipo = sf <= 49; else if(filtroTipoStock==='zerado') matchTipo = sf === 0; return matchBusca && matchTipo;}).map((p:any)=>{const sf=p.noArmazem+p.stockLoja; const vv=p.venda*p.precoVenda; const isBaixo = sf <= 49; const isSelected = p.id === stockSelecionado; const rowBg = isSelected ? 'bg-[#fef08a] ring-2 ring-[#facc15] ring-inset' : isBaixo ? 'bg-[#fee2e2]' : 'bg-white hover:bg-[#f8fafc] cursor-pointer'; const badgeBg = isBaixo ? 'bg-red-500 text-white' : 'bg-green-500 text-white'; return (<tr key={p.id} onClick={()=>setStockSelecionado(p.id)} className={`${rowBg} border-b`}><td className="p-1.5 border"><div className="font-black">{p.codigo}</div><div className="text-[9px]">{p.nome}</div><div className="text-[7px] opacity-50">{p.marca} | {p.armazem||'Matola'}</div></td><td className="text-center p-1.5 border">{p.dataEntrada}</td><td className="text-center p-1.5 border">{p.qtdEntrada}</td><td className="text-center p-1.5 border bg-yellow-50 font-bold">{p.noArmazem}</td><td className="text-center p-1.5 border">-&gt; {p.entradaLoja}</td><td className="text-center p-1.5 border">{p.dataReq}</td><td className="text-center p-1.5 border">{p.stockLoja}</td><td className="text-center font-bold text-[#1e2f4a] bg-[#fef9c3]">{(p as any).precoVenda||0} MT</td><td className="text-center p-1.5 border">{p.venda}</td><td className="text-center p-1.5 border">{p.mediaDia}/d</td><td className="text-center p-1.5 border"><span className={`px-2 py-1 rounded-full font-black ${badgeBg}`}>{sf}</span></td><td className="text-right p-1.5 border font-bold">{vv.toLocaleString('pt-MZ')} MT</td><td className="p-1.5 border text-[7px]"><div>A1-01 | 2026-12-10</div><div className="opacity-60">{p.fornecedor||'Cimpor Moç'}</div></td><td className="text-center p-1.5 border"><button onClick={(e)=>{e.stopPropagation(); setFaturacaoTab('faturacao');}} className="px-2 py-1 bg-black text-white rounded-full text-[7px] font-black">Faturar</button></td></tr>);})}</tbody></table>
                   </div>
@@ -2067,6 +2082,9 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                               fabricante: novoStockFornecedor || 'Geral',
                               dataEntrada: dataEntBR,
                               dataEntradaISO: dataEnt, stockInicialLoja: 0,
+        stockInicialArmazem: parseInt(qtd)||0,
+        recepcaoArmazem: parseInt(qtd)||0,
+        saidaArmazem: 0,
                               qtdEntrada: parseInt(novoStockQtd)||0,
                               noArmazem: parseInt(novoStockQtd)||0,
                               entradaLoja: 0,
