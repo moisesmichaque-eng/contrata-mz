@@ -396,6 +396,8 @@ export default function App(){
   const [novoFormValidadeMesNeg, setNovoFormValidadeMesNeg] = useState('');
   const [novoFormValidadeAnoNeg, setNovoFormValidadeAnoNeg] = useState('');
   const [novoFormArmazemNeg, setNovoFormArmazemNeg] = useState('Matola');
+  const [qtdEntradaTemp, setQtdEntradaTemp] = useState('');
+  const [qtdSaidaTemp, setQtdSaidaTemp] = useState('');
   const [showRelatorioStock, setShowRelatorioStock] = useState(false);
   const [entradaQtdStock, setEntradaQtdStock] = useState(50);
   const [transferQtdStock, setTransferQtdStock] = useState(20);
@@ -1849,7 +1851,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
 
 
                                 {/* MODAIS VERDE - OPERACOES STOCK ATIVO */}
-                {showEntradaStock && (
+                {false && ( /* OLD ENTRADA DESATIVADO - NOVO ABAIXO */
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] border">
                       <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Entrada de Item [F5] - Armazem</span><button onClick={()=>setShowEntradaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
@@ -1861,7 +1863,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {showSaidaStock && (
+                {false && ( /* OLD SAIDA DESATIVADO - NOVO ABAIXO */
                   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[520px] border overflow-hidden">
                       <div className="h-10 bg-[#2b4c7e] text-white px-4 flex items-center justify-between"><span className="font-bold text-[13px]">Saida de Item [F6]</span><button onClick={()=>setShowSaidaStock(false)} className="w-6 h-6 bg-white/20 rounded grid place-items-center"></button></div>
@@ -1878,7 +1880,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {false && ( /* OLD DESATIVADO */
+                {false && ( /* OLD */
                   <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
                       <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
@@ -2449,41 +2451,86 @@ Bilhete valido - Apresentar QR`;
         </div>
       )}
 
-        
+         
       {showNovoFormNegocio && (
         <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoFormNegocio(false)}>
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[600px] border-2 border-[#1e2f4a] overflow-hidden max-h-[92vh] flex flex-col" onClick={e=>e.stopPropagation()}>
             <div className="h-[56px] bg-[#8b5cf6] text-white px-5 flex items-center justify-between flex-shrink-0">
-              <div><div className="font-black text-[15px]">+ Novo Item - NEGOCIO STOCK</div><div className="text-[10px] opacity-80">Entrada completa - tudo claro</div></div>
+              <div><div className="font-black text-[15px]">+ Novo Item - NEGOCIO STOCK</div><div className="text-[10px] opacity-80">Entrada completa</div></div>
               <button onClick={()=>setShowNovoFormNegocio(false)} className="h-9 w-9 rounded-full bg-white/20 grid place-items-center font-black">X</button>
             </div>
             <div className="p-5 space-y-4 overflow-auto">
               <div className="bg-[#f8fafc] border-2 border-[#8b5cf6]/20 rounded-[10px] p-3 space-y-3">
-                <div><label className="text-[13px] font-black">Nome do Produto *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] focus:border-[#8b5cf6] outline-none" autoFocus /></div>
+                <div><label className="text-[13px] font-black">Nome do Produto *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] focus:border-[#8b5cf6] outline-none" autoFocus /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#16a34a]">QUANTIDADE DE ENTRADA *</label><p className="text-[9px] font-bold text-[#16a34a]">Qtd que entra no armazem</p><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center outline-none bg-[#f0fdf4]" /></div>
-                  <div className="bg-white border-2 border-[#f59e0b] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#d97706]">PRECO POR UNIDADE *</label><p className="text-[9px] font-bold text-[#d97706]">Preco venda MT por unidade</p><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} placeholder="850" className="w-full mt-2 h-[48px] border-2 border-[#f59e0b] rounded-[10px] px-3 font-black text-[20px] text-center outline-none bg-[#fffbeb]" /></div>
+                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#16a34a]">QTD ENTRADA *</label><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center outline-none bg-[#f0fdf4]" /></div>
+                  <div className="bg-white border-2 border-[#f59e0b] rounded-[10px] p-3"><label className="text-[12px] font-black text-[#d97706]">PRECO UNID *</label><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} placeholder="850" className="w-full mt-2 h-[48px] border-2 border-[#f59e0b] rounded-[10px] px-3 font-black text-[20px] text-center outline-none bg-[#fffbeb]" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><label className="text-[11px] font-bold">Codigo de Barras <span className="text-[9px] bg-[#94a3b8] text-white px-1.5 rounded">OPCIONAL</span></label><input value={novoFormBarcodeNeg} onChange={e=>setNovoFormBarcodeNeg(e.target.value)} placeholder="Opcional" className="w-full mt-1 h-[42px] border-2 border-dashed border-[#cbd5e1] rounded-[10px] px-3 text-[13px] outline-none" /></div>
-                  <div><label className="text-[11px] font-bold">Nome do Armazem *</label><select value={novoFormArmazemNeg} onChange={e=>setNovoFormArmazemNeg(e.target.value)} className="w-full mt-1 h-[42px] border-2 rounded-[10px] px-3 text-[13px] font-bold"><option>Matola</option><option>Maputo</option><option>Beira</option><option>Nampula</option><option>Tete</option><option>Outro</option></select></div>
+                  <div><label className="text-[11px] font-bold">Codigo Barras <span className="text-[9px] bg-[#94a3b8] text-white px-1.5 rounded">OPCIONAL</span></label><input value={novoFormBarcodeNeg} onChange={e=>setNovoFormBarcodeNeg(e.target.value)} placeholder="Opcional" className="w-full mt-1 h-[42px] border-2 border-dashed border-[#cbd5e1] rounded-[10px] px-3 text-[13px] outline-none" /></div>
+                  <div><label className="text-[11px] font-bold">Armazem *</label><select value={novoFormArmazemNeg} onChange={e=>setNovoFormArmazemNeg(e.target.value)} className="w-full mt-1 h-[42px] border-2 rounded-[10px] px-3 text-[13px] font-bold"><option>Matola</option><option>Maputo</option><option>Beira</option><option>Nampula</option><option>Tete</option><option>Outro</option></select></div>
                 </div>
-                <div className="bg-white border-2 border-[#e0f2fe] rounded-[10px] p-3"><label className="text-[11px] font-bold text-[#0284c7]">Validade Mes/Ano <span className="text-[9px] bg-[#e0f2fe] text-[#0284c7] px-1.5 rounded">OPCIONAL</span></label><p className="text-[9px] text-[#64748b]">Deixe vazio se nao tiver validade</p><div className="grid grid-cols-2 gap-2 mt-2"><select value={novoFormValidadeMesNeg} onChange={e=>setNovoFormValidadeMesNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Mes</option><option value="01">01 - Jan</option><option value="02">02 - Fev</option><option value="03">03 - Mar</option><option value="04">04 - Abr</option><option value="05">05 - Mai</option><option value="06">06 - Jun</option><option value="07">07 - Jul</option><option value="08">08 - Ago</option><option value="09">09 - Set</option><option value="10">10 - Out</option><option value="11">11 - Nov</option><option value="12">12 - Dez</option></select><select value={novoFormValidadeAnoNeg} onChange={e=>setNovoFormValidadeAnoNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Ano</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div></div>
+                <div className="bg-white border-2 border-[#e0f2fe] rounded-[10px] p-3"><label className="text-[11px] font-bold text-[#0284c7]">Validade Mes/Ano <span className="text-[9px] bg-[#e0f2fe] text-[#0284c7] px-1.5 rounded">OPCIONAL</span></label><div className="grid grid-cols-2 gap-2 mt-2"><select value={novoFormValidadeMesNeg} onChange={e=>setNovoFormValidadeMesNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Mes</option><option value="01">01-Jan</option><option value="02">02-Fev</option><option value="03">03-Mar</option><option value="04">04-Abr</option><option value="05">05-Mai</option><option value="06">06-Jun</option><option value="07">07-Jul</option><option value="08">08-Ago</option><option value="09">09-Set</option><option value="10">10-Out</option><option value="11">11-Nov</option><option value="12">12-Dez</option></select><select value={novoFormValidadeAnoNeg} onChange={e=>setNovoFormValidadeAnoNeg(e.target.value)} className="h-[42px] border-2 rounded-[10px] px-3 text-[13px]"><option value="">Ano</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div></div>
               </div>
               <div className="flex justify-end gap-2 pt-2 border-t"><button onClick={()=>setShowNovoFormNegocio(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
                 const nome=(novoFormNomeNeg||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
-                const q=parseInt(novoFormQtdNeg||'0')||0; if(q<=0){ alert('Qtd Entrada!'); return; }
-                const pv=parseFloat(novoFormPrecoNeg||'0')||0; if(pv<=0){ alert('Preco Unidade!'); return; }
+                const q=parseInt(novoFormQtdNeg||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                const pv=parseFloat(novoFormPrecoNeg||'0')||0; if(pv<=0){ alert('Preco!'); return; }
                 const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
                 let barcode=''; try{ barcode=novoFormBarcodeNeg||''; }catch(e){}
                 let mes=''; try{ mes=novoFormValidadeMesNeg||''; }catch(e){}
                 let ano=''; try{ ano=novoFormValidadeAnoNeg||''; }catch(e){}
-                let validade=''; if(mes&&ano){ validade=mes+'/'+ano; } else if(ano){ validade=ano; }
+                let validade=''; if(mes&&ano){ validade=mes+'/'+ano; }
                 let arm='Matola'; try{ arm=novoFormArmazemNeg||'Matola'; }catch(e){}
                 const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode, local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade, fornecedor:'', armazem:arm };
                 setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setNovoFormNomeNeg(''); setNovoFormQtdNeg(''); setNovoFormPrecoNeg(''); setNovoFormBarcodeNeg(''); setNovoFormValidadeMesNeg(''); setNovoFormValidadeAnoNeg(''); setNovoFormArmazemNeg('Matola'); setShowNovoFormNegocio(false); setStockSelecionado(id);
-              }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR ITEM</button></div>
+              }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEntradaStock && (
+        <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowEntradaStock(false)}>
+          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[400px] border-2 border-[#facc15] overflow-hidden" onClick={e=>e.stopPropagation()}>
+            <div className="h-[50px] bg-[#fef08a] border-b-2 border-[#facc15] px-5 flex items-center justify-between">
+              <div className="font-black text-[14px]">📥 Entrada [F5] - {(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.nome.slice(0,25) : 'Selecione produto'; })()}</div>
+              <button onClick={()=>setShowEntradaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="text-[12px]">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Nenhum selecionado'; })()}</b></div>
+              <div className="text-[12px]">Stock atual: <b className="text-[#16a34a]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()} unidades</b></div>
+              <div><label className="text-[12px] font-black">Quantidade a ENTRAR *</label><input type="number" value={qtdEntradaTemp} onChange={e=>setQtdEntradaTemp(e.target.value)} placeholder="Ex: 50" className="w-full mt-1 h-[48px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#f0fdf4] outline-none" autoFocus /></div>
+              <div className="flex justify-end gap-2"><button onClick={()=>{ setShowEntradaStock(false); setQtdEntradaTemp(''); }} className="h-[42px] px-5 border-2 rounded-[10px] font-bold">Cancelar</button><button onClick={()=>{
+                const q=parseInt(qtdEntradaTemp||'0')||0; if(q<=0){ alert('Digite quantidade!'); return; }
+                if(!stockSelecionado){ alert('Selecione um produto clicando na linha amarela!'); return; }
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((p:any)=>{ if(p.id===stockSelecionado){ return {...p, noArmazem:(p.noArmazem||0)+q, qtdEntrada:(p.qtdEntrada||0)+q}; } return p; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setQtdEntradaTemp(''); setShowEntradaStock(false);
+              }} className="h-[42px] px-6 bg-[#facc15] border-2 border-black rounded-[10px] font-black">✅ CONFIRMAR ENTRADA</button></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSaidaStock && (
+        <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowSaidaStock(false)}>
+          <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[400px] border-2 border-[#22c55e] overflow-hidden" onClick={e=>e.stopPropagation()}>
+            <div className="h-[50px] bg-[#bbf7d0] border-b-2 border-[#22c55e] px-5 flex items-center justify-between">
+              <div className="font-black text-[14px]">📤 Saida [F6] - {(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.nome.slice(0,25) : 'Selecione'; })()}</div>
+              <button onClick={()=>setShowSaidaStock(false)} className="h-8 w-8 rounded-full bg-black text-white grid place-items-center font-black">X</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="text-[12px]">Produto: <b>{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? `${p.codigo} - ${p.nome}` : 'Nenhum'; })()}</b></div>
+              <div className="text-[12px]">Stock atual: <b className="text-[#16a34a]">{(() => { const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); return p ? p.noArmazem : 0; })()}</b></div>
+              <div><label className="text-[12px] font-black">Quantidade a SAIR *</label><input type="number" value={qtdSaidaTemp} onChange={e=>setQtdSaidaTemp(e.target.value)} placeholder="Ex: 20" className="w-full mt-1 h-[48px] border-2 border-[#ef4444] rounded-[10px] px-3 font-black text-[20px] text-center bg-[#fef2f2] outline-none" autoFocus /></div>
+              <div className="flex justify-end gap-2"><button onClick={()=>{ setShowSaidaStock(false); setQtdSaidaTemp(''); }} className="h-[42px] px-5 border-2 rounded-[10px] font-bold">Cancelar</button><button onClick={()=>{
+                const q=parseInt(qtdSaidaTemp||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                const p = stockProdutos.find((x:any)=>x.id===stockSelecionado); if(!p){ alert('Selecione produto!'); return; }
+                if((p.noArmazem||0) < q){ alert('Stock insuficiente! Tem '+p.noArmazem+' e quer tirar '+q); return; }
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ return {...pp, noArmazem:(pp.noArmazem||0)-q, venda:(pp.venda||0)+q}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setQtdSaidaTemp(''); setShowSaidaStock(false);
+              }} className="h-[42px] px-6 bg-[#22c55e] text-white border-2 border-black rounded-[10px] font-black">✅ CONFIRMAR SAIDA</button></div>
             </div>
           </div>
         </div>
