@@ -1818,14 +1818,14 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="bg-[#f8fafc] border-2 border-[#8b5cf6] rounded-[10px] p-2 h-fit relative z-10">
                     <div className="text-[10px] font-black mb-2">OPERACOES STOCK</div>
                     <div className="space-y-1.5">
-                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoStock(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
+                      <button onClick={()=>{ console.log("Novo Item clicked"); setShowNovoFormNegocio(true); }} className="w-full h-9 bg-white border-2 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-blue-50 active:bg-blue-100"><span className="w-6 h-6 bg-[#dbeafe] rounded grid place-items-center font-black">+</span> Novo Item</button>
                       <button onClick={()=>{
-                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoStock(true); return; }
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto com Novo Item - Stock está com 0 itens (SICPA KENYA LTD)'); setShowNovoFormNegocio(true); return; }
                         if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
                         setShowEntradaStock(true);
                       }} className="w-full h-9 bg-[#fef9c3] border-2 border-yellow-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-yellow-200">Entrada [F5]</button>
                       <button onClick={()=>{
-                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoStock(true); return; }
+                        if(stockProdutos.length===0){ alert('Crie primeiro um produto - Stock 0 itens'); setShowNovoFormNegocio(true); return; }
                         if(!stockSelecionado && stockProdutos.length>0) setStockSelecionado(stockProdutos[0].id);
                         setShowSaidaStock(true);
                       }} className="w-full h-9 bg-[#f0fdf4] border-2 border-green-300 rounded-[8px] flex items-center gap-2 px-3 text-[11px] font-bold hover:bg-green-200">Saida [F6]</button>
@@ -1875,7 +1875,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     </div>
                   </div>
                 )}
-                {false && ( /* OLD DESATIVADO */
+                {false && ( /* OLD */
                   <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoStock(false)}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-[580px] border max-h-[92vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
                       <div className="h-12 bg-[#2b4c7e] text-white px-4 flex items-center justify-between sticky top-0 z-10">
@@ -2441,40 +2441,39 @@ Bilhete valido - Apresentar QR`;
 
 
       {tab==='admin' && (
-        <div className="max-w-[1200px] mx-auto p-3
+        <div className="max-w-[1200px] mx-auto p-3">
+          <AdminPanel />
+        </div>
+      )}
+
+        
       {showNovoFormNegocio && (
         <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center p-4" onClick={()=>setShowNovoFormNegocio(false)}>
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-[560px] border-2 border-[#1e2f4a] overflow-hidden" onClick={e=>e.stopPropagation()}>
             <div className="h-[56px] bg-[#8b5cf6] text-white px-5 flex items-center justify-between">
-              <div><div className="font-black text-[15px]">+ Novo Item - NEGÓCIO</div><div className="text-[10px] opacity-80">Stock da conta</div></div>
+              <div><div className="font-black text-[15px]">+ Novo Item - NEGOCIO</div><div className="text-[10px] opacity-80">Stock da conta</div></div>
               <button onClick={()=>setShowNovoFormNegocio(false)} className="h-9 w-9 rounded-full bg-white/20 grid place-items-center font-black">X</button>
             </div>
             <div className="p-5 space-y-4">
               <div className="bg-[#f8fafc] border-2 border-[#8b5cf6]/20 rounded-[10px] p-3 space-y-3">
-                <div><label className="text-[13px] font-black text-[#1e2f4a]">Nome do Produto *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Cimento 42.5N 50kg" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] focus:border-[#8b5cf6] outline-none" autoFocus /></div>
+                <div><label className="text-[13px] font-black">Nome do Produto *</label><input value={novoFormNomeNeg} onChange={e=>setNovoFormNomeNeg(e.target.value)} placeholder="Ex: Cimento" className="w-full mt-1 h-[46px] border-2 rounded-[10px] px-3 font-bold text-[14px] focus:border-[#8b5cf6] outline-none" autoFocus /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[11px] font-black text-[#16a34a]">Quantidade de Entrada *</label><p className="text-[9px] text-[#64748b]">Qtd que entra no armazém</p><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[44px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[18px] text-center outline-none" /></div>
-                  <div className="bg-white border-2 border-[#f59e0b] rounded-[10px] p-3"><label className="text-[11px] font-black text-[#d97706]">Preço por Unidade *</label><p className="text-[9px] text-[#64748b]">Preço venda unidade MT</p><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} placeholder="850" className="w-full mt-2 h-[44px] border-2 border-[#f59e0b] rounded-[10px] px-3 font-black text-[18px] text-center outline-none" /></div>
+                  <div className="bg-white border-2 border-[#22c55e] rounded-[10px] p-3"><label className="text-[11px] font-black text-[#16a34a]">Quantidade de Entrada *</label><p className="text-[9px] text-[#64748b]">Qtd que entra no armazem</p><input type="number" value={novoFormQtdNeg} onChange={e=>setNovoFormQtdNeg(e.target.value)} placeholder="100" className="w-full mt-2 h-[44px] border-2 border-[#22c55e] rounded-[10px] px-3 font-black text-[18px] text-center outline-none" /></div>
+                  <div className="bg-white border-2 border-[#f59e0b] rounded-[10px] p-3"><label className="text-[11px] font-black text-[#d97706]">Preco por Unidade *</label><p className="text-[9px] text-[#64748b]">Preco venda unidade MT</p><input type="number" value={novoFormPrecoNeg} onChange={e=>setNovoFormPrecoNeg(e.target.value)} placeholder="850" className="w-full mt-2 h-[44px] border-2 border-[#f59e0b] rounded-[10px] px-3 font-black text-[18px] text-center outline-none" /></div>
                 </div>
-                <div><label className="text-[11px] font-bold text-[#334155]">Código de Barras <span className="text-[9px] font-normal text-white bg-[#94a3b8] px-1.5 py-0.5 rounded">OPCIONAL</span></label><p className="text-[9px] text-[#64748b]">Pode deixar vazio se não tiver código</p><input value={novoFormBarcodeNeg||''} onChange={e=>{try{setNovoFormBarcodeNeg(e.target.value)}catch{}}} placeholder="Ex: 1234567890123 (opcional)" className="w-full mt-1 h-[42px] border-2 border-dashed border-[#cbd5e1] rounded-[10px] px-3 text-[13px] outline-none focus:border-[#8b5cf6]" /></div>
+                <div><label className="text-[11px] font-bold">Codigo de Barras <span className="text-[9px] bg-[#94a3b8] text-white px-1.5 py-0.5 rounded">OPCIONAL</span></label><p className="text-[9px] text-[#64748b]">Pode deixar vazio</p><input value={novoFormBarcodeNeg} onChange={e=>setNovoFormBarcodeNeg(e.target.value)} placeholder="1234567890123 (opcional)" className="w-full mt-1 h-[42px] border-2 border-dashed border-[#cbd5e1] rounded-[10px] px-3 text-[13px] outline-none" /></div>
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t"><button onClick={()=>setShowNovoFormNegocio(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black text-[12px]">Cancelar</button><button onClick={()=>{
-                const nome=(novoFormNomeNeg||'').trim(); if(nome.length<2){ alert('Digite o Nome do Produto!'); return; }
-                const q=parseInt(novoFormQtdNeg||'0')||0; if(q<=0){ alert('Digite a Quantidade de Entrada!'); return; }
-                const pv=parseFloat(novoFormPrecoNeg||'0')||0; if(pv<=0){ alert('Digite o Preço por Unidade!'); return; }
+              <div className="flex justify-end gap-2 pt-2 border-t"><button onClick={()=>setShowNovoFormNegocio(false)} className="h-[44px] px-6 border-2 rounded-[10px] font-black">Cancelar</button><button onClick={()=>{
+                const nome=(novoFormNomeNeg||'').trim(); if(nome.length<2){ alert('Nome!'); return; }
+                const q=parseInt(novoFormQtdNeg||'0')||0; if(q<=0){ alert('Qtd!'); return; }
+                const pv=parseFloat(novoFormPrecoNeg||'0')||0; if(pv<=0){ alert('Preco!'); return; }
                 const id=Date.now().toString(); const iso=new Date().toISOString().slice(0,10); const br=iso.split('-').reverse().join('/');
                 let barcode=''; try{ barcode=novoFormBarcodeNeg||''; }catch(e){}
                 const item:any={ id, codigo:`COD-${id.slice(-6)}`, nome, marca:'Geral', grupo:'Geral', subGrupo:'Geral', fabricante:'Geral', dataEntrada:br, dataEntradaISO:iso, qtdEntrada:q, noArmazem:q, entradaLoja:0, dataReq:'', stockLoja:0, venda:0, mediaDia:0, precoVenda:pv, precoCusto:0, minimo:10, ideal:50, barcode, local:'A1-01', lote:`LOTE-${id.slice(-6)}`, validade:'', fornecedor:'', armazem:'Matola' };
                 setStockProdutos((prev:any[])=>{ const nl=[...prev,item]; try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
-                setNovoFormNomeNeg(''); setNovoFormQtdNeg(''); setNovoFormPrecoNeg(''); try{setNovoFormBarcodeNeg('');}catch(e){} setShowNovoFormNegocio(false); setStockSelecionado(id);
-              }} className="h-[46px] px-8 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-[10px] font-black text-[13px] shadow">✅ CRIAR ITEM</button></div>
+                setNovoFormNomeNeg(''); setNovoFormQtdNeg(''); setNovoFormPrecoNeg(''); setNovoFormBarcodeNeg(''); setShowNovoFormNegocio(false);
+              }} className="h-[46px] px-8 bg-[#8b5cf6] text-white rounded-[10px] font-black">CRIAR</button></div>
             </div>
-          </div>
-        </div>
-      )}
-
-
-                  </div>
           </div>
         </div>
       )}
