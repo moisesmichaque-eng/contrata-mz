@@ -154,7 +154,7 @@ export default function App(){
     alert(" RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreco: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
   }
 
- const [tab,setTab]=useState("encontrar");
+ const [tab,setTab]=useState("encontrar"); const [profSelecionado,setProfSelecionado]=useState<any>(null);
  const [contratoSel,setContratoSel]=useState(1);
  const [clausulaAtiva,setClausulaAtiva]=useState(4);
  const [tipoCadastro,setTipoCadastro]=useState("prof");
@@ -943,60 +943,185 @@ useEffect(()=>{
    setFormContrato(prev=>({...prev, tarefas: novas, trabProf: catName}));
  },[contratoSel]);
 
-   const gerarPDFInicial = async () => {
+ const gerarPDFInicial = () => {
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000);
-   try{
-     const loadJsPDF = ():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=()=>{ setTimeout(()=>{ const j=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(j) resolve(j); else reject('jsPDF'); },300); }; s.onerror=()=>reject('Falha'); document.head.appendChild(s); }); };
-     const jsPDF = await loadJsPDF();
-     const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-     let y=10;
-     if(formContrato.logoData){ try{ doc.addImage(formContrato.logoData, 'PNG', 10, y, 20, 20); }catch(e){} }
-     doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.setTextColor(30,47,74);
-     doc.text('CONTRATO '+catName.toUpperCase()+' - 11 CLAUSULAS - ID '+id, 35, y+8);
-     y+=6; doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.text('COM LOGO E ANEXOS - Data: '+new Date().toLocaleString('pt-MZ'),35,y+3);
-     y+=10;
-     const addClausula = (titulo:string, texto:string)=>{ if(y>265){ doc.addPage(); y=10; } doc.setFillColor(30,47,74); doc.rect(10,y,190,6,'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.text(titulo,12,y+4); y+=8; doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); doc.setFontSize(7); const lines = doc.splitTextToSize(texto, 185); doc.text(lines, 12, y); y+= lines.length*3 + 4; };
-     addClausula('1. DADOS', 'CONTRATANTE: '+formContrato.empNome+' - BI: '+formContrato.empBI+' - Tel: '+formContrato.empTel+'\nTRABALHADOR: '+formContrato.trabNome+' - BI: '+formContrato.trabBI);
-     addClausula('2. TAREFAS', formContrato.tarefas.map((t:string,i:number)=> (i+1)+'. '+t).join(' | '));
-     addClausula('10. ANEXOS COM LOGO', 'Fotos: '+(formContrato.anexos?.length||0)+' - '+(formContrato.anexos?.join(', ')||'BI, NUIT')+' - Logo: '+(formContrato.logoTipo||'LOGO'));
-     const nomeArq='CONTRATO-INICIAL-'+catName+'-ID-'+id+'.pdf';
-     doc.save(nomeArq);
-     alert('Contrato PDF AUTOMATICO com logo e anexos: '+nomeArq);
-   }catch(e){ alert('Erro contrato PDF: '+e); }
-  };
-  const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); };
-const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.empNome}, BI ${formContrato.empBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.trabNome} - ${formContrato.tarefas.length} tarefas - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.trabTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
+   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO ${catName} - ID ${id} - 11 CLAUSULAS COMPLETAS</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:850px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:12px;background:#f8fafc}
+.header{background:#1e2f4a;color:white;padding:15px 20px;border-radius:12px;display:flex;align-items:center;gap:15px}
+.header h1{color:#d4a44a;margin:0;font-size:14px}
+.header-logo{background:white;border-radius:8px;padding:5px;width:70px;height:70px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:15px;margin:12px 0;background:white}
+.clausula h3{background:#1e2f4a;color:white;padding:8px 12px;border-radius:6px;margin:-15px -15px 12px -15px;font-size:11px}
+.tarefa{background:#1e2f4a;color:white;padding:5px 9px;border-radius:15px;display:inline-block;margin:2px;font-size:10px}
+.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+.assinatura-box{border:2px solid #1e2f4a;border-radius:8px;padding:12px;background:white}
+.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
+.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
+@media print{.no-print{display:none} body{background:white}}
+</style>
+</head><body>
+<div class="header"><div class="header-logo">${formContrato.logoData ? `<img src="${formContrato.logoData}" style="max-height:50px;max-width:60px;display:block;border-radius:4px;object-fit:contain" />` : `<div style="font-size:9px;color:#1e2f4a;font-weight:bold;text-align:center">${(formContrato.logoTipo || 'LOGO').substring(0,20)}</div>`}</div><div style="flex:1;text-align:left"><h1>CONTRATO ${catName.toUpperCase()} - 11 CLAUSULAS COMPLETAS - PDF INICIAL - ID ${id}</h1><div style="font-size:10px;margin-top:4px">contrata-mz.vercel.app - ${formContrato.logoTipo || 'ESSE'} - Data: ${new Date().toLocaleString('pt-MZ')} - ${formContrato.tarefas.length} tarefas</div></div></div>
+
+<div class="clausula"><h3>1. DADOS DAS PARTES</h3>
+<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel}<br>
+<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - Profissao: ${formContrato.trabProf}
+</div>
+
+<div class="clausula"><h3>2. OBJETO E TAREFAS - ${formContrato.tarefas.length} tarefas</h3>
+${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}
+</div>
+
+<div class="clausula"><h3>3. HORARIO E LOCAL</h3>
+<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
+<b>Dias:</b> ${formContrato.dias}<br>
+<b>Data inicio:</b> ${formContrato.dataInicio}<br>
+<b>Local:</b> ${formContrato.localTrab}
+</div>
+
+<div class="clausula"><h3>4. SALARIO E PAGAMENTO</h3>
+<b>Valor:</b> ${formContrato.valor} MZN<br>
+<b>Dia:</b> Todo dia ${formContrato.diaPag}<br>
+<b>Forma:</b> ${formContrato.formaPag}<br>
+<b>Prazo:</b> ${formContrato.prazo}
+</div>
+
+<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO</h3>
+<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
+<b>Alojamento:</b> ${formContrato.alojamento}<br>
+<b>Transporte:</b> ${formContrato.transporte}
+</div>
+
+<div class="clausula"><h3>6. FOLGAS E FERIAS</h3>${formContrato.folgas}</div>
+<div class="clausula"><h3>7. PERIODO EXPERIMENTAL</h3>${formContrato.periodoExp}</div>
+<div class="clausula"><h3>8. DEVERES DO TRABALHADOR</h3>${formContrato.deveresTrab}</div>
+<div class="clausula"><h3>9. DEVERES DO EMPREGADOR</h3>${formContrato.deveresEmp}</div>
+<div class="clausula"><h3>10. ANEXOS - Fotos e provas</h3>
+<b>Fotos anexadas:</b><br>
+- BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI}<br>
+- BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
+- Local: ${formContrato.localTrab}<br>
+- Anexos: ${formContrato.anexos.length} ficheiros<br>
+</div>
+
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS</h3></div>
+
+<div class="assinaturas-horizontal"><div class="assinatura-box contratante"><b>CONTRATANTE</b><br>${formContrato.empNome} - BI ${formContrato.empBI}<br>CONCORDO em ${assinaturaContratante.data || "data/hora"}</div><div class="assinatura-box contratado"><b>CONTRATADO</b><br>${formContrato.trabNome} - BI ${formContrato.trabBI}<br>CONCORDO em ${assinaturaContratado.data || "data/hora"}</div></div>
+
+<div style="background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:15px;margin-top:20px">
+<b>CONTRATO FINAL - 11 CLAUSULAS</b><br>
+${formContrato.logoTipo || 'ESSE'} - NUIT 401866876 - ID ${id}
+</div>
+
+<div style="text-align:center;margin-top:20px" class="no-print">
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:12px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer">IMPRIMIR / SALVAR COMO PDF FINAL</button>
+</div>
+</body></html>`;
+   const blob = new Blob([html], {type:"text/html"}); const url = URL.createObjectURL(blob); window.open(url,"_blank"); const a = document.createElement("a"); a.href=url; a.download=`CONTRATO-INICIAL-11-CLAUSULAS-${catName}-ID-${id}.html`; a.click();
+ };
+
+ const assinarContratante = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratante({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.empNome}, BI ${formContrato.empBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.trabNome} - ${formContrato.tarefas.length} tarefas - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.trabTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
  const assinarContratado = () => { const agora = new Date().toLocaleString("pt-MZ"); setAssinaturaContratado({ concordo:true, data:agora }); const msg = `CONTRATO ${CATS[contratoSel]} ID ${Math.floor(Math.random()*10000)} - Eu, ${formContrato.trabNome}, BI ${formContrato.trabBI}, CONCORDO com contrato ${formContrato.valor}MZN com ${formContrato.empNome} - ${agora} - Assinatura na HORIZONTAL`; window.open(`https://wa.me/${formContrato.empTel}?text=${encodeURIComponent(msg)}`,"_blank"); };
 
-   const gerarPDFFinal = async () => {
-   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO."); return; }
+ const gerarPDFFinal = () => {
+   if(!assinaturaContratante.concordo || !assinaturaContratado.concordo){ alert("Falta assinar! Precisa dos dois CONCORDO - contratante e contratado na horizontal."); return; }
    const catName = CATS[contratoSel]; const id = Math.floor(Math.random()*1000000); const agora = new Date().toLocaleString("pt-MZ");
-   const logoForPDF = (formContrato as any)?.logoData || (lojaPerfil as any)?.logoData || ''; 
-   try{
-     const loadJsPDF = ():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=()=>{ setTimeout(()=>{ const j=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(j) resolve(j); else reject('jsPDF'); },300); }; s.onerror=()=>reject('Falha'); document.head.appendChild(s); }); };
-     const jsPDF = await loadJsPDF();
-     const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-     let y=10;
-     if(logoForPDF){ try{ doc.addImage(logoForPDF, 'PNG', 10, y, 20, 20); }catch(e){} }
-     doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.setTextColor(30,47,74);
-     doc.text('CONTRATO FINAL - 11 CLAUSULAS - ID '+id+' - '+catName.toUpperCase(), 35, y+8);
-     y+=6; doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.text('PDF FINAL AUTOMATICO COM LOGO E ANEXOS - '+agora,35,y+3);
-     y+=10;
-     const addClausula = (titulo:string, texto:string)=>{ if(y>250){ doc.addPage(); y=10; } doc.setFillColor(30,47,74); doc.rect(10,y,190,6,'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.text(titulo,12,y+4); y+=7; doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); doc.setFontSize(6); const lines = doc.splitTextToSize(texto, 185); doc.text(lines, 12, y); y+= lines.length*2.8 + 4; };
-     addClausula('1. DADOS', 'CONTRATANTE: '+formContrato.empNome+' - BI: '+formContrato.empBI+'\nTRABALHADOR: '+formContrato.trabNome+' - BI: '+formContrato.trabBI);
-     addClausula('10. ANEXOS COM LOGO', 'Fotos: '+(formContrato.anexos?.length||0)+' - '+(formContrato.anexos?.join(', ')||'BI, NUIT')+' - Logo: '+(formContrato.logoTipo||'LOGO')+' - BI: '+formContrato.empBI);
-     addClausula('11. ASSINATURAS', 'CONTRATANTE: '+formContrato.empNome+' CONCORDO '+assinaturaContratante.data+'\nCONTRATADO: '+formContrato.trabNome+' CONCORDO '+assinaturaContratado.data);
-     if(y>230){ doc.addPage(); y=10; }
-     y+=5; doc.setFillColor(240,247,255); doc.rect(10,y,90,25,'F'); doc.rect(10,y,90,25,'D'); doc.text('CONTRATANTE '+formContrato.empNome,12,y+4);
-     doc.setFillColor(255,248,237); doc.rect(110,y,90,25,'F'); doc.rect(110,y,90,25,'D'); doc.text('CONTRATADO '+formContrato.trabNome,112,y+4);
-     const nomeArq='CONTRATO-FINAL-'+catName+'-ID-'+id+'.pdf';
-     doc.save(nomeArq);
-     alert('Contrato FINAL PDF AUTOMATICO: '+nomeArq);
-   }catch(e){ alert('Erro PDF final: '+e); }
+   const logoForPDF = (formContrato as any)?.logoData || (lojaPerfil as any)?.logoData || ''; const logoImgTag = logoForPDF ? `<img src="${logoForPDF}" style="width:85px;height:85px;object-fit:contain;background:#fff;border-radius:10px;padding:5px;border:1px solid #ddd" />` : '';
+   const htmlFinal = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CONTRATO FINAL 11 CLAUSULAS COMPLETAS - ${catName} - ID ${id} - ASSINATURAS HORIZONTAL</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;padding:20px;line-height:1.5;color:#1a2a3a;font-size:11px}
+.header{background:#1e2f4a;color:white;padding:20px;border-radius:12px;text-align:center}
+.header h1{color:#d4a44a;margin:0;font-size:15px}
+.clausula{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}
+.clausula h3{background:#1e2f4a;color:white;padding:6px 10px;border-radius:6px;margin:-12px -12px 10px -12px;font-size:10px}
+.tarefa{background:#1e2f4a;color:white;padding:4px 8px;border-radius:12px;display:inline-block;margin:2px;font-size:9px}
+.assinaturas-horizontal{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
+.assinatura-box{border:2px solid #1e2f4a;border-radius:10px;padding:15px;background:white;min-height:220px}
+.assinatura-box.contratante{border-color:#25D366;background:#f0f7ff}
+.assinatura-box.contratado{border-color:#d4a44a;background:#fff8ed}
+.concordowpp{background:#1a1a1a;color:#00ff00;padding:8px;border-radius:6px;font-family:monospace;font-size:9px;margin:8px 0}
+.footer{background:#fff8ed;border:2px solid #d4a44a;border-radius:12px;padding:12px;margin-top:15px;font-size:10px}
+@media print{.no-print{display:none} .assinaturas-horizontal{grid-template-columns:1fr 1fr !important}}
+</style>
+</head><body>
+<div class="header" style="display:flex;gap:15px;align-items:center;text-align:left"><div style="flex-shrink:0">${logoImgTag}</div><div style="flex:1"><h1>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - ${catName.toUpperCase()} - ASSINATURAS </h1><div>PDF FINAL PARTILHAVEL - COM ASSINATURAS E CONCORDO NA HORIZONTAL - ${agora} - contrata-mz.vercel.app - ${formContrato.tarefas.length} tarefas - Lei 23/2007 - valido em Mocambique</div></div></div>
+
+<div class="clausula"><h3>1. DADOS DAS PARTES - Quem contrata e quem faz</h3>
+<b>CONTRATANTE:</b> ${formContrato.empNome} - BI: ${formContrato.empBI} - Tel: ${formContrato.empTel} - End: ${formContrato.empEnd}<br>
+<b>TRABALHADOR:</b> ${formContrato.trabNome} - BI: ${formContrato.trabBI} - Tel: ${formContrato.trabTel} - End: ${formContrato.trabEnd} - Profissao: ${formContrato.trabProf}
+</div>
+
+<div class="clausula"><h3>2. OBJETO E TAREFAS - ${formContrato.tarefas.length} TAREFAS DE ${catName.toUpperCase()}</h3>${formContrato.tarefas.map((t:string,i:number)=>`<span class="tarefa">${i+1}. ${t}</span>`).join("")}</div>
+
+<div class="clausula"><h3>3. HORARIO E LOCAL - Quando e onde</h3>
+<b>Horario:</b> ${formContrato.horarioInicio} as ${formContrato.horarioFim}<br>
+<b>Dias:</b> ${formContrato.dias}<br>
+<b>Data inicio:</b> ${formContrato.dataInicio}<br>
+<b>Local de trabalho:</b> ${formContrato.localTrab}
+</div>
+
+<div class="clausula"><h3>4. SALARIO E PAGAMENTO - Quanto e como paga</h3>
+<b>Valor:</b> ${formContrato.valor} MZN<br>
+<b>Dia pagamento:</b> Todo dia ${formContrato.diaPag}<br>
+<b>Forma:</b> ${formContrato.formaPag}<br>
+<b>Prazo:</b> ${formContrato.prazo}
+</div>
+
+<div class="clausula"><h3>5. ALIMENTACAO E ALOJAMENTO - Beneficios</h3>
+<b>Alimentacao:</b> ${formContrato.alimentacao}<br>
+<b>Alojamento:</b> ${formContrato.alojamento}<br>
+<b>Transporte:</b> ${formContrato.transporte}
+</div>
+
+<div class="clausula"><h3>6. FOLGAS E FERIAS - Descanso legal</h3>${formContrato.folgas}</div>
+<div class="clausula"><h3>7. PERIODO EXPERIMENTAL - Teste inicial</h3>${formContrato.periodoExp}</div>
+<div class="clausula"><h3>8. DEVERES DO TRABALHADOR - Obrigacoes</h3>${formContrato.deveresTrab}</div>
+<div class="clausula"><h3>9. DEVERES DO EMPREGADOR - Obrigacoes</h3>${formContrato.deveresEmp}</div>
+<div class="clausula"><h3>10. ANEXOS (ANTES VALIDADE) - Fotos e provas - Fotos viram prova legal</h3>
+<b>Fotos e comprovativos anexados antes da validade - viram prova legal:</b><br>
+- Foto BI Contratante: ${formContrato.empNome} - BI ${formContrato.empBI} - Frente e verso - Anexado na Clausula 10<br>
+- Foto BI Contratado: ${formContrato.trabNome} - BI ${formContrato.trabBI} - Frente e verso - Anexado na Clausula 10<br>
+- Foto do local: ${formContrato.localTrab} - Foto antes de comecar<br>
+- Fotos: ${formContrato.anexos.length} ficheiros - ${formContrato.anexos.join(", ") || "BI, NUIT, Fotos obra, CV"}<br>
+- Comprovativo M-Pesa: ${formContrato.valor} MZN - ${formContrato.formaPag} - Referencia CONCORDO ID ${id}<br>
+</div>
+
+<div class="clausula"><h3>11. VALIDADE E ASSINATURAS - Assinaturas separadas na parte horizontal nao vertical</h3>
+
+<b></b>
+</div>
+
+<div class="assinaturas-horizontal">
+<div class="assinatura-box contratante">
+<b>CONTRATANTE - </b><br><br>
+${formContrato.empNome} - BI ${formContrato.empBI}<br>
+CONCORDO em ${assinaturaContratante.data}<br>
+<div class="concordowpp">Eu, ${formContrato.empNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratante.data}</div>
+Assinatura  - 1 de 2
+</div>
+<div class="assinatura-box contratado">
+<b>CONTRATADO - </b><br><br>
+${formContrato.trabNome} - BI ${formContrato.trabBI}<br>
+CONCORDO em ${assinaturaContratado.data}<br>
+<div class="concordowpp">Eu, ${formContrato.trabNome}, CONCORDO - ${formContrato.valor}MZN - ${assinaturaContratado.data}</div>
+Assinatura  - 2 de 2
+</div>
+</div>
+
+<div class="footer"><b>CONTRATO FINAL COM ASSINATURAS - 11 CLAUSULAS COMPLETAS - ID ${id} - </b><br>
+ LEI 23/2007 - VALIDO EM MOCAMBIQUE<br>
+ESSE - NUIT 401866876 - contrata-mz.vercel.app - ID ${id} - ${formContrato.valor} MZN - ${formContrato.localTrab}<br>
+${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS 
+</div>
+
+<div style="text-align:center;margin-top:20px" class="no-print">
+<button onclick="window.print()" style="background:#1e2f4a;color:white;padding:14px 28px;border-radius:10px;border:none;font-weight:bold;margin:5px">IMPRIMIR / SALVAR COMO PDF FINAL COM ASSINATURAS - 11 CLAUSULAS - HORIZONTAL</button>
+</div>
+</body></html>`;
+   const winContrato = window.open('', '_blank'); if(winContrato){ winContrato.document.write(htmlFinal); winContrato.document.close(); winContrato.focus(); setTimeout(()=>winContrato.print(), 800); } return;
   };
 
   return (
-return (
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
    <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
@@ -1006,7 +1131,39 @@ return (
       {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
       <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
       <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
-      <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
+      <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 $
+      {profSelecionado && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3" onClick={()=>setProfSelecionado(null)}>
+          <div className="bg-white rounded-[14px] max-w-[600px] w-full max-h-[90vh] overflow-auto p-5" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex justify-between items-start">
+              <div className="flex gap-3 items-center">
+                <div className="h-12 w-12 rounded-full bg-[#1e2f4a] text-white grid place-items-center font-black">{profSelecionado.iniciais||profSelecionado.nome?.substring(0,2).toUpperCase()||'PR'}</div>
+                <div>
+                  <div className="font-black text-[14px]">{profSelecionado.nome}</div>
+                  <div className="text-[10px] text-[#64748b]">{profSelecionado.tipo} - {profSelecionado.local}</div>
+                  <div className="text-[9px] text-[#94a3b8]">{profSelecionado.pais} / {profSelecionado.provincia} - {profSelecionado.distrito}</div>
+                </div>
+              </div>
+              <button onClick={()=>setProfSelecionado(null)} className="h-8 w-8 rounded-full bg-black text-white">X</button>
+            </div>
+            <div className="mt-4 space-y-3 text-[11px]">
+              <div><b>Descricao:</b> {profSelecionado.descricao}</div>
+              <div><b>Telefone:</b> {profSelecionado.telefone||profSelecionado.tel||profSelecionado.whatsapp||'Nao informado'}</div>
+              <div><b>Email:</b> {profSelecionado.email||'Nao informado'}</div>
+              <div><b>Trabalhos:</b> {profSelecionado.trabalhos} - Rating: {profSelecionado.rating}</div>
+              <div><b>Localizacao:</b> {profSelecionado.pais} - {profSelecionado.provincia} - {profSelecionado.distrito}</div>
+              <div className="flex gap-2 mt-3">
+                <a href={'tel:'+(profSelecionado.telefone||profSelecionado.tel)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-center font-black text-[11px]">LIGAR</a>
+                <a href={'https://wa.me/'+String(profSelecionado.telefone||profSelecionado.tel||'').replace(/\D/g,'').slice(-9)} target="_blank" className="flex-1 py-2 bg-[#25D366] text-white rounded-lg text-center font-black text-[11px]">WHATSAPP</a>
+              </div>
+              <button onClick={()=>{ setProfSelecionado(null); setTab('contratos'); }} className="w-full py-2 bg-[#1e2f4a] text-white rounded-lg font-black text-[11px] mt-2">GERAR CONTRATO</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
       <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#facc15] text-black ring-2 ring-black font-black':'bg-[#facc15] text-black hover:bg-[#fde047] font-black'}`}>VENDER</button>
       
       <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
@@ -1586,7 +1743,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
      {/* TOPO LARANJA - INTERATIVO ENCONTRAR MESTRE */}
      <div className="bg-[#1e2f4a] text-white rounded-[14px] px-5 py-4 mb-3">
       <div className="text-center">
-        <div className="text-[10px] tracking-[2px] text-[#c9a86a] font-extrabold">ENCONTRE NA SUA ZONA - MAIS PROXIMOS DE SI - MESTRE, PROFISSIONAL OU EMPRESA</div>
+        
         <h2 className="text-[20px] font-black mt-1.5 leading-tight">Estas a procura de um profissional, mestre ou empresa na sua zona ou mais proximo?</h2>
         <p className="text-[12px] opacity-80 mt-1.5">Encontre aqui - Pedreiro, Carpinteiro, Eletricista, Serralheiro, Domestica, Motorista... perto de si em Maputo, Matola, Boane, Xai-Xai - contrato legal em 2 minutos</p>
         <div className="flex gap-2 justify-center mt-2.5 flex-wrap">
@@ -1632,10 +1789,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                    <div className="text-[9px] text-[#94a3b8]">{p.pais} / {p.provincia} - {p.distrito}</div>
                  </div>
                </div>
-               <span className="px-2 py-1 bg-[#fef3c7] rounded-full text-[9px] font-extrabold h-fit">VERIFICADO - {p.rating}</span>
+               <button onClick={()=>setProfSelecionado(p)} className="px-3 py-1 bg-[#1e2f4a] text-white rounded-full text-[9px] font-extrabold h-fit hover:bg-black">VER PERFIL</button>
              </div>
              <div className="text-[11px] text-[#334155] mt-2">{p.descricao}</div>
-             <div className="flex gap-2 mt-2.5"><button onClick={()=>setTab('contratos')} className="flex-1 py-2 bg-[#1e2f4a] text-white border-none rounded-lg font-extrabold text-[10px]">GERAR CONTRATO</button><button className="px-3 py-2 bg-white text-[#1e2f4a] border border-[#c9a86a] rounded-lg font-extrabold text-[10px]">CONTRATAR</button></div>
+             <div className="flex gap-2 mt-2.5"><button onClick={()=>setTab('contratos')} className="flex-1 py-2 bg-[#1e2f4a] text-white border-none rounded-lg font-extrabold text-[10px]">GERAR CONTRATO</button><div className="px-2 py-1 bg-white border border-[#e2e8f0] rounded-lg text-[9px] leading-tight"><div className="font-bold text-[#1e2f4a]">{p.telefone||p.tel||p.whatsapp||"Sem tel"}</div><div className="text-[8px] text-[#64748b]">{p.email||"sem email"}</div></div></div>
              <div className="text-[9px] text-[#94a3b8] mt-1.5">{p.trabalhos} trabalhos - M-Pesa OK - Fotos OK { (p.anexos||[]).filter((a:any)=>!['bi','nuit'].includes(String(a).toLowerCase())).join(', ') }</div>
            </div>)}
          </div>
