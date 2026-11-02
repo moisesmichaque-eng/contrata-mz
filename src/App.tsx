@@ -1580,14 +1580,18 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         return matchBusca && matchTipo;
                       }).map((p:any)=>{
                         const dataEnt = p.dataEntrada || dataStockDiario || '01/11/2026';
-                        // PASSO 1 FIX - LOGICA CORRETA: Sempre usa campos diretos, sem fallback 1070
-                        const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? 0);
-                        const entradaArm = Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 0);
-                        const saidaArm = Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 0);
+                        // FORMULAS RECUPERADAS - PASSO 1 FIX - LOGICA CORRETA
+                        // ARMAZEM: Inicial = Final ontem (ou noArmazem), Entrada = recepcao/qtdEntrada, Saida = saidaArmazem/entradaLoja
+                        // FINAL ARM = INICIAL + ENTRADA - SAIDA
+                        const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? (p as any).stockInicialArmazemReal ?? 0);
+                        const entradaArm = Number((p as any).recepcaoArmazem || (p as any).qtdEntrada || 0);
+                        const saidaArm = Number((p as any).saidaArmazem || (p as any).entradaLoja || (p as any).saidaArmazemReal || 0);
                         const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
-                        const inicialLoja = Number((p as any).stockInicialLoja ?? 0);
-                        const recepLoja = Number((p as any).entradaLoja ?? 0);
-                        const vendaQtd = Number(p.venda ?? p.vendas ?? 0);
+                        // LOJA: Inicial = Final ontem loja, Recepcao = vem do armazem (entradaLoja), Venda = venda
+                        // FINAL LOJA = INICIAL LOJA + RECEPCAO - VENDA
+                        const inicialLoja = Number((p as any).stockInicialLoja ?? (p as any).stockInicialLojaReal ?? p.stockLoja ?? 0);
+                        const recepLoja = Number((p as any).entradaLoja || (p as any).recepcaoLoja || saidaArm || 0);
+                        const vendaQtd = Number(p.venda ?? p.vendas ?? (p as any).saidaLoja ?? 0);
                         const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
                         const finalTotal = finalArm + finalLoja;
                         const precoUnit = Number((p as any).precoVenda||0);
@@ -2587,7 +2591,7 @@ Bilhete valido - Apresentar QR`;
               <div className="flex justify-end gap-2"><button onClick={()=>{ setShowEntradaStock(false); setQtdEntradaTemp(''); }} className="h-[42px] px-5 border-2 rounded-[10px] font-bold">Cancelar</button><button onClick={()=>{
                 const q=parseInt(qtdEntradaTemp||'0')||0; if(q<=0){ alert('Qtd!'); return; }
                 if(!stockSelecionado){ alert('Selecione produto!'); return; }
-                setStockProdutos((prev:any[])=>{ const nl=prev.map((p:any)=>{ if(p.id===stockSelecionado){ return {...p, noArmazem:(p.noArmazem||0)+q, qtdEntrada:(p.qtdEntrada||0)+q}; } return p; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((p:any)=>{ if(p.id===stockSelecionado){ const novaEntrada = ((p as any).qtdEntrada||0)+q; const novaRecep = ((p as any).recepcaoArmazem||0)+q; return {...p, noArmazem:(p.noArmazem||0)+q, qtdEntrada:novaEntrada, recepcaoArmazem:novaRecep, stockInicialArmazem: (p as any).stockInicialArmazem ?? p.noArmazem ?? 0}; } return p; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setQtdEntradaTemp(''); setShowEntradaStock(false);
               }} className="h-[42px] px-6 bg-[#facc15] border-2 border-black rounded-[10px] font-black">ENTRADA</button></div>
             </div>
@@ -2614,7 +2618,7 @@ Bilhete valido - Apresentar QR`;
                   const confirma = confirm('FIFO ALERTA! Existe stock mais antigo: '+maisVelho.codigo+' Entrada: '+maisVelho.dataEntrada+' Stock: '+maisVelho.noArmazem+'\n\nQuer transferir do SELECIONADO mesmo assim?');
                   if(!confirma){ setStockSelecionado(maisVelho.id); return; }
                 }
-                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ const novoNoArmazem = (pp.noArmazem||0)-q; const novoEntradaLoja = (pp.entradaLoja||0)+q; const inicial = (pp.stockInicialLoja||0); const vendaAtual = (pp.venda||0); const novoStockLoja = inicial + novoEntradaLoja - vendaAtual; const dataReqBR = dataTransferencia.split('-').reverse().join('/'); return {...pp, noArmazem:novoNoArmazem, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, dataReq:dataReqBR}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
+                setStockProdutos((prev:any[])=>{ const nl=prev.map((pp:any)=>{ if(pp.id===stockSelecionado){ const novoNoArmazem = (pp.noArmazem||0)-q; const novaSaidaArm = ((pp as any).saidaArmazem||0)+q; const novoEntradaLoja = (pp.entradaLoja||0)+q; const inicialLoja = (pp.stockInicialLoja||0); const vendaAtual = (pp.venda||0); const novoStockLoja = inicialLoja + novoEntradaLoja - vendaAtual; const dataReqBR = dataTransferencia.split('-').reverse().join('/'); return {...pp, noArmazem:novoNoArmazem, saidaArmazem:novaSaidaArm, stockLoja:novoStockLoja, entradaLoja:novoEntradaLoja, recepcaoLoja:novoEntradaLoja, dataReq:dataReqBR, stockFinalArmazem: novoNoArmazem + (pp.recepcaoArmazem||pp.qtdEntrada||0) - novaSaidaArm, stockFinalLoja: novoStockLoja}; } return pp; }); try{ const t=localStorage.getItem('contaAtiva')||'geral'; localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl)); localStorage.setItem('stock_produtos', JSON.stringify(nl)); }catch(e){} return nl; });
                 setQtdSaidaTemp(''); setShowSaidaStock(false);
               }} className="h-[42px] px-5 bg-[#16a34a] text-white border-2 border-black rounded-[10px] font-black text-[12px]">ARMAZEM → LOJA (FIFO)</button></div>
             </div>
