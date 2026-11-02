@@ -1119,54 +1119,19 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
 </div>
 </body></html>`;
    const winContrato = window.open('', '_blank'); if(winContrato){ winContrato.document.write(htmlFinal); winContrato.document.close(); winContrato.focus(); setTimeout(()=>winContrato.print(), 800); } return;
-  };
+ };
 
-  return (
+ return (
   <div className="min-h-screen w-full overflow-x-hidden bg-[#f5f5f0] font-sans">
    <style>{`@media (max-width: 1023px) { input, select, textarea, button { touch-action: manipulation; } input, select, textarea { max-width: 100%; font-size: 16px; } } @media (max-width: 640px) { header { position: sticky; } }`}</style>
-   <header className="h-14 bg-[#1e2f4a] text-white flex items-center justify-between px-4 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100]">
-    <div className="flex items-center gap-2"><img src={LOGO_ESSE} alt="WEZHA" className="h-10 w-10 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="text-[14px] font-black tracking-[3px] text-[#facc15] drop-shadow-sm">TOTSHE</div></div>
-        <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-[62vw] sm:max-w-none scrollbar-hide -mx-1 px-1" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
-      
-      {/* NOVO MODULO FACILITA VIAGENS - App_41 - MESMO PADRAO FATURACAO */}
-      <button onClick={()=>setTab('viagens')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex items-center gap-1 flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
-      <button onClick={()=>setTab('encontrar')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-transparent text-white'}`}>ENCONTRAR</button>
-      <button onClick={()=>setTab('contratos')} className={`px-3 sm:px-4 py-2 rounded-md font-extrabold text-[10px] sm:text-xs flex-shrink-0 $
-      {profSelecionado && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3" onClick={()=>setProfSelecionado(null)}>
-          <div className="bg-white rounded-[14px] max-w-[600px] w-full max-h-[90vh] overflow-auto p-5" onClick={(e)=>e.stopPropagation()}>
-            <div className="flex justify-between items-start">
-              <div className="flex gap-3 items-center">
-                <div className="h-12 w-12 rounded-full bg-[#1e2f4a] text-white grid place-items-center font-black">{profSelecionado.iniciais||profSelecionado.nome?.substring(0,2).toUpperCase()||'PR'}</div>
-                <div>
-                  <div className="font-black text-[14px]">{profSelecionado.nome}</div>
-                  <div className="text-[10px] text-[#64748b]">{profSelecionado.tipo} - {profSelecionado.local}</div>
-                  <div className="text-[9px] text-[#94a3b8]">{profSelecionado.pais} / {profSelecionado.provincia} - {profSelecionado.distrito}</div>
-                </div>
-              </div>
-              <button onClick={()=>setProfSelecionado(null)} className="h-8 w-8 rounded-full bg-black text-white">X</button>
-            </div>
-            <div className="mt-4 space-y-3 text-[11px]">
-              <div><b>Descricao:</b> {profSelecionado.descricao}</div>
-              <div><b>Telefone:</b> {profSelecionado.telefone||profSelecionado.tel||profSelecionado.whatsapp||'Nao informado'}</div>
-              <div><b>Email:</b> {profSelecionado.email||'Nao informado'}</div>
-              <div><b>Trabalhos:</b> {profSelecionado.trabalhos} - Rating: {profSelecionado.rating}</div>
-              <div><b>Localizacao:</b> {profSelecionado.pais} - {profSelecionado.provincia} - {profSelecionado.distrito}</div>
-              <div className="flex gap-2 mt-3">
-                <a href={'tel:'+(profSelecionado.telefone||profSelecionado.tel)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-center font-black text-[11px]">LIGAR</a>
-                <a href={'https://wa.me/'+String(profSelecionado.telefone||profSelecionado.tel||'').replace(/\D/g,'').slice(-9)} target="_blank" className="flex-1 py-2 bg-[#25D366] text-white rounded-lg text-center font-black text-[11px]">WHATSAPP</a>
-              </div>
-              <button onClick={()=>{ setProfSelecionado(null); setTab('contratos'); }} className="w-full py-2 bg-[#1e2f4a] text-white rounded-lg font-black text-[11px] mt-2">GERAR CONTRATO</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-      {tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
-      <button onClick={()=>setTab('negocio')} className={`px-3 sm:px-4 py-2 rounded-full font-black text-[10px] sm:text-[11px] flex-shrink-0 ${tab==='negocio'?'bg-[#facc15] text-black ring-2 ring-black font-black':'bg-[#facc15] text-black hover:bg-[#fde047] font-black'}`}>VENDER</button>
-      
-      <button onClick={()=>setTab('admin')} className="h-8 w-8 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[11px] font-black text-black ml-1 hover:ring-2 hover:ring-white cursor-pointer" title="Admin - Clique para login">ADM</button>
+   <header className="min-h-[56px] bg-[#1e2f4a] text-white flex items-center justify-between px-3 border-b-[3px] border-[#c9a86a] sticky top-0 z-[100] flex-wrap gap-2 py-2">
+    <div className="flex items-center gap-2 flex-shrink-0"><img src={LOGO_ESSE} alt="WEZHA" className="h-8 w-8 rounded-full bg-white object-contain p-1 shadow-sm" /><div className="text-[13px] font-black tracking-[3px] text-[#facc15]">TOTSHE</div></div>
+    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+      <button onClick={()=>setTab('viagens')} className={`px-2.5 py-1.5 rounded-full font-black text-[9px] whitespace-nowrap flex-shrink-0 ${tab==='viagens'?'bg-[#0ea5e9] text-white ring-2 ring-white':'bg-[#0ea5e9] text-white hover:bg-[#0284c7]'}`}>VIAGENS</button>
+      <button onClick={()=>setTab('encontrar')} className={`px-2.5 py-1.5 rounded-md font-extrabold text-[9px] whitespace-nowrap flex-shrink-0 ${tab==='encontrar'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/10 text-white'}`}>ENCONTRAR</button>
+      <button onClick={()=>setTab('contratos')} className={`px-2.5 py-1.5 rounded-md font-extrabold text-[9px] whitespace-nowrap flex-shrink-0 max-w-[110px] truncate ${tab==='contratos'?'bg-[#c9a86a] text-[#1e2f4a]':'bg-white/20 text-white border border-white/30'}`}>CONTRATOS</button>
+      <button onClick={()=>setTab('negocio')} className={`px-2.5 py-1.5 rounded-full font-black text-[9px] whitespace-nowrap flex-shrink-0 ${tab==='negocio'?'bg-[#facc15] text-black ring-2 ring-black':'bg-[#facc15] text-black hover:bg-[#fde047]'}`}>VENDER</button>
+      <button onClick={()=>setTab('admin')} className="h-7 w-7 rounded-full bg-[#facc15] flex-shrink-0 flex items-center justify-center text-[9px] font-black text-black hover:ring-2 hover:ring-white cursor-pointer" title="Admin">ADM</button>
     </div>
    </header>
 
@@ -1827,6 +1792,35 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
      </div>
     </div>
    )}
+
+      {profSelecionado && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3" onClick={()=>setProfSelecionado(null)}>
+          <div className="bg-white rounded-[14px] max-w-[600px] w-full max-h-[90vh] overflow-auto p-5" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex justify-between items-start">
+              <div className="flex gap-3 items-center">
+                <div className="h-12 w-12 rounded-full bg-[#1e2f4a] text-white grid place-items-center font-black">{profSelecionado.iniciais||profSelecionado.nome?.substring(0,2).toUpperCase()||'PR'}</div>
+                <div>
+                  <div className="font-black text-[14px]">{profSelecionado.nome}</div>
+                  <div className="text-[10px] text-[#64748b]">{profSelecionado.tipo} - {profSelecionado.local}</div>
+                  <div className="text-[9px] text-[#94a3b8]">{profSelecionado.pais} / {profSelecionado.provincia} - {profSelecionado.distrito}</div>
+                </div>
+              </div>
+              <button onClick={()=>setProfSelecionado(null)} className="h-8 w-8 rounded-full bg-black text-white">X</button>
+            </div>
+            <div className="mt-4 space-y-3 text-[11px]">
+              <div><b>Descricao:</b> {profSelecionado.descricao}</div>
+              <div><b>Telefone:</b> {profSelecionado.telefone||profSelecionado.tel||profSelecionado.whatsapp||'Nao informado'}</div>
+              <div><b>Email:</b> {profSelecionado.email||'Nao informado'}</div>
+              <div><b>Trabalhos:</b> {profSelecionado.trabalhos} - Rating: {profSelecionado.rating}</div>
+              <div className="flex gap-2 mt-3">
+                <a href={'tel:'+(profSelecionado.telefone||profSelecionado.tel)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-center font-black text-[11px]">LIGAR</a>
+                <a href={'https://wa.me/'+String(profSelecionado.telefone||profSelecionado.tel||'').replace(/\D/g,'').slice(-9)} target="_blank" className="flex-1 py-2 bg-[#25D366] text-white rounded-lg text-center font-black text-[11px]">WHATSAPP</a>
+              </div>
+              <button onClick={()=>{ setProfSelecionado(null); setTab('contratos'); }} className="w-full py-2 bg-[#1e2f4a] text-white rounded-lg font-black text-[11px] mt-2">GERAR CONTRATO</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {tab==='contratos' && (
     <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10 w-full min-w-0">
