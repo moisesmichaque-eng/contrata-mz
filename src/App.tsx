@@ -1473,10 +1473,12 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockComFecho)); localStorage.setItem(`fecho_stock_${telAtiva}_${dataHoje}`, JSON.stringify(stockComFecho)); localStorage.setItem(`ultimo_fecho_${telAtiva}`, JSON.stringify(stockComFecho)); }
                         localStorage.setItem("stock_produtos", JSON.stringify(stockComFecho));
                         localStorage.setItem("ultimo_fecho", JSON.stringify(stockComFecho));
-                        // APOS SALVAR FECHO - ZERA PARA NOVO DIA/TURNO: Inicial hoje = Final ontem, recepcao 0, venda 0
+                        // APOS SALVAR FECHO - ZERA PARA NOVO DIA/TURNO: Inicial hoje = Final ontem, recepcao 0, venda 0 - CORRIGIDO LOJA
                         const novoDiaStock = stockComFecho.map((p:any)=>{
-                          const finalArm = p.stockFinalArmazem ?? 0;
-                          const finalLoja = p.stockFinalLoja ?? 0;
+                          // Final armazem e loja JA calculados no stockComFecho - sao os finais reais da tela antes de salvar
+                          const finalArm = Number(p.stockFinalArmazem ?? p.stockInicialArmazem ?? p.noArmazem ?? 0);
+                          const finalLoja = Number(p.stockFinalLoja ?? p.stockInicialLoja ?? p.stockLoja ?? 0);
+                          // IMPORTANTE: Loja inicial = final loja anterior, nao 0
                           return {
                             ...p,
                             stockInicialArmazem: finalArm,
@@ -1487,14 +1489,17 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                             entradaLoja: 0,
                             stockInicialLoja: finalLoja,
                             stockLoja: finalLoja,
+                            stockInicialLojaReal: finalLoja,
                             venda: 0,
                             vendas: 0,
+                            saidaLoja: 0,
                             stockFinalArmazem: finalArm,
                             stockFinalLoja: finalLoja,
                             stockFinalArmazemOntem: finalArm,
                             stockFinalLojaOntem: finalLoja,
                             dataEntrada: dataHoje,
-                            dataStockDiario: dataHoje
+                            dataStockDiario: dataHoje,
+                            ultimoFechoData: dataHoje
                           };
                         });
                         setTimeout(()=>{
