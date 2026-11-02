@@ -1473,12 +1473,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockComFecho)); localStorage.setItem(`fecho_stock_${telAtiva}_${dataHoje}`, JSON.stringify(stockComFecho)); localStorage.setItem(`ultimo_fecho_${telAtiva}`, JSON.stringify(stockComFecho)); }
                         localStorage.setItem("stock_produtos", JSON.stringify(stockComFecho));
                         localStorage.setItem("ultimo_fecho", JSON.stringify(stockComFecho));
-                        // APOS SALVAR FECHO - ZERA PARA NOVO DIA/TURNO: Inicial hoje = Final ontem, recepcao 0, venda 0 - CORRIGIDO LOJA
+                        // APOS SALVAR FECHO - ZERA PARA NOVO DIA/TURNO: Inicial hoje = Final ontem, recepcao 0, venda 0 - LOJA CORRIGIDO
                         const novoDiaStock = stockComFecho.map((p:any)=>{
-                          // Final armazem e loja JA calculados no stockComFecho - sao os finais reais da tela antes de salvar
                           const finalArm = Number(p.stockFinalArmazem ?? p.stockInicialArmazem ?? p.noArmazem ?? 0);
-                          const finalLoja = Number(p.stockFinalLoja ?? p.stockInicialLoja ?? p.stockLoja ?? 0);
-                          // IMPORTANTE: Loja inicial = final loja anterior, nao 0
+                          const finalLoja = Number(p.stockFinalLoja ?? (p as any).stockFinalLojaCalc ?? p.stockInicialLoja ?? p.stockLoja ?? 0);
                           return {
                             ...p,
                             stockInicialArmazem: finalArm,
@@ -1487,16 +1485,18 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                             qtdEntrada: 0,
                             saidaArmazem: 0,
                             entradaLoja: 0,
+                            recepcaoLoja: 0,
                             stockInicialLoja: finalLoja,
                             stockLoja: finalLoja,
                             stockInicialLojaReal: finalLoja,
+                            stockFinalLojaOntem: finalLoja,
                             venda: 0,
                             vendas: 0,
                             saidaLoja: 0,
+                            qtdVendida: 0,
                             stockFinalArmazem: finalArm,
                             stockFinalLoja: finalLoja,
                             stockFinalArmazemOntem: finalArm,
-                            stockFinalLojaOntem: finalLoja,
                             dataEntrada: dataHoje,
                             dataStockDiario: dataHoje,
                             ultimoFechoData: dataHoje
@@ -1587,12 +1587,19 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         const entradaArm = Number((p as any).recepcaoArmazem || (p as any).qtdEntrada || 0);
                         const saidaArm = Number((p as any).saidaArmazem || (p as any).entradaLoja || (p as any).saidaArmazemReal || 0);
                         const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
-                        // LOJA: Inicial = Final ontem loja, Recepcao = vem do armazem (entradaLoja), Venda = venda
-                        // FINAL LOJA = INICIAL LOJA + RECEPCAO - VENDA
-                        const inicialLoja = Number((p as any).stockInicialLoja ?? (p as any).stockInicialLojaReal ?? p.stockLoja ?? 0);
-                        const recepLoja = Number((p as any).entradaLoja || (p as any).recepcaoLoja || saidaArm || 0);
-                        const vendaQtd = Number(p.venda ?? p.vendas ?? (p as any).saidaLoja ?? 0);
-                        const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
+                        // LOJA - 4 COLUNAS - FORMULAS RECUPERADAS CORRETAS
+                        // STOCK INICIAL LOJA = Final loja de ontem (ou stockInicialLoja salvo)
+                        // RECEPÇÃO LOJA = vem do armazem = entradaLoja = SAÍDA armazem
+                        // VENDA = quantidade vendida hoje (só deste turno)
+                        // STOCK FINAL LOJA = INICIAL + RECEPÇÃO - VENDA
+                        const inicialLoja = Number((p as any).stockInicialLoja ?? (p as any).stockInicialLojaReal ?? (p as any).stockFinalLojaOntem ?? p.stockLoja ?? 0);
+                        const recepLoja = Number((p as any).entradaLoja ?? (p as any).recepcaoLoja ?? 0);
+                        // Se recepLoja 0 mas saidaArm tem valor, usa saidaArm (transferencia arm->loja)
+                        const recepLojaFinal = recepLoja || saidaArm || 0;
+                        const vendaQtd = Number((p as any).venda ?? (p as any).vendas ?? 0);
+                        // FINAL LOJA = INICIAL + RECEPÇÃO - VENDA (sem Math.max para mostrar se negativo, mas limita a 0 na exibição se quiser)
+                        const finalLojaCalc = inicialLoja + recepLojaFinal - vendaQtd;
+                        const finalLoja = finalLojaCalc;
                         const finalTotal = finalArm + finalLoja;
                         const precoUnit = Number((p as any).precoVenda||0);
                         const totalVendasValor = vendaQtd * precoUnit;
@@ -1607,7 +1614,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                             <td className="text-center p-1.5 border">-&gt; {saidaArm}</td>
                             <td className="text-center p-1.5 border bg-[#fef3c7] font-black">{finalArm}</td>
                             <td className="text-center p-1.5 border bg-[#dcfce7] font-bold">{inicialLoja}</td>
-                            <td className="text-center p-1.5 border bg-[#dcfce7]">{recepLoja}</td>
+                            <td className="text-center p-1.5 border bg-[#dcfce7]">{recepLojaFinal}</td>
                             <td className="text-center p-1.5 border bg-[#dcfce7] font-bold">{vendaQtd}</td>
                             <td className="text-center p-1.5 border bg-[#dcfce7] font-black">{finalLoja}</td>
                             <td className="text-center p-1.5 border bg-[#fef3c7] font-black">{finalTotal}</td>
