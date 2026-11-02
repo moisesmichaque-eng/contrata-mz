@@ -1458,7 +1458,22 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     <div className="flex items-center gap-2 bg-[#fef3c7] border-2 border-[#f59e0b] rounded-[10px] p-2">
                       <span className="text-[10px] font-black bg-[#f59e0b] text-white px-2 py-1 rounded">DATA:</span>
                       <input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="h-8 px-3 border rounded-[6px] text-[12px] font-bold bg-white" />
-                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockProdutos)); } localStorage.setItem("stock_produtos", JSON.stringify(stockProdutos)); }catch(e){} localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("Salvo! "+stockProdutos.length+" produtos guardados");}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar</button>
+                      <span className="text-[8px] bg-white border px-2 py-1 rounded-full font-bold">Final ontem = Inicial hoje</span><button onClick={()=>{try{ const telAtiva = localStorage.getItem("contaAtiva") || (lojaPerfil as any).tel; const dataHoje = dataStockDiario; // Guarda fecho de hoje para amanha usar como inicial
+                        const stockComFecho = stockProdutos.map((p:any)=>{
+                          const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? 0);
+                          const entradaArm = Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 0);
+                          const saidaArm = Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 0);
+                          const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
+                          const inicialLoja = Number((p as any).stockInicialLoja ?? 0);
+                          const recepLoja = Number((p as any).entradaLoja ?? saidaArm);
+                          const vendaQtd = Number(p.venda ?? 0);
+                          const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
+                          return {...p, stockFinalArmazem: finalArm, stockFinalLoja: finalLoja, stockFinalArmazemOntem: finalArm, stockFinalLojaOntem: finalLoja, dataStockDiario: dataHoje, dataEntrada: dataHoje};
+                        });
+                        if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockComFecho)); localStorage.setItem(`fecho_stock_${telAtiva}_${dataHoje}`, JSON.stringify(stockComFecho)); }
+                        localStorage.setItem("stock_produtos", JSON.stringify(stockComFecho));
+                        setStockProdutos(stockComFecho);
+                        }catch(e){ console.error(e); } localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("✅ FECHO SALVO! "+stockProdutos.length+" produtos - Final de hoje guardado como Inicial de amanha - Data: "+dataStockDiario);}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar Fecho</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1525,14 +1540,21 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         else if(filtroTipoStock==='zerado') matchTipo = sf === 0;
                         return matchBusca && matchTipo;
                       }).map((p:any)=>{
-                        const dataEnt = p.dataEntrada || '01/11/2026';
-                        const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? 1070);
-                        const entradaArm = Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 1000);
-                        const saidaArm = Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 70);
+                        const dataEnt = p.dataEntrada || dataStockDiario || '01/11/2026';
+                        // PASSO 1 - LOGICA CORRETA: Inicial hoje = Final ontem, recepcao 0, venda 0 no inicio do dia
+                        const ehNovoDia = p.dataStockDiario ? p.dataStockDiario !== dataStockDiario : false;
+                        const finalArmOntem = Number((p as any).stockFinalArmazemOntem ?? (p as any).stockFinalArmazem ?? (p as any).stockInicialArmazem ?? p.noArmazem ?? 0);
+                        const finalLojaOntem = Number((p as any).stockFinalLojaOntem ?? (p as any).stockFinalLoja ?? (p as any).stockInicialLoja ?? 0);
+                        // Se eh novo dia, inicial = final de ontem, senao usa inicial salvo
+                        const inicialArm = ehNovoDia ? finalArmOntem : Number((p as any).stockInicialArmazem ?? p.noArmazem ?? finalArmOntem ?? 0);
+                        // Recepcao e saida zeradas no inicio do dia - so preenche quando fizer Entrada real
+                        const entradaArm = ehNovoDia ? 0 : Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 0);
+                        const saidaArm = ehNovoDia ? 0 : Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 0);
                         const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
-                        const inicialLoja = Number((p as any).stockInicialLoja ?? 20);
-                        const recepLoja = Number((p as any).entradaLoja ?? saidaArm);
-                        const vendaQtd = Number(p.venda ?? 0);
+                        const inicialLoja = ehNovoDia ? finalLojaOntem : Number((p as any).stockInicialLoja ?? finalLojaOntem ?? 0);
+                        const recepLoja = ehNovoDia ? 0 : Number((p as any).entradaLoja ?? saidaArm);
+                        // VENDAS ACUMULADAS SO DESTE TURNO - NAO SOMA COM ONTEM - ZERA NO NOVO DIA
+                        const vendaQtd = ehNovoDia ? 0 : Number(p.venda ?? p.vendas ?? 0);
                         const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
                         const finalTotal = finalArm + finalLoja;
                         const precoUnit = Number((p as any).precoVenda||0);
@@ -1592,10 +1614,10 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
 {negocioTab==='relatorios' && (
         <div className="mt-3 space-y-3">
           <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-4">
-            <div className="font-black text-[13px]">📊 RELATÓRIO STOCK LOJA - SEM ARMAZEM</div>
-            <div className="text-[9px] text-[#64748b] mt-1">Puxa do STOCK: NOME PRODUTO | STOCK INICIAL LOJA | RECEPCAO LOJA | VENDAS QTD | PRECO UNIT | TOTAL VENDAS | STOCK FINAL LOJA - Sem coluna armazem</div>
+            <div className="font-black text-[13px]">📊 RELATÓRIO SIMPLES - Por Produto / Dia</div>
+            <div className="text-[9px] text-[#64748b] mt-1">Tabela: DATA | NOME PRODUTO | STOCK INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL - com totais no fim</div>
             <div className="mt-3 grid grid-cols-4 gap-3">
-              <div><div className="text-[8px] font-bold">PRODUTO (filtro)</div><select id="filtroProdRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{stockProdutos.map((p:any)=><option key={p.id} value={p.nome}>{p.nome} - {p.codigo}</option>)}</select></div>
+              <div><div className="text-[8px] font-bold">PRODUTO</div><select id="filtroProdRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{stockProdutos.map((p:any)=><option key={p.id} value={p.nome}>{p.nome}</option>)}</select></div>
               <div><div className="text-[8px] font-bold">GRUPO</div><select id="filtroGrupoRel" className="w-full h-8 border rounded-[6px] px-2 text-[9px]"><option value="">Todos</option>{Array.from(new Set(stockProdutos.map((p:any)=>p.marca||p.grupo||'Geral'))).map((g:any)=><option key={g} value={g}>{g}</option>)}</select></div>
               <div><div className="text-[8px] font-bold">DATA INICIO</div><input id="filtroDataIni" type="date" className="w-full h-8 border rounded-[6px] px-2 text-[9px]" /></div>
               <div><div className="text-[8px] font-bold">DATA FIM</div><input id="filtroDataFim" type="date" className="w-full h-8 border rounded-[6px] px-2 text-[9px]" /></div>
@@ -1606,90 +1628,93 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                 const grupo=(document.getElementById('filtroGrupoRel') as any)?.value||'';
                 const dIni=(document.getElementById('filtroDataIni') as any)?.value||'';
                 const dFim=(document.getElementById('filtroDataFim') as any)?.value||'';
-                let stockFiltrado=[...stockProdutos];
-                if(prod){ stockFiltrado=stockFiltrado.filter((p:any)=>p.nome.toLowerCase().includes(prod.toLowerCase())||p.codigo?.toLowerCase().includes(prod.toLowerCase())); }
-                if(grupo){ stockFiltrado=stockFiltrado.filter((p:any)=>(p.marca||p.grupo||'').toLowerCase().includes(grupo.toLowerCase())); }
-                if(stockFiltrado.length===0){ alert('Nenhum produto no stock para relatório'); return; }
+                let filtradas=[...faturas];
+                if(prod){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); }
+                if(grupo){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(grupo.toLowerCase())); }
+                if(dIni){ try{ const ini=new Date(dIni); filtradas=filtradas.filter((f:any)=>{ try{ const p=f.data?.split('/'); if(p?.length===3){ const df=new Date(p[2],p[1]-1,p[0]); return df>=ini; } return true;}catch(e){return true;} }); }catch(e){} }
+                if(dFim){ try{ const fim=new Date(dFim); filtradas=filtradas.filter((f:any)=>{ try{ const p=f.data?.split('/'); if(p?.length===3){ const df=new Date(p[2],p[1]-1,p[0]); return df<=fim; } return true;}catch(e){return true;} }); }catch(e){} }
+                if(filtradas.length===0){ alert('Nenhuma fatura no filtro'); return; }
                 try{
                   const loadJsPDF=():Promise<any>=>{ return new Promise((resolve,reject)=>{ if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; } const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=()=>{ setTimeout(()=>{ const j=(window as any).jspdf?.jsPDF||(window as any).jsPDF; if(j) resolve(j); else reject('jsPDF'); },300); }; s.onerror=()=>reject('Falha'); document.head.appendChild(s); }); };
                   const jsPDF=await loadJsPDF();
                   const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
                   let y=10;
                   doc.setFontSize(11); doc.setFont('helvetica','bold');
-                  doc.text('RELATORIO - STOCK LOJA | NOME PRODUTO | STOCK INICIAL | RECEPCAO | VENDAS | PRECO | TOTAL VENDAS | STOCK FINAL',10,y);
+                  doc.text('RELATORIO - DATA | PRODUTO | STOCK INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL',10,y);
                   y+=5; doc.setFontSize(7); doc.setFont('helvetica','normal');
-                  doc.text('Filtro Produto: '+(prod||'Todos')+' | Grupo: '+(grupo||'Todos')+' | De: '+(dIni||'...')+' Ate: '+(dFim||'...')+' | Produtos: '+stockFiltrado.length+' | Gerado: '+new Date().toLocaleString('pt-MZ')+' | Fonte: STOCK LOJA (sem armazem)',10,y);
+                  doc.text('Filtro: '+(prod||'Todos')+' | Grupo: '+(grupo||'Todos')+' | De: '+(dIni||'...')+' Ate: '+(dFim||'...')+' | Faturas: '+filtradas.length+' | Gerado: '+new Date().toLocaleString('pt-MZ'),10,y);
                   y+=6;
-                  doc.setFontSize(7); doc.setFont('helvetica','bold');
-                  doc.setFillColor(30,47,74); doc.rect(10,y,277,7,'F'); doc.setTextColor(255,255,255);
-                  doc.text('CODIGO',11,y+5);
-                  doc.text('NOME PRODUTO',30,y+5);
-                  doc.text('ST INICIAL',85,y+5);
-                  doc.text('RECEPCAO',105,y+5);
-                  doc.text('VENDAS QTD',125,y+5);
-                  doc.text('PRECO UNIT',150,y+5);
-                  doc.text('TOTAL VENDAS',175,y+5);
-                  doc.text('ST FINAL LOJA',210,y+5);
-                  doc.text('DATA',250,y+5);
-                  doc.setTextColor(0,0,0); y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(7);
-                  let totalQtd=0; let totalValor=0;
-                  stockFiltrado.forEach((p:any)=>{
-                    if(y>185){ doc.addPage(); y=10; doc.setFont('helvetica','bold'); doc.setFillColor(30,47,74); doc.rect(10,y,277,7,'F'); doc.setTextColor(255,255,255); doc.text('CODIGO',11,y+5); doc.text('NOME PRODUTO',30,y+5); doc.text('ST INICIAL',85,y+5); doc.text('RECEPCAO',105,y+5); doc.text('VENDAS QTD',125,y+5); doc.text('PRECO UNIT',150,y+5); doc.text('TOTAL VENDAS',175,y+5); doc.text('ST FINAL LOJA',210,y+5); doc.text('DATA',250,y+5); doc.setTextColor(0,0,0); y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(7); }
-                    const codigo = p.codigo || p.id?.slice(-4) || 'COD';
-                    const nome = (p.nome||'Sem nome').substring(0,28);
-                    const stInicial = p.stockInicialLoja ?? p.stockInicial ?? p.entradaLoja ?? 0;
-                    const recepcao = p.recepcaoLoja ?? p.entradaLoja ?? p.recepcao ?? 0;
-                    const vendas = p.venda ?? p.vendas ?? p.saidaLoja ?? 0;
-                    const preco = p.precoVenda ?? p.preco ?? 0;
-                    const totalVendas = vendas * preco;
-                    const stFinal = p.stockFinalLoja ?? p.stockLoja ?? ((stInicial + recepcao) - vendas);
-                    const dataEnt = p.dataEntrada || p.dataEntradaISO || new Date().toLocaleDateString('pt-MZ');
-                    doc.text(String(codigo).substring(0,10),11,y);
-                    doc.text(nome,30,y);
-                    doc.text(String(stInicial),86,y);
-                    doc.text(String(recepcao),106,y);
-                    doc.text(String(vendas),126,y);
-                    doc.text(preco.toFixed(0)+'MT',151,y);
-                    doc.text(totalVendas.toFixed(0)+'MT',176,y);
-                    doc.text(String(stFinal),211,y);
-                    doc.text(String(dataEnt).substring(0,10),250,y);
-                    y+=5; totalQtd+=Number(vendas)||0; totalValor+=Number(totalVendas)||0;
+                  // cabecalho tabela
+                  doc.setFontSize(6); doc.setFont('helvetica','bold');
+                  doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255);
+                  doc.text('DATA',11,y+4);
+                  doc.text('NOME PRODUTO',28,y+4);
+                  doc.text('ST INICIAL',62,y+4);
+                  doc.text('RECEPCAO',85,y+4);
+                  doc.text('VENDAS',105,y+4);
+                  doc.text('CLIENTE',120,y+4);
+                  doc.text('QUANTI',158,y+4);
+                  doc.text('VALOR',173,y+4);
+                  doc.text('TOTAL LINHA',195,y+4);
+                  doc.setTextColor(0,0,0);
+                  y+=6; doc.setFont('helvetica','normal');
+                  let totalQuanti=0; let totalValorGeral=0;
+                  filtradas.forEach((f:any)=>{
+                    const itens = f.itens && f.itens.length>0 ? f.itens : [{nome:prod||'Produto', qtd:1, preco:f.total}];
+                    itens.forEach((it:any)=>{
+                      if(y>185){ doc.addPage(); y=10; doc.setFont('helvetica','bold'); doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255); doc.text('DATA',11,y+4); doc.text('NOME PRODUTO',28,y+4); doc.text('ST INICIAL',62,y+4); doc.text('RECEPCAO',85,y+4); doc.text('VENDAS',105,y+4); doc.text('CLIENTE',120,y+4); doc.text('QUANTI',158,y+4); doc.text('VALOR',173,y+4); doc.text('TOTAL LINHA',195,y+4); doc.setTextColor(0,0,0); y+=6; doc.setFont('helvetica','normal'); }
+                      const stock = stockProdutos.find((s:any)=> s.nome.toLowerCase().includes((it.nome||prod||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0};
+                      const stInicial = stock.stockInicialLoja||stock.stockLoja||20;
+                      const recep = stock.entradaLoja||0;
+                      const vendas = stock.venda||it.qtd||0;
+                      const quanti = it.qtd||0;
+                      const valor = it.preco||stock.precoVenda||stock.preco||0;
+                      const totalLinha = quanti * valor;
+                      doc.text(String(f.data||'').substring(0,10),11,y+3);
+                      doc.text(String(it.nome||prod||'-').substring(0,22),28,y+3);
+                      doc.text(String(stInicial),63,y+3);
+                      doc.text(String(recep),86,y+3);
+                      doc.text(String(vendas),106,y+3);
+                      doc.text(String(f.cliente||'-').substring(0,20),120,y+3);
+                      doc.text(String(quanti),159,y+3);
+                      doc.text(String(Number(valor).toFixed(0))+'MT',173,y+3);
+                      doc.text(String(Number(totalLinha).toFixed(0))+'MT',196,y+3);
+                      y+=4;
+                      totalQuanti+=Number(quanti)||0;
+                      totalValorGeral+=Number(totalLinha)||0;
+                    });
                   });
-                  y+=3; doc.setFillColor(250,204,21); doc.rect(10,y,277,8,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0,0,0);
-                  doc.text('TOTAIS: Qtd Vendida: '+totalQtd+' | Valor Total Vendas: '+totalValor.toFixed(0)+'MT | Produtos: '+stockFiltrado.length+' | Fonte: STOCK LOJA SEM ARMAZEM',12,y+5);
-                  const nomeArq='Relatorio-Stock-Loja-'+new Date().toISOString().slice(0,10)+'.pdf';
+                  y+=4; doc.setFont('helvetica','bold'); doc.setFontSize(8);
+                  doc.setFillColor(250,204,21); doc.rect(10,y,277,7,'F');
+                  doc.setTextColor(0,0,0);
+                  doc.text('TOTAIS: Qtd Total: '+totalQuanti+' | Valor Total Geral: '+totalValorGeral.toFixed(0)+'MT | Faturas: '+filtradas.length,12,y+5);
+                  const nomeArq='Relatorio-Simples-'+(prod||'Todos')+'-'+new Date().toISOString().slice(0,10)+'.pdf'.replace(/[^\w\-\.]/g,'_');
                   doc.save(nomeArq);
-                  // Excel CSV
-                  const csv='CODIGO;NOME PRODUTO;ST INICIAL LOJA;RECEPCAO LOJA;VENDAS QTD;PRECO UNIT;TOTAL VENDAS;ST FINAL LOJA;DATA\n'+stockFiltrado.map((p:any)=>{ const codigo=p.codigo||''; const nome=(p.nome||'').replace(/;/g,','); const stInicial=p.stockInicialLoja??p.stockInicial??0; const recep=p.recepcaoLoja??p.entradaLoja??0; const vendas=p.venda??p.vendas??0; const preco=p.precoVenda??p.preco??0; const total=vendas*preco; const stFinal=p.stockFinalLoja??((stInicial+recep)-vendas); const data=p.dataEntrada||''; return codigo+';'+nome+';'+stInicial+';'+recep+';'+vendas+';'+preco+';'+total+';'+stFinal+';'+data; }).join('\n')+'\n;;;;;TOTAL;'+totalQtd+';'+totalValor.toFixed(0)+'MT';
+                  // Excel
+                  const csv='DATA;NOME PRODUTO;STOCK INICIAL;RECEPCAO;VENDAS;CLIENTE;QUANTI;VALOR;TOTAL LINHA\n'+filtradas.map((f:any)=>{ const its=f.itens||[{nome:prod||'Produto', qtd:1, preco:f.total}]; return its.map((it:any)=>{ const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd}; return f.data+';'+(it.nome||'')+';'+(s.stockInicialLoja||20)+';'+(s.entradaLoja||0)+';'+(s.venda||it.qtd||0)+';'+(f.cliente||'')+';'+(it.qtd||0)+';'+(it.preco||0)+';'+((it.qtd||0)*(it.preco||0)); }).join('\n'); }).join('\n')+'\n;;;;;TOTAL;'+totalQuanti+';;'+totalValorGeral.toFixed(0)+'MT';
                   const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
-                  alert('Relatório STOCK LOJA gerado! '+stockFiltrado.length+' produtos | Qtd Vendida: '+totalQtd+' | Valor Total: '+totalValor.toFixed(0)+'MT');
+                  alert('Relatorio gerado! PDF tabela simples com TOTAL por linha + Excel. Totais: '+totalQuanti+' unid | '+totalValorGeral.toFixed(0)+'MT');
                 }catch(e){ alert('Erro: '+e); }
-              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATÓRIO STOCK LOJA - PDF + Excel (sem armazem)</button>
-              <button onClick={()=>{
-                const prod=(document.getElementById('filtroProdRel') as any)?.value||'';
-                let stockFiltrado=[...stockProdutos];
-                if(prod){ stockFiltrado=stockFiltrado.filter((p:any)=>p.nome.toLowerCase().includes(prod.toLowerCase())); }
-                const totalQtd=stockFiltrado.reduce((s:any,p:any)=>s+(Number(p.venda||p.vendas||0)),0);
-                const totalValor=stockFiltrado.reduce((s:any,p:any)=>s+((Number(p.venda||p.vendas||0))*(Number(p.precoVenda||p.preco||0))),0);
-                const msg='RELATORIO STOCK LOJA - '+(prod||'Todos')+'\nQtd Vendida:'+totalQtd+' | Valor:'+totalValor.toFixed(0)+'MT | Produtos:'+stockFiltrado.length+'\n'+stockFiltrado.slice(0,5).map((p:any)=>p.nome+' | ST:'+(p.stockInicialLoja||0)+' | Recep:'+(p.recepcaoLoja||p.entradaLoja||0)+' | Vendas:'+(p.venda||0)+' | Total:'+((p.venda||0)*(p.precoVenda||0))+'MT').join('\n');
-                const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank');
-              }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
+              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF TABELA + Excel</button>
+              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length+'\n'+filtradas.slice(0,5).map((f:any)=>f.data+' | '+(f.itens?.[0]?.nome||prod)+' | '+(f.cliente||'')).join('\n'); const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-4">
-            <div className="font-black text-[11px]">TABELA STOCK LOJA - NOME | ST INICIAL | RECEPCAO | VENDAS | TOTAL VENDAS (sem armazem)</div>
+            <div className="font-black text-[11px]">TABELA - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL</div>
             <div className="mt-3 max-h-[500px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[9px]"><thead className="bg-[#1e2f4a] text-white sticky top-0"><tr><th className="p-2 text-left">CODIGO</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL LOJA</th><th className="p-2 text-center">RECEPCAO LOJA</th><th className="p-2 text-center">VENDAS QTD</th><th className="p-2 text-center">PRECO UNIT</th><th className="p-2 text-right">TOTAL VENDAS</th><th className="p-2 text-center">ST FINAL</th><th className="p-2 text-center">DATA</th></tr></thead><tbody>
-              {stockProdutos.length===0 ? <tr><td colSpan={9} className="p-3 text-center text-[#94a3b8]">Nenhum produto no stock - Adicione em STOCK</td></tr> : stockProdutos.map((p:any,idx:number)=>{
-                const stInicial = p.stockInicialLoja ?? p.stockInicial ?? 0;
-                const recepcao = p.recepcaoLoja ?? p.entradaLoja ?? 0;
-                const vendas = p.venda ?? p.vendas ?? 0;
-                const preco = p.precoVenda ?? p.preco ?? 0;
-                const totalVendas = vendas * preco;
-                const stFinal = p.stockFinalLoja ?? ((stInicial + recepcao) - vendas);
-                return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{p.codigo||p.id?.slice(-6)}</td><td className="p-2 font-bold">{p.nome}</td><td className="p-2 text-center bg-blue-50">{stInicial}</td><td className="p-2 text-center bg-yellow-50">{recepcao}</td><td className="p-2 text-center font-bold bg-green-50">{vendas}</td><td className="p-2 text-center">{preco.toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-100">{totalVendas.toFixed(0)}MT</td><td className="p-2 text-center">{stFinal}</td><td className="p-2 text-center">{p.dataEntrada||''}</td></tr>;
-              })}
-              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={4} className="p-2 text-right">TOTAIS:</td><td className="p-2 text-center">{stockProdutos.reduce((s:any,p:any)=>s+(Number(p.venda||p.vendas||0)),0)}</td><td className="p-2"></td><td className="p-2 text-right">{stockProdutos.reduce((s:any,p:any)=>s+((Number(p.venda||p.vendas||0))*(Number(p.precoVenda||p.preco||0))),0).toFixed(0)}MT</td><td colSpan={2} className="p-2 text-center">{stockProdutos.length} produtos</td></tr></tfoot></table>
+              <table className="w-full text-[9px]"><thead className="bg-[#1e2f4a] text-white sticky top-0"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-right">TOTAL LINHA</th></tr></thead><tbody>
+              {(() => {
+                const prodFiltro=(typeof document!=='undefined' ? (document.getElementById('filtroProdRel') as any)?.value : '')||'';
+                let lista:any[]=[]; faturas.forEach((f:any)=>{ const its=f.itens||[{nome:prodFiltro||'Produto', qtd:1, preco:f.total}]; its.forEach((it:any)=>{ lista.push({f,it}); }); });
+                if(lista.length===0) return <tr><td colSpan={9} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em VENDER</td></tr>;
+                return lista.slice(0,200).map((row:any,idx:number)=>{
+                  const f=row.f; const it=row.it;
+                  const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0, precoVenda:it.preco||0};
+                  const totalLinha=(it.qtd||0)*(it.preco||0);
+                  return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-bold">{it.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||20}</td><td className="p-2 text-center">{s.entradaLoja||0}</td><td className="p-2 text-center font-bold">{s.venda||it.qtd||0}</td><td className="p-2">{f.cliente||'-'}</td><td className="p-2 text-center">{it.qtd||0}</td><td className="p-2 text-center">{Number(it.preco||0).toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-50">{Number(totalLinha).toFixed(0)}MT</td></tr>;
+                });
+              })()}
+              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={6} className="p-2 text-right">TOTAIS GERAIS:</td><td className="p-2 text-center">{faturas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-right">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
             </div>
           </div>
         </div>
