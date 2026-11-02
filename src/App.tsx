@@ -1470,10 +1470,44 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                           const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
                           return {...p, stockFinalArmazem: finalArm, stockFinalLoja: finalLoja, stockFinalArmazemOntem: finalArm, stockFinalLojaOntem: finalLoja, dataStockDiario: dataHoje, dataEntrada: dataHoje};
                         });
-                        if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockComFecho)); localStorage.setItem(`fecho_stock_${telAtiva}_${dataHoje}`, JSON.stringify(stockComFecho)); }
+                        if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(stockComFecho)); localStorage.setItem(`fecho_stock_${telAtiva}_${dataHoje}`, JSON.stringify(stockComFecho)); localStorage.setItem(`ultimo_fecho_${telAtiva}`, JSON.stringify(stockComFecho)); }
                         localStorage.setItem("stock_produtos", JSON.stringify(stockComFecho));
-                        setStockProdutos(stockComFecho);
-                        }catch(e){ console.error(e); } localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("✅ FECHO SALVO! "+stockProdutos.length+" produtos - Final de hoje guardado como Inicial de amanha - Data: "+dataStockDiario);}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar Fecho</button>
+                        localStorage.setItem("ultimo_fecho", JSON.stringify(stockComFecho));
+                        // APOS SALVAR FECHO - ZERA PARA NOVO DIA/TURNO: Inicial hoje = Final ontem, recepcao 0, venda 0
+                        const novoDiaStock = stockComFecho.map((p:any)=>{
+                          const finalArm = p.stockFinalArmazem ?? 0;
+                          const finalLoja = p.stockFinalLoja ?? 0;
+                          return {
+                            ...p,
+                            stockInicialArmazem: finalArm,
+                            noArmazem: finalArm,
+                            recepcaoArmazem: 0,
+                            qtdEntrada: 0,
+                            saidaArmazem: 0,
+                            entradaLoja: 0,
+                            stockInicialLoja: finalLoja,
+                            stockLoja: finalLoja,
+                            venda: 0,
+                            vendas: 0,
+                            stockFinalArmazem: finalArm,
+                            stockFinalLoja: finalLoja,
+                            stockFinalArmazemOntem: finalArm,
+                            stockFinalLojaOntem: finalLoja,
+                            dataEntrada: dataHoje,
+                            dataStockDiario: dataHoje
+                          };
+                        });
+                        setTimeout(()=>{
+                          if(confirm("✅ FECHO SALVO! "+stockProdutos.length+" produtos guardados.\n\nFinal de hoje: Armazem + Loja\nQuer abrir NOVO DIA/TURNO agora?\n\nSIM = Zera recepção e vendas, puxa final como inicial\nNÃO = Continua com fecho atual")){
+                            setStockProdutos(novoDiaStock);
+                            localStorage.setItem("stock_produtos", JSON.stringify(novoDiaStock));
+                            if(telAtiva){ localStorage.setItem(`stock_produtos_${telAtiva}`, JSON.stringify(novoDiaStock)); }
+                            alert("✅ NOVO DIA ABERTO!\nStock Inicial = Final de ontem\nRecepção=0, Vendas=0 - Dia limpo para começar");
+                          } else {
+                            setStockProdutos(stockComFecho);
+                          }
+                        }, 300);
+                        }catch(e){ console.error(e); } localStorage.setItem("loja_perfil", JSON.stringify(lojaPerfil)); alert("✅ FECHO SALVO! "+stockProdutos.length+" produtos - Final guardado. Data: "+dataHoje);}} className="ml-2 h-7 px-4 bg-black text-white rounded-[6px] text-[10px] font-black hover:bg-gray-800 cursor-pointer">💾 Save/Salvar Fecho</button>
                     </div>
                     <div className="relative"><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rapido: nome, codigo, marca..." className="h-8 pl-3 pr-3 border rounded-[6px] text-[11px] w-[220px]" /></div>
                     <button onClick={()=>setFiltroRapidoStock('')} className="h-8 px-3 border rounded text-[11px] bg-[#f8fafc]">Limpar</button>
@@ -1541,20 +1575,14 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                         return matchBusca && matchTipo;
                       }).map((p:any)=>{
                         const dataEnt = p.dataEntrada || dataStockDiario || '01/11/2026';
-                        // PASSO 1 - LOGICA CORRETA: Inicial hoje = Final ontem, recepcao 0, venda 0 no inicio do dia
-                        const ehNovoDia = p.dataStockDiario ? p.dataStockDiario !== dataStockDiario : false;
-                        const finalArmOntem = Number((p as any).stockFinalArmazemOntem ?? (p as any).stockFinalArmazem ?? (p as any).stockInicialArmazem ?? p.noArmazem ?? 0);
-                        const finalLojaOntem = Number((p as any).stockFinalLojaOntem ?? (p as any).stockFinalLoja ?? (p as any).stockInicialLoja ?? 0);
-                        // Se eh novo dia, inicial = final de ontem, senao usa inicial salvo
-                        const inicialArm = ehNovoDia ? finalArmOntem : Number((p as any).stockInicialArmazem ?? p.noArmazem ?? finalArmOntem ?? 0);
-                        // Recepcao e saida zeradas no inicio do dia - so preenche quando fizer Entrada real
-                        const entradaArm = ehNovoDia ? 0 : Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 0);
-                        const saidaArm = ehNovoDia ? 0 : Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 0);
+                        // PASSO 1 FIX - LOGICA CORRETA: Sempre usa campos diretos, sem fallback 1070
+                        const inicialArm = Number((p as any).stockInicialArmazem ?? p.noArmazem ?? 0);
+                        const entradaArm = Number((p as any).recepcaoArmazem ?? (p as any).qtdEntrada ?? 0);
+                        const saidaArm = Number((p as any).saidaArmazem ?? (p as any).entradaLoja ?? 0);
                         const finalArm = Math.max(0, inicialArm + entradaArm - saidaArm);
-                        const inicialLoja = ehNovoDia ? finalLojaOntem : Number((p as any).stockInicialLoja ?? finalLojaOntem ?? 0);
-                        const recepLoja = ehNovoDia ? 0 : Number((p as any).entradaLoja ?? saidaArm);
-                        // VENDAS ACUMULADAS SO DESTE TURNO - NAO SOMA COM ONTEM - ZERA NO NOVO DIA
-                        const vendaQtd = ehNovoDia ? 0 : Number(p.venda ?? p.vendas ?? 0);
+                        const inicialLoja = Number((p as any).stockInicialLoja ?? 0);
+                        const recepLoja = Number((p as any).entradaLoja ?? 0);
+                        const vendaQtd = Number(p.venda ?? p.vendas ?? 0);
                         const finalLoja = Math.max(0, inicialLoja + recepLoja - vendaQtd);
                         const finalTotal = finalArm + finalLoja;
                         const precoUnit = Number((p as any).precoVenda||0);
