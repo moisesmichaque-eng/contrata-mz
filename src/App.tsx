@@ -154,7 +154,7 @@ export default function App(){
     alert(" RESERVA CONFIRMADA!\n\nEmpresa: " + carro.empresa + "\nRota: " + carro.rota + "\nPreco: " + carro.preco + " MT\nMotorista: " + carro.motorista + "\nTel: " + carro.tel);
   }
 
- const [tab,setTab]=useState("encontrar"); const [profSelecionado,setProfSelecionado]=useState<any>(null);
+ const [tab,setTab]=useState("encontrar"); const [verificacaoVender,setVerificacaoVender]=useState<any>({aberto:false,codigo:"",metodo:"whatsapp",destino:"",dados:null}); const [codigoInputVender,setCodigoInputVender]=useState(""); const [profSelecionado,setProfSelecionado]=useState<any>(null);
  const [contratoSel,setContratoSel]=useState(1);
  const [clausulaAtiva,setClausulaAtiva]=useState(4);
  const [tipoCadastro,setTipoCadastro]=useState("prof");
@@ -163,7 +163,7 @@ export default function App(){
  const [provFiltro,setProvFiltro]=useState("Maputo Cidade");
  const [mostrarPreviewMobile,setMostrarPreviewMobile]=useState(false);
  const [formCadastro,setFormCadastro]=useState({
-  nome:"", nuit:"", email:"", bi:"", ramo:"Pedreiro", profissao:"Pedreiro", pais:"Mocambique", provincia:"Maputo Cidade", distrito:"KaMpfumo", local:"Bairro Central", whatsapp:"", descricao:"", preco:"", anexos:[] as any[]
+  nome:"", nuit:"", bi:"", ramo:"Pedreiro", profissao:"Pedreiro", pais:"Mocambique", provincia:"Maputo Cidade", distrito:"KaMpfumo", local:"Bairro Central", whatsapp:"", descricao:"", preco:"", anexos:[] as any[]
  });
  const provinciasFiltro=useMemo(()=>{ const p=(PAISES as any)[paisFiltro]; return p||[]; },[paisFiltro]);
  const distritosForm=useMemo(()=>{ const d=(DISTRITOS_MOCAMBIQUE as any)[formCadastro.provincia]; return d||["Centro","Bairro 1","Bairro 2"]; },[formCadastro.provincia]);
@@ -1157,6 +1157,8 @@ ${agora} - PDF FINAL PARTILHAVEL COM ASSINATURAS
                       <div><label className="text-[9px] font-bold opacity-80">NOME DA LOJA / EMPRESA *</label><input value={negocioCadastroForm.nomeLoja} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, nomeLoja:e.target.value})} placeholder="Ex: Ferragem Central Matola" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                       <div><label className="text-[9px] font-bold opacity-80">TELEFONE / WHATSAPP *</label><input value={negocioCadastroForm.tel} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, tel:e.target.value})} placeholder="+258 84 123 4567" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black bg-[#f0fdf4]" /></div>
                     </div>
+                    <div><label className="text-[9px] font-bold opacity-80">EMAIL * (empresas - verificacao por email)</label><input value={(negocioCadastroForm as any).email||''} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, email:e.target.value} as any)} placeholder="Ex: loja@email.com" type="email" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black bg-[#fffbeb]" /></div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div><label className="text-[9px] font-bold opacity-80">PASSWORD *</label><input type="password" value={negocioCadastroForm.password} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, password:e.target.value})} placeholder="Crie uma password" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
                       <div><label className="text-[9px] font-bold opacity-80">NUIT</label><input value={negocioCadastroForm.nuit} onChange={e=>setNegocioCadastroForm({...negocioCadastroForm, nuit:e.target.value})} placeholder="400123456" className="w-full h-10 px-3 rounded-[8px] border text-[12px] mt-1 text-black" /></div>
@@ -1288,7 +1290,39 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           localStorage.removeItem('stock_produtos');
           localStorage.setItem('lojaPerfil', JSON.stringify(contaData));
         }catch(e){ console.error('Erro isolamento', e); }
-        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); setNegocioLogado(true); setFaturacaoLogado(true); alert('Conta criada! Bem-vindo ' + novoPerfilCompleto.nomeLoja + ' - Sua conta é isolada! Stock 0 produtos - só seus dados!');}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - 10 segundos - Entrar no negocio e Faturacao</button>
+        setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10)); () => {
+        try{
+          const nomeLoja = negocioCadastroForm.nomeLoja?.trim();
+          const tel = negocioCadastroForm.tel?.trim();
+          const email = (negocioCadastroForm as any).email?.trim();
+          const pass = negocioCadastroForm.password?.trim();
+          if(!nomeLoja || !tel || !pass){ alert('Preencha Nome, Telefone e Password *'); return; }
+          const codigo = Math.floor(100000 + Math.random()*900000).toString();
+          const metodo = email ? 'email' : 'whatsapp';
+          const destino = email || tel;
+          const novoPerfilCompleto = {
+            nomeLoja,
+            tel,
+            email: email||'',
+            password: pass,
+            nuit: negocioCadastroForm.nuit||'',
+            endereco: negocioCadastroForm.endereco||'',
+            provincia: negocioCadastroForm.provincia||'Maputo Cidade',
+            distrito: negocioCadastroForm.distrito||'',
+            ramo: negocioCadastroForm.ramo||'Comercio Geral',
+            outroRamo: (negocioCadastroForm as any).outroRamo||'',
+            logoData: (negocioCadastroForm as any).logoData||'',
+            criadoEm: new Date().toISOString(),
+            verificado: false
+          };
+          setVerificacaoVender({aberto:true, codigo, metodo, destino, dados:novoPerfilCompleto});
+          if(metodo==='email'){
+            alert('CODIGO VERIFICACAO ENVIADO PARA EMAIL\nDestino: '+destino+'\nCodigo: '+codigo+'\n(Simulacao local)');
+          } else {
+            alert('CODIGO VERIFICACAO ENVIADO PARA WHATSAPP\nDestino: '+destino+'\nCodigo: '+codigo+'\n(Simulacao local)');
+          }
+        }catch(e){ alert('Erro: '+e); }
+      }}} className="w-full mt-4 h-11 rounded-[8px] bg-[#22c55e] text-white font-black text-[12px]">Criar conta - Verificacao Email/WhatsApp</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1773,7 +1807,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
         </div>
         <div className="space-y-2">
           <div><label className="text-[9px] font-bold">Nome completo *</label><input value={formCadastro.nome} onChange={e=>setFormCadastro({...formCadastro, nome:e.target.value})} placeholder="Ex: Michaque Moises Moises" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]" /></div>
-          <div className="grid grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Email (opcional)</label><input value={formCadastro.email||""} onChange={e=>setFormCadastro({...formCadastro, email:e.target.value})} placeholder="Ex: seu@email.com" type="email" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px] bg-[#f8fafc]" /></div><div><label className="text-[9px] font-bold">NUIT (opcional)</label><input value={formCadastro.nuit} onChange={e=>setFormCadastro({...formCadastro, nuit:e.target.value})} placeholder="Ex: 123456789" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px] bg-[#f8fafc]" /></div></div>
+          <div className="grid grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">BI (opcional)</label><input value={formCadastro.bi} onChange={e=>setFormCadastro({...formCadastro, bi:e.target.value})} placeholder="Ex: 110100123456B" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px] bg-[#f8fafc]" /></div><div><label className="text-[9px] font-bold">NUIT (opcional)</label><input value={formCadastro.nuit} onChange={e=>setFormCadastro({...formCadastro, nuit:e.target.value})} placeholder="Ex: 123456789" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px] bg-[#f8fafc]" /></div></div>
           <div className="grid grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Pais *</label><select value={formCadastro.pais} onChange={e=>setFormCadastro({...formCadastro, pais:e.target.value})} className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]">{Object.keys(PAISES).map(p=><option key={p}>{p}</option>)}</select></div><div><label className="text-[9px] font-bold">Provincia *</label><select value={formCadastro.provincia} onChange={e=>setFormCadastro({...formCadastro, provincia:e.target.value})} className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]">{(PAISES[formCadastro.pais]||[]).map((p:string)=><option key={p}>{p}</option>)}</select></div></div>
           <div className="grid grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Local / Localidade *</label><input value={formCadastro.local} onChange={e=>setFormCadastro({...formCadastro, local:e.target.value})} placeholder="Ex: Bairro Central" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]" /></div><div><label className="text-[9px] font-bold">Distrito</label><select value={formCadastro.distrito} onChange={e=>setFormCadastro({...formCadastro, distrito:e.target.value})} className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]">{distritosForm.map((d:string)=><option key={d}>{d}</option>)}</select></div></div>
           <div className="grid grid-cols-2 gap-2"><div><label className="text-[9px] font-bold">Tipo de profissao / Area *</label><select value={formCadastro.profissao} onChange={e=>setFormCadastro({...formCadastro, profissao:e.target.value})} className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]">{CATS.map(c=><option key={c}>{c}</option>)}</select></div><div><label className="text-[9px] font-bold">WhatsApp</label><input value={formCadastro.whatsapp} onChange={e=>setFormCadastro({...formCadastro, whatsapp:e.target.value})} placeholder="840532899" className="w-full px-2.5 py-2 rounded-lg border border-[#e2e8f0] mt-0.5 text-[11px]" /></div></div>
@@ -2035,7 +2069,66 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
       
       {/* FATURAR REMOVIDO - MESMA COISA QUE VENDER */}
 
-{tab==='viagens' && (
+
+      {verificacaoVender.aberto && (
+        <div className="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[14px] max-w-[400px] w-full p-6">
+            <div className="text-center">
+              <div className="h-12 w-12 rounded-full bg-[#22c55e] text-white grid place-items-center font-black text-[20px] mx-auto">V</div>
+              <h3 className="text-[16px] font-black mt-3">Verificacao por {verificacaoVender.metodo}</h3>
+              <p className="text-[11px] text-[#64748b] mt-2">Codigo enviado para: <b>{verificacaoVender.destino}</b><br/>Codigo: <b className="text-[16px] text-black">{verificacaoVender.codigo}</b></p>
+            </div>
+            <div className="mt-4">
+              <label className="text-[10px] font-bold">Digite codigo 6 digitos *</label>
+              <input value={codigoInputVender} onChange={e=>setCodigoInputVender(e.target.value)} placeholder="847392" maxLength={6} className="w-full h-12 px-4 rounded-[8px] border-2 border-[#22c55e] text-[18px] font-black text-center tracking-[6px] mt-1" />
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button onClick={()=>setVerificacaoVender({...verificacaoVender, aberto:false})} className="flex-1 py-3 bg-gray-100 text-black rounded-full font-bold text-[11px]">Cancelar</button>
+              <button onClick={()=>{
+                if(codigoInputVender===verificacaoVender.codigo){
+                  const dados = verificacaoVender.dados;
+                  const tel = dados.tel;
+                  localStorage.setItem('lojaPerfil_'+tel, JSON.stringify({...dados, verificado:true, metodoVerificacao:verificacaoVender.metodo}));
+                  localStorage.setItem('conta_'+tel, JSON.stringify({...dados, verificado:true}));
+                  const listaContas = JSON.parse(localStorage.getItem('listaContas')||'[]');
+                  if(!listaContas.includes(tel)){ listaContas.push(tel); localStorage.setItem('listaContas', JSON.stringify(listaContas)); }
+                  localStorage.setItem('stock_produtos_'+tel, JSON.stringify([]));
+                  localStorage.setItem('faturas_'+tel, JSON.stringify([]));
+                  localStorage.setItem('clientes_'+tel, JSON.stringify([]));
+                  localStorage.setItem('fornecedores_'+tel, JSON.stringify([]));
+                  localStorage.setItem('contaAtiva', tel);
+                  localStorage.setItem('lojaPerfil', JSON.stringify({...dados, verificado:true}));
+                  setLojaPerfil({...dados, verificado:true});
+                  setPerfilLoja({...dados, verificado:true});
+                  setStockProdutos([]); setProdutosFat([]); setFaturas([] as any); setClientesFiado([] as any); setDataStockDiario(new Date().toISOString().slice(0,10));
+                  setNegocioLogado(true); setFaturacaoLogado(true);
+                  setVerificacaoVender({aberto:false,codigo:"",metodo:"whatsapp",destino:"",dados:null});
+                  setCodigoInputVender("");
+                  alert('CONTA VERIFICADA! Bem-vindo '+dados.nomeLoja);
+                } else {
+                  alert('Codigo incorreto! Digitado: '+codigoInputVender+' Correto: '+verificacaoVender.codigo);
+                }
+              }} className="flex-1 py-3 bg-[#22c55e] text-white rounded-full font-black text-[11px]">Verificar e Entrar</button>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button onClick={()=>{
+                const novoCodigo = Math.floor(100000 + Math.random()*900000).toString();
+                setVerificacaoVender({...verificacaoVender, codigo:novoCodigo});
+                setCodigoInputVender("");
+                alert('Novo codigo: '+novoCodigo);
+              }} className="flex-1 py-2 bg-white border rounded-full text-[9px] font-bold">Reenviar codigo</button>
+              <button onClick={()=>{
+                const metodoNovo = verificacaoVender.metodo==='email'?'whatsapp':'email';
+                const destinoNovo = metodoNovo==='email' ? (verificacaoVender.dados?.email||verificacaoVender.dados?.tel) : verificacaoVender.dados?.tel;
+                setVerificacaoVender({...verificacaoVender, metodo:metodoNovo, destino:destinoNovo});
+              }} className="flex-1 py-2 bg-[#facc15] text-black rounded-full text-[9px] font-black">Trocar para {verificacaoVender.metodo==='email'?'WhatsApp':'Email'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {tab==='viagens' && (
         <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
