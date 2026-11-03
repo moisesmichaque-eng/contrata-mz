@@ -441,18 +441,14 @@ export default function App(){
   const [ivaTipo, setIvaTipo] = useState("16");
     const finalizarComWhatsApp = async (isDividaParam?:boolean)=>{
     try {
-      if(produtosFat.length===0){alert('Adicione produtos do stock - clique nos botoes pretos Cimento, Ferro, etc'); return;}
-      // VALIDACAO STOCK NA LOJA - NAO DEIXA VENDER MAIS DO QUE TEM
+      if(produtosFat.length===0){alert('Adicione produtos do stock'); return;}
       for(let i=0;i<produtosFat.length;i++){
         const item=produtosFat[i] as any;
         const prodStock = stockProdutos.find((sp:any)=>sp.nome===item.nome||sp.codigo===item.codigo);
-        const stockDisponivel = prodStock ? Number(prodStock.stockFinalLoja ?? prodStock.stockLoja ?? prodStock.stockInicialLoja ?? prodStock.noArmazem ?? 0) : 0;
-        if(item.qtd > stockDisponivel){
-          alert('❌ STOCK INSUFICIENTE NA LOJA!\n\nProduto: '+item.nome+'\nStock na Loja: '+stockDisponivel+' unid\nTentou vender: '+item.qtd+' unid\n\nCorrija a quantidade antes de faturar!');
-          return;
-        }
+        const stockDisponivel = prodStock ? Number(prodStock.stockFinalLoja ?? prodStock.stockLoja ?? prodStock.stockInicialLoja ?? 0) : 0;
+        if(item.qtd > stockDisponivel){ alert('❌ STOCK INSUFICIENTE! '+item.nome+' Stock:'+stockDisponivel+' Tentou:'+item.qtd); return; }
       }
-      if(!telFat || telFat.replace(/\D/g,'').length<9){alert('Digite telefone/WhatsApp do cliente - ex: 840532899'); return;}
+      if(!telFat || telFat.replace(/\D/g,'').length<9){alert('Digite telefone'); return;}
       const subtotal = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd),0);
       const desc = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
       const base = subtotal - desc;
@@ -464,23 +460,12 @@ export default function App(){
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
       const isDivida = isDividaParam===true;
       const statusFatura = isDivida ? 'DIVIDA' : 'PAGO';
-      const tipoMsg = isDivida ? 'DIVIDA - FIADO - POR PAGAR' : 'Fatura/Recibo';
+      const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - '+(isDivida ? 'DIVIDA - FIADO' : 'Fatura')+'\nCliente: '+nomeCliente+'\nTotal: '+total.toFixed(0)+'MT'+(isDivida ? '\nSTATUS: EM DIVIDA' : '')+'\nObrigado!';
       
-      const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - '+tipoMsg+'\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+(isDivida?'\nSTATUS: EM DIVIDA - FIADO':'')+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*'+(isDivida?'\n\n⚠️ VALOR EM DIVIDA - CLIENTE DEVE PAGAR':'')+'\n\nObrigado!';
-
-      const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || (lojaPerfil as any).logo || '';
-      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Zoes';
-      const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
-      const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
-      const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
-      const provLojaFatura = (lojaPerfil as any).provincia || '';
-      const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Electricidade e Iluminacao';
       let numFatura = '01'; 
       const dataHojeISO = new Date().toISOString().slice(0,10);
       try{ 
         const t=localStorage.getItem('contaAtiva')||'geral'; 
-        // CONTAGEM DIARIA - cada dia comeca em 01, nao continua do dia anterior
-        // Se ontem terminou 19/02/11/2026, hoje comeca 01/03/11/2026
         const contadorDiaKey = `fatura_contador_${t}_${dataHojeISO}`;
         const contDia=parseInt(localStorage.getItem(contadorDiaKey)||'0'); 
         numFatura = String(contDia+1).padStart(2,'0'); 
@@ -488,7 +473,7 @@ export default function App(){
       const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
 
       const waUrl = 'https://wa.me/'+telFull+'?text='+encodeURIComponent(msg);
-      const winWa = window.open(waUrl, '_blank');
+      window.open(waUrl, '_blank');
 
       setStockProdutos((prevStock:any[])=>{
         let nl=[...prevStock];
@@ -513,7 +498,121 @@ export default function App(){
         return nl;
       });
 
-      // SALVA FATURA COM FLAG DE DIVIDA PARA RELATORIO RECONHECER
+      // ===== PDF FACTURA AUTOMATICO - RESTAURADO - baixa automaticamente ao clicar nos 2 botoes =====
+      const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || (lojaPerfil as any).logo || '';
+      const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Minha Loja';
+      const nuitLojaFatura = (lojaPerfil as any).nuit || perfilLoja.nuit || '';
+      const telLojaFatura = (lojaPerfil as any).tel || (perfilLoja as any).telefone || perfilLoja.telefone || '';
+      const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
+      const nomeArquivo = `Fatura ${numeroFacturaCompleto} - ${nomeCliente} - ${isDivida ? 'DIVIDA' : 'PAGO'}`.replace(/[^\w\-\s]/g,'').replace(/\s+/g,' ').trim() + '.pdf';
+
+      try{
+        const loadJsPDF = ():Promise<any> => {
+          return new Promise((resolve, reject)=>{
+            if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; }
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            script.onload = ()=>{ 
+              setTimeout(()=>{ 
+                const jsPDF = (window as any).jspdf?.jsPDF || (window as any).jsPDF; 
+                if(jsPDF) resolve(jsPDF); else reject('jsPDF nao carregou'); 
+              }, 300);
+            };
+            script.onerror = ()=>reject('Falha carregar jsPDF');
+            document.head.appendChild(script);
+          });
+        };
+
+        const jsPDF = await loadJsPDF();
+        const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+        
+        let y = 10;
+        let logoAdded = false;
+        if(logoForFaturaReal && logoForFaturaReal.length>100){
+          try{
+            let imgData = logoForFaturaReal;
+            let format = 'PNG';
+            if(imgData.includes('data:image/jpeg')) format='JPEG';
+            else if(imgData.includes('data:image/png')) format='PNG';
+            if(!imgData.startsWith('data:')){
+              imgData = 'data:image/png;base64,'+imgData;
+            }
+            doc.addImage(imgData, format, 10, y, 15, 15);
+            logoAdded = true;
+          }catch(e){ console.log('Erro logo', e); }
+        }
+        const textX = logoAdded ? 28 : 10;
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica','bold');
+        doc.text(nomeLojaFatura, textX, y+2);
+        doc.setFontSize(8);
+        doc.setFont('helvetica','normal');
+        doc.text(`NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}`, textX, y+6);
+        doc.text(`${endLojaFatura}`, textX, y+10);
+        
+        if(isDivida){
+          doc.setFillColor(255,0,0);
+          doc.setTextColor(255,255,255);
+          doc.rect(10, y+14, 40, 7, 'F');
+          doc.text('DIVIDA - FIADO', 12, y+18);
+          doc.setTextColor(0,0,0);
+        }
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica','bold');
+        doc.setFillColor(254,240,138);
+        doc.rect(textX, y+16, 60, 7, 'F');
+        doc.setTextColor(0,0,0);
+        doc.text(`Factura Nº: ${numeroFacturaCompleto}`, textX+2, y+20);
+
+        doc.setFontSize(8);
+        doc.text(`Cliente: ${nomeCliente}`, 100, y, {align:'left'});
+        doc.text(`Tel: ${telFat}`, 100, y+4, {align:'left'});
+        doc.text(`NUIT: ${nuitFat||'-'}`, 100, y+8, {align:'left'});
+        doc.text(`Data: ${dataHoje}`, 100, y+12, {align:'left'});
+        doc.text(`Status: ${statusFatura}`, 100, y+16, {align:'left'});
+
+        y = 35;
+        doc.setFontSize(8);
+        doc.setFont('helvetica','bold');
+        doc.setFillColor(241,245,249);
+        doc.rect(10, y, 128, 6, 'F');
+        doc.text('DESCRICAO', 12, y+4);
+        doc.text('QTD', 75, y+4);
+        doc.text('PRECO', 85, y+4);
+        doc.text('DESC%', 100, y+4);
+        doc.text('SUBTOTAL', 115, y+4);
+
+        y += 6;
+        doc.setFont('helvetica','normal');
+        produtosFat.forEach((p:any)=>{
+          if(y>190){ doc.addPage(); y=10; }
+          doc.text(p.nome.substring(0,35), 12, y+4);
+          doc.text(String(p.qtd), 77, y+4, {align:'center'});
+          doc.text(`${p.preco}MT`, 90, y+4, {align:'right'});
+          doc.text(`${p.desc}%`, 102, y+4, {align:'center'});
+          const sub = (p.preco*p.qtd*(1-p.desc/100));
+          doc.text(`${sub.toFixed(0)}MT`, 130, y+4, {align:'right'});
+          y+=5;
+        });
+
+        y+=3;
+        doc.setFont('helvetica','bold');
+        doc.text(`Subtotal: ${subtotal.toFixed(0)}MT`, 100, y);
+        y+=4;
+        doc.text(`Desconto: -${desc.toFixed(0)}MT`, 100, y);
+        y+=4;
+        doc.text(`IVA (${ivaTipo}%): ${iva.toFixed(0)}MT`, 100, y);
+        y+=6;
+        doc.setFontSize(10);
+        doc.setFillColor(isDivida ? 255 : 250, isDivida ? 200 : 204, isDivida ? 200 : 21);
+        doc.rect(80, y-4, 58, 8, 'F');
+        doc.text(`TOTAL: ${total.toFixed(0)}MT ${isDivida ? '(DIVIDA)' : ''}`, 82, y);
+
+        doc.save(nomeArquivo);
+      }catch(e){ console.log('Erro PDF fatura', e); }
+
       const novaFatura = {
         id: Date.now(),
         data: dataHoje,
@@ -544,7 +643,6 @@ export default function App(){
           const contadorDiaKey2 = `fatura_contador_${t2}_${dataHojeISO2}`;
           const contAtualDia=parseInt(localStorage.getItem(contadorDiaKey2)||'0');
           localStorage.setItem(contadorDiaKey2, String(contAtualDia+1));
-          // Mantem contador global antigo para compatibilidade mas nao usa para numero
           const contAtual=parseInt(localStorage.getItem(`fatura_contador_${t2}`)||'0');
           localStorage.setItem(`fatura_contador_${t2}`, String(contAtual+1));
         }catch(e){}
