@@ -898,6 +898,11 @@ useEffect(()=>{
    {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
    {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
  ] as any);
+ const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
+ const [assentosReservados, setAssentosReservados] = useState([] as number[]);
+ const [passageiroLat, setPassageiroLat] = useState(null as any);
+ const [passageiroLng, setPassageiroLng] = useState(null as any);
+ const [modoPassageiro, setModoPassageiro] = useState(false);
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
 
