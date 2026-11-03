@@ -857,8 +857,101 @@ const [produtosFat, setProdutosFat] = useState([
  const [provinciaFiltroV, setProvinciaFiltroV] = useState('Maputo Cidade');
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
- const [viagensMock, setViagensMock] = useState([] as any);
- const [filteredViagens, setFilteredViagens] = useState([] as any);
+ const [viagensMock, setViagensMock] = useState([
+   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
+   {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
+   {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
+ ]);
+ const [transportadorLogado, setTransportadorLogado] = useState(false);
+ const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
+  const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
+ const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
+ const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
+useEffect(()=>{
+  function intercept(e:any){
+    try{
+      const target = e.target as HTMLElement;
+      if(target && target.tagName==='BUTTON' && target.textContent && target.textContent.includes('Entrar - Area Transportador')){
+        e.stopPropagation();
+        e.preventDefault();
+        const username = transportadorLoginForm.username;
+        const password = transportadorLoginForm.password;
+        const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
+        const found = saved.find((t:any)=>t.username===username && t.password===password);
+        if(found){
+          setTransportadorPerfil(found);
+          setTransportadorLogado(true);
+        } else if(username===transportadorPerfil.username && password===transportadorPerfil.password){
+          setTransportadorLogado(true);
+        } else {
+          alert('Credenciais invalidas. Use username e password criados pelo transportador.');
+        }
+      }
+    }catch(err){}
+  }
+  document.addEventListener('click', intercept, true);
+  return ()=>document.removeEventListener('click', intercept, true);
+}, [transportadorLoginForm, transportadorPerfil]);
+ const [viaturas, setViaturas] = useState([
+   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
+   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
+ ] as any);
+ const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
+
+
+ // filtered list shown on PESQUISAR VIAGENS
+ const [filteredViagens, setFilteredViagens] = useState<any[]>([]);
+ useEffect(()=>{
+   try{
+     const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
+     setFilteredViagens(candidate);
+   }catch(e){setFilteredViagens([])}
+ },[viagensMock, viaturas, transportadorPerfil]);
+
+  // ===== V24 - FIX VISAO GERAL FUNCIONAL - ESTADOS CORRIGIDOS =====
+  const [mostrarMapaOverview, setMostrarMapaOverview] = useState(true);
+  const [ordenarMaisProximo, setOrdenarMaisProximo] = useState(false);
+  const [carroFocadoMapa, setCarroFocadoMapa] = useState<any>(null);
+  const [viaturaFocadaMapa, setViaturaFocadaMapa] = useState<any>(null);
+  const [mostrarPopupMapa, setMostrarPopupMapa] = useState(false);
+  const [segundosAtualizacao, setSegundosAtualizacao] = useState(12);
+
+  useEffect(()=>{
+    const iv = setInterval(()=> setSegundosAtualizacao(s=> s+1), 1000);
+    return ()=> clearInterval(iv);
+  },[]);
+
+  const todosCarrosOverview = useMemo(()=>{
+    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
+      id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
+      lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
+      rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
+      destino: (vt.rota||'').split(' - ')[1]||'Sofala', destinoDistrito: 'Beira',
+      tempo: '10h', motorista: vt.motorista||transportadorPerfil.responsavel||'Motorista', tel: vt.tel||transportadorPerfil.tel||'84 123 4567',
+      preco: vt.paragens?.[0]?.preco||vt.cargaKg*10||2500, rating:4.7, status:'Activa', livres: vt.lugares, activa:true, data: 'Hoje'
+    }));
+    return [...viagensMock, ...extras];
+  }, [viagensMock, viaturas, transportadorPerfil]);
+
+  const filtradosOverview = useMemo(()=>{
+    let lista = todosCarrosOverview.filter((v:any)=>{
+      const okProvOrig = provOrigemF ? (v.origem||'').toLowerCase().includes(provOrigemF.toLowerCase()) || provOrigemF==='Maputo Provincia' : true;
+      const okProvDest = provDestinoF ? (v.destino||'').toLowerCase().includes(provDestinoF.toLowerCase()) || provDestinoF==='Sofala' || (v.destino||'').toLowerCase().includes('beira') : true;
+      const okDistOrig = distOrigemF ? (v.origemDistrito||'').toLowerCase().includes(distOrigemF.toLowerCase()) || (v.origem||'').toLowerCase().includes(distOrigemF.toLowerCase()) : true;
+      const okDistDest = distDestinoF ? (v.destinoDistrito||'').toLowerCase().includes(distDestinoF.toLowerCase()) || (v.destino||'').toLowerCase().includes(distDestinoF.toLowerCase()) : true;
+      return okProvOrig && okProvDest && okDistOrig && okDistDest;
+    });
+    if(ordenarMaisProximo){
+      lista = [...lista].sort((a:any,b:any)=> (a.preco||0)-(b.preco||0));
+    }
+    return lista;
+  }, [todosCarrosOverview, provOrigemF, provDestinoF, distOrigemF, distDestinoF, dataViagemF, ordenarMaisProximo]);
+
+ const [formViatura, setFormViatura] = useState({tipo:'Minibus / Chapa', marca:'Toyota Coaster 25 lugares', matricula:'', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any);
+ const [formParagem, setFormParagem] = useState({local:'', preco:0} as any);
+ const [paragensTemp, setParagensTemp] = useState([{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}] as any);
  const [editandoViaturaId, setEditandoViaturaId] = useState<string|null>(null);
  const [reservas, setReservas] = useState<any[]>([]);
  const [encomendas, setEncomendas] = useState<any[]>([]);
@@ -2214,7 +2307,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{(viaturas||[]).filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
                   
 
                   {filtradosOverview.map((v:any)=>(
@@ -2376,7 +2469,7 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">
                     <div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1" /></div>
                     <div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select value={provinciaFiltroV} onChange={e=>setProvinciaFiltroV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala</option><option>Africa do Sul</option></select></div>
-                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...(viaturas||[]).filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
+                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
                   </div>
                   <div className="text-[7px] text-[#94a3b8] mt-2">LOCAL COLETA / PONTO ENCONTRO (se nao for terminal) - DESTINO CUSTOM (se nao aparecer na lista) - LOCAL SERA ENCONTRADO / ACOMPANHANTE / MENOR - APAGADOS COM X VERMELHO COMO PEDISTE - ja havias feito - Rotas: Beira-Johannesburg via Ressano Garcia, Inhambane-Johannesburg via Ponta do Ouro, Maxixe-Johannesburg, Xai-Xai-Johannesburg, Chokwe-Johannesburg, Maputo-Durban, etc - Paragens SA: Park Station, Bosman, Nelspruit Mbombela, Komatiepoort Fronteira, Ressano Garcia, Durban Central</div>
                 </div>
@@ -2534,41 +2627,13 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} REAL - SEM BRANCO - LOCAL</div>
-                        <div className="mt-2 flex gap-2">
-                          <button onClick={()=>setModoPassageiro(!modoPassageiro)} className={modoPassageiro ? "flex-1 py-1 bg-[#facc15] text-black font-black rounded-full text-[8px]" : "flex-1 py-1 bg-[#1e2f4a] text-white font-black rounded-full text-[8px]"}>{modoPassageiro ? 'MODO MOTORISTA' : 'MODO PASSAGEIRO'}</button>
-                          <button onClick={()=>{
-                            if(navigator.geolocation){
-                              navigator.geolocation.getCurrentPosition((pos)=>{
-                                setPassageiroLat(pos.coords.latitude);
-                                setPassageiroLng(pos.coords.longitude);
-                                alert('📍 Localizacao REAL: '+pos.coords.latitude.toFixed(4)+' , '+pos.coords.longitude.toFixed(4));
-                              });
-                            }
-                          }} className="flex-1 py-1 bg-green-500 text-white font-black rounded-full text-[8px]">📍 Minha Localizacao</button>
+                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
+                        <div className="mt-3 space-y-2">
+                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
+                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
                         </div>
-                        <div className="mt-3 space-y-2 max-h-[320px] overflow-y-auto">
-                          {(viaturas||[]).length===0 ? (
-                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura<br/>Registar viatura 5 lugares<br/>Teste hoje - SEM SUPABASE - SEM BRANCO</div>
-                          ) : (viaturas||[]).map((vt:any)=>{
-                            let distTxt=''; let etaTxt='';
-                            if(passageiroLat && passageiroLng && vt.lat && vt.lng){
-                              const R=6371; const dLat=(vt.lat-passageiroLat)*Math.PI/180; const dLon=(vt.lng-passageiroLng)*Math.PI/180;
-                              const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(passageiroLat*Math.PI/180)*Math.cos(vt.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-                              const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); const dist=R*c;
-                              distTxt=dist.toFixed(1)+'km'; etaTxt=Math.round((dist/40)*60)+' min';
-                            }
-                            return (
-                            <div key={vt.id} onClick={()=>{ setViaturaSelecionada(vt); setAssentosReservados([]); }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15]"}>
-                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
-                              <div className="text-[8px] mt-1">{vt.rota} {distTxt ? '- 📍 '+distTxt+' - ⏱️ '+etaTxt+' ETA REAL' : ''}</div>
-                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span>{modoPassageiro && distTxt && <span className="text-[7px] bg-blue-100 px-1 rounded">{distTxt} - {etaTxt}</span>}<button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas((viaturas||[]).filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
-                            </div>
-                            );
-                          })}
-                        </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">PASSAGEIRO: Localizacao + ETA REAL - SEM BRANCO</div><div className="text-[9px] mt-1">{viaturas.length} viaturas - Passageiro aceita GPS, ve distancia e tempo chegada real - LocalStorage, sem Supabase para nao dar branco</div></div>
-                        <button onClick={()=>{ localStorage.removeItem('viaturas_reais_teste'); setViaturas([]); alert('Frota limpa local - 0 records'); }} className="w-full mt-2 py-1 bg-red-100 text-[8px] rounded-full">🗑️ Limpar tudo LOCAL - 0 records</button>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
                         <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
