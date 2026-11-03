@@ -2570,11 +2570,45 @@ Bilhete valido - Apresentar QR`;
                       <button onClick={()=>setAuthMode('cadastro')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-white/20 text-white">CADASTRO</button>
                     </div>
                     <div className="mt-5 max-w-[420px] mx-auto">
-                      <div className="grid grid-cols-2 gap-2">
-                        <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username" className="p-2.5 rounded text-black text-[12px]" />
-                        <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password" type="password" className="p-2.5 rounded text-black text-[12px]" />
-                      </div>
-                      <button onClick={()=>{setTransportadorLogado(true); setAreaTransSubTab('frota')}} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px]">Entrar - nagi / 123</button>
+                      {authMode==='login' ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username - ex: nagi" className="p-2.5 rounded text-black text-[12px] border-2 border-[#facc15]" />
+                            <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password - ex: 123" type="password" className="p-2.5 rounded text-black text-[12px] border-2 border-[#facc15]" />
+                          </div>
+                          <button onClick={()=>{
+                            const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
+                            const found = saved.find((t:any)=>t.username===transportadorLoginForm.username && t.password===transportadorLoginForm.password);
+                            if(found || (transportadorLoginForm.username==='nagi' && transportadorLoginForm.password==='123')){
+                              if(found) setTransportadorPerfil(found);
+                              setTransportadorLogado(true); setAreaTransSubTab('frota');
+                            } else {
+                              alert('Credenciais invalidas. Use nagi/123 ou conta cadastrada');
+                            }
+                          }} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px] hover:bg-yellow-300">Entrar - nagi / 123 - LOGIN FUNCIONAL</button>
+                          <button onClick={()=>setAuthMode('cadastro')} className="w-full mt-2 h-8 text-[10px] text-white underline">Nao tem conta? Criar cadastro</button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-1 gap-2">
+                            <input value={transportadorPerfil.nomeEmpresa} onChange={e=>setTransportadorPerfil({...transportadorPerfil, nomeEmpresa:e.target.value})} placeholder="Nome Empresa" className="p-2.5 rounded text-black text-[12px]" />
+                            <div className="grid grid-cols-2 gap-2">
+                              <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username novo" className="p-2.5 rounded text-black text-[12px] border-2 border-green-400" />
+                              <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password nova" type="password" className="p-2.5 rounded text-black text-[12px] border-2 border-green-400" />
+                            </div>
+                          </div>
+                          <button onClick={()=>{
+                            if(!transportadorLoginForm.username || !transportadorLoginForm.password){ alert('Preencha username e password'); return; }
+                            const novo = {...transportadorPerfil, username:transportadorLoginForm.username, password:transportadorLoginForm.password};
+                            const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
+                            saved.push(novo);
+                            localStorage.setItem('transportadores', JSON.stringify(saved));
+                            setTransportadorLogado(true); setAreaTransSubTab('frota');
+                            alert('Conta '+novo.username+' criada!');
+                          }} className="w-full mt-3 px-6 py-3 bg-green-500 text-white font-black rounded-full text-[13px]">Criar Conta - CADASTRO FUNCIONAL</button>
+                          <button onClick={()=>setAuthMode('login')} className="w-full mt-2 h-8 text-[10px] text-white underline">Ja tem conta? Fazer login</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
