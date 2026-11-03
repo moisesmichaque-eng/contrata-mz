@@ -857,47 +857,9 @@ const [produtosFat, setProdutosFat] = useState([
  const [provinciaFiltroV, setProvinciaFiltroV] = useState('Maputo Cidade');
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
- const [viagensMock, setViagensMock] = useState([
-   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
-   {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
-   {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
- ]);
- const [transportadorLogado, setTransportadorLogado] = useState(false);
- const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
-  const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
- const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
- const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
-useEffect(()=>{
-  function intercept(e:any){
-    try{
-      const target = e.target as HTMLElement;
-      if(target && target.tagName==='BUTTON' && target.textContent && target.textContent.includes('Entrar - Area Transportador')){
-        e.stopPropagation();
-        e.preventDefault();
-        const username = transportadorLoginForm.username;
-        const password = transportadorLoginForm.password;
-        const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
-        const found = saved.find((t:any)=>t.username===username && t.password===password);
-        if(found){
-          setTransportadorPerfil(found);
-          setTransportadorLogado(true);
-        } else if(username===transportadorPerfil.username && password===transportadorPerfil.password){
-          setTransportadorLogado(true);
-        } else {
-          alert('Credenciais invalidas. Use username e password criados pelo transportador.');
-        }
-      }
-    }catch(err){}
-  }
-  document.addEventListener('click', intercept, true);
-  return ()=>document.removeEventListener('click', intercept, true);
-}, [transportadorLoginForm, transportadorPerfil]);
- const [viaturas, setViaturas] = useState([
-   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
-   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
- ] as any);
+ const [viagensMock, setViagensMock] = useState([] as any);
+ const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
+ const [assentosReservados, setAssentosReservados] = useState<number[]>([]);
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
 
@@ -2587,6 +2549,7 @@ Bilhete valido - Apresentar QR`;
                             }
                           }} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px] hover:bg-yellow-300">Entrar - nagi / 123 - LOGIN FUNCIONAL</button>
                           <button onClick={()=>setAuthMode('cadastro')} className="w-full mt-2 h-8 text-[10px] text-white underline">Nao tem conta? Criar cadastro</button>
+                          <button onClick={()=>{localStorage.removeItem('transportadores'); localStorage.removeItem('viaturas'); setViaturas([]); alert('Todos cadastros limpos! Frota zerada - pronto para clientes reais');}} className="w-full mt-2 h-8 text-[9px] text-red-300 border border-red-300 rounded-full">🗑️ Limpar todos cadastros - LIMPO CLIENTES</button>
                         </>
                       ) : (
                         <>
@@ -2604,7 +2567,7 @@ Bilhete valido - Apresentar QR`;
                             saved.push(novo);
                             localStorage.setItem('transportadores', JSON.stringify(saved));
                             setTransportadorLogado(true); setAreaTransSubTab('frota');
-                            alert('Conta '+novo.username+' criada!');
+                            alert('Conta '+novo.username+' criada! Pode registar 3 viaturas reais');
                           }} className="w-full mt-3 px-6 py-3 bg-green-500 text-white font-black rounded-full text-[13px]">Criar Conta - CADASTRO FUNCIONAL</button>
                           <button onClick={()=>setAuthMode('login')} className="w-full mt-2 h-8 text-[10px] text-white underline">Ja tem conta? Fazer login</button>
                         </>
@@ -2627,34 +2590,52 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
+                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} / 3 Max - LIMPO</div>
                         <div className="mt-3 space-y-2">
-                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                          {viaturas.length===0 ? (
+                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura registada<br/><br/>Va em Registar Viatura e adicione viatura real<br/><br/>1 conta gere 3 viaturas - LIMPO PARA CLIENTES</div>
+                          ) : viaturas.map((vt:any)=>(
+                            <div key={vt.id} onClick={()=>{
+                              setViaturaSelecionada(vt);
+                              setAssentosReservados([]);
+                            }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"}>
+                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
+                              <div className="text-[8px] mt-1">{vt.rota} - {viaturaSelecionada?.id===vt.id ? assentosReservados.length : 0}/{vt.lugares} ocupados</div>
+                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span><button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas(viaturas.filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X Remover</button></div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">{viaturas.length===0 ? '0,00 MT - 0 viagens - 0% - LIMPO' : (assentosReservados.length*450)+',00 MT - '+viaturas.length+' viagens - '+Math.round((assentosReservados.length/(viaturaSelecionada?.lugares||29))*100)+'% ocupacao'}</div></div>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
-                        <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
+                        <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - {viaturaSelecionada ? viaturaSelecionada.matricula+' - '+viaturaSelecionada.marca+' - '+viaturaSelecionada.lugares+' lugares' : 'Nenhuma viatura selecionada - Selecione a esquerda'} - FOTO LARANJA</div><button onClick={()=>{ if(!viaturaSelecionada){ alert('Selecione uma viatura a esquerda primeiro'); return; } setAreaTransSubTab('registar'); }} className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
                         <div className="mt-3 max-w-[260px] mx-auto">
-                          <div className="text-[7px] text-center font-black mb-2">FRENTE - Motorista</div>
+                          <div className="text-[7px] text-center font-black mb-2">FRENTE - Motorista - {viaturaSelecionada?.matricula || 'Nenhuma'} - Clique para reservar assento</div>
                           <div className="grid grid-cols-4 gap-1">
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">1</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#facc15] font-black">2 Ocup</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-white">3</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e] text-white">4 Livre</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">5</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#22c55e]">6</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444] text-white">7 Res</div><div className="h-7 border rounded flex items-center justify-center text-[8px] bg-[#ef4444]">8 Res</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">9</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">10</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">11</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">12</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">13</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">15</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">16</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">17</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">18</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">19</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">20</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">21</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">22</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">23</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">24</div>
-                            <div className="h-7 border rounded flex items-center justify-center text-[8px]">25</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">26</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">27</div><div className="h-7 border rounded flex items-center justify-center text-[8px]">28</div>
-                            <div className="col-span-4 h-6 flex items-center justify-center text-[7px] bg-gray-50 rounded">WC - 29</div>
+                            {(Array.from({length: viaturaSelecionada?.lugares || 0}, (_, i)=>i+1)).length===0 ? (
+                              <div className="col-span-4 text-center py-8 text-[8px] text-gray-400 border-2 border-dashed rounded">Selecione viatura a esquerda<br/>Ou registe nova viatura real</div>
+                            ) : Array.from({length: viaturaSelecionada?.lugares || 0}, (_, i)=>i+1).map(num=>(
+                              <div key={num} onClick={()=>{
+                                if(!viaturaSelecionada) return;
+                                if(assentosReservados.includes(num)){
+                                  setAssentosReservados(assentosReservados.filter(n=>n!==num));
+                                } else {
+                                  if(assentosReservados.length>=4){ alert('Max 4 assentos por reserva'); return; }
+                                  setAssentosReservados([...assentosReservados, num]);
+                                }
+                              }} className={`h-7 border rounded flex items-center justify-center text-[8px] cursor-pointer hover:bg-yellow-100 ${assentosReservados.includes(num) ? 'bg-[#facc15] font-black' : 'bg-white'}`}>{num}{assentosReservados.includes(num) ? ' Ocup' : ''}</div>
+                            ))}
+                            {(viaturaSelecionada?.lugares||0)>0 && <div className="col-span-4 h-6 flex items-center justify-center text-[7px] bg-gray-50 rounded">WC - {viaturaSelecionada?.lugares}</div>}
                           </div>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-2">
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 1 aprovada! Joao Silva - Assento 2 - 450MT - Viatura MMN-123-MP')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 1 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 2 aprovada! Maria - Assento 8 - 450MT')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 2 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                          {assentosReservados.length===0 ? (
+                            <div className="col-span-2 text-center text-[8px] text-gray-400 py-4 border-2 border-dashed rounded">Nenhuma reserva - Clique nos assentos acima para selecionar - Viatura real selecionada reflete aqui</div>
+                          ) : assentosReservados.map(num=>(
+                            <div key={num} className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva - Assento {num} - 450MT - {viaturaSelecionada?.matricula}</div><div className="text-[7px]">{viaturaSelecionada?.rota} - {viaturaSelecionada?.marca}</div><div className="flex gap-1 mt-1"><button onClick={()=>{ alert('Reserva assento '+num+' aprovada! Viatura '+viaturaSelecionada?.matricula+' - '+viaturaSelecionada?.rota); setAssentosReservados(assentosReservados.filter(n=>n!==num)); }} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>setAssentosReservados(assentosReservados.filter(n=>n!==num))} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                          ))}
                         </div>
-                        <div className="mt-2 text-[8px] text-center text-gray-500">2 pendentes - Clique em Aprovar/Rejeitar para gerir - Viaturas clicaveis</div>
+                        <div className="mt-2 text-[8px] text-center text-gray-500">{assentosReservados.length} pendentes - Clique em Aprovar/Rejeitar - Viatura {viaturaSelecionada?.matricula || 'nenhuma'} reflete lado direito - Botoes funcionais</div>
                       </div>
                     </div>
                   )}
