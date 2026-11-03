@@ -858,6 +858,7 @@ const [produtosFat, setProdutosFat] = useState([
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
  const [viagensMock, setViagensMock] = useState([] as any);
+ const [filteredViagens, setFilteredViagens] = useState([] as any);
  const [editandoViaturaId, setEditandoViaturaId] = useState<string|null>(null);
  const [reservas, setReservas] = useState<any[]>([]);
  const [encomendas, setEncomendas] = useState<any[]>([]);
@@ -2213,7 +2214,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{viaturas.filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
+                  <div className="flex items-center justify-between"><h2 className="font-bold text-[12px]"><span className="bg-[#111827] text-white w-5 h-5 rounded inline-flex items-center justify-center mr-1">{filtradosOverview.length}</span> carros encontrados para <span className="text-[#1d4ed8]">{provOrigemF} - {provDestinoF} - {distOrigemF} - {distDestinoF}</span></h2><span className="text-[8px] bg-[#f0fdf4] border border-[#22c55e] px-2 py-1 rounded-full">{(viaturas||[]).filter((v:any)=>v.activa).length} adicionados por transportadores</span></div>
                   
 
                   {filtradosOverview.map((v:any)=>(
@@ -2375,7 +2376,7 @@ Bilhete valido - Apresentar QR`;
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-3">
                     <div><label className="text-[8px] font-bold">DATA VIAGEM</label><input type="date" value={dataV} onChange={e=>setDataV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1" /></div>
                     <div><label className="text-[8px] font-bold">PROVINCIA FILTRO</label><select value={provinciaFiltroV} onChange={e=>setProvinciaFiltroV(e.target.value)} className="w-full h-9 border rounded-[8px] text-[11px] px-2 mt-1"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza - Xai-Xai</option><option>Inhambane</option><option>Sofala</option><option>Africa do Sul</option></select></div>
-                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
+                    <div className="flex items-end"><button onClick={()=>{ const candidate = [...viagensMock, ...(viaturas||[]).filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: dataV || 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))]; const filtered = candidate.filter((v:any)=>{ const okOrigem = origemV? (v.origem||'').toLowerCase().includes(origemV.toLowerCase()) : true; const okOrigemDistrito = origemDistritoV? ((v.origemDistrito||'').toLowerCase().includes(origemDistritoV.toLowerCase()) || (v.origem||'').toLowerCase().includes(origemDistritoV.toLowerCase())) : true; const okDestino = destinoV? (v.destino||'').toLowerCase().includes(destinoV.toLowerCase()) : true; const okDestinoDistrito = destinoDistritoV? ((v.destinoDistrito||'').toLowerCase().includes(destinoDistritoV.toLowerCase()) || (v.destino||'').toLowerCase().includes(destinoDistritoV.toLowerCase())) : true; return okOrigem && okOrigemDistrito && okDestino && okDestinoDistrito; }); const others = candidate.filter(c => !filtered.includes(c)); setFilteredViagens([...filtered, ...others]); }} className="w-full h-9 bg-[#0ea5e9] text-white rounded-[8px] font-black text-[11px]">PESQUISAR VIAGENS</button></div>
                   </div>
                   <div className="text-[7px] text-[#94a3b8] mt-2">LOCAL COLETA / PONTO ENCONTRO (se nao for terminal) - DESTINO CUSTOM (se nao aparecer na lista) - LOCAL SERA ENCONTRADO / ACOMPANHANTE / MENOR - APAGADOS COM X VERMELHO COMO PEDISTE - ja havias feito - Rotas: Beira-Johannesburg via Ressano Garcia, Inhambane-Johannesburg via Ponta do Ouro, Maxixe-Johannesburg, Xai-Xai-Johannesburg, Chokwe-Johannesburg, Maputo-Durban, etc - Paragens SA: Park Station, Bosman, Nelspruit Mbombela, Komatiepoort Fronteira, Ressano Garcia, Durban Central</div>
                 </div>
@@ -2547,9 +2548,9 @@ Bilhete valido - Apresentar QR`;
                           }} className="flex-1 py-1 bg-green-500 text-white font-black rounded-full text-[8px]">📍 Minha Localizacao</button>
                         </div>
                         <div className="mt-3 space-y-2 max-h-[320px] overflow-y-auto">
-                          {viaturas.length===0 ? (
+                          {(viaturas||[]).length===0 ? (
                             <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura<br/>Registar viatura 5 lugares<br/>Teste hoje - SEM SUPABASE - SEM BRANCO</div>
-                          ) : viaturas.map((vt:any)=>{
+                          ) : (viaturas||[]).map((vt:any)=>{
                             let distTxt=''; let etaTxt='';
                             if(passageiroLat && passageiroLng && vt.lat && vt.lng){
                               const R=6371; const dLat=(vt.lat-passageiroLat)*Math.PI/180; const dLon=(vt.lng-passageiroLng)*Math.PI/180;
@@ -2561,7 +2562,7 @@ Bilhete valido - Apresentar QR`;
                             <div key={vt.id} onClick={()=>{ setViaturaSelecionada(vt); setAssentosReservados([]); }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15]"}>
                               <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
                               <div className="text-[8px] mt-1">{vt.rota} {distTxt ? '- 📍 '+distTxt+' - ⏱️ '+etaTxt+' ETA REAL' : ''}</div>
-                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span>{modoPassageiro && distTxt && <span className="text-[7px] bg-blue-100 px-1 rounded">{distTxt} - {etaTxt}</span>}<button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas(viaturas.filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
+                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span>{modoPassageiro && distTxt && <span className="text-[7px] bg-blue-100 px-1 rounded">{distTxt} - {etaTxt}</span>}<button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas((viaturas||[]).filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
                             </div>
                             );
                           })}
