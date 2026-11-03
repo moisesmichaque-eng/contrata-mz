@@ -1745,7 +1745,35 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-bold">{it.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||20}</td><td className="p-2 text-center">{s.entradaLoja||0}</td><td className="p-2 text-center font-bold">{s.venda||it.qtd||0}</td><td className="p-2">{f.cliente||'-'}</td><td className="p-2 text-center">{it.qtd||0}</td><td className="p-2 text-center">{Number(it.preco||0).toFixed(0)}MT</td><td className="p-2 text-center bg-blue-50 font-bold">{Number(valorDivida).toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-50">{Number(totalComDividas).toFixed(0)}MT</td></tr>;
                 });
               })()}
-              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={6} className="p-2 text-right">TOTAIS GERAIS {filtroRelatorioAtivo ? '(FILTRADO)' : ''}:</td><td className="p-2 text-center">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-center bg-blue-100">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>{ const isDiv=f.isDivida; return s + (isDiv ? (Number(f.total)||0) : 0); },0).toFixed(0)}MT</td><td className="p-2 text-right">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
+              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr>
+                {(() => {
+                  const listaBase = filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas;
+                  let totalQuanti=0; let totalValorDivida=0; let totalComDividas=0; let totalStInicial=0; let totalRecepcao=0; let totalVendas=0;
+                  listaBase.forEach((f:any)=>{
+                    const its=f.itens||[{qtd:1, preco:f.total}];
+                    its.forEach((it:any)=>{
+                      const q=Number(it.qtd)||0;
+                      const p=Number(it.preco)||0;
+                      const linha=q*p;
+                      const isDiv = f.isDivida===true || f.status==='DIVIDA';
+                      totalQuanti+=q;
+                      totalComDividas+=linha;
+                      if(isDiv) totalValorDivida+=linha;
+                      const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:q};
+                      totalStInicial+=Number(s.stockInicialLoja||20);
+                      totalRecepcao+=Number(s.entradaLoja||0);
+                      totalVendas+=Number(s.venda||q);
+                    });
+                  });
+                  return <>
+                    <td className="p-2 text-right" colSpan={6}>TOTAIS GERAIS {filtroRelatorioAtivo ? '(FILTRADO)' : ''}: ST:{totalStInicial} REC:{totalRecepcao} V:{totalVendas}</td>
+                    <td className="p-2 text-center">{totalQuanti}</td>
+                    <td className="p-2"></td>
+                    <td className="p-2 text-center bg-blue-200">{totalValorDivida.toFixed(0)}MT</td>
+                    <td className="p-2 text-right bg-yellow-300">{totalComDividas.toFixed(0)}MT</td>
+                  </>;
+                })()}
+              </tr></tfoot></table>
             </div>
           </div>
         </div>
