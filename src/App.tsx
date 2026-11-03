@@ -412,7 +412,7 @@ export default function App(){
   const [novoStockBarcode, setNovoStockBarcode] = useState(''); const [novoStockDataEntrada, setNovoStockDataEntrada] = useState(new Date().toISOString().slice(0,10)); const [novoStockLocal, setNovoStockLocal] = useState('A1-01'); const [novoStockValidade, setNovoStockValidade] = useState(''); const [novoStockFornecedor, setNovoStockFornecedor] = useState(''); const [novoStockLote, setNovoStockLote] = useState('LOTE-'+Date.now().toString().slice(-6)); const [filtroFIFOData, setFiltroFIFOData] = useState('');
   const [novoStockNome, setNovoStockNome] = useState(''); const [novoStockPreco, setNovoStockPreco] = useState(''); // Preco por unidade - reflete automaticamente em VENDER const [novoStockQtd, setNovoStockQtd] = useState(''); const [novoStockCusto, setNovoStockCusto] = useState(''); const [novoStockCat, setNovoStockCat] = useState('Cimento');
   const [ivaTipo, setIvaTipo] = useState("16");
-    const finalizarComWhatsApp = async ()=>{
+    const finalizarComWhatsApp = async (isDividaParam?:boolean)=>{
     try {
       if(produtosFat.length===0){alert('Adicione produtos do stock - clique nos botoes pretos Cimento, Ferro, etc'); return;}
       // VALIDACAO STOCK NA LOJA - NAO DEIXA VENDER MAIS DO QUE TEM
@@ -435,8 +435,11 @@ export default function App(){
       const telFull = '258'+telCliente;
       const nomeCliente = (nomeFat && nomeFat.trim().length>0) ? nomeFat.trim() : (telFat && telFat.trim().length>0 ? telFat.trim() : 'Cliente Balcao');
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
+      const isDivida = isDividaParam===true;
+      const statusFatura = isDivida ? 'DIVIDA' : 'PAGO';
+      const tipoMsg = isDivida ? 'DIVIDA - FIADO - POR PAGAR' : 'Fatura/Recibo';
       
-      const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - Fatura/Recibo\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*\n\nObrigado!';
+      const msg = '*'+(perfilLoja.nome||'Minha Loja')+'* - '+tipoMsg+'\n\nCliente: '+nomeCliente+(nuitFat?'\nNUIT: '+nuitFat:'')+'\nTel: '+telFat+'\nData: '+dataHoje+(isDivida?'\nSTATUS: EM DIVIDA - FIADO':'')+'\n\n*Itens ('+produtosFat.length+'):*\n'+produtosFat.map(p=>'- '+p.nome+' | Qtd:'+p.qtd+' x '+p.preco+'MT = '+(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT'+(p.desc>0?' Desc '+p.desc+'%':'')).join('\n')+'\n\nSubtotal: '+subtotal.toFixed(0)+'MT\nDesconto: -'+desc.toFixed(0)+'MT\nSubtotal liq: '+base.toFixed(0)+'MT\nIVA ('+ivaTipo+'%): '+iva.toFixed(0)+'MT\n*TOTAL: '+total.toFixed(0)+'MT*'+(isDivida?'\n\n⚠️ VALOR EM DIVIDA - CLIENTE DEVE PAGAR':'')+'\n\nObrigado!';
 
       const logoForFaturaReal = (lojaPerfil as any).logoData || (perfilLoja as any).logoData || (lojaPerfil as any).logo || '';
       const nomeLojaFatura = (lojaPerfil as any).nomeLoja || perfilLoja.nome || (lojaPerfil as any).nome || 'Zoes';
@@ -463,164 +466,55 @@ export default function App(){
               const recepcao=s.entradaLoja||0;
               const novaVendaCalc=(s.venda||0)+qtdVendida;
               const novoStockLoja=Math.max(0, inicialLoja + recepcao - novaVendaCalc);
-              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVendaCalc};
+              nl[idx]={...s, stockLoja:novoStockLoja, venda:novaVendaCalc, stockFinalLoja:novoStockLoja};
             }
           }
         });
         try{
           const t=localStorage.getItem('contaAtiva')||'geral';
           localStorage.setItem(`stock_produtos_${t}`, JSON.stringify(nl));
-          localStorage.setItem('stock_produtos', JSON.stringify(nl));
         }catch(e){}
         return nl;
       });
 
-      let numFaturaAtual='01';
-      try{
-        const t=localStorage.getItem('contaAtiva')||'geral';
-        let contador=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0');
-        contador+=1;
-        numFaturaAtual=String(contador).padStart(2,'0');
-        localStorage.setItem(`fatura_contador_${t}`, String(contador));
-        const faturasExist=JSON.parse(localStorage.getItem(`faturas_${t}`)||'[]');
-        faturasExist.push({id:`FT-${numFaturaAtual}/${dataHoje}`, numero:numFaturaAtual, data:dataHoje, cliente:nomeCliente, total:total});
-        localStorage.setItem(`faturas_${t}`, JSON.stringify(faturasExist));
-      }catch(e){}
+      // SALVA FATURA COM FLAG DE DIVIDA PARA RELATORIO RECONHECER
+      const novaFatura = {
+        id: Date.now(),
+        data: dataHoje,
+        dataISO: new Date().toISOString().slice(0,10),
+        cliente: nomeCliente,
+        tel: telFat,
+        nuit: nuitFat,
+        total: total,
+        subtotal: subtotal,
+        desconto: desc,
+        iva: iva,
+        ivaTipo: ivaTipo,
+        itens: [...produtosFat],
+        status: statusFatura,
+        isDivida: isDivida,
+        valorDivida: isDivida ? total : 0,
+        valorPago: isDivida ? 0 : total,
+        numero: numeroFacturaCompleto
+      };
 
-      const nomeArquivo = `Fatura ${numeroFacturaCompleto} - ${nomeCliente}`.replace(/[^\w\-\s]/g,'').replace(/\s+/g,' ').trim() + '.pdf';
-
-      try{
-        const loadJsPDF = ():Promise<any> => {
-          return new Promise((resolve, reject)=>{
-            if((window as any).jspdf && (window as any).jspdf.jsPDF){ resolve((window as any).jspdf.jsPDF); return; }
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-            script.onload = ()=>{ 
-              setTimeout(()=>{ 
-                const jsPDF = (window as any).jspdf?.jsPDF || (window as any).jsPDF; 
-                if(jsPDF) resolve(jsPDF); else reject('jsPDF nao carregou'); 
-              }, 300);
-            };
-            script.onerror = ()=>reject('Falha carregar jsPDF');
-            document.head.appendChild(script);
-          });
-        };
-
-        const jsPDF = await loadJsPDF();
-        const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
-        
-        let y = 10;
-        // LOGO TIPO - tenta adicionar logo se existir
-        let logoAdded = false;
-        if(logoForFaturaReal && logoForFaturaReal.length>100){
-          try{
-            let imgData = logoForFaturaReal;
-            let format = 'PNG';
-            if(imgData.includes('data:image/jpeg')) format='JPEG';
-            else if(imgData.includes('data:image/png')) format='PNG';
-            else if(imgData.includes('data:image/jpg')) format='JPEG';
-            // Se nao tem data prefix, adiciona
-            if(!imgData.startsWith('data:')){
-              imgData = 'data:image/png;base64,'+imgData;
-            }
-            doc.addImage(imgData, format, 10, y, 15, 15);
-            logoAdded = true;
-          }catch(e){ console.log('Erro logo PDF', e); }
-        }
-        const textX = logoAdded ? 28 : 10;
-
-        doc.setFontSize(12);
-        doc.setFont('helvetica','bold');
-        doc.text(nomeLojaFatura, textX, y+2);
-        doc.setFontSize(8);
-        doc.setFont('helvetica','normal');
-        doc.text(`NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}`, textX, y+6);
-        doc.text(`${ramoLojaFatura}`, textX, y+10);
-        doc.text(`${endLojaFatura} - ${provLojaFatura}`, textX, y+14);
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica','bold');
-        doc.setFillColor(254,240,138);
-        doc.rect(textX, y+16, 60, 7, 'F');
-        doc.text(`Factura Nº: ${numeroFacturaCompleto}`, textX+2, y+20);
-
-        doc.setFontSize(8);
-        doc.text(`Cliente: ${nomeCliente}`, 100, y, {align:'left'});
-        doc.text(`Tel: ${telFat}`, 100, y+4, {align:'left'});
-        doc.text(`NUIT: ${nuitFat||'-'}`, 100, y+8, {align:'left'});
-        doc.text(`Data: ${dataHoje}`, 100, y+12, {align:'left'});
-        doc.text(`Factura: ${numeroFacturaCompleto}`, 100, y+16, {align:'left'});
-
-        y = 35;
-        doc.setFontSize(8);
-        doc.setFont('helvetica','bold');
-        doc.setFillColor(241,245,249);
-        doc.rect(10, y, 128, 6, 'F');
-        doc.text('DESCRICAO', 12, y+4);
-        doc.text('QTD', 75, y+4);
-        doc.text('PRECO', 85, y+4);
-        doc.text('DESC%', 100, y+4);
-        doc.text('SUBTOTAL', 115, y+4);
-
-        y += 6;
-        doc.setFont('helvetica','normal');
-        produtosFat.forEach((p:any)=>{
-          if(y>190){ doc.addPage(); y=10; }
-          doc.text(p.nome.substring(0,35), 12, y+4);
-          doc.text(String(p.qtd), 77, y+4, {align:'center'});
-          doc.text(`${p.preco}MT`, 90, y+4, {align:'right'});
-          doc.text(`${p.desc}%`, 102, y+4, {align:'center'});
-          const sub = (p.preco*p.qtd*(1-p.desc/100)).toFixed(0)+'MT';
-          doc.text(sub, 128, y+4, {align:'right'});
-          y+=5;
-        });
-
-        y+=2;
-        doc.setFont('helvetica','normal');
-        doc.text(`Subtotal: ${subtotal.toFixed(0)}MT`, 128, y, {align:'right'});
-        y+=4;
-        doc.text(`Desconto: -${desc.toFixed(0)}MT`, 128, y, {align:'right'});
-        y+=4;
-        doc.text(`Subtotal liq: ${base.toFixed(0)}MT`, 128, y, {align:'right'});
-        y+=4;
-        doc.text(`IVA (${ivaTipo}%): ${iva.toFixed(0)}MT`, 128, y, {align:'right'});
-        y+=6;
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(10);
-        doc.text(`TOTAL: ${total.toFixed(0)}MT`, 128, y, {align:'right'});
-
-        y+=10;
-        doc.setFontSize(6);
-        doc.setFont('helvetica','normal');
-        doc.text(`Documento emitido por ${nomeLojaFatura} - ${nuitLojaFatura} - ${telLojaFatura} | Sistema ContrataMZ + VENDER - ${new Date().toLocaleString('pt-MZ')}`, 10, y);
-
-        doc.save(nomeArquivo);
-      } catch(e){
-        console.error('Erro jsPDF, fallback HTML', e);
-        const logoHtml = logoForFaturaReal ? `<img src="${logoForFaturaReal}" style="height:60px; max-width:120px; object-fit:contain; border:1px solid #ddd; border-radius:8px; padding:4px; background:white;" />` : `<div style="height:60px; width:60px; background:black; color:white; display:grid; place-items:center; font-weight:900; border-radius:8px;">${(nomeLojaFatura).slice(0,2).toUpperCase()}</div>`;
-        const faturaHtml = `<html><head><meta charset="utf-8"><title>Fatura ${numeroFacturaCompleto}</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ccc;padding:8px;font-size:12px}th{background:#f1f5f9}.total{text-align:right;line-height:1.8}.header{display:flex;gap:15px;align-items:center}</style></head><body><div class="header">${logoHtml}<div><h2>${nomeLojaFatura}</h2><div>NUIT: ${nuitLojaFatura} | Tel: ${telLojaFatura}</div><div>Factura Nº: ${numeroFacturaCompleto}</div></div></div><div>Cliente: ${nomeCliente} - Tel: ${telFat}</div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map((p:any)=>`<tr><td>${p.nome}</td><td>${p.qtd}</td><td>${p.preco}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="total">TOTAL: ${total.toFixed(0)}MT</div></body></html>`;
-        const blob = new Blob([faturaHtml], {type: 'text/html'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = nomeArquivo.replace('.pdf','.html');
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){} }, 1500);
-      }
-
-      if(!winWa){
-        setTimeout(()=>{ window.location.href = waUrl; }, 500);
-      }
-
-      setFaturas([{id:Date.now(), data:dataHoje, cliente:nomeCliente, tel:telFat, nuit:nuitFat, total: total.toFixed(0)}] as any);
+      setFaturas((prev:any[])=>{
+        const novaLista=[...prev, novaFatura];
+        try{
+          const t=localStorage.getItem('contaAtiva')||'geral';
+          localStorage.setItem(`faturas_${t}`, JSON.stringify(novaLista));
+          const contAtual=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0');
+          localStorage.setItem(`fatura_contador_${t}`, String(contAtual+1));
+        }catch(e){}
+        return novaLista;
+      });
       
       setTimeout(()=>{ setProdutosFat([]); }, 1500);
     } catch(err){
       alert('Erro ao finalizar: '+err);
       console.error(err);
     }
-  };
+  };;
 
 
 
@@ -1419,7 +1313,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                           }
                           if(novaQtd < 1){ alert('Quantidade minima 1'); return; }
                           const n=[...produtosFat]; n[i].qtd=novaQtd; setProdutosFat(n);
-                        }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.preco} onChange={e=>{ const n=[...produtosFat]; n[i].preco=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.desc} onChange={e=>{ const n=[...produtosFat]; n[i].desc=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==p.id))} className="col-span-1">🗑️</button></div>)}</div><div className="mt-3 text-right text-[10px] space-y-1 bg-[#f8fafc] rounded p-3"><div>Subtotal bruto <b>{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</b></div><div className="text-red-600">Descontos <b>- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</b></div><div>Subtotal liquido <b>{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</b></div><div>IVA ({ivaTipo}%) <b>{ivaTipo==='sem'?0:ivaTipo==='16'?((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0):((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0)} MT</b></div><div className="font-black text-[12px] border-t pt-1">TOTAL <span className="text-[#0f766e]">{(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</span></div></div><div className="mt-2 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div><div className="mt-3 flex gap-2"><button onClick={()=>finalizarComWhatsApp()} className="flex-1 h-10 bg-[#16a34a] text-white rounded-[8px] text-[10px] font-black">Enviar via WhatsApp para {telFat || '258828765432'} - {produtosFat.length} itens - Baixa Stock Auto</button><button className="px-4 h-10 bg-white border rounded-[8px] text-[9px] font-bold">Pré-visualizar PDF</button></div></div>
+                        }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.preco} onChange={e=>{ const n=[...produtosFat]; n[i].preco=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><div className="col-span-2"><input type="number" value={p.desc} onChange={e=>{ const n=[...produtosFat]; n[i].desc=Number(e.target.value); setProdutosFat(n); }} className="w-full border rounded px-1 py-1 text-center" /></div><button onClick={()=>setProdutosFat(produtosFat.filter(x=>x.id!==p.id))} className="col-span-1">🗑️</button></div>)}</div><div className="mt-3 text-right text-[10px] space-y-1 bg-[#f8fafc] rounded p-3"><div>Subtotal bruto <b>{produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0).toFixed(0)} MT</b></div><div className="text-red-600">Descontos <b>- {produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0).toFixed(0)} MT</b></div><div>Subtotal liquido <b>{(produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0)).toFixed(0)} MT</b></div><div>IVA ({ivaTipo}%) <b>{ivaTipo==='sem'?0:ivaTipo==='16'?((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.16).toFixed(0):((produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0)-produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0))*0.05).toFixed(0)} MT</b></div><div className="font-black text-[12px] border-t pt-1">TOTAL <span className="text-[#0f766e]">{(()=>{const sub=produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0); const d=produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0); const b=sub-d; const iva=ivaTipo==='sem'?0:ivaTipo==='16'?b*0.16:b*0.05; return (b+iva).toFixed(0);})()} MT</span></div></div><div className="mt-2 flex gap-2"><button onClick={()=>setIvaTipo('sem')} className={ivaTipo==='sem' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Sem IVA</button><button onClick={()=>setIvaTipo('16')} className={ivaTipo==='16' ? 'bg-[#16a34a] text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 16%</button><button onClick={()=>setIvaTipo('5')} className={ivaTipo==='5' ? 'bg-black text-white px-3 py-1 rounded-full text-[8px]' : 'bg-white border px-3 py-1 rounded-full text-[8px]'}>Com IVA 5%</button></div><div className="mt-3 flex gap-2"><button onClick={()=>finalizarComWhatsApp(false)} className="flex-1 h-10 bg-[#16a34a] text-white rounded-[8px] text-[10px] font-black">Enviar via WhatsApp para {telFat || '258828765432'} - {produtosFat.length} itens - Baixa Stock Auto - PAGO</button><button onClick={()=>finalizarComWhatsApp(true)} className="px-4 h-10 bg-[#facc15] border-2 border-black text-black rounded-[8px] text-[9px] font-black hover:bg-[#eab308]">DÍVIDAS - FIADO - {produtosFat.length} itens</button></div></div>
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-3 h-fit sticky top-3">
@@ -2667,16 +2561,41 @@ Bilhete valido - Apresentar QR`;
 
         <footer className="mt-10 border-t py-6 text-center text-[10px] text-[#94a3b8]">
           {faturacaoTab==='faturas' && (
-            <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-              <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length}</h3>
-              <p className="text-[10px] opacity-60 mb-3">Vendas com Finalizar Documento - Baixa Stock Auto</p>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-left">TOTAL</th><th className="p-2 text-center">PAG</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={4} className="p-6 text-center opacity-50">Nenhuma fatura ainda</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className="border-b"><td className="p-2">{f.data}</td><td className="p-2">{f.cliente}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center">{f.pagamento}</td></tr>))}</tbody></table>
+            <div className="space-y-3">
+              <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                <h3 className="font-black text-[13px] mb-3">Faturas emitidas - {faturas.length} | RELATORIO DIVIDAS - 3 VALORES</h3>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-green-50 border-2 border-green-200 rounded-[10px] p-3"><div className="text-[9px] font-bold text-green-700">TOTAL SEM DIVIDAS (PAGO/CAIXA)</div><div className="font-black text-[18px] text-green-700">{faturas.filter((f:any)=>!f.isDivida).reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div><div className="text-[8px] text-[#64748b]">{faturas.filter((f:any)=>!f.isDivida).length} faturas pagas</div></div>
+                  <div className="bg-red-50 border-2 border-red-200 rounded-[10px] p-3"><div className="text-[9px] font-bold text-red-700">VALOR TOTAL DE DIVIDAS (FIADO)</div><div className="font-black text-[18px] text-red-700">{faturas.filter((f:any)=>f.isDivida).reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div><div className="text-[8px] text-[#64748b]">{faturas.filter((f:any)=>f.isDivida).length} faturas em divida</div></div>
+                  <div className="bg-[#1e2f4a] text-white rounded-[10px] p-3"><div className="text-[9px] font-bold opacity-80">TOTAL GERAL (COM DIVIDAS)</div><div className="font-black text-[18px]">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div><div className="text-[8px] opacity-60">{faturas.length} faturas total - Pago + Divida</div></div>
+                </div>
+                <div className="flex gap-2 mb-3">
+                  <button onClick={()=>{ (window as any).filtroFaturaDivida='todos'; (document.getElementById('filtroFaturaStatus') as any).value='todos'; }} className="px-3 py-1 bg-[#1e2f4a] text-white rounded-full text-[8px] font-bold">Todos ({faturas.length})</button>
+                  <button onClick={()=>{ (window as any).filtroFaturaDivida='pagos'; }} className="px-3 py-1 bg-green-100 text-green-700 border border-green-300 rounded-full text-[8px] font-bold">Sem Dividas - Pagos ({faturas.filter((f:any)=>!f.isDivida).length})</button>
+                  <button onClick={()=>{ (window as any).filtroFaturaDivida='dividas'; }} className="px-3 py-1 bg-red-100 text-red-700 border border-red-300 rounded-full text-[8px] font-bold">Com Dividas - Fiado ({faturas.filter((f:any)=>f.isDivida).length})</button>
+                </div>
+                <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">CLIENTE / TEL</th><th className="p-2 text-left">PRODUTOS LEVADOS</th><th className="p-2 text-right">TOTAL</th><th className="p-2 text-center">STATUS</th><th className="p-2 text-center">ACAO</th></tr></thead><tbody>{faturas.length===0 ? <tr><td colSpan={6} className="p-6 text-center opacity-50">Nenhuma fatura ainda - Venda com botao VERDE (PAGO) ou AMARELO (DIVIDAS)</td></tr> : faturas.map((f:any)=>(<tr key={f.id} className={`border-b ${f.isDivida ? 'bg-red-50' : 'bg-green-50'}`}><td className="p-2 text-[9px]">{f.data}<div className="text-[7px] opacity-60">{f.numero||''}</div></td><td className="p-2"><div className="font-bold text-[10px]">{f.cliente}</div><div className="text-[8px] opacity-60">{f.tel}</div></td><td className="p-2 text-[8px]">{f.itens ? f.itens.map((it:any)=>it.nome+' x'+it.qtd).join(', ').substring(0,60) : (f.produtos||'')}</td><td className="p-2 text-right font-bold">{f.total} MT</td><td className="p-2 text-center"><span className={`px-2 py-1 rounded-full text-[7px] font-black ${f.isDivida ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>{f.status|| (f.isDivida ? 'DIVIDA' : 'PAGO')}</span></td><td className="p-2 text-center">{f.isDivida ? <button onClick={()=>{ if(confirm('Cliente '+f.cliente+' pagou '+f.total+' MT? Marcar como PAGO?')){ setFaturas(faturas.map((x:any)=>x.id===f.id ? {...x, isDivida:false, status:'PAGO', valorDivida:0, valorPago:x.total} : x)); alert('Divida de '+f.cliente+' marcada como PAGA!'); } }} className="px-2 py-1 bg-green-600 text-white rounded-full text-[7px]">PAGOU</button> : <span className="text-[7px] text-green-600">✓ Pago</span>}</td></tr>))}</tbody></table>
+                <div className="mt-3 p-3 bg-[#f8fafc] rounded-[8px] text-[9px]">
+                  <div className="font-bold">Como funciona DIVIDAS:</div>
+                  <div>• Botao VERDE (PAGO) → entra em TOTAL SEM DIVIDAS → caixa</div>
+                  <div>• Botao AMARELO DÍVIDAS (FIADO) → entra em VALOR TOTAL DE DIVIDAS → lista de devedores</div>
+                  <div>• TOTAL GERAL = SEM DIVIDAS + DIVIDAS</div>
+                  <div>• Quando cliente paga, clica PAGOU → divida vira pago</div>
+                </div>
+              </div>
             </div>
           )}
           {faturacaoTab==='clientes' && (
-            <div className="bg-white rounded-[12px] p-4 shadow-sm border">
-              <h3 className="font-black text-[13px] mb-3">Clientes - Fiado</h3>
-              <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">NOME</th><th className="p-2 text-right">DIVIDA</th><th className="p-2 text-left">DATA</th></tr></thead><tbody>{clientesFiado.length===0 ? <tr><td colSpan={3} className="p-6 text-center opacity-50">Sem dividas</td></tr> : clientesFiado.map((c:any,i:number)=>(<tr key={i} className="border-b"><td className="p-2">{c.nome}</td><td className="p-2 text-right font-bold text-[#dc2626]">{c.divida} MT</td><td className="p-2">{c.data}</td></tr>))}</tbody></table>
+            <div className="space-y-3">
+              <div className="bg-white rounded-[12px] p-4 shadow-sm border">
+                <h3 className="font-black text-[13px] mb-3">Clientes com Dívidas - Registo Completo do que foi levado</h3>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  <div className="bg-red-50 p-3 rounded-[8px] border"><div className="text-[8px] font-bold text-red-700">TOTAL CLIENTES COM DIVIDA</div><div className="font-black text-[16px] text-red-700">{Array.from(new Set(faturas.filter((f:any)=>f.isDivida).map((f:any)=>f.cliente))).length} clientes</div></div>
+                  <div className="bg-[#1e2f4a] text-white p-3 rounded-[8px]"><div className="text-[8px] font-bold opacity-80">VALOR TOTAL EM DIVIDA</div><div className="font-black text-[16px]">{faturas.filter((f:any)=>f.isDivida).reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)} MT</div></div>
+                  <div className="bg-green-50 p-3 rounded-[8px] border"><div className="text-[8px] font-bold text-green-700">TOTAL PRODUTOS EM DIVIDA</div><div className="font-black text-[16px] text-green-700">{faturas.filter((f:any)=>f.isDivida).reduce((s:any,f:any)=>s+(f.itens ? f.itens.reduce((ss:any,it:any)=>ss+(it.qtd||0),0) : 0),0)} unid</div></div>
+                </div>
+                <table className="w-full text-[11px]"><thead className="bg-[#f8fafc]"><tr><th className="p-2 text-left">CLIENTE / TELEFONE</th><th className="p-2 text-left">O QUE FOI LEVADO</th><th className="p-2 text-right">QTD TOTAL</th><th className="p-2 text-right">VALOR DIVIDA</th><th className="p-2 text-left">DATA</th><th className="p-2 text-center">ACAO</th></tr></thead><tbody>{faturas.filter((f:any)=>f.isDivida).length===0 ? <tr><td colSpan={6} className="p-6 text-center opacity-50">Sem dividas - Todas as vendas foram PAGAS. Use botao DÍVIDAS para criar fiado.</td></tr> : faturas.filter((f:any)=>f.isDivida).map((f:any,i:number)=>(<tr key={i} className="border-b bg-red-50"><td className="p-2"><div className="font-bold">{f.cliente}</div><div className="text-[8px] opacity-60">{f.tel} {f.nuit ? 'NUIT:'+f.nuit : ''}</div></td><td className="p-2 text-[8px]">{f.itens ? f.itens.map((it:any)=>it.nome+' ('+it.qtd+'x '+it.preco+'MT)').join(', ') : 'Sem detalhe'}</td><td className="p-2 text-right font-bold">{f.itens ? f.itens.reduce((s:any,it:any)=>s+(it.qtd||0),0) : 0}</td><td className="p-2 text-right font-black text-red-600">{f.total} MT</td><td className="p-2 text-[9px]">{f.data}</td><td className="p-2 text-center"><button onClick={()=>{ if(confirm('Confirmar pagamento de '+f.cliente+' - '+f.total+' MT?')){ setFaturas(faturas.map((x:any)=>x.id===f.id ? {...x, isDivida:false, status:'PAGO'} : x)); } }} className="px-3 py-1 bg-green-600 text-white rounded-full text-[8px]">Recebeu</button></td></tr>))}</tbody></table>
+              </div>
             </div>
           )}
           </footer>
