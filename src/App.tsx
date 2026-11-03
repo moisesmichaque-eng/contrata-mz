@@ -1729,19 +1729,23 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
           <div className="bg-white border rounded-[12px] p-4">
             <div className="font-black text-[11px]">TABELA - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL</div>
             <div className="mt-3 max-h-[500px] overflow-auto border rounded-[10px]">
-              <table className="w-full text-[9px]"><thead className="bg-[#1e2f4a] text-white sticky top-0"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-right">TOTAL LINHA</th></tr></thead><tbody>
+              <table className="w-full text-[9px]"><thead className="bg-[#1e2f4a] text-white sticky top-0"><tr><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-center bg-blue-800">VALOR DIVIDA</th><th className="p-2 text-right bg-yellow-500 text-black">TOTAL C/DIVIDAS</th></tr></thead><tbody>
               {(() => {
-                const prodFiltro=(typeof document!=='undefined' ? (document.getElementById('filtroProdRel') as any)?.value : '')||'';
-                let lista:any[]=[]; faturas.forEach((f:any)=>{ const its=f.itens||[{nome:prodFiltro||'Produto', qtd:1, preco:f.total}]; its.forEach((it:any)=>{ lista.push({f,it}); }); });
-                if(lista.length===0) return <tr><td colSpan={9} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura - Fature em VENDER</td></tr>;
-                return lista.slice(0,200).map((row:any,idx:number)=>{
+                const listaBase = filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas;
+                if(listaBase.length===0) return <tr><td colSpan={10} className="p-3 text-center text-[#94a3b8]">Nenhuma fatura {filtroRelatorioAtivo ? 'no filtro selecionado - clique LIMPAR FILTRO' : '- Fature em VENDER'}</td></tr>;
+                let lista:any[]=[]; 
+                listaBase.forEach((f:any)=>{ const its=f.itens||[{nome:'Produto', qtd:1, preco:f.total}]; its.forEach((it:any)=>{ lista.push({f,it}); }); });
+                return lista.slice(0,300).map((row:any,idx:number)=>{
                   const f=row.f; const it=row.it;
                   const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0, precoVenda:it.preco||0};
                   const totalLinha=(it.qtd||0)*(it.preco||0);
-                  return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-bold">{it.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||20}</td><td className="p-2 text-center">{s.entradaLoja||0}</td><td className="p-2 text-center font-bold">{s.venda||it.qtd||0}</td><td className="p-2">{f.cliente||'-'}</td><td className="p-2 text-center">{it.qtd||0}</td><td className="p-2 text-center">{Number(it.preco||0).toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-50">{Number(totalLinha).toFixed(0)}MT</td></tr>;
+                  const isDivida = f.isDivida===true || f.status==='DIVIDA';
+                  const valorDivida = isDivida ? totalLinha : 0;
+                  const totalComDividas = totalLinha;
+                  return <tr key={idx} className="border-b hover:bg-[#f8fafc]"><td className="p-2">{f.data}</td><td className="p-2 font-bold">{it.nome||'-'}</td><td className="p-2 text-center bg-blue-50">{s.stockInicialLoja||20}</td><td className="p-2 text-center">{s.entradaLoja||0}</td><td className="p-2 text-center font-bold">{s.venda||it.qtd||0}</td><td className="p-2">{f.cliente||'-'}</td><td className="p-2 text-center">{it.qtd||0}</td><td className="p-2 text-center">{Number(it.preco||0).toFixed(0)}MT</td><td className="p-2 text-center bg-blue-50 font-bold">{Number(valorDivida).toFixed(0)}MT</td><td className="p-2 text-right font-black bg-yellow-50">{Number(totalComDividas).toFixed(0)}MT</td></tr>;
                 });
               })()}
-              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={6} className="p-2 text-right">TOTAIS GERAIS:</td><td className="p-2 text-center">{faturas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-right">{faturas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
+              </tbody><tfoot className="bg-[#facc15] font-black sticky bottom-0"><tr><td colSpan={6} className="p-2 text-right">TOTAIS GERAIS {filtroRelatorioAtivo ? '(FILTRADO)' : ''}:</td><td className="p-2 text-center">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0)}</td><td className="p-2"></td><td className="p-2 text-center bg-blue-100">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>{ const isDiv=f.isDivida; return s + (isDiv ? (Number(f.total)||0) : 0); },0).toFixed(0)}MT</td><td className="p-2 text-right">{(filtroRelatorioAtivo ? faturasFiltradasDisplay : faturas).reduce((s:any,f:any)=>s+(Number(f.total)||0),0).toFixed(0)}MT</td></tr></tfoot></table>
             </div>
           </div>
         </div>
