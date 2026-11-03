@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // ===== SUPABASE CLIENT - CONTRATA-MZ VIAGENS NACIONAL =====
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bkwkulxuprpboozaehfh.supabase.co';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://YOUR_PROJECT.supabase.co';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -858,84 +858,6 @@ const [produtosFat, setProdutosFat] = useState([
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
  const [viagensMock, setViagensMock] = useState([] as any);
- const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
- const [assentosReservados, setAssentosReservados] = useState<number[]>([]);
- const [passageiroLat, setPassageiroLat] = useState<number|null>(null);
- const [passageiroLng, setPassageiroLng] = useState<number|null>(null);
- const [modoPassageiro, setModoPassageiro] = useState(false);
- const [loadingViaturas, setLoadingViaturas] = useState(false);
- const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
-
-
- // filtered list shown on PESQUISAR VIAGENS
- 
- // ===== LOAD REAL - SEM BRANCO - COM PROTECAO =====
- useEffect(()=>{
-   async function loadReal(){
-     try{
-       setLoadingViaturas(true);
-       const res = await supabase.from('viagens_motoristas').select('*').limit(20);
-       if(res && !res.error && res.data && res.data.length>0){
-         const mapped = res.data.map((d:any)=>({ id:d.id, marca:d.carro||'Toyota', matricula:d.matricula, lugares:d.lugares||5, rota:(d.provincia||'Matola')+' - '+(d.destino_atual||'Maputo'), tipo:d.carro, estado:d.status||'disponivel', activa:true, lat:d.lat||-25.96, lng:d.lng||32.58 }));
-         setViaturas(mapped);
-         if(mapped.length>0) setViaturaSelecionada(mapped[0]);
-       }
-     }catch(e){ console.log('load error safe', e); }
-     setLoadingViaturas(false);
-   }
-   loadReal();
- },[]);
-
-const [filteredViagens, setFilteredViagens] = useState<any[]>([]);
- useEffect(()=>{
-   try{
-     const candidate = [...viagensMock, ...viaturas.filter(vt=>vt.activa).map(vt=>({id:vt.id, transp: vt.marca, viatura: vt.marca, matricula: vt.matricula, lugares: vt.lugares, cargaKg: vt.cargaKg, origem: (vt.rota||'').split(' - ')[0]||vt.rota, origemDistrito: '', destino: (vt.rota||'').split(' - ')[1]||vt.rota, destinoDistrito: '', data: 'Hoje', hora: '', chegada: '', motorista: vt.motorista || transportadorPerfil.responsavel || '', paragens: vt.paragens||[], preco: vt.paragens?.[0]?.preco||0 }))];
-     setFilteredViagens(candidate);
-   }catch(e){setFilteredViagens([])}
- },[viagensMock, viaturas, transportadorPerfil]);
-
-  // ===== V24 - FIX VISAO GERAL FUNCIONAL - ESTADOS CORRIGIDOS =====
-  const [mostrarMapaOverview, setMostrarMapaOverview] = useState(true);
-  const [ordenarMaisProximo, setOrdenarMaisProximo] = useState(false);
-  const [carroFocadoMapa, setCarroFocadoMapa] = useState<any>(null);
-  const [viaturaFocadaMapa, setViaturaFocadaMapa] = useState<any>(null);
-  const [mostrarPopupMapa, setMostrarPopupMapa] = useState(false);
-  const [segundosAtualizacao, setSegundosAtualizacao] = useState(12);
-
-  useEffect(()=>{
-    const iv = setInterval(()=> setSegundosAtualizacao(s=> s+1), 1000);
-    return ()=> clearInterval(iv);
-  },[]);
-
-  const todosCarrosOverview = useMemo(()=>{
-    const extras = viaturas.filter((vt:any)=>vt.activa).map((vt:any)=>({
-      id: vt.id, transp: vt.marca, marca: vt.marca, tipo: vt.tipo, matricula: vt.matricula, mat: vt.matricula,
-      lugares: vt.lugares, cargaKg: vt.cargaKg, carga: `${vt.cargaKg} Ton`,
-      rota: vt.rota, origem: (vt.rota||'').split(' - ')[0]||'Maputo Provincia', origemDistrito: 'Matola',
-      destino: (vt.rota||'').split(' - ')[1]||'Sofala', destinoDistrito: 'Beira',
-      tempo: '10h', motorista: vt.motorista||transportadorPerfil.responsavel||'Motorista', tel: vt.tel||transportadorPerfil.tel||'84 123 4567',
-      preco: vt.paragens?.[0]?.preco||vt.cargaKg*10||2500, rating:4.7, status:'Activa', livres: vt.lugares, activa:true, data: 'Hoje'
-    }));
-    return [...viagensMock, ...extras];
-  }, [viagensMock, viaturas, transportadorPerfil]);
-
-  const filtradosOverview = useMemo(()=>{
-    let lista = todosCarrosOverview.filter((v:any)=>{
-      const okProvOrig = provOrigemF ? (v.origem||'').toLowerCase().includes(provOrigemF.toLowerCase()) || provOrigemF==='Maputo Provincia' : true;
-      const okProvDest = provDestinoF ? (v.destino||'').toLowerCase().includes(provDestinoF.toLowerCase()) || provDestinoF==='Sofala' || (v.destino||'').toLowerCase().includes('beira') : true;
-      const okDistOrig = distOrigemF ? (v.origemDistrito||'').toLowerCase().includes(distOrigemF.toLowerCase()) || (v.origem||'').toLowerCase().includes(distOrigemF.toLowerCase()) : true;
-      const okDistDest = distDestinoF ? (v.destinoDistrito||'').toLowerCase().includes(distDestinoF.toLowerCase()) || (v.destino||'').toLowerCase().includes(distDestinoF.toLowerCase()) : true;
-      return okProvOrig && okProvDest && okDistOrig && okDistDest;
-    });
-    if(ordenarMaisProximo){
-      lista = [...lista].sort((a:any,b:any)=> (a.preco||0)-(b.preco||0));
-    }
-    return lista;
-  }, [todosCarrosOverview, provOrigemF, provDestinoF, distOrigemF, distDestinoF, dataViagemF, ordenarMaisProximo]);
-
- const [formViatura, setFormViatura] = useState({tipo:'Minibus / Chapa', marca:'Toyota Coaster 25 lugares', matricula:'', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:true, bagagem:true, encomendas:true, estado:'Activa'} as any);
- const [formParagem, setFormParagem] = useState({local:'', preco:0} as any);
- const [paragensTemp, setParagensTemp] = useState([{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}] as any);
  const [editandoViaturaId, setEditandoViaturaId] = useState<string|null>(null);
  const [reservas, setReservas] = useState<any[]>([]);
  const [encomendas, setEncomendas] = useState<any[]>([]);
@@ -2611,13 +2533,41 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
-                        <div className="mt-3 space-y-2">
-                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} REAL - SEM BRANCO - LOCAL</div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={()=>setModoPassageiro(!modoPassageiro)} className={modoPassageiro ? "flex-1 py-1 bg-[#facc15] text-black font-black rounded-full text-[8px]" : "flex-1 py-1 bg-[#1e2f4a] text-white font-black rounded-full text-[8px]"}>{modoPassageiro ? 'MODO MOTORISTA' : 'MODO PASSAGEIRO'}</button>
+                          <button onClick={()=>{
+                            if(navigator.geolocation){
+                              navigator.geolocation.getCurrentPosition((pos)=>{
+                                setPassageiroLat(pos.coords.latitude);
+                                setPassageiroLng(pos.coords.longitude);
+                                alert('📍 Localizacao REAL: '+pos.coords.latitude.toFixed(4)+' , '+pos.coords.longitude.toFixed(4));
+                              });
+                            }
+                          }} className="flex-1 py-1 bg-green-500 text-white font-black rounded-full text-[8px]">📍 Minha Localizacao</button>
                         </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
+                        <div className="mt-3 space-y-2 max-h-[320px] overflow-y-auto">
+                          {viaturas.length===0 ? (
+                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura<br/>Registar viatura 5 lugares<br/>Teste hoje - SEM SUPABASE - SEM BRANCO</div>
+                          ) : viaturas.map((vt:any)=>{
+                            let distTxt=''; let etaTxt='';
+                            if(passageiroLat && passageiroLng && vt.lat && vt.lng){
+                              const R=6371; const dLat=(vt.lat-passageiroLat)*Math.PI/180; const dLon=(vt.lng-passageiroLng)*Math.PI/180;
+                              const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(passageiroLat*Math.PI/180)*Math.cos(vt.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                              const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); const dist=R*c;
+                              distTxt=dist.toFixed(1)+'km'; etaTxt=Math.round((dist/40)*60)+' min';
+                            }
+                            return (
+                            <div key={vt.id} onClick={()=>{ setViaturaSelecionada(vt); setAssentosReservados([]); }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15]"}>
+                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
+                              <div className="text-[8px] mt-1">{vt.rota} {distTxt ? '- 📍 '+distTxt+' - ⏱️ '+etaTxt+' ETA REAL' : ''}</div>
+                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span>{modoPassageiro && distTxt && <span className="text-[7px] bg-blue-100 px-1 rounded">{distTxt} - {etaTxt}</span>}<button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas(viaturas.filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
+                            </div>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">PASSAGEIRO: Localizacao + ETA REAL - SEM BRANCO</div><div className="text-[9px] mt-1">{viaturas.length} viaturas - Passageiro aceita GPS, ve distancia e tempo chegada real - LocalStorage, sem Supabase para nao dar branco</div></div>
+                        <button onClick={()=>{ localStorage.removeItem('viaturas_reais_teste'); setViaturas([]); alert('Frota limpa local - 0 records'); }} className="w-full mt-2 py-1 bg-red-100 text-[8px] rounded-full">🗑️ Limpar tudo LOCAL - 0 records</button>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
                         <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
