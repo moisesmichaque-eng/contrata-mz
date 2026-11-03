@@ -857,9 +857,47 @@ const [produtosFat, setProdutosFat] = useState([
  const [provinciaFiltroV, setProvinciaFiltroV] = useState('Maputo Cidade');
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
- const [viagensMock, setViagensMock] = useState([] as any);
- const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
- const [assentosReservados, setAssentosReservados] = useState<number[]>([]);
+ const [viagensMock, setViagensMock] = useState([
+   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
+   {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
+   {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
+ ]);
+ const [transportadorLogado, setTransportadorLogado] = useState(false);
+ const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
+  const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
+ const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
+ const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
+useEffect(()=>{
+  function intercept(e:any){
+    try{
+      const target = e.target as HTMLElement;
+      if(target && target.tagName==='BUTTON' && target.textContent && target.textContent.includes('Entrar - Area Transportador')){
+        e.stopPropagation();
+        e.preventDefault();
+        const username = transportadorLoginForm.username;
+        const password = transportadorLoginForm.password;
+        const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
+        const found = saved.find((t:any)=>t.username===username && t.password===password);
+        if(found){
+          setTransportadorPerfil(found);
+          setTransportadorLogado(true);
+        } else if(username===transportadorPerfil.username && password===transportadorPerfil.password){
+          setTransportadorLogado(true);
+        } else {
+          alert('Credenciais invalidas. Use username e password criados pelo transportador.');
+        }
+      }
+    }catch(err){}
+  }
+  document.addEventListener('click', intercept, true);
+  return ()=>document.removeEventListener('click', intercept, true);
+}, [transportadorLoginForm, transportadorPerfil]);
+ const [viaturas, setViaturas] = useState([
+   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
+   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
+ ] as any);
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
 
@@ -2589,22 +2627,13 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} / 3 Max - LIMPO</div>
+                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
                         <div className="mt-3 space-y-2">
-                          {viaturas.length===0 ? (
-                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura<br/>Registar Viatura real<br/>1 conta = 3 viaturas max</div>
-                          ) : viaturas.map((vt:any)=>(
-                            <div key={vt.id} onClick={()=>{
-                              setViaturaSelecionada(vt);
-                              setAssentosReservados([]);
-                            }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15]"}>
-                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
-                              <div className="text-[8px] mt-1">{vt.rota}</div>
-                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><button onClick={(e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')) setViaturas(viaturas.filter((x:any)=>x.id!==vt.id));}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
-                            </div>
-                          ))}
+                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
+                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
                         </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">{viaturas.length===0 ? '0,00 MT - 0 viagens - LIMPO' : viaturas.length+' viagens - Activas'}</div></div>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
                         <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
