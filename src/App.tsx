@@ -189,6 +189,33 @@ export default function App(){
   const [faturacaoTab, setFaturacaoTab] = useState<'faturacao'|'painel'|'stock'|'faturas'|'clientes'>('faturacao');
   const [faturarAba, setFaturarAba] = useState('VENDER');
   const [faturas, setFaturas] = useState<any[]>([]);
+  const [filtroRelatorioAtivo, setFiltroRelatorioAtivo] = useState(false);
+  const [faturasFiltradasDisplay, setFaturasFiltradasDisplay] = useState<any[]>([]);
+
+  const filtrarRelatorioPorData = ()=>{
+    const dIni=(document.getElementById('filtroDataIni') as any)?.value||'';
+    const dFim=(document.getElementById('filtroDataFim') as any)?.value||'';
+    const prod=(document.getElementById('filtroProdRel') as any)?.value||'';
+    const grupo=(document.getElementById('filtroGrupoRel') as any)?.value||'';
+    const parseData = (ds:string)=>{ try{ if(!ds) return ''; if(ds.includes('/')){ const p=ds.split('/'); if(p.length===3) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; } return ds.substring(0,10); }catch(e){ return ''; } };
+    let filtradas=[...faturas];
+    if(prod){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); }
+    if(grupo && grupo!=='Todos'){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(grupo.toLowerCase())); }
+    if(dIni){ filtradas=filtradas.filter((f:any)=>{ const iso=parseData(f.data||f.dataISO||''); return iso >= dIni; }); }
+    if(dFim){ filtradas=filtradas.filter((f:any)=>{ const iso=parseData(f.data||f.dataISO||''); return iso <= dFim; }); }
+    setFaturasFiltradasDisplay(filtradas);
+    setFiltroRelatorioAtivo(true);
+  };
+
+  const limparFiltroRelatorio = ()=>{
+    setFiltroRelatorioAtivo(false);
+    setFaturasFiltradasDisplay([]);
+    const elIni=document.getElementById('filtroDataIni') as any;
+    const elFim=document.getElementById('filtroDataFim') as any;
+    const elProd=document.getElementById('filtroProdRel') as any;
+    const elGrupo=document.getElementById('filtroGrupoRel') as any;
+    if(elIni) elIni.value=''; if(elFim) elFim.value=''; if(elProd) elProd.value=''; if(elGrupo) elGrupo.value='';
+  };
   const [clientesFiado, setClientesFiado] = useState<any[]>([]);
   const [perfilLoja, setPerfilLoja] = useState({nome:'Minha Loja', nuit:'', endereco:'', telefone:'', iva:'16', moeda:'MT'});
 
@@ -1592,6 +1619,8 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               <div><div className="text-[8px] font-bold">DATA FIM</div><input id="filtroDataFim" type="date" className="w-full h-8 border rounded-[6px] px-2 text-[9px]" /></div>
             </div>
             <div className="mt-3 flex gap-2 flex-wrap">
+              <button onClick={()=>{ filtrarRelatorioPorData(); }} className="px-4 py-2 bg-yellow-400 border-2 border-black text-black rounded-full text-[9px] font-black hover:bg-yellow-500">🔍 SEARCH / REFRESH - FILTRAR TABELA POR DATA</button>
+              <button onClick={()=>{ limparFiltroRelatorio(); }} className="px-4 py-2 bg-white border-2 border-black text-black rounded-full text-[9px] font-black">LIMPAR FILTRO</button>
               <button onClick={async()=>{
                 const prod=(document.getElementById('filtroProdRel') as any)?.value||'';
                 const grupo=(document.getElementById('filtroGrupoRel') as any)?.value||'';
@@ -1600,7 +1629,6 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                 let filtradas=[...faturas];
                 if(prod){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); }
                 if(grupo && grupo!=='Todos'){ filtradas=filtradas.filter((f:any)=>JSON.stringify(f).toLowerCase().includes(grupo.toLowerCase())); }
-                // ALGORITMO FILTRO DATA FIX - apenas dias selecionados - corrige bug que trazia tudo mesmo pedindo 03/11
                 const parseDataFatura = (dataStr:string)=>{
                   try{
                     if(!dataStr) return '';
@@ -1635,7 +1663,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   });
                 }
                 if(filtradas.length===0){
-                  alert(`Nenhuma fatura no periodo selecionado\nDe: ${dIni||'inicio'} Ate: ${dFim||'hoje'}\nFaturas totais: ${faturas.length}\nVerifique as datas - se pediu 03/11, coloque De: 2026-11-03 Ate: 2026-11-03`);
+                  alert(`Nenhuma fatura no periodo selecionado\nDe: ${dIni||'inicio'} Ate: ${dFim||'hoje'}\nFaturas totais: ${faturas.length}`);
                   return;
                 }
                 try{
@@ -1646,28 +1674,18 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   doc.setFontSize(9); doc.setFont('helvetica','bold');
                   doc.text('RELATORIO - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | VALOR DIVIDA | TOTAL COM DIVIDAS',10,y);
                   y+=5; doc.setFontSize(6); doc.setFont('helvetica','normal');
-                  doc.text(`Filtro: ${prod||'Todos'} | Grupo: ${grupo||'Todos'} | De: ${dIni||'...'} Ate: ${dFim||'...'} | Faturas: ${filtradas.length} de ${faturas.length} | Gerado: ${new Date().toLocaleString('pt-MZ')}`,10,y);
+                  doc.text(`Filtro: ${prod||'Todos'} | De: ${dIni||'...'} Ate: ${dFim||'...'} | Faturas: ${filtradas.length} de ${faturas.length}`,10,y);
                   y+=6;
                   doc.setFontSize(5); doc.setFont('helvetica','bold');
                   doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255);
-                  doc.text('DATA',11,y+4);
-                  doc.text('NOME PRODUTO',28,y+4);
-                  doc.text('ST INICIAL',62,y+4);
-                  doc.text('RECEPCAO',85,y+4);
-                  doc.text('VENDAS',105,y+4);
-                  doc.text('CLIENTE',120,y+4);
-                  doc.text('QUANTI',158,y+4);
-                  doc.text('VALOR',173,y+4);
-                  doc.text('VALOR DIVIDA',190,y+4);
-                  doc.text('TOTAL C/DIVIDAS',220,y+4);
-                  doc.setTextColor(0,0,0);
-                  y+=6; doc.setFont('helvetica','normal');
+                  doc.text('DATA',11,y+4); doc.text('NOME PRODUTO',28,y+4); doc.text('ST INICIAL',62,y+4); doc.text('RECEPCAO',85,y+4); doc.text('VENDAS',105,y+4); doc.text('CLIENTE',120,y+4); doc.text('QUANTI',158,y+4); doc.text('VALOR',173,y+4); doc.text('VALOR DIVIDA',190,y+4); doc.text('TOTAL C/DIVIDAS',220,y+4);
+                  doc.setTextColor(0,0,0); y+=6; doc.setFont('helvetica','normal');
                   let totalStInicial=0; let totalRecepcao=0; let totalVendas=0; let totalQuanti=0; let totalValor=0; let totalValorDivida=0; let totalComDividas=0;
                   filtradas.forEach((f:any)=>{
                     const itens = f.itens && f.itens.length>0 ? f.itens : [{nome:prod||'Produto', qtd:1, preco:f.total}];
                     const isDivida = f.isDivida===true || f.status==='DIVIDA';
                     itens.forEach((it:any)=>{
-                      if(y>185){ doc.addPage(); y=10; doc.setFont('helvetica','bold'); doc.setFillColor(30,47,74); doc.rect(10,y,277,6,'F'); doc.setTextColor(255,255,255); doc.text('DATA',11,y+4); doc.text('NOME PRODUTO',28,y+4); doc.text('ST INICIAL',62,y+4); doc.text('RECEPCAO',85,y+4); doc.text('VENDAS',105,y+4); doc.text('CLIENTE',120,y+4); doc.text('QUANTI',158,y+4); doc.text('VALOR',173,y+4); doc.text('VALOR DIVIDA',190,y+4); doc.text('TOTAL C/DIVIDAS',220,y+4); doc.setTextColor(0,0,0); y+=6; doc.setFont('helvetica','normal'); }
+                      if(y>185){ doc.addPage(); y=10; }
                       const stock = stockProdutos.find((s:any)=> s.nome.toLowerCase().includes((it.nome||prod||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd||0};
                       const stInicial = stock.stockInicialLoja||stock.stockLoja||20;
                       const recep = stock.entradaLoja||0;
@@ -1675,9 +1693,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                       const quanti = it.qtd||0;
                       const valor = it.preco||stock.precoVenda||stock.preco||0;
                       const totalLinha = quanti * valor;
-                      // COLUNA AZUL: VALOR DIVIDA - mostra valor se for divida, senao 0
                       const valorDivida = isDivida ? totalLinha : 0;
-                      // COLUNA AMARELA: TOTAL COM DIVIDAS - inclui dividas nos valores
                       const totalComDivida = totalLinha;
                       doc.text(String(f.data||'').substring(0,10),11,y+3);
                       doc.text(String(it.nome||prod||'-').substring(0,22),28,y+3);
@@ -1700,19 +1716,14 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                     });
                   });
                   y+=4; doc.setFont('helvetica','bold'); doc.setFontSize(7);
-                  doc.setFillColor(250,204,21); doc.rect(10,y,277,7,'F');
-                  doc.setTextColor(0,0,0);
-                  doc.text(`TOTAIS: ST INI: ${totalStInicial} | RECEPCAO: ${totalRecepcao} | VENDAS: ${totalVendas} | QUANTI: ${totalQuanti} | VALOR: ${totalValor.toFixed(0)}MT | VALOR DIVIDA: ${totalValorDivida.toFixed(0)}MT | TOTAL C/DIVIDAS: ${totalComDividas.toFixed(0)}MT | Faturas: ${filtradas.length}`,12,y+5);
-                  y+=10; doc.setFontSize(8);
-                  doc.text(`RESUMO: Total em Divida (azul): ${totalValorDivida.toFixed(0)}MT | Total Geral com Dividas (amarelo): ${totalComDividas.toFixed(0)}MT | Filtro: ${dIni||'todos'} ate ${dFim||'todos'}`,12,y);
-                  const nomeArq=`Relatorio-${dIni||'todos'}-ate-${dFim||'todos'}-${new Date().toISOString().slice(0,10)}.pdf`.replace(/[^\w\-\.]/g,'_');
+                  doc.setFillColor(250,204,21); doc.rect(10,y,277,7,'F'); doc.setTextColor(0,0,0);
+                  doc.text(`TOTAIS: ST INI: ${totalStInicial} | RECEPCAO: ${totalRecepcao} | VENDAS: ${totalVendas} | QUANTI: ${totalQuanti} | VALOR DIVIDA: ${totalValorDivida.toFixed(0)}MT | TOTAL C/DIVIDAS: ${totalComDividas.toFixed(0)}MT | Faturas: ${filtradas.length}`,12,y+5);
+                  const nomeArq=`Relatorio-${dIni||'todos'}-ate-${dFim||'todos'}.pdf`.replace(/[^\w\-\.]/g,'_');
                   doc.save(nomeArq);
-                  const csv=`DATA;NOME PRODUTO;STOCK INICIAL;RECEPCAO;VENDAS;CLIENTE;QUANTI;VALOR;VALOR DIVIDA;TOTAL COM DIVIDAS\n`+filtradas.map((f:any)=>{ const its=f.itens||[{nome:prod||'Produto', qtd:1, preco:f.total}]; const isDiv=f.isDivida; return its.map((it:any)=>{ const s=stockProdutos.find((x:any)=> x.nome.toLowerCase().includes((it.nome||'').toLowerCase().substring(0,6)))||{stockInicialLoja:20, entradaLoja:0, venda:it.qtd}; const tot=(it.qtd||0)*(it.preco||0); const vDiv=isDiv?tot:0; return `${f.data};${it.nome||''};${s.stockInicialLoja||20};${s.entradaLoja||0};${s.venda||it.qtd||0};${f.cliente||''};${it.qtd||0};${it.preco||0};${vDiv};${tot}`; }).join('\n'); }).join('\n')+`\nTOTAIS; ;${totalStInicial};${totalRecepcao};${totalVendas}; ;${totalQuanti};;${totalValorDivida.toFixed(0)};${totalComDividas.toFixed(0)};`;
-                  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=nomeArq.replace('.pdf','.csv'); document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},1000);
-                  alert(`Relatorio gerado!\n\nFiltro Data: ${dIni||'inicio'} ate ${dFim||'hoje'} -> ${filtradas.length} faturas\n\nCOLUNA AZUL VALOR DIVIDA: ${totalValorDivida.toFixed(0)}MT (mostra valor quando e divida, senao 0)\nCOLUNA AMARELA TOTAL C/DIVIDAS: ${totalComDividas.toFixed(0)}MT (inclui dividas)\n\nLinha amarela com totais por coluna tipo Excel\n\nSe pediu 03/11, agora so mostra 03/11!`);
+                  alert(`PDF gerado! Filtro ${dIni} ate ${dFim} -> ${filtradas.length} faturas | Divida: ${totalValorDivida}MT | Total: ${totalComDividas}MT`);
                 }catch(e){ alert('Erro: '+e); }
-              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF COM DIVIDAS + FILTRO DATA FIX</button>
-              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length+'\n'+filtradas.slice(0,5).map((f:any)=>f.data+' | '+(f.itens?.[0]?.nome||prod)+' | '+(f.cliente||'')).join('\n'); const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
+              }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF COM DIVIDAS + FILTRO DATA</button>
+              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length; const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-4">
