@@ -475,7 +475,16 @@ export default function App(){
       const endLojaFatura = (lojaPerfil as any).endereco || perfilLoja.endereco || '';
       const provLojaFatura = (lojaPerfil as any).provincia || '';
       const ramoLojaFatura = (lojaPerfil as any).ramoActividade || (lojaPerfil as any).ramo || perfilLoja.ramo || 'Electricidade e Iluminacao';
-      let numFatura = '01'; try{ const t=localStorage.getItem('contaAtiva')||'geral'; const cont=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0'); numFatura = String(cont+1).padStart(2,'0'); }catch(e){}
+      let numFatura = '01'; 
+      const dataHojeISO = new Date().toISOString().slice(0,10);
+      try{ 
+        const t=localStorage.getItem('contaAtiva')||'geral'; 
+        // CONTAGEM DIARIA - cada dia comeca em 01, nao continua do dia anterior
+        // Se ontem terminou 19/02/11/2026, hoje comeca 01/03/11/2026
+        const contadorDiaKey = `fatura_contador_${t}_${dataHojeISO}`;
+        const contDia=parseInt(localStorage.getItem(contadorDiaKey)||'0'); 
+        numFatura = String(contDia+1).padStart(2,'0'); 
+      }catch(e){}
       const numeroFacturaCompleto = `${numFatura}/${dataHoje.replace(/\//g,'-')}`;
 
       const waUrl = 'https://wa.me/'+telFull+'?text='+encodeURIComponent(msg);
@@ -530,8 +539,14 @@ export default function App(){
         try{
           const t=localStorage.getItem('contaAtiva')||'geral';
           localStorage.setItem(`faturas_${t}`, JSON.stringify(novaLista));
-          const contAtual=parseInt(localStorage.getItem(`fatura_contador_${t}`)||'0');
-          localStorage.setItem(`fatura_contador_${t}`, String(contAtual+1));
+          const dataHojeISO2 = new Date().toISOString().slice(0,10);
+          const t2=localStorage.getItem('contaAtiva')||'geral';
+          const contadorDiaKey2 = `fatura_contador_${t2}_${dataHojeISO2}`;
+          const contAtualDia=parseInt(localStorage.getItem(contadorDiaKey2)||'0');
+          localStorage.setItem(contadorDiaKey2, String(contAtualDia+1));
+          // Mantem contador global antigo para compatibilidade mas nao usa para numero
+          const contAtual=parseInt(localStorage.getItem(`fatura_contador_${t2}`)||'0');
+          localStorage.setItem(`fatura_contador_${t2}`, String(contAtual+1));
         }catch(e){}
         return novaLista;
       });
