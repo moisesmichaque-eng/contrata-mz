@@ -861,73 +861,47 @@ const [produtosFat, setProdutosFat] = useState([
  const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
  const [assentosReservados, setAssentosReservados] = useState<number[]>([]);
  const [loadingViaturas, setLoadingViaturas] = useState(false);
- const [liveViaturasReais, setLiveViaturasReais] = useState([] as any);
+ const [passageiroLat, setPassageiroLat] = useState<number|null>(null);
+ const [passageiroLng, setPassageiroLng] = useState<number|null>(null);
+ const [modoPassageiro, setModoPassageiro] = useState(false);
 
- // ===== CARREGAR VIATURAS REAIS DO SUPABASE - 5 CARROS EXISTENTES =====
+ // ===== CARREGAR VIATURAS REAIS - COM PROTECAO ANTI-BRANCO =====
  useEffect(()=>{
-   async function loadReais(){
-     setLoadingViaturas(true);
+   async function loadReaisSafe(){
      try{
-       // Carregar de viagens_motoristas (onde tem 5 reais: Tete Rapido, Beira Link etc)
-       const { data: dataMotoristas, error: errMoto } = await supabase.from('viagens_motoristas').select('*').order('created_at', {ascending:false}).limit(50);
-       if(!errMoto && dataMotoristas && dataMotoristas.length>0){
-         const mapeadas = dataMotoristas.map((d:any)=>({
+       setLoadingViaturas(true);
+       // Tentar carregar de viagens_motoristas (pode estar vazia 0 records - nao quebra)
+       const result = await supabase.from('viagens_motoristas').select('*').limit(20);
+       if(result && !result.error && result.data && result.data.length>0){
+         const mapeadas = result.data.map((d:any)=>({
            id: d.id,
            marca: d.carro||d.marca||'Toyota',
-           matricula: d.matricula||d.carro||'SEM-MAT',
-           lugares: d.lugares||15,
-           rota: (d.provincia||'Maputo')+' - '+(d.destino_atual||d.destino||'Beira'),
+           matricula: d.matricula||'SEM-MAT',
+           lugares: d.lugares||5,
+           rota: (d.provincia||'Matola')+' - '+(d.destino_atual||'Maputo'),
            tipo: d.carro||'Hiace',
            estado: d.status||'disponivel',
            activa: true,
            lat: d.lat||-25.96,
            lng: d.lng||32.58,
            nome: d.nome||'Motorista',
-           origem_data: 'viagens_motoristas',
-           raw: d
+           distancia: 0,
+           tempoChegada: '5 min'
          }));
-         setLiveViaturasReais(mapeadas);
          setViaturas(mapeadas);
          if(mapeadas.length>0) setViaturaSelecionada(mapeadas[0]);
-         console.log('5 carros reais carregados de viagens_motoristas:', mapeadas.length);
+       } else {
+         // Se vazio ou erro, deixa vazio mas NAO quebra - mostra mensagem para registar
+         setViaturas([]);
        }
-       // Tambem carregar de viaturas (tabela vazia por enquanto, mas vai encher)
-       const { data: dataViaturas } = await supabase.from('viaturas').select('*').order('created_at', {ascending:false}).limit(50);
-       if(dataViaturas && dataViaturas.length>0){
-         const mapeadasV = dataViaturas.map((d:any)=>({
-           id: d.id,
-           marca: d.marca,
-           matricula: d.matricula,
-           lugares: d.lugares||29,
-           rota: d.rota||'Maputo - Beira',
-           tipo: d.tipo||d.marca,
-           estado: d.estado||'Activa',
-           activa: true,
-           origem_data: 'viaturas',
-           raw: d
-         }));
-         setViaturas((prev:any)=>[...mapeadasV, ...prev]);
-       }
-     }catch(e){ console.log('Erro load reais', e); }
-     setLoadingViaturas(false);
+     }catch(e){
+       console.log('Erro load mas nao quebra', e);
+       setViaturas([]);
+     }finally{
+       setLoadingViaturas(false);
+     }
    }
-   loadReais();
-
-   // Realtime: quando alguem regista viatura nova, aparece para todos
-   const channel = supabase.channel('viaturas_realtime_v94')
-     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'viaturas' }, (payload:any)=>{
-       const d=payload.new;
-       const mapeada={ id:d.id, marca:d.marca, matricula:d.matricula, lugares:d.lugares||29, rota:d.rota||'Maputo - Beira', tipo:d.tipo||d.marca, estado:'Activa', activa:true, origem_data:'viaturas', raw:d };
-       setViaturas((prev:any)=>[mapeada, ...prev]);
-     })
-     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'viagens_motoristas' }, (payload:any)=>{
-       const d=payload.new;
-       const mapeada={ id:d.id, marca:d.carro||d.marca, matricula:d.matricula||d.carro, lugares:d.lugares||15, rota:(d.provincia||'Maputo')+' - '+(d.destino_atual||'Beira'), tipo:d.carro, estado:d.status||'disponivel', activa:true, lat:d.lat, lng:d.lng, nome:d.nome, origem_data:'viagens_motoristas', raw:d };
-       setViaturas((prev:any)=>[mapeada, ...prev]);
-       setLiveViaturasReais((prev:any)=>[mapeada, ...prev]);
-     })
-     .subscribe();
-   return ()=>{ supabase.removeChannel(channel); };
+   loadReaisSafe();
  },[]);
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
@@ -2658,34 +2632,45 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} REAL - {loadingViaturas ? 'Carregando...' : 'Supabase OK'}</div>
-                        <div className="mt-3 space-y-2 max-h-[300px] overflow-y-auto">
+                        <div className="font-black text-[11px]">Minhas Viaturas - {viaturas.length} REAL - {loadingViaturas ? 'Carregando...' : 'Pronto'}</div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={()=>setModoPassageiro(!modoPassageiro)} className={modoPassageiro ? "flex-1 py-1 bg-[#facc15] text-black font-black rounded-full text-[8px]" : "flex-1 py-1 bg-[#1e2f4a] text-white font-black rounded-full text-[8px]"}>{modoPassageiro ? 'MODO MOTORISTA' : 'MODO PASSAGEIRO - Ver como passageiro ve'}</button>
+                          <button onClick={()=>{
+                            if(navigator.geolocation){
+                              navigator.geolocation.getCurrentPosition((pos)=>{
+                                setPassageiroLat(pos.coords.latitude);
+                                setPassageiroLng(pos.coords.longitude);
+                                alert('📍 Localizacao passageiro REAL: Lat '+pos.coords.latitude.toFixed(4)+' Lng '+pos.coords.longitude.toFixed(4)+' - Agora pode calcular ETA real até carros');
+                              });
+                            }
+                          }} className="flex-1 py-1 bg-green-500 text-white font-black rounded-full text-[8px]">📍 Minha Localizacao REAL</button>
+                        </div>
+                        <div className="mt-3 space-y-2 max-h-[320px] overflow-y-auto">
                           {viaturas.length===0 ? (
-                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">{loadingViaturas ? 'Carregando 5 carros reais do Supabase...' : 'Nenhuma viatura - Mas seu Supabase tem 5 em viagens_motoristas - Clique Registar para adicionar' }</div>
-                          ) : viaturas.map((vt:any)=>(
+                            <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhuma viatura real ainda<br/><br/>Registar viatura de 5 lugares para teste<br/>1 conta = 3 viaturas max<br/><br/>Tabela viagens_motoristas esta vazia - 0 records - pronto para real</div>
+                          ) : viaturas.map((vt:any)=>{
+                            let distTxt = '';
+                            let etaTxt = '';
+                            if(passageiroLat && passageiroLng && vt.lat && vt.lng){
+                              const R=6371; const dLat=(vt.lat-passageiroLat)*Math.PI/180; const dLon=(vt.lng-passageiroLng)*Math.PI/180;
+                              const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(passageiroLat*Math.PI/180)*Math.cos(vt.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                              const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); const dist=R*c;
+                              distTxt = dist.toFixed(1)+'km';
+                              etaTxt = Math.round((dist/40)*60)+' min';
+                            }
+                            return (
                             <div key={vt.id} onClick={()=>{
                               setViaturaSelecionada(vt);
                               setAssentosReservados([]);
-                            }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"}>
-                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L - {vt.origem_data}</div>
-                              <div className="text-[8px] mt-1">{vt.rota} - {vt.nome||''}</div>
-                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">{vt.estado}</span><span className="text-[7px] bg-green-100 px-1 rounded">REAL Supabase</span><button onClick={async (e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+' do Supabase?')){ try{ await supabase.from('viagens_motoristas').delete().eq('id', vt.id); await supabase.from('viaturas').delete().eq('id', vt.id); setViaturas(viaturas.filter((x:any)=>x.id!==vt.id)); }catch(err){ alert('Erro remover'); } }}} className="ml-auto text-[7px] bg-red-100 px-1 rounded hover:bg-red-200">X Remover Real</button></div>
+                            }} className={viaturaSelecionada?.id===vt.id ? "border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer" : "border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15]"}>
+                              <div className="font-black text-[10px]">{vt.matricula} - {vt.marca} - {vt.lugares}L</div>
+                              <div className="text-[8px] mt-1">{vt.rota} {distTxt ? '- 📍 '+distTxt+' - ⏱️ '+etaTxt+' ETA REAL' : '- Sem localizacao ainda - Clique 📍'}</div>
+                              <div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">{vt.estado}</span><span className="text-[7px] bg-green-100 px-1 rounded">REAL Supabase</span>{modoPassageiro && distTxt && <span className="text-[7px] bg-blue-100 px-1 rounded">Passageiro ve: {distTxt} - {etaTxt}</span>}<button onClick={async (e)=>{e.stopPropagation(); if(confirm('Remover '+vt.matricula+'?')){ try{ await supabase.from('viagens_motoristas').delete().eq('id', vt.id); setViaturas(viaturas.filter((x:any)=>x.id!==vt.id)); }catch(err){} }}} className="ml-auto text-[7px] bg-red-100 px-1 rounded">X</button></div>
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA - REAL</div><div className="text-[10px] mt-1">{viaturas.length} viaturas reais do Supabase - {viaturas.length>0 ? viaturas[0].rota : '0 viagens'} - Sistema REAL ligado</div></div>
-                        <button onClick={async ()=>{
-                          if(!viaturaSelecionada){ alert('Selecione viatura a esquerda'); return; }
-                          if(navigator.geolocation){
-                            navigator.geolocation.getCurrentPosition(async (pos)=>{
-                              const lat=pos.coords.latitude; const lng=pos.coords.longitude;
-                              try{
-                                await supabase.from('viagens_motoristas').update({lat, lng, updated_at: new Date().toISOString()}).eq('id', viaturaSelecionada.id);
-                                alert('📍 Localizacao REAL partilhada! Lat '+lat.toFixed(4)+' Lng '+lng.toFixed(4)+' - Viatura '+viaturaSelecionada.matricula+' agora visivel no mapa real - ETA calculado');
-                              }catch(e:any){ alert('Erro partilhar local: '+e.message); }
-                            });
-                          } else { alert('Navegador nao suporta GPS'); }
-                        }} className="w-full mt-2 py-2 bg-[#facc15] text-black font-black rounded-full text-[9px]">📍 Partilhar Localizacao REAL - ETA Passageiro</button>
+                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO - PASSAGEIRO VE: Localizacao + ETA REAL</div><div className="text-[9px] mt-1">{viaturas.length} viaturas reais - Passageiro entra, aceita GPS, ve carros por perto com distancia e tempo chegada real - Mock virou real</div></div>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
                         <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
@@ -2728,24 +2713,22 @@ Bilhete valido - Apresentar QR`;
                           <div className="pt-2"><label className="text-[8px] font-black">FOTOS DA VIATURA - 4 fotos obrigatorias</label><div className="grid grid-cols-4 gap-1 mt-1"><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Frente</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Tras</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Lado</div><div className="h-10 border-2 border-dashed rounded flex items-center justify-center text-[12px] bg-gray-50">+ Interior</div></div></div>
                           <button onClick={()=>{ if(!novaViaturaForm.matricula || !novaViaturaForm.lotacao || !novaViaturaForm.rota){ alert("Preencha MATRICULA, LOTACAO e ROTA"); return;} if(viaturas.length>=3){ alert("Limite 3 viaturas"); return;} const nova={ id:"v"+Date.now(), tipo:novaViaturaForm.tipo, marca:novaViaturaForm.marca+" "+novaViaturaForm.modelo, matricula:novaViaturaForm.matricula.toUpperCase(), lugares:parseInt(novaViaturaForm.lotacao)||15, ano:novaViaturaForm.ano, cor:"Branco", cargaKg:300, rota:novaViaturaForm.rota, ac:true, bagagem:true, encomendas:true, estado:"Activa | Verificada", activa:true, verificada:true, combustivel:novaViaturaForm.combustivel, km:novaViaturaForm.km, documentos:novaViaturaForm, paragens:[{local:novaViaturaForm.rota.split("-")[1]?.trim()||"Destino", preco:1000}], activa:true, estado:'Activa' }; 
                         (async ()=>{
-                        try{
-                          const payloadViatura = { marca: nova.marca, matricula: nova.matricula, lugares: parseInt((novaViaturaForm.lotacao||'29')), rota: nova.rota, tipo: nova.tipo, estado: 'Activa', activa: true };
-                          const { data: dataV, error: errV } = await supabase.from('viaturas').insert([payloadViatura]).select();
-                          const payloadMotorista = { nome: transportadorPerfil.nomeEmpresa||transportadorLoginForm.username||'Transportador', carro: nova.marca, matricula: nova.matricula, lugares: parseInt(novaViaturaForm.lotacao||'29'), provincia: nova.rota.split(' - ')[0]||'Maputo', destino_atual: nova.rota.split(' - ')[1]||'Beira', status: 'disponivel', lat: -25.96, lng: 32.58, telefone: '84 000 0000' };
-                          const { data: dataM, error: errM } = await supabase.from('viagens_motoristas').insert([payloadMotorista]).select();
-                          if((!errV && dataV && dataV[0]) || (!errM && dataM && dataM[0])){
-                            const real = dataM?.[0] || dataV?.[0];
-                            alert("Viatura REAL "+nova.matricula+" registada no Supabase! ID "+real.id+" - Ja aparece no Table Editor viagens_motoristas");
-                          } else {
+                          try{
+                            const payloadMotorista = { nome: transportadorPerfil.nomeEmpresa||transportadorLoginForm.username||'Motorista Real', carro: nova.marca, matricula: nova.matricula, lugares: parseInt(novaViaturaForm.lotacao||'5'), provincia: nova.rota.split(' - ')[0]||'Matola', destino_atual: nova.rota.split(' - ')[1]||'Maputo', status: 'disponivel', lat: passageiroLat||-25.96, lng: passageiroLng||32.58, telefone: '84 000 0000' };
+                            const result = await supabase.from('viagens_motoristas').insert([payloadMotorista]).select();
+                            if(result && !result.error && result.data && result.data[0]){
+                              setViaturas((prev:any)=>[ { id: result.data[0].id, marca: result.data[0].carro, matricula: result.data[0].matricula, lugares: result.data[0].lugares, rota: result.data[0].provincia+' - '+result.data[0].destino_atual, tipo: result.data[0].carro, estado: 'disponivel', activa: true, lat: result.data[0].lat, lng: result.data[0].lng, nome: result.data[0].nome }, ...prev]);
+                              alert('Viatura REAL '+nova.matricula+' registada! 5 lugares - Ja no Supabase!');
+                            } else {
+                              setViaturas((prev:any)=>[...prev, nova]);
+                              alert('Viatura '+nova.matricula+' registada local - Supabase: '+(result?.error?.message||'sem ligacao'));
+                            }
+                          }catch(e:any){
                             setViaturas((prev:any)=>[...prev, nova]);
-                            alert("Viatura "+nova.matricula+" registada local (Supabase erro: "+(errV?.message||errM?.message||'sem ligacao')+")");
+                            alert('Viatura '+nova.matricula+' erro: '+e.message);
                           }
-                        }catch(e:any){
-                          setViaturas((prev:any)=>[...prev, nova]);
-                          alert("Viatura "+nova.matricula+" erro: "+e.message);
-                        }
                         })();
-                        setNovaViaturaForm({matricula:"", marca:"Toyota", modelo:"Coaster", ano:"2020", lotacao:"29", tipo:"Mini-Bus 29 lugares", combustivel:"Diesel", estado:"Boa", rota:"Maputo - Beira", km:"120000", seguro:true, inspeccao:true, licenca:false, manifesto:false}); setAreaTransSubTab("frota"); }} className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px] hover:bg-black">Registar Viatura REAL - Supabase - 5 Carros + Novoa</button>
+                        setNovaViaturaForm({matricula:"", marca:"Toyota", modelo:"Coaster", ano:"2020", lotacao:"5", tipo:"Minibus 5 lugares", combustivel:"Diesel", estado:"Boa", rota:"Matola - Maputo", km:"120000", seguro:true, inspeccao:true, licenca:false, manifesto:false}); setAreaTransSubTab("frota"); }} className="w-full mt-3 py-2.5 bg-[#1e2f4a] text-white font-black rounded-full text-[10px] hover:bg-black">Registar Viatura REAL 5 Lugares - TESTEa</button>
                         </div>
                       </div>
                       <div className="md:col-span-2">
