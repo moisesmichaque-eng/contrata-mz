@@ -2825,7 +2825,19 @@ Bilhete valido - Apresentar QR`;
                         <div className="font-black text-[11px]">Registar Nova Viatura - FOTO AMARELA</div>
                         <div className="text-[8px] text-gray-500 mt-1">Preencha para adicionar a sua frota - Max 3 viaturas</div>
                         <div className="mt-3 space-y-2">
-                          <div><label className="text-[8px] font-black">MATRICULA *</label><input value={novaViaturaForm.matricula} onChange={e=>setNovaViaturaForm({...novaViaturaForm, matricula:e.target.value})} placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white border-[#facc15]" /></div>
+                          <div><label className="text-[8px] font-black">CONTACTO MOTORISTA - PARA PASSAGEIRO ENCONTRAR - 100% REAL
+                        </div><div className="space-y-2">
+                          <div>
+                            <div className="text-[9px] font-black">NOME MOTORISTA * - 100% REAL</div>
+                            <input value={nomeMotorista} onChange={(e:any)=>setNomeMotorista(e.target.value)} placeholder="Ex: Aderito Moises - nome real" className="w-full px-2 py-2 border-2 border-black rounded text-[10px] font-bold" />
+                          </div>
+                          <div>
+                            <div className="text-[9px] font-black">TELEFONE * - 100% REAL - WhatsApp</div>
+                            <input value={telMotorista} onChange={(e:any)=>setTelMotorista(e.target.value)} placeholder="Ex: 84 123 4567 - telefone real" className="w-full px-2 py-2 border-2 border-black rounded text-[10px] font-bold" />
+                          </div>
+                          <div className="text-[7px] bg-yellow-100 p-1 rounded">Com nome+telefone, passageiro encontra com 📍 local exacto e ⏱️ ETA exacto - GPS ao vivo</div>
+                        </div><div className="mt-3 font-black text-[9px]">DADOS VIATURA
+                        </div><div className="text-[9px] font-black mt-2">MATRICULA *</label><input value={novaViaturaForm.matricula} onChange={e=>setNovaViaturaForm({...novaViaturaForm, matricula:e.target.value})} placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white border-[#facc15]" /></div>
                           <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><select value={novaViaturaForm.marca} onChange={e=>setNovaViaturaForm({...novaViaturaForm, marca:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Toyota</option><option>Nissan</option><option>Mercedes</option><option>Yutong</option></select></div><div><label className="text-[8px] font-black">MODELO</label><select value={novaViaturaForm.modelo} onChange={e=>setNovaViaturaForm({...novaViaturaForm, modelo:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Coaster</option><option>Hiace</option><option>Quantum</option><option>Rosa</option></select></div></div>
                           <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><input value={novaViaturaForm.ano} onChange={e=>setNovaViaturaForm({...novaViaturaForm, ano:e.target.value})} placeholder="2018" className="w-full p-2 border rounded text-[10px]" /></div><div><label className="text-[8px] font-black">LOTACAO *</label><input value={novaViaturaForm.lotacao} onChange={e=>setNovaViaturaForm({...novaViaturaForm, lotacao:e.target.value})} placeholder="29" className="w-full p-2 border rounded text-[10px] border-[#facc15]" /></div></div>
                           <div><label className="text-[8px] font-black">TIPO VIATURA</label><select value={novaViaturaForm.tipo} onChange={e=>setNovaViaturaForm({...novaViaturaForm, tipo:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Mini-Bus 29 lugares</option><option>Hiace 15 lugares</option><option>Coaster 25 lugares</option><option>Autocarro 50 lugares</option></select></div>
