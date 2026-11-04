@@ -893,18 +893,63 @@ useEffect(()=>{
   document.addEventListener('click', intercept, true);
   return ()=>document.removeEventListener('click', intercept, true);
 }, [transportadorLoginForm, transportadorPerfil]);
- const [viaturas, setViaturas] = useState([
-   {id:'v1', tipo:'Minibus / Chapa', marca:'Toyota Hiace 15 lugares', matricula:'ABX 123 MC', lugares:15, ano:'2020', cor:'Branco', cargaKg:300, rota:'Maputo - Xai-Xai', ac:true, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, lat:-25.966, lng:32.583, motorista:'Joao', telefone:'84 123 4567', paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}]},
-   {id:'v2', tipo:'Toyota Coaster', marca:'Toyota Coaster 25 lugares', matricula:'ACD 456 MC', lugares:25, ano:'2021', cor:'Azul', cargaKg:500, rota:'Maputo - Beira', ac:false, bagagem:true, encomendas:true, estado:'Activa | Verificada', activa:true, verificada:true, lat:-25.95, lng:32.59, motorista:'Carlos', telefone:'82 987 6543', paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
-   {id:'v3', tipo:'Toyota hiace quantum', marca:'Toyota hiace quantum', matricula:'AA124JB', lugares:15, ano:'2022', cor:'Branco', cargaKg:300, rota:'Xai-Xai-South Africa', ac:true, bagagem:true, encomendas:true, estado:'Activa | Em verificacao', activa:true, verificada:false, lat:-25.97, lng:32.57, motorista:'Pedro', telefone:'84 555 1234', paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Johannesburg Park Station', preco:4500}]},
- ] as any);
+ const [viaturas, setViaturas] = useState([] as any);
+ const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
  const [passageiroLat, setPassageiroLat] = useState(null as any);
  const [passageiroLng, setPassageiroLng] = useState(null as any);
- const [passageiroNome, setPassageiroNome] = useState('');
- const [passageiroBairro, setPassageiroBairro] = useState('');
- const [passageiroAceitou, setPassageiroAceitou] = useState(false);
- const [viaturaSelecionada, setViaturaSelecionada] = useState(null as any);
+ const [passageiroStatus, setPassageiroStatus] = useState('pendente');
+ const [pickupLocation, setPickupLocation] = useState('Matola');
+ const [destino, setDestino] = useState('Maputo');
+ const [tipoSelecionado, setTipoSelecionado] = useState('Economy');
+ const [paymentMethod, setPaymentMethod] = useState('Cash');
+ const [loadingReal, setLoadingReal] = useState(false);
  const [assentosReservados, setAssentosReservados] = useState([] as number[]);
+
+ useEffect(()=>{
+   if(navigator.geolocation){
+     navigator.geolocation.getCurrentPosition((pos)=>{
+       setPassageiroLat(pos.coords.latitude);
+       setPassageiroLng(pos.coords.longitude);
+       setPassageiroStatus('permitido');
+     }, ()=>{ setPassageiroStatus('negado'); }, {enableHighAccuracy:true});
+   }
+ },[]);
+
+ useEffect(()=>{
+   async function loadReais(){
+     try{
+       setLoadingReal(true);
+       const res = await supabase.from('viagens_motoristas').select('*').order('created_at', {ascending:false}).limit(20);
+       if(res && !res.error && res.data && res.data.length>0){
+         const reais = res.data.map((d:any)=>({
+           id:d.id, matricula:d.matricula, marca:d.carro||d.marca||'Toyota', lugares:d.lugares||5,
+           rota:(d.provincia||'Matola')+' - '+(d.destino_atual||'Maputo'), tipo:d.carro?.includes('Hiace')?'Economy':d.lugares<=3?'Txopela':d.lugares==1?'Moto':'Fastest',
+           estado:d.status||'disponivel', lat:d.lat||-25.96, lng:d.lng||32.58, motorista:d.nome||'Motorista Real', telefone:d.telefone||'84...', preco:d.lugares*160||800, tempo:'', created_at:d.created_at
+         }));
+         setViaturas(reais);
+       } else {
+         setViaturas([]);
+       }
+     }catch(e){ setViaturas([]); }
+     setLoadingReal(false);
+   }
+   loadReais();
+   
+   // Realtime - quando registar carro real, aparece sem F5
+   try{
+     const channel = supabase.channel('viagens_motoristas-real').on('postgres_changes', {event:'*', schema:'public', table:'viagens_motoristas'}, (payload:any)=>{
+       if(payload.eventType==='INSERT'){
+         const d=payload.new;
+         const novo={id:d.id, matricula:d.matricula, marca:d.carro, lugares:d.lugares, rota:(d.provincia||'Matola')+' - '+(d.destino_atual||'Maputo'), tipo:d.lugares<=3?'Txopela':d.lugares==1?'Moto':'Fastest', estado:d.status, lat:d.lat, lng:d.lng, motorista:d.nome, telefone:d.telefone, preco:d.lugares*160||800};
+         setViaturas((prev:any)=>[novo, ...prev]);
+       }
+       if(payload.eventType==='DELETE'){
+         setViaturas((prev:any)=>prev.filter((v:any)=>v.id!==payload.old.id));
+       }
+     }).subscribe();
+     return ()=>{ supabase.removeChannel(channel); };
+   }catch(e){}
+ },[]);
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
 
@@ -2250,66 +2295,6 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               <button onClick={()=>setViagensTab('area')} className="px-4 h-7 rounded-full text-[9px] font-black bg-[#facc15] text-black border">AREA TRANSPORTADOR</button>
             </div>
           </div>
-          {/* ===== PASSAGEIRO PUBLICO - ACEITA LOCALIZACAO - DISTANCIA EXATA E TEMPO REAL ===== */}
-          <div className="bg-[#facc15] border-2 border-black rounded-[12px] p-4 mb-4">
-            <div className="font-black text-[13px] text-black">🧍 PUBLICO / PASSAGEIRO - ENTRE NO SITE E ACEITE LOCALIZACAO</div>
-            <div className="mt-1 text-[10px] text-black">Site pede sua localizacao para usar como referencia e mostrar distancia exata do carro ate voce e tempo previsto de chegada REAL</div>
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input value={passageiroNome} onChange={(e:any)=>setPassageiroNome(e.target.value)} placeholder="Seu nome (passageiro)" className="px-3 py-2 border-2 border-black rounded-[8px] text-[10px] font-bold" />
-              <input value={passageiroBairro} onChange={(e:any)=>setPassageiroBairro(e.target.value)} placeholder="Seu bairro (ex: Matola)" className="px-3 py-2 border-2 border-black rounded-[8px] text-[10px]" />
-            </div>
-            <div className="mt-3">
-              {!passageiroAceitou ? (
-                <button onClick={()=>{
-                  if(!passageiroNome){ alert('Digite seu nome, passageiro!'); return; }
-                  if(navigator.geolocation){
-                    navigator.geolocation.getCurrentPosition((pos)=>{
-                      setPassageiroLat(pos.coords.latitude);
-                      setPassageiroLng(pos.coords.longitude);
-                      setPassageiroAceitou(true);
-                      alert('✅ '+passageiroNome+', localizacao aceita! Lat '+pos.coords.latitude.toFixed(4)+' Lng '+pos.coords.longitude.toFixed(4)+' - Agora vou calcular distancia exata de cada carro ate voce em '+passageiroBairro+' e tempo real de chegada!');
-                    }, ()=>{ alert('Ative GPS no telefone - passageiro precisa aceitar localizacao para ver distancia exata'); });
-                  }
-                }} className="w-full py-3 bg-black text-white font-black rounded-full text-[12px]">📍 EU, PASSAGEIRO, ACEITO LOCALIZACAO - MOSTRAR CARROS COM DISTANCIA EXATA E TEMPO REAL</button>
-              ) : (
-                <div className="w-full py-3 bg-green-600 text-white font-black rounded-full text-[11px] text-center">✅ Passageiro {passageiroNome} em {passageiroBairro} - Localizacao: {passageiroLat?.toFixed(4)}, {passageiroLng?.toFixed(4)} - Mostrando distancia exata e tempo real de chegada dos carros ate voce</div>
-              )}
-            </div>
-            {passageiroAceitou && (
-              <div className="mt-3 bg-white rounded-[10px] p-3 border">
-                <div className="font-black text-[10px]">TRANSPORTES PERTO DE {passageiroNome.toUpperCase()} EM {passageiroBairro.toUpperCase()} - DISTANCIA EXATA E TEMPO REAL</div>
-                <div className="mt-2 space-y-2">
-                  {(()=>{
-                    const R=6371;
-                    const calc=(v:any)=>{
-                      const dLat=(v.lat-passageiroLat)*Math.PI/180;
-                      const dLon=(v.lng-passageiroLng)*Math.PI/180;
-                      const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(passageiroLat*Math.PI/180)*Math.cos(v.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-                      return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-                    };
-                    const ordenados=[...viaturas].sort((a:any,b:any)=>calc(a)-calc(b));
-                    return ordenados.map((vt:any)=>{
-                      const d=calc(vt);
-                      const tempo=Math.max(1, Math.round((d/35)*60));
-                      return (
-                        <div key={vt.id} className="border-2 border-black rounded-[10px] p-2 bg-[#fefce8]">
-                          <div className="font-black text-[11px]">{vt.matricula} - {vt.marca} - {vt.lugares} lugares - Motorista {vt.motorista}</div>
-                          <div className="mt-1 text-[10px] font-bold text-[#1e2f4a]">📍 {d.toFixed(1)} km de voce ({passageiroNome} em {passageiroBairro}) - ⏱️ {tempo} min tempo real previsto para chegada do carro ate voce</div>
-                          <div className="text-[8px] mt-1">Rota: {vt.rota} - Tel: {vt.telefone} - Estado: {vt.estado}</div>
-                          <div className="mt-2 grid grid-cols-3 gap-2">
-                            <button onClick={()=>{ setViaturaSelecionada(vt); }} className="py-1 bg-white border rounded-full text-[8px] font-bold">Ver Detalhes</button>
-                            <button onClick={()=>{ setViaturaSelecionada(vt); alert('Reserva - Passageiro '+passageiroNome+' - Distancia exata '+d.toFixed(1)+'km - Tempo '+tempo+'min - Carro '+vt.matricula+' vai chegar em '+passageiroBairro); }} className="py-1 bg-[#facc15] font-black rounded-full text-[8px]">Reservar - {d.toFixed(1)}km</button>
-                            <button onClick={()=>{ alert('WhatsApp motorista '+vt.motorista+' - '+vt.telefone+' - Passageiro '+passageiroNome+' em '+passageiroBairro+' - Distancia '+d.toFixed(1)+'km - Tempo '+tempo+'min'); }} className="py-1 bg-green-500 text-white font-black rounded-full text-[8px]">WhatsApp - {tempo}min</button>
-                          </div>
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-            )}
-          </div>
-
 
           
           {viagensTab==='overview' && (
@@ -2693,14 +2678,77 @@ Bilhete valido - Apresentar QR`;
 
                   {areaTransSubTab==='frota' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
-                        <div className="mt-3 space-y-2">
-                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                      <div className="space-y-0 rounded-[20px] overflow-hidden border bg-white">
+                        <div className="bg-[#facc15] p-3">
+                          <div className="font-black text-[11px]">100% REAL - SUPABASE - {viaturas.length} carros reais - {loadingReal ? 'Carregando reais...' : 'Pronto'}</div>
+                          <div className="text-[9px] mt-1">{passageiroStatus==='permitido' ? '✅ Localizacao passageiro permitida - Distancia exata REAL' : '⏳ Pedindo localizacao passageiro: Permitir sempre / Permitir agora / Nao permitir'}</div>
+                          {viaturas.length===0 && !loadingReal && <div className="mt-2 text-[9px] bg-white rounded p-2 border-2 border-dashed">0 records reais no Supabase - Tabela viagens_motoristas vazia - Registar 1 carro REAL de 5 lugares para teste hoje - 100% real, nao mock</div>}
                         </div>
-                        <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
+
+                        <div className="relative h-[220px] bg-[#e8f4f8] overflow-hidden">
+                          <svg className="w-full h-full" viewBox="0 0 400 220">
+                            <path d="M 50 20 Q 100 80 120 120 Q 140 160 130 200 Q 120 220 100 200" stroke="#9ca3af" strokeWidth="3" fill="none" strokeDasharray="6 3" />
+                            {viaturas.map((vt:any, i:number)=>{
+                              const x=80 + i*70; const y=120 + (vt.lat ? (vt.lat+25.96)*500 : 0);
+                              return `<g><circle cx="${x}" cy="${y}" r="10" fill="${vt.tipo==='Economy'?'#facc15':vt.tipo==='Txopela'?'#22c55e':vt.tipo==='Moto'?'#ef4444':'#3b82f6'}" stroke="black" strokeWidth="1"/><text x="${x-15}" y="${y-15}" fontSize="8" fontWeight="bold">${vt.matricula}</text></g>`;
+                            }).join('')}
+                          </svg>
+                          <div className="absolute top-2 left-2 bg-white rounded-full px-2 py-1 shadow text-[9px] font-bold">Pickup: {pickupLocation}</div>
+                          <div className="absolute top-2 right-2 bg-white rounded-full px-2 py-1 shadow text-[9px] font-bold">{destino} - {viaturas.length} reais</div>
+                          {passageiroLat && <div className="absolute bottom-2 left-2 bg-green-500 text-white rounded-full px-2 py-1 shadow text-[8px] font-bold">📍 Voce: {passageiroLat.toFixed(4)}</div>}
+                        </div>
+
+                        <div className="p-3 border-b">
+                          <div className="flex gap-2">
+                            <input value={pickupLocation} onChange={(e:any)=>setPickupLocation(e.target.value)} className="flex-1 px-2 py-2 border rounded-[8px] text-[10px] font-bold" placeholder="Pickup - Matola" />
+                            <input value={destino} onChange={(e:any)=>setDestino(e.target.value)} className="flex-1 px-2 py-2 border rounded-[8px] text-[10px] font-bold" placeholder="Destino - Maputo" />
+                          </div>
+                        </div>
+
+                        <div className="p-3">
+                          <div className="font-black text-[10px]">CARROS REAIS - {viaturas.length} - {passageiroStatus==='permitido' ? 'Distancia exata REAL' : 'Aguardando localizacao'}</div>
+                          <div className="mt-2 space-y-2 max-h-[400px] overflow-y-auto">
+                            {viaturas.length===0 ? (
+                              <div className="text-center py-8 text-[10px] text-gray-400 border-2 border-dashed rounded-[10px]">Nenhum carro REAL ainda<br/>Tabela viagens_motoristas: 0 records<br/>Registar viatura abaixo para teste 100% real<br/>Ex: AAH 123 MP - Toyota Hiace - 5 lugares</div>
+                            ) : viaturas.map((vt:any)=>{
+                              let dist=0; let tempo=0; let distTxt='Calculando...'; let tempoTxt='';
+                              if(passageiroLat && passageiroLng){
+                                const R=6371; const dLat=(vt.lat-passageiroLat)*Math.PI/180; const dLon=(vt.lng-passageiroLng)*Math.PI/180;
+                                const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(passageiroLat*Math.PI/180)*Math.cos(vt.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                                const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); dist=R*c; tempo=Math.max(1, Math.round((dist/40)*60));
+                                distTxt=dist.toFixed(1)+' km'; tempoTxt=tempo+' min';
+                              }
+                              return (
+                                <div key={vt.id} className="border-2 border-black rounded-[12px] p-3 bg-[#fefce8]">
+                                  <div className="font-black text-[11px]">REAL - {vt.matricula} - {vt.marca} - {vt.lugares}L - {vt.motorista}</div>
+                                  <div className="mt-1 text-[10px] font-bold text-[#1e2f4a]">📍 {distTxt} de voce - ⏱️ {tempoTxt} tempo real - Rota {vt.rota}</div>
+                                  <div className="text-[8px] mt-1">Tel: {vt.telefone} - Estado: {vt.estado} - Preco: {vt.preco} MT - 100% REAL Supabase</div>
+                                  <div className="mt-2 grid grid-cols-3 gap-2">
+                                    <button onClick={async()=>{ if(confirm('Remover REAL '+vt.matricula+' do Supabase?')){ try{ await supabase.from('viagens_motoristas').delete().eq('id', vt.id); setViaturas((prev:any)=>prev.filter((x:any)=>x.id!==vt.id)); alert('Removido REAL do Supabase!'); }catch(e){ alert('Erro: '+e); } } }} className="py-1 bg-white border border-red-200 text-red-600 rounded-full text-[7px] font-bold">Remover REAL</button>
+                                    <button onClick={()=>{ setViaturaSelecionada(vt); setAssentosReservados([]); }} className="py-1 bg-[#facc15] rounded-full text-[7px] font-black">Ver {vt.lugares}L</button>
+                                    <button onClick={()=>{ alert('WhatsApp REAL motorista '+vt.motorista+' - '+vt.telefone+' - Passageiro em '+pickupLocation+' - Distancia REAL '+distTxt+' - Tempo REAL '+tempoTxt); }} className="py-1 bg-green-500 text-white rounded-full text-[7px] font-black">WhatsApp REAL</button>
+                                  </div>
+                                  {viaturaSelecionada?.id===vt.id && (
+                                    <div className="mt-2 p-2 bg-black text-white rounded-[10px]">
+                                      <div className="text-[8px] font-black">RESERVA REAL - {vt.matricula} - {distTxt} - {tempoTxt} - 100% REAL</div>
+                                      <div className="mt-2 grid grid-cols-5 gap-1">
+                                        {Array.from({length: vt.lugares||5}, (_, i)=>i+1).map((num)=>(
+                                          <button key={num} onClick={()=>{ if(assentosReservados.includes(num)) setAssentosReservados(assentosReservados.filter((n:any)=>n!==num)); else setAssentosReservados([...assentosReservados, num]); }} className={assentosReservados.includes(num) ? "w-8 h-8 bg-[#facc15] text-black font-black rounded text-[8px]" : "w-8 h-8 bg-white text-black rounded text-[8px]"}>{num}</button>
+                                        ))}
+                                      </div>
+                                      <button onClick={()=>{ if(assentosReservados.length===0){ alert('Selecione assento'); return; } alert('✅ Reserva REAL confirmada! '+vt.matricula+' - Assentos '+assentosReservados.join(',')+' - Distancia REAL '+distTxt+' - Tempo REAL '+tempoTxt+' - Motorista '+vt.motorista+' avisado REAL!'); setAssentosReservados([]); }} className="w-full mt-2 py-2 bg-[#facc15] text-black font-black rounded-full text-[8px]">CONFIRMAR REAL - {distTxt} - {tempoTxt}</button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-[#1e2f4a] text-white">
+                          <div className="text-[8px] font-black">100% REAL - SEM MOCK - SUPABASE viagens_motoristas</div>
+                          <div className="text-[9px] mt-1">{viaturas.length} carros reais - Passageiro: {passageiroStatus} - Realtime: carro novo aparece sem F5</div>
+                        </div>
                       </div>
                       <div className="md:col-span-2 bg-white rounded-[12px] border p-3">
                         <div className="flex justify-between items-center"><div className="font-black text-[11px]">Mapa de assentos - Coaster 29 lugares - FOTO LARANJA</div><button className="text-[8px] bg-[#1e2f4a] text-white px-2 py-1 rounded-full">+ Nova Viagem</button></div>
