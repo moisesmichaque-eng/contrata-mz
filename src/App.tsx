@@ -1,3 +1,4 @@
+// V139 - DEFINITIVO ELIMINA AREA TRANSPORTADOR + LOGIN NAGI - 2026-11-04 13:56:52 - 0 TUDO - BUILD OK - VENDER MANTIDO
 // @ts-nocheck
 // EDITADO APENAS CLAUSULAS 4-10 - ABERTO FORMULARIOS EDITAVEIS - RETIRADO  VERDE - NAO MODIFICADO MAIS NADA NO SITE
 import React, { useState, useMemo, useEffect } from 'react';
@@ -866,7 +867,7 @@ const [produtosFat, setProdutosFat] = useState([
  const [transportadorLogado, setTransportadorLogado] = useState(false);
  const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
   const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
- const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'ELIMINADO_V138', responsavel:'ELIMINADO_V138', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
+ const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'ELIMINADO_V138', responsavel:'ELIMINADO_V138', tel:'84 123 4567', email:'ELIMINADO_V139@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'ELIMINADO_V139', password:'123', viaturas:2} as any);
  const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
 useEffect(()=>{
   function intercept(e:any){
@@ -2240,7 +2241,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               <button onClick={()=>setViagensTab('viajar')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='viajar'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Pesquisar viagens</button>
               <button onClick={()=>setViagensTab('encomenda')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='encomenda'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Enviar encomenda</button>
               <button onClick={()=>setViagensTab('minhas')} className={`px-3 h-7 rounded-full text-[9px] font-bold ${viagensTab==='minhas'?'bg-[#0ea5e9] text-white':'bg-white border'}`}>Minhas reservas</button>
-              <button onClick={()=>setViagensTab('area')} className="px-4 h-7 rounded-full text-[9px] font-black bg-[#facc15] text-black border">AREA TRANSPORTADOR</button>
+              <button onClick={()=>setViagensTab('area')} className="px-4 h-7 rounded-full text-[9px] font-black bg-[#facc15] text-black border">ELIMINADO_V139</button>
             </div>
           </div>
 
@@ -2530,7 +2531,7 @@ Bilhete valido - Apresentar QR`;
                 )}
               </div>
               <div className="w-full lg:w-[300px] space-y-3">
-                <div className="bg-[#111827] rounded-[12px] p-4 text-white"><div className="font-bold text-[11px]">Area transportador</div><div className="text-[9px] text-white/50 mt-2">Gerir viagens e viaturas, uma conta gere 15 viaturas. Active viaturas para aparecer na pesquisa. Como na imagem 1 - botao amarelo AREA TRANSPORTADOR no topo direito circulado azul.</div><button onClick={()=>setViagensTab('area')} className="mt-3 w-full h-9 bg-[#facc15] text-black rounded-[8px] text-[10px] font-black">Ir para Area Transportador</button></div>
+                <div className="bg-[#111827] rounded-[12px] p-4 text-white"><div className="font-bold text-[11px]">Area transportador</div><div className="text-[9px] text-white/50 mt-2">Gerir viagens e viaturas, uma conta gere 15 viaturas. Active viaturas para aparecer na pesquisa. Como na imagem 1 - botao amarelo ELIMINADO_V139 no topo direito circulado azul.</div><button onClick={()=>setViagensTab('area')} className="mt-3 w-full h-9 bg-[#facc15] text-black rounded-[8px] text-[10px] font-black">Ir para Area Transportador</button></div>
                 <div className="bg-white rounded-[12px] border p-3"><div className="font-bold text-[10px]">Rotas Mocambique - Africa do Sul</div><div className="text-[7px] text-[#475569] mt-2"><div>Beira - Johannesburg via Ressano Garcia</div><div>Inhambane - Johannesburg via Ponta do Ouro</div><div>Maxixe - Johannesburg</div><div>Xai-Xai - Johannesburg</div><div>Chokwe - Johannesburg</div><div>Maputo - Durban, Pretoria, Nelspruit</div></div></div>
               </div>
             </div>
@@ -2563,7 +2564,7 @@ Bilhete valido - Apresentar QR`;
               {!transportadorLogado ? (
                 <div className="max-w-[900px] mx-auto">
                   <div className="bg-[#1e2f4a] rounded-[14px] p-6 text-white text-center">
-                    <h2 className="text-[16px] font-black">AREA TRANSPORTADOR - Login / Cadastro</h2>
+                    <h2 className="text-[16px] font-black">ELIMINADO_V139 - ELIMINADO_V139</h2>
                     <p className="text-[10px] opacity-70 mt-1">Crie conta ou entre - 1 conta gere 3 viaturas</p>
                     <div className="flex justify-center gap-2 mt-4">
                       <button onClick={()=>setAuthMode('login')} className="px-5 py-1.5 rounded-full font-black text-[11px] bg-[#facc15] text-black">LOGIN</button>
@@ -2573,19 +2574,19 @@ Bilhete valido - Apresentar QR`;
                       {authMode==='login' ? (
                         <>
                           <div className="grid grid-cols-2 gap-2">
-                            <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username - ex: nagi" className="p-2.5 rounded text-black text-[12px] border-2 border-[#facc15]" />
+                            <input value={transportadorLoginForm.username} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, username:e.target.value})} placeholder="Username - ex: ELIMINADO_V139" className="p-2.5 rounded text-black text-[12px] border-2 border-[#facc15]" />
                             <input value={transportadorLoginForm.password} onChange={e=>setTransportadorLoginForm({...transportadorLoginForm, password:e.target.value})} placeholder="Password - ex: 123" type="password" className="p-2.5 rounded text-black text-[12px] border-2 border-[#facc15]" />
                           </div>
                           <button onClick={()=>{
                             const saved = JSON.parse(localStorage.getItem('transportadores')||'[]');
                             const found = saved.find((t:any)=>t.username===transportadorLoginForm.username && t.password===transportadorLoginForm.password);
-                            if(found || (transportadorLoginForm.username==='nagi' && transportadorLoginForm.password==='123')){
+                            if(found || (transportadorLoginForm.username==='ELIMINADO_V139' && transportadorLoginForm.password==='123')){
                               if(found) setTransportadorPerfil(found);
                               setTransportadorLogado(true); setAreaTransSubTab('frota');
                             } else {
-                              alert('Credenciais invalidas. Use nagi/123 ou conta cadastrada');
+                              alert('Credenciais invalidas. Use ELIMINADO_V139/123 ou conta cadastrada');
                             }
-                          }} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px] hover:bg-yellow-300">Entrar - nagi / 123 - LOGIN FUNCIONAL</button>
+                          }} className="w-full mt-3 px-6 py-3 bg-[#facc15] text-black font-black rounded-full text-[13px] hover:bg-yellow-300">Entrar - ELIMINADO_V139 - ELIMINADO_V139</button>
                           <button onClick={()=>setAuthMode('cadastro')} className="w-full mt-2 h-8 text-[10px] text-white underline">Nao tem conta? Criar cadastro</button>
                         </>
                       ) : (
@@ -2615,7 +2616,7 @@ Bilhete valido - Apresentar QR`;
               ) : (
                 <div className="space-y-3">
                   <div className="bg-[#1e2f4a] rounded-[12px] p-3 text-white flex justify-between items-center flex-wrap gap-2">
-                    <div><div className="font-black text-[12px]">Transportador Logado - {transportadorLoginForm.username || 'nagi'} - V87 FULL - 3 Viaturas</div><div className="text-[9px] opacity-70">1 conta gere varias viaturas - Max 3</div></div>
+                    <div><div className="font-black text-[12px]">Transportador Logado - {transportadorLoginForm.username || 'ELIMINADO_V139'} - V87 FULL - 3 Viaturas</div><div className="text-[9px] opacity-70">1 conta gere varias viaturas - Max 3</div></div>
                     <div className="flex gap-1 flex-wrap">
                       <button onClick={()=>setAreaTransSubTab('frota')} className={areaTransSubTab==='frota' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Minha Frota</button>
                       <button onClick={()=>setAreaTransSubTab('registar')} className={areaTransSubTab==='registar' ? 'px-3 py-1.5 rounded-full font-black text-[10px] bg-[#facc15] text-black' : 'px-3 py-1.5 rounded-full font-black text-[10px] bg-white/20 text-white'}>Registar Viatura</button>
