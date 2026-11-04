@@ -131,7 +131,7 @@ export default function App(){
   const carrosReaisFoto3 = [
     { id:1, rota:"Boane -&gt; Beira", origem:"Maputo Provincia", destino:"Sofala", dOrigem:"Matola", dDestino:"Beira", empresa:"MozLog Express", preco:2800, motorista:"Samuel Mucavele", tel:"82 888 9900", carga:"7 Ton", previsao:"10h 20min", status:"A CAMINHO", matricula:"ADF 561 SF" },
     { id:2, rota:"Maputo -&gt; Beira", origem:"Maputo Cidade", destino:"Sofala", dOrigem:"Maputo", dDestino:"Beira", empresa:"ESSE Viagens", preco:3200, motorista:"Carlos Nhampossa", tel:"84 123 4567", carga:"Passageiros", previsao:"8h 30min", status:"EMBARQUE", matricula:"AHN 442 MP" },
-    { id:3, rota:"Matola -&gt; Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"ZERO", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
+    { id:3, rota:"Matola -&gt; Xai-Xai", origem:"Maputo Provincia", destino:"Gaza", dOrigem:"Matola", dDestino:"Xai-Xai", empresa:"Nagi Invest", preco:2500, motorista:"Jose Matsinhe", tel:"82 345 6789", carga:"5 Ton", previsao:"3h 15min", status:"A CAMINHO", matricula:"ABG 123 MP" },
     { id:4, rota:"Maputo -&gt; Johannesburg", origem:"Maputo Cidade", destino:"Joanesburgo - SA", dOrigem:"Maputo", dDestino:"Park Station Johannesburg (destino #1)", empresa:"Intercape Moz", preco:3500, motorista:"Pedro Mafu", tel:"84 999 0001", carga:"Passageiros", previsao:"8h 00min", status:"DISPONIVEL", matricula:"JHB 001 SA" },
     { id:5, rota:"Maputo -&gt; Nampula", origem:"Maputo Cidade", destino:"Nampula", dOrigem:"Maputo", dDestino:"Nampula", empresa:"Nacala Log", preco:4500, motorista:"Alberto Chissano", tel:"82 111 2222", carga:"10 Ton", previsao:"20h 00min", status:"A CAMINHO", matricula:"NPL 300 MP" },
     { id:6, rota:"Matola -&gt; Komatipoort", origem:"Maputo Provincia", destino:"Nelspruit - SA", dOrigem:"Matola", dDestino:"Komatipoort - Fronteira Ressano Garcia", empresa:"Matsulu Trans", preco:1800, motorista:"Elias Matsinhe", tel:"82 555 6666", carga:"3 Ton", previsao:"2h 30min", status:"A CAMINHO", matricula:"MTS 001 SA" },
@@ -448,13 +448,13 @@ export default function App(){
         const stockDisponivel = prodStock ? Number(prodStock.stockFinalLoja ?? prodStock.stockLoja ?? prodStock.stockInicialLoja ?? 0) : 0;
         if(item.qtd > stockDisponivel){ alert('❌ STOCK INSUFICIENTE! '+item.nome+' Stock:'+stockDisponivel+' Tentou:'+item.qtd); return; }
       }
-      if(!telFat || telFat.replace(/\D/g,'').length<9){alert('Digite telefone'); return;}
+      if(!telFat || telFat.replace(/[^0-9]/g,'').length<9){alert('Digite telefone'); return;}
       const subtotal = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd),0);
       const desc = produtosFat.reduce((s,p)=>s+((p.preco||0)*p.qtd*p.desc/100),0);
       const base = subtotal - desc;
       const iva = ivaTipo==='sem'?0: ivaTipo==='16'? base*0.16 : base*0.05;
       const total = base + iva;
-      const telCliente = telFat.replace(/\D/g,'').slice(-9);
+      const telCliente = telFat.replace(/[^0-9]/g,'').slice(-9);
       const telFull = '258'+telCliente;
       const nomeCliente = (nomeFat && nomeFat.trim().length>0) ? nomeFat.trim() : (telFat && telFat.trim().length>0 ? telFat.trim() : 'Cliente Balcao');
       const dataHoje = new Date().toLocaleDateString('pt-MZ');
@@ -858,7 +858,7 @@ const [produtosFat, setProdutosFat] = useState([
  const [dataV, setDataV] = useState(new Date().toISOString().split('T')[0]);
  const [tipoViagem, setTipoViagem] = useState<'passageiro'|'encomenda'>('passageiro');
  const [viagensMock, setViagensMock] = useState([
-   {id:1, transp:'ZERO', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
+   {id:1, transp:'Nagi Invest', motorista:'Carlos Matsinhe', tel:'84 123 4567', origem:'Maputo Provincia', origemDistrito:'Matola', destino:'Sofala', destinoDistrito:'Beira', data:'2026-10-15', hora:'05:30', chegada:'18:00', preco:2500, lugares:25, cargaKg:500, viatura:'Toyota Coaster 25 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Maxixe', preco:1200}, {local:'Inhambane', preco:1500}, {local:'Beira', preco:2500}]},
    {id:2, transp:'Maning Transporte', motorista:'Joao Matola', tel:'82 987 6543', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Nampula', destinoDistrito:'Nampula', data:'2026-10-15', hora:'06:00', chegada:'20:00', preco:3500, lugares:15, cargaKg:800, viatura:'Mini-bus 15 lugares - ACD 456 MC', matricula:'ACD 456 MC', estado:'Confirmada', activo:true, paragens:[{local:'Xai-Xai', preco:800}, {local:'Beira', preco:2500}, {local:'Nampula', preco:3500}]},
    {id:3, transp:'ESSE Viagens', motorista:'Michaque Moises', tel:'84 053 2899', origem:'Gaza - Xai-Xai', origemDistrito:'Xai-Xai', destino:'Maputo Provincia', destinoDistrito:'Maputo Cidade', data:'2026-10-16', hora:'04:30', chegada:'08:00', preco:800, lugares:30, cargaKg:300, viatura:'Coaster 30 lugares - ESSE 001', matricula:'ESSE 001', estado:'Confirmada', activo:true, paragens:[{local:'Maputo', preco:800}]},
    {id:4, transp:'Transporte Sul Africa', motorista:'Jose SA', tel:'84 111 2233', origem:'Maputo Provincia', origemDistrito:'Maputo Cidade', destino:'Gauteng - Johannesburg', destinoDistrito:'Park Station', data:'2026-10-17', hora:'18:00', chegada:'06:00', preco:4500, lugares:20, cargaKg:1000, viatura:'Bus 50 lugares - SA 001', matricula:'SA 001', estado:'Confirmada', activo:true, paragens:[{local:'Ressano Garcia', preco:800}, {local:'Komatiepoort Fronteira', preco:1200}, {local:'Nelspruit Mbombela', preco:2000}, {local:'Pretoria', preco:4000}, {local:'Johannesburg Park Station', preco:4500}]},
@@ -866,7 +866,7 @@ const [produtosFat, setProdutosFat] = useState([
  const [transportadorLogado, setTransportadorLogado] = useState(false);
  const [areaTransSubTab, setAreaTransSubTab] = useState('frota');
   const [authMode, setAuthMode] = useState<'login'|'cadastro'>('login');
- const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'ZERO', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
+ const [transportadorPerfil, setTransportadorPerfil] = useState({nomeEmpresa:'Nagi Invest', responsavel:'Carlos Matsinhe', tel:'84 123 4567', email:'nagi@exemplo.com', nuit:'401866876', provincia:'Maputo Provincia', rotas:'Maputo - Beira, Maputo - Johannesburg', estadoAprovacao:'Autorizado', username:'nagi', password:'123', viaturas:2} as any);
  const [transportadorLoginForm, setTransportadorLoginForm] = useState({username:'', password:''});
 useEffect(()=>{
   function intercept(e:any){
@@ -896,27 +896,7 @@ useEffect(()=>{
  const [viaturas, setViaturas] = useState([] as any);
  const [nomeMotorista, setNomeMotorista] = useState('');
  const [telMotorista, setTelMotorista] = useState('');
- const [gpsAtivo, setGpsAtivo] = useState(false);
- const [passageiroLat, setPassageiroLat] = useState(null as any);
- const [passageiroLng, setPassageiroLng] = useState(null as any);
- const deletarViaturaSeguro = async (id:any, matricula:any) => {
-   if(!confirm('Remover REAL '+matricula+'? - Vai sumir do amarelo - 100% REAL')) return;
-   try{ await supabase.from('viagens_motoristas').delete().eq('id', id); }catch(e){}
-   setViaturas((prev:any)=>prev.filter((v:any)=>v.id!==id));
-   alert('✅ '+matricula+' removida - amarelo agora 0 - Sem tela branca!');
- };
- const [loadingReal, setLoadingReal] = useState(false);
- useEffect(()=>{
-   async function load(){
-     try{
-       const res = await supabase.from('viagens_motoristas').select('*').order('created_at',{ascending:false}).limit(100);
-       if(res && res.data){ setViaturas(res.data.map((d:any)=>({id:d.id, matricula:d.matricula, marca:d.carro||'Toyota', modelo:d.modelo||'Coaster', ano:d.ano||'2018', lotacao:d.lugares||15, motorista:d.nome||nomeMotorista, telefone:d.telefone||telMotorista, rota:(d.provincia||'Matola')+' - '+(d.destino_atual||'Maputo'), status:d.status||'Activa', lat:d.lat, lng:d.lng}))); }
-       else { setViaturas([]); }
-     }catch(e){ setViaturas([]); }
-   }
-   load();
- },[]);
- // ZERO - AMARELO VAZIO - SEM ZERO
+ const [gpsAtivo, setGpsAtivo] = useState(false); // V118 ZERO - BUILD 100% OK
  const [novaViaturaForm, setNovaViaturaForm] = useState({matricula:'', marca:'Toyota', modelo:'Coaster', ano:'2020', lotacao:'29', tipo:'Mini-Bus 29 lugares', combustivel:'Diesel', estado:'Boa', rota:'Maputo - Beira', km:'120000', seguro:true, inspeccao:true, licenca:false, manifesto:false} as any);
 
 
@@ -1857,7 +1837,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   alert(`PDF gerado! Filtro ${dIni} ate ${dFim} -> ${filtradas.length} faturas | Divida: ${totalValorDivida}MT | Total: ${totalComDividas}MT`);
                 }catch(e){ alert('Erro: '+e); }
               }} className="px-4 py-2 bg-[#1e2f4a] text-white rounded-full text-[9px] font-black">GERAR RELATORIO - PDF COM DIVIDAS + FILTRO DATA</button>
-              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length; const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/\D/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
+              <button onClick={()=>{ const prod=(document.getElementById('filtroProdRel') as any)?.value||''; const filtradas=faturas.filter((f:any)=>!prod||JSON.stringify(f).toLowerCase().includes(prod.toLowerCase())); const total=filtradas.reduce((s:any,f:any)=>s+(Number(f.total)||0),0); const qtd=filtradas.reduce((s:any,f:any)=>s+(f.itens?.reduce((a:any,b:any)=>a+(b.qtd||0),0)||0),0); const msg='RELATORIO SIMPLES - '+(prod||'Todos')+' | Qtd:'+qtd+' | Total:'+total.toFixed(0)+'MT | Faturas:'+filtradas.length; const tel=(lojaPerfil as any).tel||perfilLoja.telefone||'258828765432'; const waUrl='https://wa.me/'+tel.replace(/[^0-9]/g,'').slice(-9)+'?text='+encodeURIComponent(msg); window.open(waUrl,'_blank'); }} className="px-4 py-2 bg-green-600 text-white rounded-full text-[9px] font-black">ENVIAR WHATSAPP</button>
             </div>
           </div>
           <div className="bg-white border rounded-[12px] p-4">
@@ -2029,7 +2009,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
               <div><b>Trabalhos:</b> {profSelecionado.trabalhos} - Rating: {profSelecionado.rating}</div>
               <div className="flex gap-2 mt-3">
                 <a href={'tel:'+(profSelecionado.telefone||profSelecionado.tel)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-center font-black text-[11px]">LIGAR</a>
-                <a href={'https://wa.me/'+String(profSelecionado.telefone||profSelecionado.tel||'').replace(/\D/g,'').slice(-9)} target="_blank" className="flex-1 py-2 bg-[#25D366] text-white rounded-lg text-center font-black text-[11px]">WHATSAPP</a>
+                <a href={'https://wa.me/'+String(profSelecionado.telefone||profSelecionado.tel||'').replace(/[^0-9]/g,'').slice(-9)} target="_blank" className="flex-1 py-2 bg-[#25D366] text-white rounded-lg text-center font-black text-[11px]">WHATSAPP</a>
               </div>
               <button onClick={()=>{ setProfSelecionado(null); setTab('contratos'); }} className="w-full py-2 bg-[#1e2f4a] text-white rounded-lg font-black text-[11px] mt-2">GERAR CONTRATO</button>
             </div>
@@ -2038,7 +2018,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
       )}
 
       {tab==='contratos' && (
-    <section className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10 w-full min-w-0">
+    <div className="max-w-[1200px] mx-auto p-2 sm:p-4 pb-10 w-full min-w-0">
      <div className="bg-[#1e2f4a] text-white rounded-[12px] p-3.5 mb-3">
       <div className="flex justify-between items-center flex-wrap gap-2">
         <div>
@@ -2195,7 +2175,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                   <div className="mt-1 flex gap-2">
                     <div className="w-16 h-16 border-2 border-dashed border-[#c9a86a] rounded-lg flex items-center justify-center bg-[#f8fafc] overflow-hidden">{formContrato.logoData ? " Logo" : "\uD83C\uDFE2"}</div>
                     <div className="flex-1">
-                      <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: ZERO" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
+                      <input value={formContrato.logoTipo || ''} onChange={e=>setFormContrato({...formContrato, logoTipo:e.target.value})} placeholder="Nome empresa - Ex: Nagi Invest" className="w-full h-9 px-2 border-2 rounded-lg text-[11px]" />
                       <div className="flex gap-1 mt-1">
                         <button onClick={()=>document.getElementById('inputLogoTipo')?.click()} className="h-7 px-3 bg-[#1e2f4a] text-white rounded-full text-[9px] font-bold">\uD83D\uDCCE Anexar Logo</button><button onClick={()=>fazerLogout()} className="h-6 px-3 bg-red-600 text-white rounded-full text-[9px] font-black">Sair da Conta</button>
                         <input id="inputLogoTipo" type="file" accept="image/*" className="hidden" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>setFormContrato((prev:any)=>({...prev, logoData:r.result, logoTipo: prev.logoTipo || f.name})); r.readAsDataURL(f); }}} />
@@ -2243,7 +2223,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
        <div className="mt-3 grid grid-cols-1 gap-2"><button onClick={gerarPDFFinal} className="h-10 bg-[#d4a44a] text-[#1e2f4a] rounded-xl font-bold text-[10px]">PDF FINAL</button></div>
      </div>
     </div>
-   </section>
+   </div>
   )}
 
 
@@ -2251,7 +2231,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
       {/* FATURAR REMOVIDO - MESMA COISA QUE VENDER */}
 
 {tab==='viajar' && (
-        <section className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
+        <div className="max-w-[1440px] mx-auto p-2 sm:p-4 pb-10">
           <div className="bg-white rounded-[12px] border p-3 mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="h-7 w-7 rounded-[6px] bg-[#0ea5e9] text-white grid place-items-center font-black text-[12px]">FV</div><div className="font-black text-[12px]">Facilita Viagens</div><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#e0f2fe] border text-[#0c4a6e]">NACIONAL TODAS PROVINCIAS - TEMPO REAL - Foto 3</span><span className="text-[8px] px-2 py-0.5 rounded-full bg-[#fef9c3]">ROTA PREVISAO MOTORISTA CARGA 2800MT</span></div>
             <div className="flex gap-1.5 flex-wrap">
@@ -2285,7 +2265,7 @@ setLojaPerfil((prev:any)=>({...prev, ...novoPerfilCompleto}));
                       {focada && mostrarPopupMapa && (
                         <div className="absolute top-[-140px] left-1/2 bg-white border-2 border-black rounded-xl shadow-2xl p-3 w-72 z-50" style={{transform:'translateX(-50%)'}}>
                           <button onClick={()=>setMostrarPopupMapa(false)} className="absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full">X</button>
-                          <div className="font-black text-[11px]">{v.marca || 'NAGI'} {v.motorista || 'ZERO'} {v.matricula}</div>
+                          <div className="font-black text-[11px]">{v.marca || 'NAGI'} {v.motorista || 'Nagi Invest'} {v.matricula}</div>
                           <div className="text-[9px]">{v.origem || 'Maputo'} para {v.destino || 'Sofala'} {v.preco || 2500} MT</div>
                           <div className="flex gap-1 mt-2"><button onClick={()=>{setViagemSel(v); setMostrarFormPass(true);}} className="flex-1 h-8 bg-slate-800 text-white rounded-full text-[9px]">Reservar neste carro</button></div>
                         </div>
@@ -2648,9 +2628,9 @@ Bilhete valido - Apresentar QR`;
                       <div className="bg-white rounded-[12px] border p-3">
                         <div className="font-black text-[11px]">Minhas Viaturas - 3</div>
                         <div className="mt-3 space-y-2">
-                          <div onClick={()=>{alert('Viatura ZERO selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='ZERO'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">ZERO - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
-                          <div onClick={()=>alert('Viatura ZERO selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">ZERO - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
-                          <div onClick={()=>alert('Viatura ZERO selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">ZERO - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
+                          <div onClick={()=>{alert('Viatura MMN-123-MP selecionada - Coaster 29 - Maputo Beira - 4/29 ocupados - Activa Verificada'); (window as any).viaturaSelecionada='MMN-123-MP'}} className="border-2 border-[#facc15] bg-[#fefce8] rounded-[10px] p-2 cursor-pointer hover:bg-yellow-100"><div className="font-black text-[10px]">MMN-123-MP - Coaster - 29 - 1.5</div><div className="text-[8px] mt-1">Maputo - Beira - 4/29 ocupados</div><div className="flex gap-1 mt-1"><span className="text-[7px] bg-[#facc15] px-1 rounded">Activa</span><span className="text-[7px] bg-green-100 px-1 rounded">Verificada</span></div></div>
+                          <div onClick={()=>alert('Viatura MMN-456-MP selecionada - Hiace 15 - Maputo Xai-Xai - 2/15')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-456-MP - Hiace - 15</div><div className="text-[8px]">Maputo - Xai-Xai - 2/15</div></div>
+                          <div onClick={()=>alert('Viatura MMN-789-MP selecionada - Mini-Bus 22 - Maputo Nampula - Manutencao')} className="border rounded-[10px] p-2 cursor-pointer hover:border-[#facc15] hover:bg-[#fefce8]"><div className="font-black text-[10px]">MMN-789-MP - Mini-Bus - 22</div><div className="text-[8px]">Maputo - Nampula - Manutencao</div></div>
                         </div>
                         <div className="mt-3 bg-[#1e2f4a] rounded-[10px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67% ocupacao</div></div>
                       </div>
@@ -2670,7 +2650,7 @@ Bilhete valido - Apresentar QR`;
                           </div>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-2">
-                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 1 aprovada! Joao Silva - Assento 2 - 450MT - Viatura ZERO')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 1 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
+                          <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 1 - Joao Silva - Assento 2 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 1 aprovada! Joao Silva - Assento 2 - 450MT - Viatura MMN-123-MP')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 1 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
                           <div className="bg-[#fefce8] border border-yellow-200 rounded-[8px] p-2"><div className="font-black text-[8px]">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-1"><button onClick={()=>alert('Reserva 2 aprovada! Maria - Assento 8 - 450MT')} className="flex-1 text-[7px] bg-[#22c55e] text-white py-1 rounded hover:bg-green-600 font-bold">Aprovar</button><button onClick={()=>alert('Reserva 2 rejeitada!')} className="flex-1 text-[7px] bg-gray-200 py-1 rounded hover:bg-red-200 font-bold">Rejeitar</button></div></div>
                         </div>
                         <div className="mt-2 text-[8px] text-center text-gray-500">2 pendentes - Clique em Aprovar/Rejeitar para gerir - Viaturas clicaveis</div>
@@ -2681,18 +2661,10 @@ Bilhete valido - Apresentar QR`;
                   {areaTransSubTab==='registar' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="bg-white rounded-[12px] border p-3">
-                        <div className="font-black text-[11px]">Registar Nova Viatura - 100% REAL - VAZIO AMARELO
-
-                        </div><div className="bg-[#fefce8] border-2 border-dashed border-black rounded-[12px] p-3">
-                          <div className="font-black text-[10px]">CONTACTO MOTORISTA - 100% REAL - Para aparecer no amarelo</div>
-                          <div className="mt-2"><div className="text-[8px] font-black">NOME MOTORISTA *</div><input value={nomeMotorista} onChange={(e:any)=>setNomeMotorista(e.target.value)} placeholder="Ex: Aderito Moises" className="w-full p-2 border rounded text-[10px]" /></div>
-                          <div className="mt-2"><div className="text-[8px] font-black">TELEFONE * - WhatsApp</div><input value={telMotorista} onChange={(e:any)=>setTelMotorista(e.target.value)} placeholder="Ex: 84 123 4567" className="w-full p-2 border rounded text-[10px]" /></div>
-                          <div className="mt-2 text-[7px] bg-white p-1 rounded">Registar nova viatura → aparece no espaço AMARELO à direita com botões funcionando</div>
-                        </div>
-                        <div className="mt-4 font-black text-[10px]">DADOS VIATURA - FOTO AMARELA</div>
+                        <div className="font-black text-[11px]">Registar Nova Viatura - FOTO AMARELA</div>
                         <div className="text-[8px] text-gray-500 mt-1">Preencha para adicionar a sua frota - Max 3 viaturas</div>
                         <div className="mt-3 space-y-2">
-                          <div><label className="text-[8px] font-black">MATRICULA *</label><input value={novaViaturaForm.matricula} onChange={e=>setNovaViaturaForm({...novaViaturaForm, matricula:e.target.value})} placeholder="ZERO" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white border-[#facc15]" /></div>
+                          <div><label className="text-[8px] font-black">MATRICULA *</label><input value={novaViaturaForm.matricula} onChange={e=>setNovaViaturaForm({...novaViaturaForm, matricula:e.target.value})} placeholder="MMN-123-MP" className="w-full p-2 border rounded text-[10px] mt-0.5 bg-white border-[#facc15]" /></div>
                           <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">MARCA</label><select value={novaViaturaForm.marca} onChange={e=>setNovaViaturaForm({...novaViaturaForm, marca:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Toyota</option><option>Nissan</option><option>Mercedes</option><option>Yutong</option></select></div><div><label className="text-[8px] font-black">MODELO</label><select value={novaViaturaForm.modelo} onChange={e=>setNovaViaturaForm({...novaViaturaForm, modelo:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Coaster</option><option>Hiace</option><option>Quantum</option><option>Rosa</option></select></div></div>
                           <div className="grid grid-cols-2 gap-2"><div><label className="text-[8px] font-black">ANO</label><input value={novaViaturaForm.ano} onChange={e=>setNovaViaturaForm({...novaViaturaForm, ano:e.target.value})} placeholder="2018" className="w-full p-2 border rounded text-[10px]" /></div><div><label className="text-[8px] font-black">LOTACAO *</label><input value={novaViaturaForm.lotacao} onChange={e=>setNovaViaturaForm({...novaViaturaForm, lotacao:e.target.value})} placeholder="29" className="w-full p-2 border rounded text-[10px] border-[#facc15]" /></div></div>
                           <div><label className="text-[8px] font-black">TIPO VIATURA</label><select value={novaViaturaForm.tipo} onChange={e=>setNovaViaturaForm({...novaViaturaForm, tipo:e.target.value})} className="w-full p-2 border rounded text-[10px]"><option>Mini-Bus 29 lugares</option><option>Hiace 15 lugares</option><option>Coaster 25 lugares</option><option>Autocarro 50 lugares</option></select></div>
@@ -2707,8 +2679,8 @@ Bilhete valido - Apresentar QR`;
                       <div className="md:col-span-2">
                         <div className="font-black text-[11px] mb-2">Frota registada - 2 viaturas - FOTO AMARELA DIREITA</div>
                         <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">ZERO - COASTER 29</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span><span className="text-[6px] bg-[#facc15] text-black px-1 rounded">Verificada</span></div></div><div className="p-2"><div className="text-[8px] font-black">Toyota Coaster - 2018</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29 lugares</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2018</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao Cumbane</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Beira</div><div className="bg-[#fef2f2] p-1 rounded">KM: 120.000</div><div className="bg-[#fef2f2] p-1 rounded">Estado: Boa</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button><button className="flex-1 py-1 bg-[#facc15] rounded text-[7px] font-black">Ver</button></div></div></div>
-                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">ZERO - HIACE 15</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span></div></div><div className="p-2"><div className="text-[8px] font-black">Nissan Civilian - 2020</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 15</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2020</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Xai-Xai</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-123-MP - COASTER 29</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span><span className="text-[6px] bg-[#facc15] text-black px-1 rounded">Verificada</span></div></div><div className="p-2"><div className="text-[8px] font-black">Toyota Coaster - 2018</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 29 lugares</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2018</div><div className="bg-[#fef2f2] p-1 rounded">Motorista: Joao Cumbane</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Beira</div><div className="bg-[#fef2f2] p-1 rounded">KM: 120.000</div><div className="bg-[#fef2f2] p-1 rounded">Estado: Boa</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button><button className="flex-1 py-1 bg-[#facc15] rounded text-[7px] font-black">Ver</button></div></div></div>
+                          <div className="bg-white rounded-[12px] border overflow-hidden"><div className="bg-[#1e2f4a] text-white p-2 flex justify-between"><div className="text-[8px] font-black">MMN-456-MP - HIACE 15</div><div className="flex gap-1"><span className="text-[6px] bg-green-500 px-1 rounded">Activa</span></div></div><div className="p-2"><div className="text-[8px] font-black">Nissan Civilian - 2020</div><div className="grid grid-cols-2 gap-1 mt-1 text-[7px]"><div className="bg-[#fef2f2] p-1 rounded">Lotacao: 15</div><div className="bg-[#fef2f2] p-1 rounded">Ano: 2020</div><div className="bg-[#fef2f2] p-1 rounded">Rota: Maputo - Xai-Xai</div></div><div className="flex gap-1 mt-2"><button className="flex-1 py-1 border rounded text-[7px]">Editar</button><button className="flex-1 py-1 border rounded text-[7px]">Remover</button></div></div></div>
                         </div>
                         <div className="mt-3 bg-green-50 border border-green-200 rounded-[8px] p-3 text-center"><div className="text-[10px] font-black text-green-800">V87 FULL LAYOUT OK - Igual as 2 fotos que voce circulou!</div><div className="text-[8px] text-green-700 mt-1">Esquerda: Form Registar Nova Viatura completo | Direita: Frota registada 2 cards</div></div>
                       </div>
@@ -2719,7 +2691,7 @@ Bilhete valido - Apresentar QR`;
                     <div className="bg-white rounded-[12px] border p-4">
                       <div className="font-black text-[12px]">Mapa 29 - FOTO LARANJA - Coaster 29 lugares - 3 colunas</div>
                       <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Minhas Viaturas - 3</div><div className="mt-2 space-y-2"><div className="bg-white border-2 border-[#facc15] rounded-[8px] p-2"><div className="text-[8px] font-black">ZERO - Coaster 29 - 4/29</div><div className="text-[7px]">Maputo - Beira - 450MT</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">ZERO - Hiace 15 - 2/15</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">ZERO - Mini-Bus 22</div></div></div><div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67%</div><div className="text-[7px] opacity-70 mt-1">REGRAS NEGOCIO: 1 conta 3 viaturas max</div></div></div>
+                        <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Minhas Viaturas - 3</div><div className="mt-2 space-y-2"><div className="bg-white border-2 border-[#facc15] rounded-[8px] p-2"><div className="text-[8px] font-black">MMN-123-MP - Coaster 29 - 4/29</div><div className="text-[7px]">Maputo - Beira - 450MT</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-456-MP - Hiace 15 - 2/15</div></div><div className="bg-white border rounded-[8px] p-2"><div className="text-[8px]">MMN-789-MP - Mini-Bus 22</div></div></div><div className="mt-4 bg-[#1e2f4a] rounded-[8px] p-2 text-white"><div className="text-[8px] font-black">RESUMO FINANCEIRO DO DIA</div><div className="text-[10px] mt-1">1.400,00 MT - 3 viagens - 67%</div><div className="text-[7px] opacity-70 mt-1">REGRAS NEGOCIO: 1 conta 3 viaturas max</div></div></div>
                         <div className="bg-white border-2 border-[#1e2f4a] rounded-[12px] p-3"><div className="flex justify-between items-center"><div className="text-[8px] font-black">FRENTE - Maputo - Beira - 4/29 ocupados</div><span className="text-[7px] bg-[#facc15] px-2 py-0.5 rounded-full font-black">Coaster 29</span></div><div className="mt-3 max-w-[200px] mx-auto grid grid-cols-4 gap-1"><div className="h-6 border rounded flex items-center justify-center text-[7px]">1</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-[#facc15]">2</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">3</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500 text-white">4</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">5</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-green-500">6</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">7</div><div className="h-6 border rounded flex items-center justify-center text-[7px] bg-red-500 text-white">8</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">9</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">10</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">11</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">12</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">13</div><div className="h-6 border rounded flex items-center justify-center text-[8px]">14</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">15</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">16</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">17</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">18</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">19</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">20</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">21</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">22</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">23</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">24</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">25</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">26</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">27</div><div className="h-6 border rounded flex items-center justify-center text-[7px]">28</div><div className="col-span-4 h-5 bg-gray-100 rounded flex items-center justify-center text-[7px]">WC - Porta traseira - 29</div></div><div className="mt-3 flex justify-center gap-3 text-[7px]"><div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#facc15] rounded"></div>Ocupado</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div>Livre</div><div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded"></div>Reservado</div></div></div>
                         <div className="bg-gray-50 rounded-[10px] p-3"><div className="text-[9px] font-black">Reservas - 2 pendentes</div><div className="mt-2 space-y-2"><div className="bg-[#fefce8] border-2 border-yellow-200 rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 1 - Joao Silva - Assento 2 - Maputo-Beira</div><div className="text-[7px]">WhatsApp: 82 123 4567 - 450MT - M-Pesa pago</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button><button className="flex-1 text-[7px] bg-gray-200 py-1.5 rounded">Rejeitar</button></div></div><div className="bg-[#fefce8] border rounded-[8px] p-2"><div className="text-[8px] font-black">Reserva 2 - Maria - Assento 8 - 450MT</div><div className="flex gap-1 mt-2"><button className="flex-1 text-[7px] bg-[#22c55e] text-white py-1.5 rounded">Aprovar</button></div></div></div><div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2"><div className="text-[7px] font-black">Legenda cores - Igual foto laranja</div><div className="text-[7px] mt-1">Amarelo=Ocupado Verde=Livre Vermelho=Reservado</div></div></div>
                       </div>
@@ -2729,7 +2701,7 @@ Bilhete valido - Apresentar QR`;
               )}
             </div>
           )}
-</section>
+</div>
       )}
 
 
