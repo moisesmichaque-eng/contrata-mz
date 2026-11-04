@@ -894,6 +894,8 @@ useEffect(()=>{
   return ()=>document.removeEventListener('click', intercept, true);
 }, [transportadorLoginForm, transportadorPerfil]);
  const [viaturas, setViaturas] = useState([] as any);
+ const [nomeMotorista, setNomeMotorista] = useState('');
+ const [telMotorista, setTelMotorista] = useState('');
  const [contaTransportador, setContaTransportador] = useState('');
  useEffect(()=>{
    const c = localStorage.getItem('conta_transportador') || localStorage.getItem('conta') || 'transportador-'+Math.random().toString(36).slice(2,7);
