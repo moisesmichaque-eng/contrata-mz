@@ -2688,8 +2688,43 @@ Bilhete valido - Apresentar QR`;
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="space-y-0 rounded-[20px] overflow-hidden border bg-white">
                         <div className="bg-[#facc15] p-3">
-                          <div className="font-black text-[11px]">100% REAL - SUPABASE - {viaturas.length} carros reais - {loadingReal ? 'Carregando reais...' : 'Pronto'}</div>
-                          <div className="text-[9px] mt-1">{passageiroStatus==='permitido' ? '✅ Localizacao passageiro permitida - Distancia exata REAL' : '⏳ Pedindo localizacao passageiro: Permitir sempre / Permitir agora / Nao permitir'}</div>
+                          <div className="font-black text-[11px]">100% REAL - GPS AO VIVO - {viaturas.length} carros - {loadingReal ? 'Carregando...' : 'Pronto'}</div>
+                          <div className="mt-2 flex gap-2">
+                            <button onClick={()=>{
+                              if((window as any).gpsWatchId){
+                                navigator.geolocation.clearWatch((window as any).gpsWatchId);
+                                (window as any).gpsWatchId=null;
+                                alert('GPS DESLIGADO - Voce ficou OFFLINE igual Yango');
+                                return;
+                              }
+                              if(!navigator.geolocation){ alert('Sem GPS'); return; }
+                              alert('📡 LIGANDO GPS AO VIVO - Igual Yango - Seu telefone vai enviar localizacao a cada 10s - NAO FECHE O SITE!');
+                              const watchId = navigator.geolocation.watchPosition(async (pos)=>{
+                                const lat=pos.coords.latitude; const lng=pos.coords.longitude;
+                                setPassageiroLat(lat); setPassageiroLng(lng);
+                                // Atualizar TODAS suas viaturas no Supabase com GPS REAL AO VIVO
+                                const conta = localStorage.getItem('conta_transportador')||'';
+                                try{
+                                  await supabase.from('viagens_motoristas').update({lat, lng, status:'online', ultima_atualizacao:new Date().toISOString()}).eq('conta_id', conta);
+                                  setPassageiroStatus('online - GPS enviando '+new Date().toLocaleTimeString());
+                                }catch(e){}
+                              }, (err)=>{ alert('Erro GPS: '+err.message); }, {enableHighAccuracy:true, maximumAge:0, timeout:10000});
+                              (window as any).gpsWatchId=watchId;
+                            }} className="flex-1 py-2 bg-black text-white font-black rounded-full text-[9px]">📡 LIGAR GPS AO VIVO - ONLINE</button>
+                            <button onClick={async()=>{
+                              if((window as any).gpsWatchId){
+                                navigator.geolocation.clearWatch((window as any).gpsWatchId);
+                                (window as any).gpsWatchId=null;
+                              }
+                              const conta=localStorage.getItem('conta_transportador')||'';
+                              try{
+                                await supabase.from('viagens_motoristas').update({status:'offline', ultima_atualizacao:new Date().toISOString()}).eq('conta_id', conta);
+                                alert('🔴 OFFLINE - Voce desligou GPS - Passageiros nao veem mais seus carros');
+                                setPassageiroStatus('offline');
+                              }catch(e){ alert('Erro: '+e); }
+                            }} className="flex-1 py-2 bg-red-600 text-white font-black rounded-full text-[9px]">🔴 DESLIGAR GPS - OFFLINE</button>
+                          </div>
+                          <div className="text-[9px] mt-1">{passageiroStatus.includes('online') ? '🟢 ONLINE - GPS AO VIVO enviando a cada 10s - Igual Yango - NAO FECHE SITE' : passageiroStatus==='permitido' ? '✅ Localizacao passageiro permitida - Distancia exata REAL' : '⏳ Pedindo localizacao passageiro: Permitir sempre / Permitir agora / Nao permitir'}</div>
                           {viaturas.length===0 && !loadingReal && <div className="mt-2 text-[9px] bg-white rounded p-2 border-2 border-dashed">0 records reais no Supabase - Tabela viagens_motoristas vazia - Registar 1 carro REAL de 5 lugares para teste hoje - 100% real, nao mock</div>}
                         </div>
 
