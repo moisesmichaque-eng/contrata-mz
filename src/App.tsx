@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
 
 export default function App(){
   const [activeTab, setActiveTab] = useState('ENCONTRAR');
