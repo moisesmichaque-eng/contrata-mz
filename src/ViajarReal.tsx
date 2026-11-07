@@ -253,7 +253,7 @@ export default function ViajarReal(){
           </div>
         )}
         {/* IMAGEM MINIBUS - sempre visivel na primeira pagina, antes de entrar - imagem de public/minibus-wezha.jpg */}
-        {true && (
+        {!passLogado && !transLogado && (
           <div className="mt-4 rounded-xl overflow-hidden border bg-white">
             <img src="/minibus-wezha.jpg" alt="Minibus WEZHA - Expresso Maputo" onError={(e:any)=>{ const el=e.currentTarget; const tentativas=['/minibus-wezha.jpg','/minibus-wezha.jpeg','/minibus-wezha.png','/minibus-wezha.jfif','/minibus-wezha.webp']; const atual=tentativas.indexOf(new URL(el.src).pathname); if(atual>=0 && atual<tentativas.length-1){ el.src=tentativas[atual+1]; } else { el.style.display='none'; } }} className="w-full h-[280px] object-cover block" />
             <div className="p-3 flex justify-between items-center"><b className="text-[13px]">Viaja tranquilo, sem stress!</b><span className="text-[11px] text-gray-500">M-Pesa • e-Mola • mKesh</span></div>
@@ -395,7 +395,7 @@ export default function ViajarReal(){
             <div className="flex gap-2 mt-3"><select value={filtroRota} onChange={e=>setFiltroRota(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Xai-Xai -&gt; Maputo</option><option>Maputo -&gt; Xai-Xai</option><option>Matola -&gt; Maputo</option></select><select value={filtroCor} onChange={e=>setFiltroCor(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Branco</option><option>Preto</option><option>Prateado</option><option>Vermelho</option><option>Azul</option></select></div>
             {reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length>0 && (<div className="mt-3 border-t pt-2"><div className="font-bold text-[12px]">Minhas Reservas ({reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length}) - {passLogado?.nome}</div>{reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).slice(0,5).map((r:any)=>(<div key={r.id} className="text-[11px] border rounded px-2 py-1 mt-1 flex justify-between"><span><b>{r.origem} -&gt; {r.destino}</b> - {r.numPass} pessoa(s) - {r.total}MT - {r.matricula} - {r.status}</span><span>{r.data}</span></div>))}</div>)}
           </div>
-          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p>
+          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p><div className="flex gap-2 mt-2 flex-wrap items-center"><button onClick={()=>{ pedirLocalizacaoPassageiro(); carregarReais(); }} className="bg-[#0a66c2] text-white px-3 py-1 rounded-full text-[11px] font-bold">📍 Permitir localização / Atualizar Mapa</button><span className="text-[11px]">GPS: {permissao} | Carros no mapa: {lista.length}</span></div>
             <div ref={mapaRef} className="w-full h-[380px] border rounded mt-3 z-0" style={{minHeight:380}}></div>
             
           </div>
