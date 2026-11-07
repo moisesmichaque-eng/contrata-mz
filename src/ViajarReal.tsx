@@ -253,7 +253,7 @@ export default function ViajarReal(){
           </div>
         )}
         {/* IMAGEM MINIBUS - sempre visivel na primeira pagina, antes de entrar - imagem de public/minibus-wezha.jpg */}
-        {!passLogado && !transLogado && (
+        {true && (
           <div className="mt-4 rounded-xl overflow-hidden border bg-white">
             <img src="/minibus-wezha.jpg" alt="Minibus WEZHA - Expresso Maputo" onError={(e:any)=>{ const el=e.currentTarget; const tentativas=['/minibus-wezha.jpg','/minibus-wezha.jpeg','/minibus-wezha.png','/minibus-wezha.jfif','/minibus-wezha.webp']; const atual=tentativas.indexOf(new URL(el.src).pathname); if(atual>=0 && atual<tentativas.length-1){ el.src=tentativas[atual+1]; } else { el.style.display='none'; } }} className="w-full h-[280px] object-cover block" />
             <div className="p-3 flex justify-between items-center"><b className="text-[13px]">Viaja tranquilo, sem stress!</b><span className="text-[11px] text-gray-500">M-Pesa • e-Mola • mKesh</span></div>
