@@ -58,6 +58,7 @@ export default function ViajarReal(){
   const sairPassageiro = () => { setPassLogado(null); localStorage.removeItem('viajar_passageiro_sessao'); setPapel(null); };
   const sairTransportador = () => { setTransLogado(null); localStorage.removeItem('viajar_transportador_sessao'); setPapel(null); };
   const [passageiroPos, setPassageiroPos] = useState<{lat:number,lng:number}|null>(null);
+  const [passageiroPrecisao, setPassageiroPrecisao] = useState<number|null>(null);
   // FASE 1 - MAPA REAL (Leaflet + OpenStreetMap)
   const mapaRef = useRef<HTMLDivElement|null>(null);
   const leafletMapRef = useRef<any>(null);
@@ -74,6 +75,7 @@ export default function ViajarReal(){
     const m=L.map(mapaRef.current).setView(centro, 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(m);
     leafletMapRef.current=m;
+    m.on('click', (e:any)=>{ setPassageiroPos({lat:e.latlng.lat, lng:e.latlng.lng}); setPassageiroPrecisao(0); });
     setTimeout(()=>{ try{ m.invalidateSize(); }catch(e){} }, 300);
     return m;
   };
@@ -129,7 +131,7 @@ export default function ViajarReal(){
       const { data } = await supabase.from('viagens_motoristas').select('*').order('ultima_atualizacao',{ascending:false});
       const todas = (data as any[])||[];
       const visiveis = todas.filter((v:any)=> ['ONLINE','APROVADA','APROVADO','APROVADO_ONLINE'].includes(String(v.status||'').toUpperCase()));
-      const comPos = visiveis.map((v:any,i:number)=>{ if(v.lat && v.lng) return v; const c = coordDe(v); return {...v, lat:c[0]+(i*0.004), lng:c[1]+(i*0.004), semGPS:true}; });
+      const comPos = visiveis.map((v:any,i:number)=>{ if(v.lat && v.lng) return {...v, semGPS:false}; const st=String(v.status||'').toUpperCase(); if(st==='ONLINE' || st==='APROVADO_ONLINE'){ return {...v, lat:null, lng:null, semGPS:true, semGPSReal:true}; } const c = coordDe(v); return {...v, lat:c[0]+(i*0.004), lng:c[1]+(i*0.004), semGPS:true, posAproximadaCidade:true}; });
       // Juntar aprovadas locais que ainda não estão no Supabase
       const locais = (viaturasTrans||[]).filter((v:any)=> v.status==='APROVADA' && !comPos.some((x:any)=> String(x.matricula)===String(v.matricula)));
       const locaisComPos = locais.map((v:any,i:number)=>{ const c = coordDe(v); return {...v, lat:c[0]+(i*0.004), lng:c[1]+(i*0.004), semGPS:true}; });
@@ -137,9 +139,9 @@ export default function ViajarReal(){
     }catch(e){ setLista([]); }
     setCarregando(false);
   };
-  const pedirGPS = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); },()=>{ setPermissao('denied'); alert('Localizacao nao permitida! Clica Permitir para veres os carros perto de ti.'); },{enableHighAccuracy:true, timeout:10000}); };
+  const pedirGPS = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPassageiroPrecisao(Math.round(pos.coords.accuracy||0)); setPermissao('granted'); },()=>{ setPermissao('denied'); alert('Localizacao nao permitida! Clica Permitir para veres os carros perto de ti.'); },{enableHighAccuracy:true, timeout:10000}); };
   // Como inDrive: Permitir - pede localizacao com Precise: On
-  const pedirLocalizacaoPassageiro = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } setPermissao('prompt'); navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); alert('Localizacao ativada! Agora vês os carros perto de ti + distancia + ETA a 90 km/h.'); },()=>{ setPermissao('denied'); alert('Clica Permitir no aviso do telefone para ativares a localizacao.'); },{enableHighAccuracy:true, timeout:15000, maximumAge:0}); };
+  const pedirLocalizacaoPassageiro = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } setPermissao('prompt'); navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPassageiroPrecisao(Math.round(pos.coords.accuracy||0)); setPermissao('granted'); alert('Localizacao ativada! Agora vês os carros perto de ti + distancia + ETA a 90 km/h.'); },()=>{ setPermissao('denied'); alert('Clica Permitir no aviso do telefone para ativares a localizacao.'); },{enableHighAccuracy:true, timeout:15000, maximumAge:0}); };
   useEffect(()=>{ carregarReais(); pedirGPS(); if(navigator.permissions) navigator.permissions.query({name:'geolocation' as any}).then((r:any)=>setPermissao(r.state)); },[]);
   // FASE 1 - Marcadores MAPA REAL - aqui 'lista' já existe, sem erro TDZ!
   useEffect(()=>{
@@ -400,7 +402,7 @@ export default function ViajarReal(){
             <div className="flex gap-2 mt-3"><select value={filtroRota} onChange={e=>setFiltroRota(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Xai-Xai -&gt; Maputo</option><option>Maputo -&gt; Xai-Xai</option><option>Matola -&gt; Maputo</option></select><select value={filtroCor} onChange={e=>setFiltroCor(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Branco</option><option>Preto</option><option>Prateado</option><option>Vermelho</option><option>Azul</option></select></div>
             {reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length>0 && (<div className="mt-3 border-t pt-2"><div className="font-bold text-[12px]">Minhas Reservas ({reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length}) - {passLogado?.nome}</div>{reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).slice(0,5).map((r:any)=>(<div key={r.id} className="text-[11px] border rounded px-2 py-1 mt-1 flex justify-between"><span><b>{r.origem} -&gt; {r.destino}</b> - {r.numPass} pessoa(s) - {r.total}MT - {r.matricula} - {r.status}</span><span>{r.data}</span></div>))}</div>)}
           </div>
-          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p><div className="flex gap-2 mt-2 flex-wrap items-center"><button onClick={()=>{ pedirLocalizacaoPassageiro(); carregarReais(); setTimeout(()=>{ garantirMapa(); }, 400); }} className="bg-[#0a66c2] text-white px-3 py-1 rounded-full text-[11px] font-bold">📍 Permitir localização / Atualizar Mapa</button><span className="text-[11px]">GPS: {permissao} | Carros no mapa: {lista.length}</span></div><div className="flex gap-3 mt-1 text-[11px]"><span>Azul = Tu</span><span>Vermelho = Viatura com matricula</span><span>Carrega no vermelho para ver motorista</span></div>
+          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p><div className="flex gap-2 mt-2 flex-wrap items-center"><button onClick={()=>{ pedirLocalizacaoPassageiro(); carregarReais(); setTimeout(()=>{ garantirMapa(); }, 400); }} className="bg-[#0a66c2] text-white px-3 py-1 rounded-full text-[11px] font-bold">📍 Permitir localização / Atualizar Mapa</button><span className="text-[11px]">GPS: {permissao} | Carros no mapa: {lista.length}</span></div><div className="flex gap-2 mt-2 flex-wrap items-center"><span className="text-[11px] font-bold">Precisao GPS: {passageiroPrecisao==null ? "sem GPS" : passageiroPrecisao===0 ? "corrigida a mao" : "± "+passageiroPrecisao+" m"}</span>{passageiroPrecisao!=null && passageiroPrecisao>1000 && (<span className="text-[11px] bg-red-100 text-red-700 px-2 py-1 rounded">Computador sem GPS exacto - pode errar 100s de km! Usa o telefone ou corrige em baixo.</span>)}<button onClick={()=>{ const c=CIDADES[origem]||CIDADES["Xai-Xai"]; setPassageiroPos({lat:c.lat, lng:c.lng}); setPassageiroPrecisao(0); }} className="bg-green-600 text-white px-3 py-1 rounded-full text-[11px] font-bold">Estou em {origem} - Corrigir</button><span className="text-[11px]">Ou toca no mapa onde estas para corrigir a tua posicao.</span></div><div className="flex gap-3 mt-1 text-[11px]"><span>Azul = Tu</span><span>Vermelho = Viatura com matricula</span><span>Carrega no vermelho para ver motorista</span></div>
             <div ref={mapaRef} className="w-full h-[380px] border rounded mt-3 z-0" style={{minHeight:380}}></div>
             
           </div>
@@ -417,7 +419,7 @@ export default function ViajarReal(){
                   <div className="flex gap-2 mt-2 items-center"><span className="w-6 h-6 rounded-full border" style={{backgroundColor: cor==='Branco'?'#fff':cor==='Preto'?'#000':cor==='Prateado'?'#c0c0c0':cor==='Vermelho'?'#ef4444':cor==='Azul'?'#3b82f6':cor==='Verde'?'#22c55e':'#eab308'}}></span><span className="text-[12px] font-bold">Cor: {cor}</span><span className="text-[11px] text-gray-500">| Matricula: {v.matricula}</span></div>
                   <p className="text-[12px] mt-1">Motorista: {v.nomeMotorista||v.nome} - {v.telMotorista||v.telefone} (GPS + Chamadas)</p><p className="text-[11px] text-gray-600">Dono: {v.nomeDono||v.transportador} - {v.telDono||v.tel||''}</p>
                   <p className="text-[11px] text-gray-600">{v.cidade}, {v.provincia} -&gt; {v.destino_atual} - {v.lugares} lugares</p>
-                  <p className="text-[11px] mt-1">Distancia ate ti: {distTxt} {etaTxt && `| ETA: ${etaTxt}`} | Rota {origem} -&gt; {destino}: {rotaInfo.distEstrada.toFixed(1)} km - {rotaInfo.precoPP}MT/pessoa</p>
+                  {v.semGPSReal && (<p className="text-[11px] mt-1 bg-red-50 text-red-700 px-2 py-1 rounded">Motorista ONLINE mas sem GPS real - posicao nao mostrada no mapa. Pede ao motorista para ligar o GPS no telefone dele.</p>)}<p className="text-[11px] mt-1">Distancia ate ti: {distTxt} {etaTxt && `| ETA: ${etaTxt}`} | Rota {origem} -&gt; {destino}: {rotaInfo.distEstrada.toFixed(1)} km - {rotaInfo.precoPP}MT/pessoa</p>
                   <p className="text-[10px] text-gray-400">Atualizado: {v.ultima_atualizacao}</p>
                   <div className="flex gap-2 mt-3 flex-wrap">
                     <a href={`tel:${String(v.telefone||'').replace(/[^0-9]/g,'')}`} className="text-[11px] bg-green-600 text-white px-3 py-1 rounded-full font-bold">Ligar</a>
