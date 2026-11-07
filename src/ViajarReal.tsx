@@ -186,7 +186,7 @@ export default function ViajarReal(){
     if(!formViat.nomeMotorista || !formViat.telMotorista){ alert('Nome do Motorista e Numero do Motorista sao obrigatorios - o motorista e quem anda com GPS ligado!'); return; }
     if(!docsFiles.carta || !docsFiles.livrete || !docsFiles.seguro){ alert('Documentos obrigatorios: faz upload do FILE da Carta + Livrete + Seguro (numero e opcional)'); return; }
     const rotaDef = `${formViat.provOrig} - ${formViat.distOrig} -> ${formViat.provDest} - ${formViat.distDest}`;
-    const nova:any = {...formViat, destino:rotaDef, fotos:{...fotosViatura}, fotoFrente:fotosViatura.frente, foto:fotosViatura.frente, paragens:paragens.filter((p:any)=>p.nome.trim()), rota:rotaDef, provOrig:formViat.provOrig, distOrig:formViat.distOrig, provDest:formViat.provDest, distDest:formViat.distDest, id:Date.now(), nome:formViat.nomeMotorista, nomeMotorista:formViat.nomeMotorista, telMotorista:formViat.telMotorista, telefone:formViat.telMotorista, nomeDono:formViat.nomeDono||transLogado.nome, telDono:formViat.telDono||transLogado.tel, transportador:formViat.nomeDono||transLogado.nome, tel:formViat.telDono||transLogado.tel, docs:{...docsNums, files:{...docsFiles}}, docsFiles:{...docsFiles}, docsNums:{...docsNums}, status:'PENDENTE', dataSubmissao:new Date().toLocaleString('pt-MZ')};
+    const nova:any = {...formViat, destino:rotaDef, fotos:{...fotosViatura}, fotoFrente:fotosViatura.frente, foto:fotosViatura.frente, paragens:paragens.filter((p:any)=>p.nome.trim()),, rota:rotaDef, provOrig:formViat.provOrig, distOrig:formViat.distOrig, provDest:formViat.provDest, distDest:formViat.distDest, id:Date.now(), nome:formViat.nomeMotorista, nomeMotorista:formViat.nomeMotorista, telMotorista:formViat.telMotorista, telefone:formViat.telMotorista, nomeDono:formViat.nomeDono||transLogado.nome, telDono:formViat.telDono||transLogado.tel, transportador:formViat.nomeDono||transLogado.nome, tel:formViat.telDono||transLogado.tel, docs:{...docsNums, files:{...docsFiles}}, docsFiles:{...docsFiles}, docsNums:{...docsNums}, status:'PENDENTE', dataSubmissao:new Date().toLocaleString('pt-MZ')};
     const listaN=[nova, ...viaturasTrans]; setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
     // Tambem tenta criar no Supabase como OFFLINE (aguardar aprovacao, nao aparece para passageiro)
     try{ await supabase.from('viagens_motoristas').insert([{nome:formViat.nomeMotorista, carro:`${formViat.marca} ${formViat.modelo}`, matricula:formViat.matricula.toUpperCase(), provincia:formViat.provincia, cidade:formViat.cidade, telefone:formViat.telMotorista, foto:fotosViatura.frente||formViat.foto||'', lugares:parseInt(formViat.lugares)||15, destino_atual:formViat.destino, status:'OFFLINE', conta_id:transLogado.conta_id, ultima_atualizacao:new Date().toISOString(), updated_at:new Date().toISOString()}]); }catch(e){}
@@ -252,10 +252,10 @@ export default function ViajarReal(){
             <span className="text-[11px] text-gray-500 py-2">{papel==='transportador' ? 'Novo? Regista. Já tens conta? Faz Login.' : 'Novo? Regista. Já tens conta? Faz Login com o teu telefone.'}</span>
           </div>
         )}
-        {/* IMAGEM MINIBUS - espaço vazio em baixo, primeira página - imagem de public */}
-        {!papel && !passLogado && !transLogado && (
+        {/* IMAGEM MINIBUS - sempre visivel na primeira pagina, antes de entrar - imagem de public/minibus-wezha.jpg */}
+        {!passLogado && !transLogado && (
           <div className="mt-4 rounded-xl overflow-hidden border bg-white">
-            <img src="/minibus-wezha.jpg" alt="Minibus WEZHA" onError={(e:any)=>{ e.currentTarget.src='/minibus-wezha.png'; }} className="w-full h-[280px] object-cover block" />
+            <img src="/minibus-wezha.jpg" alt="Minibus WEZHA - Expresso Maputo" onError={(e:any)=>{ const el=e.currentTarget; const tentativas=['/minibus-wezha.jpg','/minibus-wezha.jpeg','/minibus-wezha.png','/minibus-wezha.jfif','/minibus-wezha.webp']; const atual=tentativas.indexOf(new URL(el.src).pathname); if(atual>=0 && atual<tentativas.length-1){ el.src=tentativas[atual+1]; } else { el.style.display='none'; } }} className="w-full h-[280px] object-cover block" />
             <div className="p-3 flex justify-between items-center"><b className="text-[13px]">Viaja tranquilo, sem stress!</b><span className="text-[11px] text-gray-500">M-Pesa • e-Mola • mKesh</span></div>
           </div>
         )}
