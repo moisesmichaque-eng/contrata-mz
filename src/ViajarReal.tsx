@@ -101,6 +101,9 @@ export default function ViajarReal(){
   const [docsNums, setDocsNums] = useState<any>({bi:'', carta:'', livrete:'', seguro:'', licenca:'', fotoViatura:''});
   const [viaturasTrans, setViaturasTrans] = useState<any[]>(()=>{ try{ return JSON.parse(localStorage.getItem('viajar_viaturas_trans')||'[]'); }catch(e){ return []; } });
   const [formViat, setFormViat] = useState({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''});
+  const [fotosViatura, setFotosViatura] = useState<any>({frente:'', ladoEsq:'', ladoDir:'', tras:'', dentro:''});
+  const [paragens, setParagens] = useState<any[]>([{nome:'', valor:''}]);
+  const lerFoto = (lado:string, file:any)=>{ if(!file) return; const r=new FileReader(); r.onload=()=> setFotosViatura((p:any)=>({...p,[lado]:String(r.result)})); r.readAsDataURL(file); };
   const [mostrarMaisCarros, setMostrarMaisCarros] = useState(false);
   // PASSAGEIRO - reservar
   const [origem, setOrigem] = useState('Xai-Xai'); const [destino, setDestino] = useState('Maputo');
@@ -114,8 +117,21 @@ export default function ViajarReal(){
   const [notificacoes, setNotificacoes] = useState<any[]>(()=>{ try{ return JSON.parse(localStorage.getItem('viajar_notificacoes')||'[]'); }catch(e){ return []; } });
   const carregarReais = async () => {
     setCarregando(true);
-    const { data } = await supabase.from('viagens_motoristas').select('*').eq('status','ONLINE').order('ultima_atualizacao',{ascending:false});
-    setLista((data as any[])||[]); setCarregando(false);
+    // MAPA FIX: antes só ONLINE com GPS - por isso cadastradas não apareciam!
+    // Agora: ONLINE + APROVADA + APROVADO + PENDENTE aprovada local. Se não tem lat/lng, usa fallback da paragem / Maputo.
+    const COORDS:any = {'Maputo':[-25.9655,32.5832],'Matola':[-25.9620,32.4580],'Xai-Xai':[-25.0520,33.6440],'Macia':[-25.0230,33.1000],'Manjacaze':[-24.7070,33.5500],'Chokwe':[-24.5330,32.9830],'Boane':[-26.0450,32.3300],'Moamba':[-25.6000,32.2500],'Namaacha':[-25.9830,31.9500],'Marracuene':[-25.7330,32.6670],'Inhambane':[-23.8650,35.3830],'Maxixe':[-23.8600,35.3500],'Vilankulo':[-22.0000,35.3170],'Beira':[-19.8430,34.8380],'Nampula':[-15.1160,39.2670],'Quelimane':[-17.8780,36.8880],'Tete':[-16.1560,33.5860],'Lichinga':[-13.3170,35.2400],'Pemba':[-12.9730,40.5170],'Chimoio':[-19.1160,33.4830]};
+    const coordDe = (v:any)=>{ const cidade = String(v.cidade||v.provincia||v.destino||'Maputo'); for(const k in COORDS){ if(cidade.includes(k)) return COORDS[k]; } return COORDS['Maputo']; };
+    try{
+      const { data } = await supabase.from('viagens_motoristas').select('*').order('ultima_atualizacao',{ascending:false});
+      const todas = (data as any[])||[];
+      const visiveis = todas.filter((v:any)=> ['ONLINE','APROVADA','APROVADO','APROVADO_ONLINE'].includes(String(v.status||'').toUpperCase()));
+      const comPos = visiveis.map((v:any,i:number)=>{ if(v.lat && v.lng) return v; const c = coordDe(v); return {...v, lat:c[0]+(i*0.004), lng:c[1]+(i*0.004), semGPS:true}; });
+      // Juntar aprovadas locais que ainda não estão no Supabase
+      const locais = (viaturasTrans||[]).filter((v:any)=> v.status==='APROVADA' && !comPos.some((x:any)=> String(x.matricula)===String(v.matricula)));
+      const locaisComPos = locais.map((v:any,i:number)=>{ const c = coordDe(v); return {...v, lat:c[0]+(i*0.004), lng:c[1]+(i*0.004), semGPS:true}; });
+      setLista([...comPos, ...locaisComPos]);
+    }catch(e){ setLista([]); }
+    setCarregando(false);
   };
   const pedirGPS = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); },()=>{ setPermissao('denied'); alert('Localizacao nao permitida! Clica Permitir para veres os carros perto de ti.'); },{enableHighAccuracy:true, timeout:10000}); };
   // Como inDrive: Permitir - pede localizacao com Precise: On
@@ -132,7 +148,7 @@ export default function ViajarReal(){
     }
     lista.forEach((v:any)=>{
       if(!v.lat || !v.lng) return;
-      const mk=L.marker([v.lat, v.lng]).addTo(m).bindPopup('<b>'+(v.matricula||'')+' - '+(v.carro||v.marca||'')+'</b><br/>Motorista: '+(v.nome||v.nomeMotorista||'')+'<br/>Tel: '+(v.telefone||v.telMotorista||'')+'<br/>Rota: '+(v.destino_atual||v.rota||'')+'<br/>Lat/Lng real Supabase: '+v.lat+', '+v.lng);
+      const mk=L.marker([v.lat, v.lng]).addTo(m).bindPopup((v.fotoFrente||v.foto ? '<img src="'+(v.fotoFrente||v.foto)+'" style="width:100%;height:80px;object-fit:cover;border-radius:8px;" />' : '')+'<b>'+(v.matricula||'')+' - '+(v.carro||v.marca||'')+'</b><br/>Motorista: '+(v.nome||v.nomeMotorista||'')+'<br/>Tel: '+(v.telefone||v.telMotorista||'')+'<br/>Rota: '+(v.destino_atual||v.rota||'')+'<br/>Lat/Lng real Supabase: '+v.lat+', '+v.lng);
       leafletMarcadoresRef.current.push(mk);
     });
   },[lista, passageiroPos]);
@@ -170,11 +186,11 @@ export default function ViajarReal(){
     if(!formViat.nomeMotorista || !formViat.telMotorista){ alert('Nome do Motorista e Numero do Motorista sao obrigatorios - o motorista e quem anda com GPS ligado!'); return; }
     if(!docsFiles.carta || !docsFiles.livrete || !docsFiles.seguro){ alert('Documentos obrigatorios: faz upload do FILE da Carta + Livrete + Seguro (numero e opcional)'); return; }
     const rotaDef = `${formViat.provOrig} - ${formViat.distOrig} -> ${formViat.provDest} - ${formViat.distDest}`;
-    const nova:any = {...formViat, destino:rotaDef, rota:rotaDef, provOrig:formViat.provOrig, distOrig:formViat.distOrig, provDest:formViat.provDest, distDest:formViat.distDest, id:Date.now(), nome:formViat.nomeMotorista, nomeMotorista:formViat.nomeMotorista, telMotorista:formViat.telMotorista, telefone:formViat.telMotorista, nomeDono:formViat.nomeDono||transLogado.nome, telDono:formViat.telDono||transLogado.tel, transportador:formViat.nomeDono||transLogado.nome, tel:formViat.telDono||transLogado.tel, docs:{...docsNums, files:{...docsFiles}}, docsFiles:{...docsFiles}, docsNums:{...docsNums}, status:'PENDENTE', dataSubmissao:new Date().toLocaleString('pt-MZ')};
+    const nova:any = {...formViat, destino:rotaDef, fotos:{...fotosViatura}, fotoFrente:fotosViatura.frente, foto:fotosViatura.frente, paragens:paragens.filter((p:any)=>p.nome.trim()),, rota:rotaDef, provOrig:formViat.provOrig, distOrig:formViat.distOrig, provDest:formViat.provDest, distDest:formViat.distDest, id:Date.now(), nome:formViat.nomeMotorista, nomeMotorista:formViat.nomeMotorista, telMotorista:formViat.telMotorista, telefone:formViat.telMotorista, nomeDono:formViat.nomeDono||transLogado.nome, telDono:formViat.telDono||transLogado.tel, transportador:formViat.nomeDono||transLogado.nome, tel:formViat.telDono||transLogado.tel, docs:{...docsNums, files:{...docsFiles}}, docsFiles:{...docsFiles}, docsNums:{...docsNums}, status:'PENDENTE', dataSubmissao:new Date().toLocaleString('pt-MZ')};
     const listaN=[nova, ...viaturasTrans]; setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
     // Tambem tenta criar no Supabase como OFFLINE (aguardar aprovacao, nao aparece para passageiro)
-    try{ await supabase.from('viagens_motoristas').insert([{nome:formViat.nomeMotorista, carro:`${formViat.marca} ${formViat.modelo}`, matricula:formViat.matricula.toUpperCase(), provincia:formViat.provincia, cidade:formViat.cidade, telefone:formViat.telMotorista, lugares:parseInt(formViat.lugares)||15, destino_atual:formViat.destino, status:'OFFLINE', conta_id:transLogado.conta_id, ultima_atualizacao:new Date().toISOString(), updated_at:new Date().toISOString()}]); }catch(e){}
-    setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); setMostrarMaisCarros(true);
+    try{ await supabase.from('viagens_motoristas').insert([{nome:formViat.nomeMotorista, carro:`${formViat.marca} ${formViat.modelo}`, matricula:formViat.matricula.toUpperCase(), provincia:formViat.provincia, cidade:formViat.cidade, telefone:formViat.telMotorista, foto:fotosViatura.frente||formViat.foto||'', lugares:parseInt(formViat.lugares)||15, destino_atual:formViat.destino, status:'OFFLINE', conta_id:transLogado.conta_id, ultima_atualizacao:new Date().toISOString(), updated_at:new Date().toISOString()}]); }catch(e){}
+    setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); setFotosViatura({frente:'', ladoEsq:'', ladoDir:'', tras:'', dentro:''}); setParagens([{nome:'', valor:''}]); setMostrarMaisCarros(true);
     alert('Viatura SUBMETIDA! A aguardar aprovacao do dono do aplicativo.');
   };
   const aprovarViatura = (id:any) => { // DONO DO APLICATIVO aprova
@@ -243,8 +259,6 @@ export default function ViajarReal(){
             <div className="p-3 flex justify-between items-center"><b className="text-[13px]">Viaja tranquilo, sem stress!</b><span className="text-[11px] text-gray-500">M-Pesa • e-Mola • mKesh</span></div>
           </div>
         )}
-        </div>
-        
       </div>
       {/* PORTA PASSAGEIRO - como inDrive: numero valido -> entra so para procurar carros, reservar e viajar. NAO ve transportador. */}
       {papel==='passageiro' && !passLogado && (
@@ -328,7 +342,38 @@ export default function ViajarReal(){
                   <div className="md:col-span-4 border rounded p-2 bg-blue-50"><div className="font-bold text-[12px]">Motorista + Dono - Telefone com GPS</div><p className="text-[10px] text-gray-600">O MOTORISTA deve andar com o telefone ligado com GPS. O numero do motorista e usado para 2 coisas: 1) receber chamadas do passageiro 2) mostrar distancia + tempo de chegada (ETA) onde o passageiro estiver, a 90 km/h. O numero do dono e so para notificacao.</p><div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2"><div><label className="text-[11px] font-bold">Nome Motorista *</label><input value={formViat.nomeMotorista} onChange={e=>setFormViat({...formViat,nomeMotorista:e.target.value})} className="w-full border rounded px-2 py-2 text-[13px]" placeholder="Nome do motorista" /></div><div><label className="text-[11px] font-bold">Numero Motorista * - GPS + Chamadas</label><input value={formViat.telMotorista} onChange={e=>setFormViat({...formViat,telMotorista:e.target.value})} className="w-full border rounded px-2 py-2 text-[13px]" placeholder="84... - telefone com GPS ligado" /></div><div><label className="text-[11px] font-bold">Nome Dono</label><input value={formViat.nomeDono} onChange={e=>setFormViat({...formViat,nomeDono:e.target.value})} className="w-full border rounded px-2 py-2 text-[13px]" placeholder="Nome do dono (se diferente)" /></div><div><label className="text-[11px] font-bold">Numero Dono - Notificacao</label><input value={formViat.telDono} onChange={e=>setFormViat({...formViat,telDono:e.target.value})} className="w-full border rounded px-2 py-2 text-[13px]" placeholder="84... - dono recebe notificacao" /></div></div></div>
                 </div>
                 <div className="mt-4 border rounded p-3 bg-[#f8fafc]"><div className="font-bold text-[13px]">Registar Rota do Carro - Escolhe Provincia + Distrito dos dois lados</div><div className="grid grid-cols-2 gap-3 mt-2"><div className="border rounded p-2 bg-white"><div className="font-bold text-[11px]">ORIGEM - Lado 1</div><label className="text-[11px]">Provincia Origem</label><select value={formViat.provOrig} onChange={e=>setFormViat({...formViat,provOrig:e.target.value})} className="w-full border rounded px-2 py-2 text-[12px]"><option>Gaza</option><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Niassa</option><option>Cabo Delgado</option></select><label className="text-[11px]">Distrito Origem</label><input value={formViat.distOrig} onChange={e=>setFormViat({...formViat,distOrig:e.target.value})} className="w-full border rounded px-2 py-2 text-[12px]" placeholder="Ex: Xai-Xai" /></div><div className="border rounded p-2 bg-white"><div className="font-bold text-[11px]">DESTINO - Lado 2</div><label className="text-[11px]">Provincia Destino</label><select value={formViat.provDest} onChange={e=>setFormViat({...formViat,provDest:e.target.value})} className="w-full border rounded px-2 py-2 text-[12px]"><option>Maputo Cidade</option><option>Maputo Provincia</option><option>Gaza</option><option>Inhambane</option><option>Sofala</option><option>Manica</option><option>Tete</option><option>Zambezia</option><option>Nampula</option><option>Niassa</option><option>Cabo Delgado</option></select><label className="text-[11px]">Distrito Destino</label><input value={formViat.distDest} onChange={e=>setFormViat({...formViat,distDest:e.target.value})} className="w-full border rounded px-2 py-2 text-[12px]" placeholder="Ex: Maputo" /></div></div><div className="text-[12px] mt-2 font-bold">Rota definida: {formViat.provOrig} - {formViat.distOrig} -&gt; {formViat.provDest} - {formViat.distDest}</div></div>
-                <div className="flex gap-2 mt-4"><button onClick={submeterViatura} className="flex-1 bg-[#0a66c2] text-white py-3 rounded-full font-bold text-[13px]">SUBMETER VIATURA - Esperar Aprovacao</button><button onClick={ligarGps} className="flex-1 bg-green-600 text-white py-3 rounded-full font-bold text-[13px]">{gpsAtivo?'GPS LIGADO - Telefone do Motorista':'LIGAR GPS AO VIVO - No Telefone do Motorista'}</button></div>
+                
+                {/* FOTOS VIATURA - Frente, Lados, Trás, Dentro - Frente = capa no Yango */}
+                <div className="bg-white rounded-xl border p-4 mt-3">
+                  <h3 className="font-bold text-[13px]">📸 Fotos da Viatura - Frente, Lados, Trás, Dentro</h3>
+                  <p className="text-[11px] text-gray-500 mt-1">A foto da FRENTE aparece na procura do passageiro, como no Yango. Quando o carro chega, o passageiro reconhece pela foto.</p>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2">
+                    {[{k:'frente',l:'Frente * (capa)'},{k:'ladoEsq',l:'Lado Esquerdo'},{k:'ladoDir',l:'Lado Direito'},{k:'tras',l:'Trás'},{k:'dentro',l:'Dentro'}].map((f:any)=>(
+                      <div key={f.k} className="border rounded p-2">
+                        <label className="text-[11px] font-bold">{f.l}</label>
+                        {fotosViatura[f.k] && <img src={fotosViatura[f.k]} alt={f.l} className="w-full h-[70px] object-cover rounded mt-1" />}
+                        <input type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e:any)=>lerFoto(f.k, e.target.files?.[0])} className="w-full text-[11px] mt-1" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* PARAGENS - até 15, nome + valor */}
+                <div className="bg-white rounded-xl border p-4 mt-3">
+                  <h3 className="font-bold text-[13px]">📍 Paragens - até 15 (nome + valor)</h3>
+                  <p className="text-[11px] text-gray-500 mt-1">Ex: Xai-Xai 0 MT, Macia 150 MT, Manjacaze 300 MT. O passageiro paga o valor da paragem onde desce.</p>
+                  {paragens.map((p:any,i:number)=>(
+                    <div key={i} className="flex gap-2 mt-2">
+                      <input value={p.nome} onChange={(e:any)=>{ const a=[...paragens]; a[i].nome=e.target.value; setParagens(a); }} placeholder={`Paragem ${i+1} - ex: Macia`} className="flex-1 border rounded px-2 py-1 text-[12px]" />
+                      <input value={p.valor} onChange={(e:any)=>{ const a=[...paragens]; a[i].valor=e.target.value.replace(/[^0-9]/g,''); setParagens(a); }} placeholder="Valor MT" inputMode="numeric" className="w-[100px] border rounded px-2 py-1 text-[12px]" />
+                      {paragens.length>1 && <button onClick={()=>setParagens(paragens.filter((_:any,j:number)=>j!==i))} className="bg-red-100 text-red-600 px-2 rounded text-[11px]">X</button>}
+                    </div>
+                  ))}
+                  <div className="flex gap-2 mt-2">
+                    {paragens.length<15 && <button onClick={()=>setParagens([...paragens,{nome:'',valor:''}])} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[11px] font-bold">+ Adicionar Paragem ({paragens.length}/15)</button>}
+                    <span className="text-[11px] text-gray-500 py-1">Máximo 15 paragens.</span>
+                  </div>
+                </div>
+<div className="flex gap-2 mt-4"><button onClick={submeterViatura} className="flex-1 bg-[#0a66c2] text-white py-3 rounded-full font-bold text-[13px]">SUBMETER VIATURA - Esperar Aprovacao</button><button onClick={ligarGps} className="flex-1 bg-green-600 text-white py-3 rounded-full font-bold text-[13px]">{gpsAtivo?'GPS LIGADO - Telefone do Motorista':'LIGAR GPS AO VIVO - No Telefone do Motorista'}</button></div>
                 {mostrarMaisCarros && (<div className="mt-3 bg-green-50 border border-green-200 rounded p-3 text-center"><div className="text-[12px] font-bold">Viatura submetida! Queres registar mais carros?</div><button onClick={()=>{ setMostrarMaisCarros(false); setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); }} className="mt-2 bg-[#0a66c2] text-white px-5 py-2 rounded-full font-bold text-[12px]">+ REGISTAR MAIS CARROS</button></div>)}
               </div>
               <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Minhas Viaturas Submetidas ({viaturasTrans.length}) - Estado</h3>
