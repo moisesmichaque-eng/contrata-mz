@@ -21,10 +21,16 @@ export default function ViajarReal(){
   const getContasPass = () => { try{ return JSON.parse(localStorage.getItem('viajar_passageiro_contas')||'[]'); }catch(e){ return []; } };
   const salvarContaPassLocal = (conta:any) => { const lista=getContasPass(); const sem=lista.filter((c:any)=>c.tel!==conta.tel); sem.unshift(conta); localStorage.setItem('viajar_passageiro_contas', JSON.stringify(sem)); return sem; };
   const entrarPassageiro = async () => {
-    if(!formPass.nome.trim()){ alert('Escreve o teu Nome'); return; }
-    const telOK=validarTelMZ(formPass.tel);
-    if(!telOK){ alert('Numero invalido! Escreve um numero valido de Mocambique: ex: 84 123 4567 (9 digitos, comeca com 82,83,84,85,86,87)'); return; }
-    const nome=formPass.nome.trim();
+    // Se a pessoa pôs o telefone no campo NOME (como na foto: 840532899 no Nome), troca sozinho
+    let nomeCampo = formPass.nome.trim();
+    let telCampo = formPass.tel.trim();
+    if(/^[0-9 +]+$/.test(nomeCampo) && !validarTelMZ(telCampo) && validarTelMZ(nomeCampo)){
+      telCampo = nomeCampo; nomeCampo = 'Passageiro';
+    }
+    if(!nomeCampo){ alert('Escreve o teu nome'); return; }
+    const telOK=validarTelMZ(telCampo);
+    if(!telOK){ alert('Telefone inválido. Ex: 84 123 4567'); return; }
+    const nome=nomeCampo;
     try{
       const {data:ex} = await supabase.from('viagens_passageiros').select('*').eq('username', telOK).limit(1);
       if(ex && ex.length>0){
@@ -41,7 +47,7 @@ export default function ViajarReal(){
     if(!guardado){ alert('Atenção: tabela viagens_passageiros ainda não existe no Supabase! Vou guardar neste telefone, mas cria a tabela com o SQL em baixo para funcionar noutro telefone.'); }
     salvarContaPassLocal(p); setPassLogado(p); localStorage.setItem('viajar_passageiro_sessao', JSON.stringify(p));
     setNomePass(p.nome); setTelPass(p.tel); setAba('passageiro');
-    alert('Bem-vindo '+p.nome+'! Conta passageiro REAL criada! Numero: '+telOK);
+    alert('Bem-vindo '+p.nome+'!');
   };
   const sairPassageiro = () => { setPassLogado(null); localStorage.removeItem('viajar_passageiro_sessao'); setPapel(null); };
   const sairTransportador = () => { setTransLogado(null); localStorage.removeItem('viajar_transportador_sessao'); setPapel(null); };
@@ -102,9 +108,9 @@ export default function ViajarReal(){
     const { data } = await supabase.from('viagens_motoristas').select('*').eq('status','ONLINE').order('ultima_atualizacao',{ascending:false});
     setLista((data as any[])||[]); setCarregando(false);
   };
-  const pedirGPS = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); },()=>{ setPermissao('denied'); alert('Localizacao nao permitida! Clica Allow While Using App para veres os carros perto de ti.'); },{enableHighAccuracy:true, timeout:10000}); };
-  // Como inDrive: Allow While Using App - pede localizacao com Precise: On
-  const pedirLocalizacaoPassageiro = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } setPermissao('prompt'); navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); alert('Localizacao ativada! Agora vês os carros perto de ti + distancia + ETA a 90 km/h.'); },()=>{ setPermissao('denied'); alert('Clica Allow While Using App no aviso do telefone para ativares a localizacao.'); },{enableHighAccuracy:true, timeout:15000, maximumAge:0}); };
+  const pedirGPS = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); },()=>{ setPermissao('denied'); alert('Localizacao nao permitida! Clica Permitir para veres os carros perto de ti.'); },{enableHighAccuracy:true, timeout:10000}); };
+  // Como inDrive: Permitir - pede localizacao com Precise: On
+  const pedirLocalizacaoPassageiro = () => { if(!navigator.geolocation){ alert('Este telefone nao tem GPS'); return; } setPermissao('prompt'); navigator.geolocation.getCurrentPosition((pos:any)=>{ setPassageiroPos({lat:pos.coords.latitude,lng:pos.coords.longitude}); setPermissao('granted'); alert('Localizacao ativada! Agora vês os carros perto de ti + distancia + ETA a 90 km/h.'); },()=>{ setPermissao('denied'); alert('Clica Permitir no aviso do telefone para ativares a localizacao.'); },{enableHighAccuracy:true, timeout:15000, maximumAge:0}); };
   useEffect(()=>{ carregarReais(); pedirGPS(); if(navigator.permissions) navigator.permissions.query({name:'geolocation' as any}).then((r:any)=>setPermissao(r.state)); },[]);
   // FASE 1 - Marcadores MAPA REAL - aqui 'lista' já existe, sem erro TDZ!
   useEffect(()=>{
@@ -203,52 +209,46 @@ export default function ViajarReal(){
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-black p-4 font-sans"><div className="max-w-6xl mx-auto">
       <div className="bg-white rounded-xl shadow-sm border p-6 mb-4">
-<div style={{borderRadius:16, overflow:'hidden', background:'linear-gradient(90deg,#0E7A5A,#0B3D91)', color:'white'}}>
-          <img src="/minibus-wezha.jpg" alt="Minibus WEZHA a viajar - Sem filas!" style={{width:'100%', maxHeight:240, objectFit:'cover', display:'block'}} />
-          <div style={{padding:'14px 16px'}}>
-            <h1 style={{margin:0, fontSize:22, fontWeight:900}}>Chega de filas! Viaja com WEZHA! 🚌</h1>
-            <p style={{margin:'6px 0 0', fontSize:13, opacity:.92}}>Reserva o teu lugar no telefone, sem ir para a paragem cedo! Vês o minibus a chegar, pagas com M-Pesa e viajas tranquilo! {lista.length} carros online agora!</p>
-            <div style={{display:'flex', gap:6, marginTop:10, flexWrap:'wrap'}}>
-              <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>✅ Sem fila - Reserva já!</span>
-              <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>📍 Vês o carro a chegar!</span>
-              <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>💳 Paga com M-Pesa!</span>
-            </div>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold text-[#0a66c2]">VIAJAR - 100% REAL</h1>
+        <p className="text-[12px] text-gray-600 mt-1">2 Paineis: Transportador (regista, submete, espera aprovar) | Passageiro (ve mapa, carros, rotas, reserva) - {lista.length} ONLINE</p>
+        <p className="text-[11px] mt-2">Passageiro GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido'}</p>
+        <p className="text-[11px] mt-2">Passageiro GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido - clica Permitir em baixo'}</p>
         <div className="flex gap-2 mt-4 flex-wrap">
-          <button onClick={()=>{ setPapel('passageiro'); setAba('passageiro'); }} className={`px-7 py-3.5 rounded-full text-[15px] font-bold shadow-lg ${papel==='passageiro'?'bg-green-600 text-white':'bg-green-100 text-green-800'}`}>Sou Passageiro - Procurar Carros e Reservar</button>
-          <button onClick={()=>{ setPapel('transportador'); setAba('transportador'); }} className={`px-7 py-3.5 rounded-full text-[15px] font-bold shadow-lg ${papel==='transportador'?'bg-[#0a66c2] text-white':'bg-blue-100 text-blue-800'}`}>Sou Transportador - Registar Viatura</button>
+          <button onClick={()=>{ setPapel('passageiro'); setAba('passageiro'); }} className={`px-5 py-2 rounded-full text-[13px] font-bold ${papel==='passageiro'?'bg-green-600 text-white':'bg-green-100 text-green-800'}`}>Sou Passageiro</button>
+          <button onClick={()=>{ setPapel('transportador'); setAba('transportador'); }} className={`px-5 py-2 rounded-full text-[13px] font-bold ${papel==='transportador'?'bg-[#0a66c2] text-white':'bg-blue-100 text-blue-800'}`}>Sou Transportador</button>
           {(papel||passLogado||transLogado) && (<button onClick={()=>{ setPapel(null); setPassLogado(null); localStorage.removeItem('viajar_passageiro_sessao'); }} className="bg-gray-100 px-4 py-2 rounded-full text-[11px]">Sair / Trocar de Porta</button>)}
           <button onClick={carregarReais} className="bg-gray-100 px-4 py-2 rounded-full text-[11px]">Recarregar</button>
         </div>
-        {!papel && (<div className="mt-3 bg-green-50 border border-green-200 rounded-xl p-3 text-[12px]">👋 <b>Escolhe:</b> És <b>Passageiro</b>? Procura o teu carro e reserva! És <b>Transportador</b>? Regista a tua viatura e recebe reservas!</div>)}
+        {!papel && (<div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 text-[12px]">Escolhe a tua porta: <b>Sou Passageiro</b> = so procuras carros, reservas bilhetes e viajas. <b>NAO</b> vês a area do transportador. <b>Sou Transportador</b> = registas viatura, documentos, GPS e recebes reservas. Cada porta tem a sua entrada com numero de telefone.</div>)}
       </div>
       {/* PORTA PASSAGEIRO - como inDrive: numero valido -> entra so para procurar carros, reservar e viajar. NAO ve transportador. */}
       {papel==='passageiro' && !passLogado && (
         <div className="space-y-4">
           <div className="bg-green-600 rounded-xl p-6 text-white">
-            <h2 className="font-black text-[18px]">Passageiro - Porta de Entrada</h2>
-            <p className="text-[11px] mt-1">Escreve o teu numero de telefone valido para entrares. So vais poder: procurar carros, ver distancia + ETA, reservar bilhetes e viajar. NAO vais ver a area do transportador.</p>
+            <h2 className="font-black text-[18px]">Passageiro</h2>
+            <p className="text-[11px] mt-1">Escreve nome + telefone e entra.</p>
             <div className="grid grid-cols-2 gap-3 mt-4 bg-white text-black rounded-xl p-4">
               <div><label className="text-[11px] font-bold">Nome Completo *</label><input value={formPass.nome} onChange={e=>setFormPass({...formPass,nome:e.target.value})} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="Teu nome" /></div>
               <div><label className="text-[11px] font-bold">Numero de Telefone * - Valido Mocambique</label><input value={formPass.tel} onChange={e=>setFormPass({...formPass,tel:e.target.value})} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="84 123 4567" /></div>
             </div>
-            <p className="text-[10px] mt-2">Ex: 82, 83, 84, 85, 86, 87 - 9 digitos. Se escreveres 258841234567 tambem aceita.</p>
-            <button onClick={entrarPassageiro} className="w-full mt-3 bg-white text-green-700 py-3 rounded-full font-bold text-[13px]">ENTRAR COMO PASSAGEIRO - Procurar Carros</button>
-            <div className="mt-3 bg-white/10 rounded p-2 text-[11px]">Conta passageiro REAL: fica guardada no servidor (viagens_passageiros) + neste telefone. Para entrar noutro telefone usa o mesmo numero.</div>
+            <p className="text-[10px] mt-2">Ex: 84 123 4567</p>
+            <button onClick={entrarPassageiro} className="w-full mt-3 bg-white text-green-700 py-3 rounded-full font-bold text-[13px]">ENTRAR</button>
+            
             {getContasPass().length>0 && (<div className="mt-2 bg-white text-black rounded p-2 text-[11px]"><b>Contas passageiro neste telefone ({getContasPass().length}):</b>{getContasPass().map((c:any)=>(<div key={c.tel} className="flex justify-between mt-1"><span>{c.nome} - {c.tel}</span><button onClick={()=>{ setFormPass({nome:c.nome, tel:c.tel}); }} className="bg-green-600 text-white px-2 py-1 rounded-full text-[10px]">Usar este numero</button></div>))}</div>)}
           </div>
+          {permissao!=='granted' && permissao!=='denied' && (
           <div className="bg-white rounded-xl border p-6">
-            <h3 className="font-bold text-[16px]">Allow VIAJAR to use your location?</h3>
-            <p className="text-[12px] text-gray-600 mt-1">Location helps the app work correctly, makes navigation easier and ensures better safety - como no inDrive.</p>
-            <div className="mt-3 bg-[#e8f5e9] border rounded p-3 text-[12px]"><span className="bg-white px-2 py-1 rounded-full text-[#0a66c2] font-bold">Precise: On</span><span className="ml-2">O ponto azul no mapa és tu. Os carros perto de ti aparecem com distancia + ETA a 90 km/h.</span></div>
+            <h3 className="font-bold text-[16px]">Permitir localização?</h3>
+            <p className="text-[12px] text-gray-600 mt-1">Mostra os carros mais perto de ti.</p>
+            <div className="mt-3 bg-[#e8f5e9] border rounded p-3 text-[12px]"><span className="bg-white px-2 py-1 rounded-full text-[#0a66c2] font-bold">Precise: On</span><span className="ml-2">Vês os carros perto de ti.</span></div>
             <div className="grid gap-2 mt-3">
-              <button onClick={pedirLocalizacaoPassageiro} className="w-full py-2 rounded-full text-[#0a66c2] font-bold text-[14px] border">Allow While Using App</button>
-              <button onClick={pedirLocalizacaoPassageiro} className="w-full py-2 rounded-full text-[#0a66c2] text-[13px] border">Allow Once</button>
+              <button onClick={pedirLocalizacaoPassageiro} className="w-full py-2 rounded-full text-[#0a66c2] font-bold text-[14px] border">Permitir</button>
+              <button onClick={pedirLocalizacaoPassageiro} className="w-full py-2 rounded-full text-[#0a66c2] text-[13px] border">Permitir uma vez</button>
               <button onClick={()=>{ setPermissao('denied'); alert('Sem localizacao, nao consegues ver a distancia dos carros ate ti. Podes procurar por rota, mas sem ETA.'); }} className="w-full py-2 rounded-full text-[#0a66c2] text-[13px] border">Don&apos;t Allow</button>
             </div>
-            <p className="text-[11px] mt-2 text-gray-500">📍 A tua localização ajuda a mostrar os carros mais perto de ti.</p>
+            <p className="text-[11px] mt-2">A tua localização mostra os carros mais perto de ti.</p>
           </div>
+          )}
         </div>
       )}
       {papel==='transportador' && (
@@ -256,7 +256,7 @@ export default function ViajarReal(){
           {!transLogado ? (
             <div className="bg-[#0a66c2] rounded-xl p-6 text-white">
               <h2 className="font-black text-[18px]">Transportador - Criar Conta / Entrar</h2>
-              <p className="text-[11px] mt-1">Como VENDER: cria conta, depois documentos, depois submete viatura e espera o dono aceitar.</p>
+              
               <div className="grid grid-cols-2 gap-3 mt-4 bg-white text-black rounded-xl p-4">
                 <div><label className="text-[11px] font-bold">Nome Completo *</label><input value={formTrans.nome} onChange={e=>setFormTrans({...formTrans,nome:e.target.value})} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="Nome do transportador" /></div>
                 <div><label className="text-[11px] font-bold">Telefone / WhatsApp *</label><input value={formTrans.tel} onChange={e=>setFormTrans({...formTrans,tel:e.target.value})} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="84..." /></div>
@@ -307,14 +307,14 @@ export default function ViajarReal(){
       )}
       {papel==='passageiro' && passLogado && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[16px]">Passageiro - {passLogado?.nome} - {passLogado?.tel} - Escolhe a Viatura e clica Reservar</h3><div className="flex gap-2 mt-2 flex-wrap"><button onClick={pedirLocalizacaoPassageiro} className="bg-green-600 text-white px-4 py-2 rounded-full text-[12px] font-bold">Enable location services - Allow While Using App</button><button onClick={sairPassageiro} className="bg-gray-100 px-3 py-1 rounded-full text-[11px]">Sair como Passageiro</button><span className="text-[11px] py-2">GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido'}</span></div><p className="text-[11px] text-gray-500 mt-1">Só podes: procurar carros, ver distancia + ETA a 90 km/h, reservar bilhetes e viajar. NAO tens acesso à area do Transportador.</p><p className="text-[11px] text-gray-500 mt-1">O formulario de reserva esta DENTRO de cada viatura, no botao Reservar. Escolhe a viatura em baixo, clica Reservar, preenche e confirma. O bilhete fica ocupado e o motorista + dono recebem notificacao.</p>
+          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[16px]">Passageiro - {passLogado?.nome} - {passLogado?.tel} - Escolhe a Viatura e clica Reservar</h3><div className="flex gap-2 mt-2 flex-wrap"><button onClick={pedirLocalizacaoPassageiro} className="bg-green-600 text-white px-4 py-2 rounded-full text-[12px] font-bold">Enable location services - Permitir</button><button onClick={sairPassageiro} className="bg-gray-100 px-3 py-1 rounded-full text-[11px]">Sair como Passageiro</button><span className="text-[11px] py-2">GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido'}</span></div><p className="text-[11px] text-gray-500 mt-1">Só podes: procurar carros, ver distancia + ETA a 90 km/h, reservar bilhetes e viajar. NAO tens acesso à area do Transportador.</p><p className="text-[11px] text-gray-500 mt-1">O formulario de reserva esta DENTRO de cada viatura, no botao Reservar. Escolhe a viatura em baixo, clica Reservar, preenche e confirma. O bilhete fica ocupado e o motorista + dono recebem notificacao.</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3"><div><label className="text-[11px] font-bold">Origem</label><select value={origem} onChange={e=>setOrigem(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px]">{Object.keys(CIDADES).map((c:string)=>(<option key={c}>{c}</option>))}</select></div><div><label className="text-[11px] font-bold">Destino</label><select value={destino} onChange={e=>setDestino(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px]">{Object.keys(CIDADES).map((c:string)=>(<option key={c}>{c}</option>))}</select></div><div className="bg-[#fffbeb] border rounded p-2 text-[12px]">Rota: <b>{origem} -&gt; {destino}</b><br/>Distancia: <b>{rotaInfo.distEstrada.toFixed(1)} km</b> | ETA <b>{rotaInfo.etaMin} min</b> | <b>{rotaInfo.precoPP}MT/pessoa</b></div><div className="bg-green-50 border rounded p-2 text-[12px]">Minhas Reservas: <b>{reservas.length}</b><br/>{reservas.slice(0,3).map((r:any)=>(<div key={r.id}>{r.matricula} - Assento {r.assento||'-'} - {r.total}MT - {r.status}</div>))}</div></div>
             <div className="flex gap-2 mt-3"><select value={filtroRota} onChange={e=>setFiltroRota(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Xai-Xai -&gt; Maputo</option><option>Maputo -&gt; Xai-Xai</option><option>Matola -&gt; Maputo</option></select><select value={filtroCor} onChange={e=>setFiltroCor(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Branco</option><option>Preto</option><option>Prateado</option><option>Vermelho</option><option>Azul</option></select></div>
             {reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length>0 && (<div className="mt-3 border-t pt-2"><div className="font-bold text-[12px]">Minhas Reservas ({reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length}) - {passLogado?.nome}</div>{reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).slice(0,5).map((r:any)=>(<div key={r.id} className="text-[11px] border rounded px-2 py-1 mt-1 flex justify-between"><span><b>{r.origem} -&gt; {r.destino}</b> - {r.numPass} pessoa(s) - {r.total}MT - {r.matricula} - {r.status}</span><span>{r.data}</span></div>))}</div>)}
           </div>
           <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa REAL - Carros ONLINE / APROVADOS - OpenStreetMap</h3><p className="text-[11px] text-gray-500">Mapa real que diz a verdade: ponto = GPS real do Supabase (lat/lng). Clica no ponto para ver matricula + motorista + rota. Ponto vermelho = tu (GPS real).</p>
             <div ref={mapaRef} className="w-full h-[380px] border rounded mt-3 z-0" style={{minHeight:380}}></div>
-            <p className="text-[10px] text-gray-500 mt-2">Fonte: OpenStreetMap + Leaflet. Se não vês o mapa, verifica internet. Carros sem lat/lng não aparecem - liga GPS no painel Transportador. Tu: {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'GPS não obtido - clica Allow While Using App'} | Carros com GPS: {lista.filter((v:any)=>v.lat&&v.lng).length} / {lista.length}</p>
+            <p className="text-[10px] text-gray-500 mt-2">Fonte: OpenStreetMap + Leaflet. Se não vês o mapa, verifica internet. Carros sem lat/lng não aparecem - liga GPS no painel Transportador. Tu: {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'GPS não obtido - clica Permitir'} | Carros com GPS: {lista.filter((v:any)=>v.lat&&v.lng).length} / {lista.length}</p>
           </div>
           <div className="grid md:grid-cols-2 gap-3">
             {listaPassageiro.length===0 && viaturasAprovadas.length===0 && (<div className="bg-white p-6 rounded-xl border text-center text-[13px] text-gray-500">Nenhuma viatura ONLINE / APROVADA - transportador deve submeter e dono aprovar, depois ligar GPS.</div>)}
