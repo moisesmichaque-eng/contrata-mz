@@ -66,18 +66,21 @@ export default function ViajarReal(){
     const link=document.createElement('link'); link.rel='stylesheet'; link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
     const s=document.createElement('script'); s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.onload=()=>resolve(); s.onerror=()=>resolve(); document.head.appendChild(s);
   });
+  const garantirMapa = ()=>{
+    const L=(window as any).L; if(!L || !mapaRef.current) return null;
+    if(leafletMapRef.current){ try{ leafletMapRef.current.invalidateSize(); }catch(e){} return leafletMapRef.current; }
+    const centro = passageiroPos ? [passageiroPos.lat, passageiroPos.lng] : [-25.9655, 32.5832];
+    const m=L.map(mapaRef.current).setView(centro, 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(m);
+    leafletMapRef.current=m;
+    setTimeout(()=>{ try{ m.invalidateSize(); }catch(e){} }, 300);
+    return m;
+  };
   useEffect(()=>{
     let cancel=false;
-    carregarLeaflet().then(()=>{
-      if(cancel || !mapaRef.current || leafletMapRef.current) return;
-      const L=(window as any).L; if(!L) return;
-      const centro = passageiroPos ? [passageiroPos.lat, passageiroPos.lng] : [-25.9655, 32.5832];
-      const m=L.map(mapaRef.current).setView(centro, 11);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(m);
-      leafletMapRef.current=m;
-    });
+    carregarLeaflet().then(()=>{ if(!cancel){ garantirMapa(); setTimeout(garantirMapa, 600); setTimeout(garantirMapa, 1500); } });
     return ()=>{ cancel=true; };
-  },[]);
+  },[papel, passLogado]);
   const [permissao, setPermissao] = useState<any>('unknown');
   const [lista, setLista] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(false);
@@ -139,7 +142,7 @@ export default function ViajarReal(){
   useEffect(()=>{ carregarReais(); pedirGPS(); if(navigator.permissions) navigator.permissions.query({name:'geolocation' as any}).then((r:any)=>setPermissao(r.state)); },[]);
   // FASE 1 - Marcadores MAPA REAL - aqui 'lista' já existe, sem erro TDZ!
   useEffect(()=>{
-    const L=(window as any).L; const m=leafletMapRef.current; if(!L || !m) return;
+    const L=(window as any).L; let m=leafletMapRef.current; if(!L) return; if(!m) m=garantirMapa(); if(!m) return; try{ m.invalidateSize(); }catch(e){}
     leafletMarcadoresRef.current.forEach((mk:any)=>{ try{ m.removeLayer(mk); }catch(e){} });
     leafletMarcadoresRef.current=[];
     if(passageiroPos){
@@ -253,9 +256,9 @@ export default function ViajarReal(){
           </div>
         )}
         {/* IMAGEM MINIBUS - sempre visivel na primeira pagina, antes de entrar - imagem de public/minibus-wezha.jpg */}
-        {!passLogado && !transLogado && (
+        {true && (
           <div className="mt-4 rounded-xl overflow-hidden border bg-white">
-            <img src="/minibus-wezha.jpg" alt="Minibus WEZHA - Expresso Maputo" onError={(e:any)=>{ const el=e.currentTarget; const tentativas=['/minibus-wezha.jpg','/minibus-wezha.jpeg','/minibus-wezha.png','/minibus-wezha.jfif','/minibus-wezha.webp']; const atual=tentativas.indexOf(new URL(el.src).pathname); if(atual>=0 && atual<tentativas.length-1){ el.src=tentativas[atual+1]; } else { el.style.display='none'; } }} className="w-full h-[280px] object-cover block" />
+            <img src="/minibus-wezha.jpg" alt="Minibus WEZHA - Expresso Maputo" onError={(e:any)=>{ const el=e.currentTarget; const tentativas=['/minibus-wezha.jpg','/minibus-wezha.jpeg','/minibus-wezha.png','/minibus-wezha.jfif','/minibus-wezha.webp']; const atual=tentativas.indexOf(new URL(el.src).pathname); if(atual>=0 && atual<tentativas.length-1){ el.src=tentativas[atual+1]; } else { el.style.display='none'; const fb=document.getElementById('minibus-fallback'); if(fb) fb.style.display='flex'; } }} className="w-full h-[280px] object-cover block" /><div id="minibus-fallback" style={{display:'none'}} className="w-full h-[280px] bg-[#0a66c2] text-white flex flex-col items-center justify-center"><b className="text-[18px]">🚌 Minibus WEZHA - Expresso Maputo</b><span className="text-[12px] mt-1">Foto em public/minibus-wezha.jpg - se nao vês a foto, o ficheiro nao foi para o GitHub</span></div>
             <div className="p-3 flex justify-between items-center"><b className="text-[13px]">Viaja tranquilo, sem stress!</b><span className="text-[11px] text-gray-500">M-Pesa • e-Mola • mKesh</span></div>
           </div>
         )}
@@ -395,7 +398,7 @@ export default function ViajarReal(){
             <div className="flex gap-2 mt-3"><select value={filtroRota} onChange={e=>setFiltroRota(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Xai-Xai -&gt; Maputo</option><option>Maputo -&gt; Xai-Xai</option><option>Matola -&gt; Maputo</option></select><select value={filtroCor} onChange={e=>setFiltroCor(e.target.value)} className="border rounded px-3 py-1 text-[12px]"><option>Todas</option><option>Branco</option><option>Preto</option><option>Prateado</option><option>Vermelho</option><option>Azul</option></select></div>
             {reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length>0 && (<div className="mt-3 border-t pt-2"><div className="font-bold text-[12px]">Minhas Reservas ({reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).length}) - {passLogado?.nome}</div>{reservas.filter((r:any)=>!passLogado || r.telPass===passLogado.tel).slice(0,5).map((r:any)=>(<div key={r.id} className="text-[11px] border rounded px-2 py-1 mt-1 flex justify-between"><span><b>{r.origem} -&gt; {r.destino}</b> - {r.numPass} pessoa(s) - {r.total}MT - {r.matricula} - {r.status}</span><span>{r.data}</span></div>))}</div>)}
           </div>
-          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p><div className="flex gap-2 mt-2 flex-wrap items-center"><button onClick={()=>{ pedirLocalizacaoPassageiro(); carregarReais(); }} className="bg-[#0a66c2] text-white px-3 py-1 rounded-full text-[11px] font-bold">📍 Permitir localização / Atualizar Mapa</button><span className="text-[11px]">GPS: {permissao} | Carros no mapa: {lista.length}</span></div>
+          <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Mapa - Carros ONLINE</h3><p className="text-[11px] text-gray-500">Clica no ponto para ver o carro.</p><div className="flex gap-2 mt-2 flex-wrap items-center"><button onClick={()=>{ pedirLocalizacaoPassageiro(); carregarReais(); setTimeout(()=>{ garantirMapa(); }, 400); }} className="bg-[#0a66c2] text-white px-3 py-1 rounded-full text-[11px] font-bold">📍 Permitir localização / Atualizar Mapa</button><span className="text-[11px]">GPS: {permissao} | Carros no mapa: {lista.length}</span></div>
             <div ref={mapaRef} className="w-full h-[380px] border rounded mt-3 z-0" style={{minHeight:380}}></div>
             
           </div>
