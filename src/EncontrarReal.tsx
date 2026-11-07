@@ -35,6 +35,9 @@ export default function EncontrarReal() {
   const [lista, setLista] = useState<TecnicoRealDB[]>([]);
   const [busca, setBusca] = useState('');
   const [filtroTipo, setFiltroTipo] = useState<'TODOS'|'PROFISSIONAL'|'EMPRESA'>('TODOS');
+  const [filtroPais, setFiltroPais] = useState('');
+  const [filtroProvincia, setFiltroProvincia] = useState('');
+  const [filtroDistrito, setFiltroDistrito] = useState('');
   const [carregando, setCarregando] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [tipoForm, setTipoForm] = useState<'PROFISSIONAL' | 'EMPRESA'>('PROFISSIONAL');
@@ -142,7 +145,19 @@ export default function EncontrarReal() {
     setCarregando(false);
   };
 
-  const listaFiltrada = lista.filter((p:any)=> { if(filtroTipo==='TODOS') return true; const tipo = String(p.tipo||p.tipo_perfil||p.profissao||'').toUpperCase(); if(filtroTipo==='EMPRESA') return tipo.includes('EMPRESA') || String(p.empresa||'').length>0; return !tipo.includes('EMPRESA') && !String(p.empresa||'').length; });
+  const listaFiltrada = lista.filter((p:any)=> {
+    // Tipo: Profissional / Empresa / Todos
+    if(filtroTipo!=='TODOS'){
+      const tipo = String(p.tipo||p.tipo_perfil||p.profissao||'').toUpperCase();
+      if(filtroTipo==='EMPRESA' && !(tipo.includes('EMPRESA') || String(p.empresa||'').length>0)) return false;
+      if(filtroTipo==='PROFISSIONAL' && (tipo.includes('EMPRESA') || String(p.empresa||'').length>0)) return false;
+    }
+    // Perto de ti: Pais / Provincia / Distrito - tudo real do Supabase
+    if(filtroPais && String(p.pais||'').toLowerCase() !== filtroPais.toLowerCase()) return false;
+    if(filtroProvincia && String(p.provincia||'').toLowerCase() !== filtroProvincia.toLowerCase()) return false;
+    if(filtroDistrito && !String(p.distrito||p.zona||'').toLowerCase().includes(filtroDistrito.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-black p-4 font-sans">
@@ -181,6 +196,41 @@ export default function EncontrarReal() {
                 </div>
               </div>
               <button onClick={carregarReais} style={{background:'black', color:'white', padding:'11px 20px', borderRadius:999, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', marginTop:18}}>PESQUISAR</button>
+            </div>
+            <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:12, alignItems:'end'}}>
+              <div style={{flex:1, minWidth:130}}>
+                <label style={{fontSize:11, fontWeight:800}}>📍 País - Onde estás?</label>
+                <select value={filtroPais} onChange={e=> setFiltroPais(e.target.value)} style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 10px', fontSize:12, marginTop:4, background:'white'}}>
+                  <option value="">Todos os países</option>
+                  <option value="Moçambique">Moçambique</option>
+                  <option value="África do Sul">África do Sul</option>
+                  <option value="Zimbabwe">Zimbabwe</option>
+                  <option value="Malawi">Malawi</option>
+                  <option value="Tanzânia">Tanzânia</option>
+                </select>
+              </div>
+              <div style={{flex:1, minWidth:150}}>
+                <label style={{fontSize:11, fontWeight:800}}>🏠 Província</label>
+                <select value={filtroProvincia} onChange={e=> setFiltroProvincia(e.target.value)} style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 10px', fontSize:12, marginTop:4, background:'white'}}>
+                  <option value="">Todas as províncias</option>
+                  <option value="Maputo Cidade">Maputo Cidade</option>
+                  <option value="Maputo Província">Maputo Província</option>
+                  <option value="Gaza">Gaza</option>
+                  <option value="Inhambane">Inhambane</option>
+                  <option value="Sofala">Sofala</option>
+                  <option value="Manica">Manica</option>
+                  <option value="Tete">Tete</option>
+                  <option value="Zambézia">Zambézia</option>
+                  <option value="Nampula">Nampula</option>
+                  <option value="Niassa">Niassa</option>
+                  <option value="Cabo Delgado">Cabo Delgado</option>
+                </select>
+              </div>
+              <div style={{flex:1, minWidth:140}}>
+                <label style={{fontSize:11, fontWeight:800}}>📌 Distrito / Zona - Perto de ti!</label>
+                <input value={filtroDistrito} onChange={e=> setFiltroDistrito(e.target.value)} placeholder="Ex: Xai-Xai, Matola, KaMpfumo..." style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 12px', fontSize:12, marginTop:4}} />
+              </div>
+              <button onClick={()=>{ setFiltroPais(''); setFiltroProvincia(''); setFiltroDistrito(''); }} style={{background:'white', border:'1px solid #ddd', padding:'9px 14px', borderRadius:999, fontSize:11, fontWeight:800, cursor:'pointer'}}>Limpar perto de mim</button>
             </div>
             <div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:10, alignItems:'center'}}>
               <span style={{fontSize:11, fontWeight:800}}>Tags Populares:</span>
