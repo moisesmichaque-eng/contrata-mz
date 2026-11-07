@@ -88,8 +88,8 @@ export default function EncontrarReal() {
   useEffect(() => { carregarReais(); }, []);
 
   const handleCadastro = async () => {
-    if (!form.nome || !form.email || !form.username || !form.password) {
-      alert('Preencha nome, email, username, password');
+    if (!form.nome || !form.username || !form.password) {
+      alert('Preencha nome, username e password. Email é opcional!');
       return;
     }
     if (form.password !== form.confirmar) {
@@ -146,7 +146,6 @@ export default function EncontrarReal() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
           <div style={{borderRadius:16, overflow:'hidden', background:'linear-gradient(90deg,#0B3D91,#134E9E)', color:'white', padding:0}}>
-            <img src="/profissoes-wezha.jpg" alt="Carpinteiro, Serralheiro, Eletricista, Pedreiro - WEZHA" style={{width:'100%', maxHeight:240, objectFit:'cover', display:'block'}} />
             <div style={{padding:'14px 16px'}}>
               <h1 style={{margin:0, fontSize:22, fontWeight:900}}>Encontra o teu profissional perto de ti! 🛠️</h1>
               <p style={{margin:'6px 0 0', fontSize:13, opacity:.92}}>Precisas de um Carpinteiro? Um Serralheiro? Um Eletricista? Um Pedreiro? Estão aqui, em Maputo, Matola, Boane, Xai-Xai - verificados, com fotos e contrato! {lista.length} profissionais à tua espera!</p>
@@ -155,15 +154,8 @@ export default function EncontrarReal() {
                 <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>⚡ Eletricista - Luz segura!</span>
                 <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🔥 Serralheiro - Grade forte!</span>
                 <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🧱 Pedreiro - Casa firme!</span>
-                <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🔧 Canalizador - Sem fuga!</span>
-                <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🌿 Jardineiro - Jardim lindo!</span>
-                <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🏠 Doméstica - Casa limpa!</span>
-                <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🎨 Pintor - Parede nova!</span>
-                <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🔧 Mecânico - Carro pronto!</span>
               </div>
-                        </div>
-            <img src="/mais-profissoes-wezha.jpg" alt="Canalizador, Jardineiro, Domestica, Pintor, Mecanico - WEZHA" style={{width:'100%', maxHeight:200, objectFit:'cover', display:'block', marginTop:8, borderRadius:12}} />
-            <div style={{padding:'8px 16px 14px', fontSize:11, opacity:.9}}>Mais profissionais: Canalizador • Jardineiro • Doméstica • Pintor • Mecânico • Babysitter - todos perto de ti!</div>
+            </div>
           </div>
           
           
@@ -219,7 +211,7 @@ export default function EncontrarReal() {
               <div className="p-6 border-b flex justify-between">
                 <div>
                   <h2 className="font-bold">{tipoForm === 'PROFISSIONAL' ? 'REGISTAR-ME - Profissional' : 'CADASTRAR-ME - Empresa'}</h2>
-                  <p className="text-[11px] text-gray-500">Email no lugar de BI - Username + Password + Confirmar + Anexos múltiplos - Compatível com tua tabela real</p>
+                  <p className="text-[11px] text-gray-500">Cria o teu perfil com o teu telefone - rápido e fácil!</p>
                 </div>
                 <button onClick={() => setMostrarForm(false)} className="text-2xl px-2">×</button>
               </div>
@@ -231,7 +223,7 @@ export default function EncontrarReal() {
                 </div>
 
                 <div><label className="text-[11px] font-bold">Nome *</label><input value={form.nome} onChange={e=>setForm({...form, nome:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" placeholder="Michaque Mungoi" /></div>
-                <div><label className="text-[11px] font-bold">Email * (no lugar de BI)</label><input value={form.email} onChange={e=>setForm({...form, email:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" type="email" placeholder="moisesmichaque@gmail.com" /></div>
+                <div><label className="text-[11px] font-bold">Email (opcional - se não tens, deixa vazio)</label><input value={form.email} onChange={e=>setForm({...form, email:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" type="email" placeholder="Ex: nome@gmail.com (opcional)" /></div>
                 <div><label className="text-[11px] font-bold">Username *</label><input value={form.username} onChange={e=>setForm({...form, username:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" placeholder="maderitomoises" /></div>
                 <div><label className="text-[11px] font-bold">Telefone *</label><input value={form.telefone} onChange={e=>setForm({...form, telefone:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" placeholder="840532899" /></div>
                 <div><label className="text-[11px] font-bold">Password *</label><input value={form.password} onChange={e=>setForm({...form, password:e.target.value})} type="password" className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" /></div>
@@ -260,7 +252,7 @@ export default function EncontrarReal() {
             <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-auto">
               <div className="p-6 border-b flex justify-between"><h3 className="font-bold">{perfilAberto.nome} - {perfilAberto.tipo}</h3><button onClick={()=>setPerfilAberto(null)} className="text-2xl">×</button></div>
               <div className="p-6 text-[13px] space-y-2">
-                <p><b>Email:</b> {perfilAberto.email} {perfilAberto.username ? `@${perfilAberto.username}` : '(sem username - antigo)'}</p>
+                <p>{perfilAberto.email ? `Email: ${perfilAberto.email} ` : ''}{perfilAberto.username ? `@${perfilAberto.username}` : '(sem username - antigo)'}</p>
                 <p><b>Telefone:</b> {perfilAberto.telefone} - WhatsApp: {perfilAberto.whatsapp}</p>
                 <p><b>Zona:</b> {perfilAberto.zona}, {perfilAberto.distrito}, {perfilAberto.provincia}</p>
                 <p><b>Profissão:</b> {perfilAberto.profissao}</p>
