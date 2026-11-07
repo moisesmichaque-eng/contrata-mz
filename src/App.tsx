@@ -10,11 +10,25 @@ import ContratosReal from './ContratosReal';
 let supabase: any = null; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
 
 export function LogoWezha({ size=32 }: any){
-  // Logo correto de /public/logo-wezha.jpg - pequeno, contain, sem cortar
-  // Antes era SVG desenhado e ficava cortado. Agora usa a imagem real que já está em public.
+  const [tentativa, setTentativa] = React.useState(0);
+  const fontes = ['/logo-wezha.jpg','/logo-wezha.png','/logo-wezha.jfif','/logo-wezha.jpeg','/logo-wezha.webp','/logo-wezha'];
+  // Se já tentou todos os nomes e nenhum existe, mostra o SVG (nunca fica partido!)
+  if(tentativa >= fontes.length){
+    return (
+      <div style={{position:'relative', width:size, height:size, flexShrink:0, background:'white', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}} title="WEZHA - TOTSHE">
+        <svg viewBox="0 0 100 100" style={{width:'92%',height:'92%'}}>
+          <path d="M 92 8 A 48 48 0 1 0 92 92 A 58 58 0 0 1 92 8" fill="#0B3D91" />
+          <path d="M 38 22 A 44 44 0 1 1 38 82 A 50 50 0 0 0 38 22" fill="#F5B81D" />
+          <circle cx="50" cy="50" r="32" fill="white" />
+          <text x="50" y="55" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#0B3D91" fontFamily="Georgia, serif">WEZHA</text>
+        </svg>
+        <span style={{position:'absolute', right:0, bottom:0, fontSize:6, fontWeight:800, color:'#0B3D91', background:'white', padding:'0 2px', borderRadius:4}}>TOTSHE</span>
+      </div>
+    );
+  }
   return (
-    <div style={{position:'relative', width:size, height:size, flexShrink:0, background:'white', borderRadius:'50%', padding:2, boxShadow:'0 1px 4px rgba(0,0,0,.12)', overflow:'hidden'}} title="WEZHA - TOTSHE">
-      <img src="/logo-wezha.jpg" alt="WEZHA" style={{width:'100%', height:'100%', objectFit:'contain', borderRadius:'50%', display:'block', background:'white'}} />
+    <div style={{position:'relative', width:size, height:size, flexShrink:0, background:'white', borderRadius:'50%', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', padding:2}} title="WEZHA - TOTSHE">
+      <img src={fontes[tentativa]} alt="WEZHA" onError={()=> setTentativa(tentativa+1)} style={{width:'100%', height:'100%', borderRadius:'50%', objectFit:'contain', background:'white', display:'block'}} />
     </div>
   );
 }
