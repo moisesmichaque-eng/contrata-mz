@@ -55,28 +55,18 @@ export default function ViajarReal(){
     const link=document.createElement('link'); link.rel='stylesheet'; link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
     const s=document.createElement('script'); s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.onload=()=>resolve(); s.onerror=()=>resolve(); document.head.appendChild(s);
   });
-  // FASE DONO - MAP FIX: mapa só nasce quando Passageiro entra! Antes nascia quando ainda não havia div, falhava e nunca mais tentava! Agora tenta de novo a cada 300ms até aparecer!
   useEffect(()=>{
-    if(!(papel==='passageiro' && passLogado)) return;
-    let cancel=false; let tentativas=0;
-    const tentar=()=>{
-      if(cancel) return;
-      if(!mapaRef.current){ tentativas++; if(tentativas<20) setTimeout(tentar, 300); return; }
-      if(leafletMapRef.current){ try{ leafletMapRef.current.invalidateSize(); }catch(e){} return; }
-      carregarLeaflet().then(()=>{
-        if(cancel || !mapaRef.current || leafletMapRef.current) return;
-        const L=(window as any).L; if(!L){ setTimeout(tentar, 500); return; }
-        const centro = passageiroPos ? [passageiroPos.lat, passageiroPos.lng] : [-25.9655, 32.5832];
-        const m=L.map(mapaRef.current).setView(centro, 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(m);
-        leafletMapRef.current=m;
-        setTimeout(()=>{ try{ m.invalidateSize(); }catch(e){} }, 500);
-      });
-    };
-    setTimeout(tentar, 300);
+    let cancel=false;
+    carregarLeaflet().then(()=>{
+      if(cancel || !mapaRef.current || leafletMapRef.current) return;
+      const L=(window as any).L; if(!L) return;
+      const centro = passageiroPos ? [passageiroPos.lat, passageiroPos.lng] : [-25.9655, 32.5832];
+      const m=L.map(mapaRef.current).setView(centro, 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(m);
+      leafletMapRef.current=m;
+    });
     return ()=>{ cancel=true; };
-  },[papel, passLogado]);
-  useEffect(()=>{ const m=leafletMapRef.current; if(!m || !passageiroPos) return; try{ m.setView([passageiroPos.lat, passageiroPos.lng], 13); m.invalidateSize(); }catch(e){} },[passageiroPos]);
+  },[]);
   const [permissao, setPermissao] = useState<any>('unknown');
   const [lista, setLista] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(false);
@@ -169,7 +159,7 @@ export default function ViajarReal(){
     const listaN=[nova, ...viaturasTrans]; setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
     // Tambem tenta criar no Supabase como OFFLINE (aguardar aprovacao, nao aparece para passageiro)
     try{ await supabase.from('viagens_motoristas').insert([{nome:formViat.nomeMotorista, carro:`${formViat.marca} ${formViat.modelo}`, matricula:formViat.matricula.toUpperCase(), provincia:formViat.provincia, cidade:formViat.cidade, telefone:formViat.telMotorista, lugares:parseInt(formViat.lugares)||15, destino_atual:formViat.destino, status:'OFFLINE', conta_id:transLogado.conta_id, ultima_atualizacao:new Date().toISOString(), updated_at:new Date().toISOString()}]); }catch(e){}
-    setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); setMostrarMaisCarros(true); try{ notificarDonoWhatsApp({matricula:formViat.matricula, marca:formViat.marca, modelo:formViat.modelo, cor:formViat.cor, nomeMotorista:formViat.nomeMotorista, telMotorista:formViat.telMotorista, nomeDono:formViat.nomeDono, distOrig:formViat.distOrig, distDest:formViat.distDest}); }catch(e){}
+    setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); setMostrarMaisCarros(true);
     alert('Viatura SUBMETIDA! A aguardar aprovacao do dono do aplicativo.');
   };
   const aprovarViatura = (id:any) => { // DONO DO APLICATIVO aprova
@@ -179,81 +169,6 @@ export default function ViajarReal(){
     carregarReais(); alert('Aprovada! Agora aparece para passageiros.');
   };
   const rejeitarViatura = (id:any) => { const listaN = viaturasTrans.map((v:any)=> v.id===id ? {...v, status:'REJEITADA'} : v); setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN)); };
-
-  // FASE 3 - MOTORISTA DE HOJE + SENTIDO ATUAL - Rota FIXA, Sentido muda 2x/dia! Botoes + Escrever!
-  const [motoristaHojeNome, setMotoristaHojeNome] = useState('');
-  const [motoristaHojeTel, setMotoristaHojeTel] = useState('');
-  const [sentidoTextoPorViatura, setSentidoTextoPorViatura] = useState<any>({});
-  const gerarSentidos = (v:any) => {
-    const orig = v.distOrig || v.cidade || v.origem || 'Origem';
-    const dest = v.distDest || v.destino_atual || v.destino || 'Destino';
-    let o=orig, d=dest;
-    if(String(dest).includes('->')){ const partes=String(dest).split('->'); if(partes.length===2){ o=partes[0].trim(); d=partes[1].trim(); } }
-    if(String(orig).includes('->')){ const partes=String(orig).split('->'); if(partes.length===2){ o=partes[0].trim(); d=partes[1].trim(); } }
-    return {orig:o, dest:d, ida:`${o} -> ${d}`, volta:`${d} -> ${o}`, paradoOrig:`Parado em ${o}`, paradoDest:`Parado em ${d}`};
-  };
-  const atualizarSentido = async (v:any, tipo:string) => {
-    const s=gerarSentidos(v);
-    let label='';
-    if(tipo==='ida') label=s.ida;
-    else if(tipo==='volta') label=s.volta;
-    else if(tipo==='parado_origem') label=s.paradoOrig;
-    else if(tipo==='parado_destino') label=s.paradoDest;
-    else label=s.ida;
-    const textoCustom=(sentidoTextoPorViatura[v.id]||'').trim();
-    const hora=new Date().toLocaleString('pt-MZ',{day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-    const nomeMot=(motoristaHojeNome||'').trim() || v.nomeMotorista || v.nome || '';
-    const telMot=(motoristaHojeTel||'').trim() || v.telMotorista || v.telefone || '';
-    const listaN=viaturasTrans.map((x:any)=> x.id===v.id ? {...x, sentidoAtual:label, sentidoTexto:textoCustom, sentidoHora:hora, nomeMotorista:nomeMot, telMotorista:telMot, telefone:telMot, destino_atual:label} : x);
-    setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
-    try{ await supabase.from('viagens_motoristas').update({nome:nomeMot, telefone:telMot, destino_atual:label}).eq('matricula', String(v.matricula||'').toUpperCase()); }catch(e){}
-    alert(`Sentido atualizado! ${v.matricula} - Agora: ${label}${textoCustom?` - ${textoCustom}`:''} - Atualizado às ${hora} - Motorista: ${nomeMot} - ${telMot}`);
-  };
-  // FASE DONO - 3 CLIQUES NO LOGO -> LOGIN DONO -> PAINEL DO DONO! Sem botão Admin visível! Sem password no código! Password fica só no Supabase viagens_admins!
-  const [logoCliques, setLogoCliques] = useState(0);
-  const [mostrarLoginDono, setMostrarLoginDono] = useState(false);
-  const [donoLogado, setDonoLogado] = useState<any>(()=>{ try{ return JSON.parse(sessionStorage.getItem('viajar_dono_sessao')||'null'); }catch(e){ return null; } });
-  const [donoUser, setDonoUser] = useState('');
-  const [donoPass, setDonoPass] = useState('');
-  const [motivoRejeicao, setMotivoRejeicao] = useState<any>({});
-  const DONO_WHATSAPP='258823832513';
-  const clicarLogo = () => { const n=logoCliques+1; setLogoCliques(n); if(n>=3){ setLogoCliques(0); setMostrarLoginDono(true); } setTimeout(()=>{ setLogoCliques(0); }, 2000); };
-  const loginDono = async () => {
-    const u=(donoUser||'').trim(); const p=(donoPass||'').trim();
-    if(!u || !p){ alert('Escreve Username + Password do Dono!'); return; }
-    try{
-      const {data} = await supabase.from('viagens_admins').select('*').eq('username', u).limit(1);
-      if(data && data.length>0 && String(data[0].password)===p){
-        const dono={username:u, nome:data[0].nome||'Dono VIAJAR', login_em:new Date().toLocaleString('pt-MZ')};
-        setDonoLogado(dono); sessionStorage.setItem('viajar_dono_sessao', JSON.stringify(dono));
-        setMostrarLoginDono(false); setDonoUser(''); setDonoPass('');
-        alert('Bem-vindo, Dono! Painel do Dono aberto!'); return;
-      }
-      alert('Username ou Password do Dono errada! Se ainda não criaste a conta do Dono, vai ao Supabase > viagens_admins > Insert e cria a tua conta!');
-    }catch(e){ alert('Erro a verificar Dono! Verifica se criaste a tabela viagens_admins com o SQL!'); }
-  };
-  const sairDono = () => { setDonoLogado(null); sessionStorage.removeItem('viajar_dono_sessao'); };
-  const aprovarViaturaDono = async (id:any) => {
-    const listaN=viaturasTrans.map((v:any)=> v.id===id ? {...v, status:'APROVADA'} : v);
-    setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
-    const v=viaturasTrans.find((x:any)=>x.id===id);
-    if(v){ try{ await supabase.from('viagens_motoristas').update({status:'APROVADA'}).eq('matricula', String(v.matricula||'').toUpperCase()); }catch(e){} }
-    if(v){ const msg=`VIAJAR - A tua viatura ${v.matricula} foi APROVADA pelo Dono! Agora podes ligar GPS e receber passageiros!`; const num=String(v.telMotorista||v.telefone||'').replace(/[^0-9]/g,''); if(num) window.open('https://wa.me/' + (num.startsWith('258')?num:'258'+num) + '?text=' + encodeURIComponent(msg), '_blank'); }
-    alert('Aprovada! Agora aparece para passageiros!');
-  };
-  const rejeitarViaturaDono = async (id:any) => {
-    const motivo=(motivoRejeicao[id]||'').trim();
-    if(!motivo){ alert('Escreve o motivo da rejeição! Ex: Seguro expirado!'); return; }
-    const listaN=viaturasTrans.map((v:any)=> v.id===id ? {...v, status:'REJEITADA', motivoRejeicao:motivo} : v);
-    setViaturasTrans(listaN); localStorage.setItem('viajar_viaturas_trans', JSON.stringify(listaN));
-    const v=viaturasTrans.find((x:any)=>x.id===id);
-    if(v){ try{ await supabase.from('viagens_motoristas').update({status:'REJEITADA'}).eq('matricula', String(v.matricula||'').toUpperCase()); }catch(e){} }
-    alert('Rejeitada! Motivo: '+motivo);
-  };
-  const notificarDonoWhatsApp = (v:any) => {
-    const msg=`VIAJAR - NOVA VIATURA A ESPERAR APROVAÇÃO! Matrícula: ${v.matricula} - ${v.marca} ${v.modelo} - Cor: ${v.cor} - Motorista: ${v.nomeMotorista||''} - ${v.telMotorista||''} - Dono: ${v.nomeDono||''} - Rota FIXA: ${v.distOrig||''} -> ${v.distDest||''} - Entra no Painel do Dono (3 cliques no logo) para ver documentos e aprovar!`;
-    window.open('https://wa.me/' + DONO_WHATSAPP + '?text=' + encodeURIComponent(msg), '_blank');
-  };
   const ligarGps = () => {
     if(!transLogado) return; const mat = viaturasTrans.find((v:any)=>v.status==='APROVADA')?.matricula || lista.find((v:any)=>v.conta_id===transLogado.conta_id)?.matricula;
     if(!mat){ alert('Primeiro submete e espera aprovar, ou usa viatura ja aprovada'); return; }
@@ -280,7 +195,7 @@ export default function ViajarReal(){
     const notiN=[noti, ...notificacoes]; setNotificacoes(notiN); localStorage.setItem('viajar_notificacoes', JSON.stringify(notiN));
     const msg=`RESERVA BILHETE Assento ${assentoSel||'-'} - ${origem} -> ${destinoCustom||destino} | ${numPass} pessoa(s) | ${rotaInfo.distEstrada.toFixed(1)} km | Total ${total}MT | Passageiro: ${nomePass} - ${telPass} | Familiar: ${nomeFamiliar} - ${telFamiliar} | Pag: ${modoPag} | Viatura: ${v.matricula}`;
     const num=String(v.telMotorista||v.telefone||v.tel||'').replace(/[^0-9]/g,''); if(num) window.open('https://wa.me/' + (num.startsWith('258')?num:'258'+num) + '?text=' + encodeURIComponent(msg), '_blank');
-    try{ const bilhete=`VIAJAR - BILHETE\nAssento: ${assentoSel||'-'}\nPassageiro: ${nomePass} - ${telPass}\nRota: ${origem} -> ${destinoCustom||destino}\nTotal: ${total}MT - Pag: ${modoPag}\nViatura: ${v.matricula}\nMotorista: ${v.nomeMotorista||v.nome||''} - ${v.telMotorista||v.telefone||''}\nData: ${new Date().toLocaleString('pt-MZ')}`; const blob=new Blob([bilhete], {type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`Bilhete-${v.matricula}-Assento-${assentoSel||'x'}.txt`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000); }catch(e){} alert(`RESERVADA! Bilhete Assento ${assentoSel||'-'} - ${origem} -> ${destino} - ${total}MT - ${v.matricula} - Bilhete fez DOWNLOAD + WhatsApp do Motorista aberto!`);
+    alert(`RESERVADA! Bilhete Assento ${assentoSel||'-'} - ${origem} -> ${destino} - ${total}MT - ${v.matricula} - Motorista + Dono notificados!`);
     setReservaViatura(null); setAssentoSel(null);
   };
   const enviarChat = (v:any) => { if(!chatTexto.trim()) return; const m1={de:'Tu', texto:chatTexto, hora:new Date().toLocaleTimeString('pt-MZ',{hour:'2-digit',minute:'2-digit'})}; setChatMsgs([...chatMsgs, m1]); setChatTexto(''); setTimeout(()=>{ setChatMsgs((prev:any)=>[...prev, {de:v.nome, texto:`Recebido! Estou a caminho ${origem} -> ${destino}. ETA ${rotaInfo.etaMin} min.`, hora:new Date().toLocaleTimeString('pt-MZ',{hour:'2-digit',minute:'2-digit'})}]); },1200); };
@@ -288,22 +203,25 @@ export default function ViajarReal(){
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-black p-4 font-sans"><div className="max-w-6xl mx-auto">
       <div className="bg-white rounded-xl shadow-sm border p-6 mb-4">
-        <h1 onClick={clicarLogo} style={{cursor:"pointer"}} title="VIAJAR" className="text-2xl font-bold text-[#0a66c2]">VIAJAR - 100% REAL</h1>
-        <p className="text-[12px] text-gray-600 mt-1">2 Paineis: Transportador (regista, submete, espera aprovar) | Passageiro (ve mapa, carros, rotas, reserva) - {lista.length} ONLINE</p>
-        <p className="text-[11px] mt-2">Passageiro GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido'}</p>
-        <p className="text-[11px] mt-2">Passageiro GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido - clica Allow While Using App em baixo'}</p>
+<div style={{borderRadius:16, overflow:'hidden', background:'linear-gradient(90deg,#0E7A5A,#0B3D91)', color:'white'}}>
+          <img src="/minibus-wezha.jpg" alt="Minibus WEZHA a viajar - Sem filas!" style={{width:'100%', maxHeight:240, objectFit:'cover', display:'block'}} />
+          <div style={{padding:'14px 16px'}}>
+            <h1 style={{margin:0, fontSize:22, fontWeight:900}}>Chega de filas! Viaja com WEZHA! 🚌</h1>
+            <p style={{margin:'6px 0 0', fontSize:13, opacity:.92}}>Reserva o teu lugar no telefone, sem ir para a paragem cedo! Vês o minibus a chegar, pagas com M-Pesa e viajas tranquilo! {lista.length} carros online agora!</p>
+            <div style={{display:'flex', gap:6, marginTop:10, flexWrap:'wrap'}}>
+              <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>✅ Sem fila - Reserva já!</span>
+              <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>📍 Vês o carro a chegar!</span>
+              <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>💳 Paga com M-Pesa!</span>
+            </div>
+          </div>
+        </div>
         <div className="flex gap-2 mt-4 flex-wrap">
-          <button onClick={()=>{ setPapel('passageiro'); setAba('passageiro'); }} className={`px-5 py-2 rounded-full text-[13px] font-bold ${papel==='passageiro'?'bg-green-600 text-white':'bg-green-100 text-green-800'}`}>Sou Passageiro - Procurar Carros e Reservar</button>
-          <button onClick={()=>{ setPapel('transportador'); setAba('transportador'); }} className={`px-5 py-2 rounded-full text-[13px] font-bold ${papel==='transportador'?'bg-[#0a66c2] text-white':'bg-blue-100 text-blue-800'}`}>Sou Transportador - Registar Viatura</button>
+          <button onClick={()=>{ setPapel('passageiro'); setAba('passageiro'); }} className={`px-7 py-3.5 rounded-full text-[15px] font-bold shadow-lg ${papel==='passageiro'?'bg-green-600 text-white':'bg-green-100 text-green-800'}`}>Sou Passageiro - Procurar Carros e Reservar</button>
+          <button onClick={()=>{ setPapel('transportador'); setAba('transportador'); }} className={`px-7 py-3.5 rounded-full text-[15px] font-bold shadow-lg ${papel==='transportador'?'bg-[#0a66c2] text-white':'bg-blue-100 text-blue-800'}`}>Sou Transportador - Registar Viatura</button>
           {(papel||passLogado||transLogado) && (<button onClick={()=>{ setPapel(null); setPassLogado(null); localStorage.removeItem('viajar_passageiro_sessao'); }} className="bg-gray-100 px-4 py-2 rounded-full text-[11px]">Sair / Trocar de Porta</button>)}
           <button onClick={carregarReais} className="bg-gray-100 px-4 py-2 rounded-full text-[11px]">Recarregar</button>
-          {mostrarLoginDono && (<div className="mt-4 bg-black text-white rounded-xl p-4 border-2 border-yellow-400"><h3 className="font-bold text-[14px]">Painel do Dono - Login Secreto</h3><p className="text-[11px] text-gray-300">Só o Dono entra aqui! 3 cliques no logo!</p><div className="grid grid-cols-2 gap-3 mt-3"><div><label className="text-[11px] font-bold">Username do Dono</label><input value={donoUser} onChange={e=>setDonoUser(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px] text-black" placeholder="Username do Dono" /></div><div><label className="text-[11px] font-bold">Password do Dono</label><input type="password" value={donoPass} onChange={e=>setDonoPass(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px] text-black" placeholder="Password do Dono" /></div></div><div className="flex gap-2 mt-3"><button onClick={loginDono} className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold text-[12px]">Entrar como Dono</button><button onClick={()=>setMostrarLoginDono(false)} className="bg-gray-700 px-4 py-2 rounded-full text-[12px]">Fechar</button></div></div>)}
-          {donoLogado && (<div className="mt-4 bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4"><div className="flex justify-between"><h3 className="font-bold text-[15px]">Painel do Dono - {donoLogado.nome} - {donoLogado.username}</h3><button onClick={sairDono} className="bg-gray-100 px-3 py-1 rounded-full text-[11px]">Sair como Dono</button></div><p className="text-[11px] text-gray-600">Aqui tu vês TODOS os documentos e aprovas ou rejeitas! Transportador NUNCA vê isto! Viaturas a esperar: {viaturasTrans.filter((v:any)=>v.status==='PENDENTE').length} | Aprovadas: {viaturasTrans.filter((v:any)=>v.status==='APROVADA').length} | Rejeitadas: {viaturasTrans.filter((v:any)=>v.status==='REJEITADA').length}</p>
-            {viaturasTrans.filter((v:any)=>v.status==='PENDENTE').length===0 ? (<p className="text-[12px] text-gray-500 mt-2">Nenhuma viatura a esperar aprovação!</p>) : viaturasTrans.filter((v:any)=>v.status==='PENDENTE').map((v:any)=>(<div key={'dono-'+v.id} className="border rounded p-3 mt-3 bg-white"><div className="font-bold text-[13px]">{v.matricula} - {v.marca} {v.modelo} - Cor: {v.cor} - {v.lugares} lugares</div><div className="text-[11px] text-gray-600 mt-1">Motorista: {v.nomeMotorista} - {v.telMotorista} | Dono: {v.nomeDono} - {v.telDono} | Rota FIXA: {v.distOrig} -&gt; {v.distDest} | Submetida: {v.dataSubmissao}</div><div className="text-[11px] mt-2"><b>Documentos - Clica para ver!</b><br/>Carta: {v.docs?.carta||v.docs?.cartaNome||'Sem ficheiro'} | Livrete: {v.docs?.livrete||'Sem ficheiro'} | Seguro: {v.docs?.seguro||'Sem ficheiro'} | Foto Viatura: {v.foto||v.docs?.foto||'Sem foto'}</div><div className="text-[10px] text-red-600 mt-1">Se os documentos são só nome, pede ao transportador para subir a foto mesmo! Na próxima fase os documentos sobem para o Storage e aqui vais ver a foto!</div><div className="flex gap-2 mt-3 flex-wrap"><button onClick={()=>aprovarViaturaDono(v.id)} className="bg-green-600 text-white px-5 py-2 rounded-full font-bold text-[12px]">APROVAR - Vai para Viaturas Ativas!</button><input value={motivoRejeicao[v.id]||''} onChange={e=>setMotivoRejeicao({...motivoRejeicao, [v.id]:e.target.value})} className="border rounded px-3 py-2 text-[12px] flex-1" placeholder="Motivo da rejeição - Ex: Seguro expirado!" /><button onClick={()=>rejeitarViaturaDono(v.id)} className="bg-red-600 text-white px-4 py-2 rounded-full font-bold text-[12px]">Rejeitar</button></div></div>))}
-            <div className="mt-3 border-t pt-2"><div className="font-bold text-[12px]">Todas as Viaturas - Estado</div>{viaturasTrans.map((v:any)=>(<div key={'dono-todas-'+v.id} className="text-[11px] border rounded px-2 py-1 mt-1 flex justify-between"><span><b>{v.matricula}</b> - {v.marca} {v.modelo} - {v.status} {v.motivoRejeicao?`- Motivo: ${v.motivoRejeicao}`:''}</span><span>{v.dataSubmissao}</span></div>))}</div>
-          </div>)}
         </div>
-        {!papel && (<div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 text-[12px]">Escolhe a tua porta: <b>Sou Passageiro</b> = so procuras carros, reservas bilhetes e viajas. <b>NAO</b> vês a area do transportador. <b>Sou Transportador</b> = registas viatura, documentos, GPS e recebes reservas. Cada porta tem a sua entrada com numero de telefone.</div>)}
+        {!papel && (<div className="mt-3 bg-green-50 border border-green-200 rounded-xl p-3 text-[12px]">👋 <b>Escolhe:</b> És <b>Passageiro</b>? Procura o teu carro e reserva! És <b>Transportador</b>? Regista a tua viatura e recebe reservas!</div>)}
       </div>
       {/* PORTA PASSAGEIRO - como inDrive: numero valido -> entra so para procurar carros, reservar e viajar. NAO ve transportador. */}
       {papel==='passageiro' && !passLogado && (
@@ -329,7 +247,7 @@ export default function ViajarReal(){
               <button onClick={pedirLocalizacaoPassageiro} className="w-full py-2 rounded-full text-[#0a66c2] text-[13px] border">Allow Once</button>
               <button onClick={()=>{ setPermissao('denied'); alert('Sem localizacao, nao consegues ver a distancia dos carros ate ti. Podes procurar por rota, mas sem ETA.'); }} className="w-full py-2 rounded-full text-[#0a66c2] text-[13px] border">Don&apos;t Allow</button>
             </div>
-            <p className="text-[11px] mt-2">Passageiro GPS: {String(permissao)} {passageiroPos?`(${passageiroPos.lat.toFixed(5)}, ${passageiroPos.lng.toFixed(5)})`:'nao obtido'}</p>
+            <p className="text-[11px] mt-2 text-gray-500">📍 A tua localização ajuda a mostrar os carros mais perto de ti.</p>
           </div>
         </div>
       )}
@@ -375,14 +293,9 @@ export default function ViajarReal(){
                 <div className="flex gap-2 mt-4"><button onClick={submeterViatura} className="flex-1 bg-[#0a66c2] text-white py-3 rounded-full font-bold text-[13px]">SUBMETER VIATURA - Esperar Aprovacao</button><button onClick={ligarGps} className="flex-1 bg-green-600 text-white py-3 rounded-full font-bold text-[13px]">{gpsAtivo?'GPS LIGADO - Telefone do Motorista':'LIGAR GPS AO VIVO - No Telefone do Motorista'}</button></div>
                 {mostrarMaisCarros && (<div className="mt-3 bg-green-50 border border-green-200 rounded p-3 text-center"><div className="text-[12px] font-bold">Viatura submetida! Queres registar mais carros?</div><button onClick={()=>{ setMostrarMaisCarros(false); setFormViat({matricula:'', marca:'', modelo:'', cor:'Branco', lugares:'15', provincia:'', cidade:'', destino:'Xai-Xai -> Maputo', preco:'', foto:'', provOrig:'Gaza', distOrig:'Xai-Xai', provDest:'Maputo Cidade', distDest:'Maputo', nomeMotorista:'', telMotorista:'', nomeDono:'', telDono:''}); }} className="mt-2 bg-[#0a66c2] text-white px-5 py-2 rounded-full font-bold text-[12px]">+ REGISTAR MAIS CARROS</button></div>)}
               </div>
-              <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Motorista de Hoje + Sentido Atual - Rota FIXA, Sentido muda 2x/dia!</h3><p className="text-[11px] text-gray-500 mt-1">A ROTA fica fixa como cadastraste! O que muda é o MOTORISTA de hoje + o SENTIDO atual - porque o carro pode fazer 2 viagens num dia! De manhã vai, às 18h volta!</p>
-                <div className="grid grid-cols-2 gap-3 mt-3"><div><label className="text-[11px] font-bold">Motorista de Hoje - Nome</label><input value={motoristaHojeNome} onChange={e=>setMotoristaHojeNome(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="Ex: Michaque / João" /></div><div><label className="text-[11px] font-bold">Motorista de Hoje - Número (GPS + Chamadas)</label><input value={motoristaHojeTel} onChange={e=>setMotoristaHojeTel(e.target.value)} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="Ex: 840532899" /></div></div>
-                <p className="text-[10px] text-gray-500 mt-2">Se hoje o motorista é outro, muda aqui! O número novo passa a ser usado para Ligar + WhatsApp + GPS! Se deixares vazio, fica o motorista que já estava na viatura.</p>
-              </div>
               <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Minhas Viaturas Submetidas ({viaturasTrans.length}) - Estado</h3>
-                {viaturasTrans.length===0 ? (<p className="text-[12px] text-gray-500 mt-2">Nenhuma viatura submetida ainda.</p>) : viaturasTrans.map((v:any)=>(<div key={v.id} className="border rounded p-3 mt-2 flex justify-between items-center"><div><b>{v.matricula} - {v.marca} {v.modelo} - Cor: {v.cor}</b><div className="text-[11px] text-gray-500">{v.destino} | {v.lugares} lugares | {v.dataSubmissao} | Docs: Carta {v.docs.carta} | Livrete {v.docs.livrete} | Seguro {v.docs.seguro}</div></div><div className="flex gap-2 items-center"><span className={`px-2 py-1 rounded-full text-[11px] font-bold ${v.status==='APROVADA'?'bg-green-100 text-green-700':v.status==='REJEITADA'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-700'}`}>{v.status}</span>{v.status==='PENDENTE' && (<><span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-[11px] font-bold">A aguardar Dono! Só o Dono aprova! (3 cliques no logo)</span></>)}</div></div>))}
+                {viaturasTrans.length===0 ? (<p className="text-[12px] text-gray-500 mt-2">Nenhuma viatura submetida ainda.</p>) : viaturasTrans.map((v:any)=>(<div key={v.id} className="border rounded p-3 mt-2 flex justify-between items-center"><div><b>{v.matricula} - {v.marca} {v.modelo} - Cor: {v.cor}</b><div className="text-[11px] text-gray-500">{v.destino} | {v.lugares} lugares | {v.dataSubmissao} | Docs: Carta {v.docs.carta} | Livrete {v.docs.livrete} | Seguro {v.docs.seguro}</div></div><div className="flex gap-2 items-center"><span className={`px-2 py-1 rounded-full text-[11px] font-bold ${v.status==='APROVADA'?'bg-green-100 text-green-700':v.status==='REJEITADA'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-700'}`}>{v.status}</span>{v.status==='PENDENTE' && (<><button onClick={()=>aprovarViatura(v.id)} className="bg-green-600 text-white px-3 py-1 rounded-full text-[11px] font-bold">Aprovar (Dono)</button><button onClick={()=>rejeitarViatura(v.id)} className="bg-red-500 text-white px-3 py-1 rounded-full text-[11px]">Rejeitar</button></>)}</div></div>))}
                 <p className="text-[10px] text-gray-500 mt-2">PENDENTE = a aguardar dono. APROVADA = aparece para passageiros. REJEITADA = corrige documentos e submete de novo.</p>
-                {viaturasTrans.map((v:any)=>{ const s=gerarSentidos(v); return (<div key={'sentido-'+v.id} className="border-2 border-blue-100 rounded p-3 mt-3 bg-blue-50"><div className="font-bold text-[12px]">Sentido Atual - {v.matricula} - {v.marca} {v.modelo}</div><div className="text-[11px] mt-1">Rota FIXA: <b>{s.orig} → {s.dest}</b> - Não muda! | Agora: <b>{v.sentidoAtual||v.destino_atual||'Ainda sem sentido'}</b> {v.sentidoTexto?` - ${v.sentidoTexto}`:''} {v.sentidoHora?` - Atualizado às ${v.sentidoHora}`:''}</div><div className="text-[11px] mt-1">Motorista de Hoje: {v.nomeMotorista||v.nome||'-'} - {v.telMotorista||v.telefone||'-'}</div><div className="flex gap-2 mt-2 flex-wrap"><button onClick={()=>atualizarSentido(v,'ida')} className="bg-[#0a66c2] text-white px-3 py-2 rounded-full text-[11px] font-bold">{s.ida} - Ida</button><button onClick={()=>atualizarSentido(v,'volta')} className="bg-green-600 text-white px-3 py-2 rounded-full text-[11px] font-bold">{s.volta} - Volta</button><button onClick={()=>atualizarSentido(v,'parado_origem')} className="bg-gray-200 px-3 py-2 rounded-full text-[11px] font-bold">{s.paradoOrig}</button><button onClick={()=>atualizarSentido(v,'parado_destino')} className="bg-gray-200 px-3 py-2 rounded-full text-[11px] font-bold">{s.paradoDest}</button></div><div className="mt-2"><label className="text-[11px] font-bold">Ou escreve onde estás! (opcional - fica junto com o botão!)</label><input value={sentidoTextoPorViatura[v.id]||''} onChange={e=>setSentidoTextoPorViatura({...sentidoTextoPorViatura, [v.id]:e.target.value})} className="w-full border rounded px-3 py-2 text-[13px]" placeholder="Ex: Estou em Macia, a sair agora! / Estou em Marracuene, atraso 30 min!" /></div><p className="text-[10px] text-gray-500 mt-1">Escreve e depois clica num botão em cima! Ex: Escreve `Estou em Macia!` + clica `Xai-Xai → Maputo` = Passageiro vê `Agora: Xai-Xai → Maputo - Estou em Macia!`</p></div>); })}
               </div>
               <div className="bg-white rounded-xl border p-6"><h3 className="font-bold text-[14px]">Notificacoes - Reservas das Tuas Viaturas ({notificacoes.length}) - Motorista + Dono</h3><p className="text-[11px] text-gray-500">Quando passageiro reserva, tu (dono/motorista) recebes aqui + WhatsApp. O bilhete fica ocupado.</p>
                 {notificacoes.length===0 ? (<p className="text-[12px] text-gray-500 mt-2">Nenhuma reserva ainda.</p>) : notificacoes.slice(0,10).map((n:any)=>(<div key={n.id} className="border rounded p-3 mt-2 flex justify-between"><div><b>{n.msg}</b><div className="text-[11px] text-gray-500">{n.data} | Passageiro: {n.passageiro} - {n.telPass} | Motorista: {n.motorista} - {n.matricula}</div></div><button onClick={()=>{ const nn=notificacoes.map((x:any)=>x.id===n.id?{...x,lida:true}:x); setNotificacoes(nn); localStorage.setItem('viajar_notificacoes', JSON.stringify(nn)); }} className="bg-green-600 text-white px-3 py-1 rounded-full text-[11px]">{n.lida?'Lida':'Marcar Lida'}</button></div>))}
@@ -414,7 +327,7 @@ export default function ViajarReal(){
                 <div key={v.id} className="bg-white rounded-xl border p-4">
                   <div className="flex justify-between"><h4 className="font-bold text-[14px]">{v.matricula} - {v.carro}</h4><span className="text-[10px] px-2 py-1 rounded-full bg-green-100 text-green-700">{v.status}</span></div>
                   <div className="flex gap-2 mt-2 items-center"><span className="w-6 h-6 rounded-full border" style={{backgroundColor: cor==='Branco'?'#fff':cor==='Preto'?'#000':cor==='Prateado'?'#c0c0c0':cor==='Vermelho'?'#ef4444':cor==='Azul'?'#3b82f6':cor==='Verde'?'#22c55e':'#eab308'}}></span><span className="text-[12px] font-bold">Cor: {cor}</span><span className="text-[11px] text-gray-500">| Matricula: {v.matricula}</span></div>
-                  <p className="text-[12px] mt-1">Motorista: {v.nomeMotorista||v.nome} - {v.telMotorista||v.telefone} (GPS + Chamadas)</p><p className="text-[12px] mt-1 bg-blue-50 border border-blue-100 rounded px-2 py-1"><b>Sentido Atual:</b> {v.sentidoAtual||v.destino_atual||'A aguardar sentido'} {v.sentidoTexto ? ` - ${v.sentidoTexto}` : ''} {v.sentidoHora ? ` - Atualizado às ${v.sentidoHora}` : ''}</p><p className="text-[10px] text-gray-500">Rota FIXA: {v.distOrig||v.cidade||''} → {v.distDest||''} - Não muda! Só o sentido muda!</p><p className="text-[11px] text-gray-600">Dono: {v.nomeDono||v.transportador} - {v.telDono||v.tel||''}</p>
+                  <p className="text-[12px] mt-1">Motorista: {v.nomeMotorista||v.nome} - {v.telMotorista||v.telefone} (GPS + Chamadas)</p><p className="text-[11px] text-gray-600">Dono: {v.nomeDono||v.transportador} - {v.telDono||v.tel||''}</p>
                   <p className="text-[11px] text-gray-600">{v.cidade}, {v.provincia} -&gt; {v.destino_atual} - {v.lugares} lugares</p>
                   <p className="text-[11px] mt-1">Distancia ate ti: {distTxt} {etaTxt && `| ETA: ${etaTxt}`} | Rota {origem} -&gt; {destino}: {rotaInfo.distEstrada.toFixed(1)} km - {rotaInfo.precoPP}MT/pessoa</p>
                   <p className="text-[10px] text-gray-400">Atualizado: {v.ultima_atualizacao}</p>
