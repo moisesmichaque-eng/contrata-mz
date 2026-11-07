@@ -9,16 +9,12 @@ import ContratosReal from './ContratosReal';
 // Supabase - se existir no teu projeto, usa. Se nao, o painel usa localStorage + contagem real!
 let supabase: any = null; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
 
-export function LogoWezha({ size=36 }: any){
+export function LogoWezha({ size=32 }: any){
+  // Logo correto de /public/logo-wezha.jpg - pequeno, contain, sem cortar
+  // Antes era SVG desenhado e ficava cortado. Agora usa a imagem real que já está em public.
   return (
-    <div style={{position:'relative', width:size, height:size, flexShrink:0}} title="WEZHA - TOTSHE - WEZHA - TOTSHE">
-      <svg viewBox="0 0 100 100" style={{width:'100%',height:'100%'}}>
-        <path d="M 92 8 A 48 48 0 1 0 92 92 A 58 58 0 0 1 92 8" fill="#0B3D91" />
-        <path d="M 38 22 A 44 44 0 1 1 38 82 A 50 50 0 0 0 38 22" fill="#F5B81D" />
-        <circle cx="50" cy="50" r="32" fill="white" />
-        <text x="50" y="55" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#0B3D91" fontFamily="Georgia, serif">WEZHA</text>
-      </svg>
-      <span style={{position:'absolute', right:-2, bottom:-4, fontSize:7, fontWeight:800, color:'#0B3D91', background:'white', padding:'0 2px', borderRadius:4, letterSpacing:1}}>TOTSHE</span>
+    <div style={{position:'relative', width:size, height:size, flexShrink:0, background:'white', borderRadius:'50%', padding:2, boxShadow:'0 1px 4px rgba(0,0,0,.12)', overflow:'hidden'}} title="WEZHA - TOTSHE">
+      <img src="/logo-wezha.jpg" alt="WEZHA" style={{width:'100%', height:'100%', objectFit:'contain', borderRadius:'50%', display:'block', background:'white'}} />
     </div>
   );
 }
@@ -100,7 +96,7 @@ export default function App(){
     return (
       <div style={{minHeight:'100vh', background:'linear-gradient(180deg,#0B3D91 0%, #134E9E 50%, #F5B81D 100%)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', color:'white', fontFamily:'system-ui, sans-serif', padding:20}}>
         <style>{`@keyframes girar { 0%{ transform: rotate(0deg) scale(1)} 50%{ transform: rotate(180deg) scale(1.08)} 100%{ transform: rotate(360deg) scale(1)} } @keyframes pulsar { 0%,100%{ transform: scale(1); opacity:1} 50%{ transform: scale(1.05); opacity:.9} } .logo-girar{ animation: girar 2.2s ease-in-out; }`}</style>
-        <div className="logo-girar" style={{background:'white', padding:18, borderRadius:'50%', boxShadow:'0 0 40px rgba(255,255,255,.6)'}}><LogoWezha size={150} /></div>
+        <div className="logo-girar" style={{background:'white', padding:18, borderRadius:'50%', boxShadow:'0 0 40px rgba(255,255,255,.6)'}}><LogoWezha size={110} /></div>
         <h1 style={{margin:'20px 0 0', fontSize:32, fontWeight:900, letterSpacing:2}}>WEZHA</h1>
         <div style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 14px', borderRadius:999, fontWeight:900, fontSize:12, letterSpacing:3, marginTop:6}}>TOTSHE</div>
         <p style={{margin:'14px 0 0', fontSize:14, fontWeight:700}}>Bem-vindo ao Contrata-MZ!</p>
@@ -122,7 +118,7 @@ export default function App(){
     return (
       <div style={{minHeight:'100vh', background:'#F6F8FB', fontFamily:'system-ui, sans-serif'}}>
         <div style={{background:'#0B3D91', borderBottom:'3px solid #F5B81D', padding:'10px 16px', display:'flex', alignItems:'center', gap:12}}>
-          <div onClick={clicarLogo} style={{cursor:'pointer'}}><LogoWezha size={40} /></div>
+          <div onClick={clicarLogo} style={{cursor:'pointer'}}><LogoWezha size={32} /></div>
           <div><div style={{color:'white', fontWeight:900, fontSize:16}}>PAINEL DE GESTÃO - WEZHA</div><div style={{color:'#F5B81D', fontSize:11}}>Painel de Gestão - WEZHA</div></div>
           <button onClick={()=>{ setDonoLogado(false); setTab('encontrar'); }} style={{marginLeft:'auto', background:'#F5B81D', color:'#0B3D91', border:'none', padding:'8px 14px', borderRadius:999, fontWeight:800, fontSize:11, cursor:'pointer'}}>SAIR →</button>
         </div>
@@ -206,7 +202,7 @@ export default function App(){
       <div style={{position:'sticky', top:0, zIndex:40, background:'#0B3D91', borderBottom:'3px solid #F5B81D', boxShadow:'0 4px 20px rgba(0,0,0,.2)'}}>
         <div style={{maxWidth:1600, margin:'0 auto', padding:'8px 16px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
           <div onClick={clicarLogo} style={{display:'flex', alignItems:'center', gap:10, background:'white', padding:'4px 12px 4px 4px', borderRadius:999, boxShadow:'0 2px 10px rgba(0,0,0,.2)', cursor:'pointer'}} title="WEZHA - TOTSHE">
-            <div className="logo-flutuar"><LogoWezha size={40} /></div>
+            <div className="logo-flutuar"><LogoWezha size={32} /></div>
             <div><div style={{fontWeight:900, fontSize:16, color:'#0B3D91', lineHeight:1}}>WEZHA <span style={{fontSize:9, color:'#F5B81D', background:'#0B3D91', padding:'1px 5px', borderRadius:999}}>TOTSHE</span></div><div style={{fontSize:9, color:'#666'}}>Contrata-MZ • Contratos • Viagens • Vendas</div></div>
           </div>
           <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>{tabs.map((t:any)=> <button key={t.id} onClick={()=>setTab(t.id)} className={`btn-tab ${tab===t.id?'ativo':''}`} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:11, background: tab===t.id ? t.cor : 'white', color: tab===t.id ? 'white' : '#0B3D91'}}>{t.label}</button>)}</div>
@@ -223,12 +219,12 @@ export default function App(){
       <div style={{maxWidth:1600, margin:'0 auto', padding:'0 16px 30px'}}>
         {tab==='encontrar' && <EncontrarReal />}{tab==='viajar' && <ViajarReal />}{tab==='vender' && <VenderReal />}{tab==='contratos' && <ContratosReal />}
       </div>
-      <div style={{textAlign:'center', padding:'16px', color:'#0B3D91', fontSize:11}}><div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}><LogoWezha size={28} /><b>WEZHA - TOTSHE</b> • Contrata-MZ • Feito em Moçambique 🇲🇿</div><p>Protege o teu trabalho! Sem contrato, sem prova! Com contrato, estás protegido!</p></div>
+      <div style={{textAlign:'center', padding:'16px', color:'#0B3D91', fontSize:11}}><div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}><LogoWezha size={24} /><b>WEZHA - TOTSHE</b> • Contrata-MZ • Feito em Moçambique 🇲🇿</div><p>Protege o teu trabalho! Sem contrato, sem prova! Com contrato, estás protegido!</p></div>
 
       {mostrarLoginDono && (
         <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,.6)', zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:16}}>
           <div style={{background:'white', borderRadius:20, padding:22, width:'100%', maxWidth:360, textAlign:'center'}}>
-            <LogoWezha size={60} /><h3 style={{color:'#0B3D91'}}>Painel de Gestão - WEZHA</h3><p style={{fontSize:11, color:'#666'}}>Área Reservada - Dono</p>
+            <LogoWezha size={44} /><h3 style={{color:'#0B3D91'}}>Painel de Gestão - WEZHA</h3><p style={{fontSize:11, color:'#666'}}>Área Reservada - Dono</p>
             <input value={donoUser} onChange={e=> setDonoUser(e.target.value)} placeholder="Username" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:10}} />
             <input type="password" value={donoPass} onChange={e=> setDonoPass(e.target.value)} placeholder="Password" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:8}} />
             <button onClick={loginDono} style={{width:'100%', background:'#0B3D91', color:'white', border:'none', padding:12, borderRadius:999, fontWeight:800, marginTop:12, cursor:'pointer'}}>ENTRAR</button>
