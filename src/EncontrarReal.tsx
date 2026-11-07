@@ -34,6 +34,7 @@ type TecnicoRealDB = {
 export default function EncontrarReal() {
   const [lista, setLista] = useState<TecnicoRealDB[]>([]);
   const [busca, setBusca] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState<'TODOS'|'PROFISSIONAL'|'EMPRESA'>('TODOS');
   const [carregando, setCarregando] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [tipoForm, setTipoForm] = useState<'PROFISSIONAL' | 'EMPRESA'>('PROFISSIONAL');
@@ -141,6 +142,8 @@ export default function EncontrarReal() {
     setCarregando(false);
   };
 
+  const listaFiltrada = lista.filter((p:any)=> { if(filtroTipo==='TODOS') return true; const tipo = String(p.tipo||p.tipo_perfil||p.profissao||'').toUpperCase(); if(filtroTipo==='EMPRESA') return tipo.includes('EMPRESA') || String(p.empresa||'').length>0; return !tipo.includes('EMPRESA') && !String(p.empresa||'').length; });
+
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-black p-4 font-sans">
       <div className="max-w-6xl mx-auto">
@@ -162,16 +165,31 @@ export default function EncontrarReal() {
           <div className="flex gap-3 mt-4 flex-wrap">
             <button onClick={() => { setTipoForm('PROFISSIONAL'); setMostrarForm(true); }} className="bg-[#0a66c2] text-white px-5 py-2.5 rounded-full text-[13px] font-bold">REGISTAR-ME - PROFISSIONAL</button>
             <button onClick={() => { setTipoForm('EMPRESA'); setMostrarForm(true); }} className="bg-white text-[#0a66c2] border-2 border-[#0a66c2] px-5 py-2.5 rounded-full text-[13px] font-bold">CADASTRAR-ME - EMPRESA</button>
-            <button onClick={carregarReais} className="bg-gray-100 px-4 py-2.5 rounded-full text-[12px] ml-auto">🔄 Recarregar Real</button>
+            <button onClick={carregarReais} className="bg-gray-100 px-4 py-2.5 rounded-full text-[12px] ml-auto">🔄 Atualizar</button>
           </div>
 
-          <div className="mt-5 flex gap-2">
-            <input value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && carregarReais()} placeholder="Pesquisar real: nome, profissão, zona, província..." className="flex-1 border border-gray-300 rounded-full px-5 py-2.5 text-[13px] outline-none" />
-            <button onClick={carregarReais} className="bg-black text-white px-6 py-2.5 rounded-full text-[13px] font-bold">PESQUISAR REAL</button>
+          <div style={{background:'#FFF7E6', borderRadius:14, padding:14, marginTop:18}}>
+            <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center'}}>
+              <div style={{flex:1, minWidth:220}}>
+                <label style={{fontSize:11, fontWeight:800}}>O que precisas? - Estás à procura de...?</label>
+                <input value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && carregarReais()} placeholder="Ex: Serralheiro, Pedreiro, Eletricista, Doméstica..." style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'10px 14px', fontSize:13, marginTop:4}} />
+              </div>
+              <div>
+                <label style={{fontSize:11, fontWeight:800}}>Mostrar só:</label>
+                <div style={{display:'flex', gap:6, marginTop:4}}>
+                  {(['TODOS','PROFISSIONAL','EMPRESA'] as const).map((f:any)=> <button key={f} onClick={()=> setFiltroTipo(f)} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:12, background: filtroTipo===f ? '#0B3D91' : '#fff', color: filtroTipo===f ? 'white' : '#333', boxShadow:'0 1px 3px rgba(0,0,0,.1)'}}>{f==='TODOS' ? 'Todos' : f==='PROFISSIONAL' ? '👤 Profissional' : '🏢 Empresa'}</button>)}
+                </div>
+              </div>
+              <button onClick={carregarReais} style={{background:'black', color:'white', padding:'11px 20px', borderRadius:999, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', marginTop:18}}>PESQUISAR</button>
+            </div>
+            <div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:10, alignItems:'center'}}>
+              <span style={{fontSize:11, fontWeight:800}}>Tags Populares:</span>
+              {['Pedreiro','Carpinteiro','Eletricista','Canalizador','Pintor','Serralheiro','Doméstica','Motorista'].map((tag:any)=> <button key={tag} onClick={()=>{ setBusca(tag); carregarReais(); }} style={{background:'white', border:'1px solid #eee', padding:'4px 10px', borderRadius:999, fontSize:11, cursor:'pointer'}}>{tag}</button>)}
+            </div>
           </div>
         </div>
 
-        {carregando ? <div className="text-center py-20">Carregando reais...</div> : lista.length === 0 ? (
+        {carregando ? <div className="text-center py-20">Carregando reais...</div> : listaFiltrada.length === 0 ? (
           <div className="bg-white rounded-xl border p-12 text-center">
             <div className="text-5xl mb-4">🔍</div>
             <h3 className="font-bold">Nenhum profissional real</h3>
@@ -179,7 +197,7 @@ export default function EncontrarReal() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {lista.map(p => (
+            {listaFiltrada.map(p => (
               <div key={p.id} className="bg-white rounded-xl border p-5 hover:shadow-md">
                 <div className="flex gap-3">
                   <div className="w-12 h-12 rounded-full bg-[#0a66c2] text-white flex items-center justify-center font-bold">{p.nome?.charAt(0)?.toUpperCase()}</div>
@@ -217,9 +235,9 @@ export default function EncontrarReal() {
               </div>
 
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-auto">
-                <div className="md:col-span-2 flex gap-2">
-                  <button onClick={() => setTipoForm('PROFISSIONAL')} className={`flex-1 py-2 rounded-full text-[12px] font-bold ${tipoForm==='PROFISSIONAL' ? 'bg-[#0a66c2] text-white' : 'bg-gray-100'}`}>Profissional</button>
-                  <button onClick={() => setTipoForm('EMPRESA')} className={`flex-1 py-2 rounded-full text-[12px] font-bold ${tipoForm==='EMPRESA' ? 'bg-[#0a66c2] text-white' : 'bg-gray-100'}`}>Empresa</button>
+                <div className="md:col-span-2">
+                  <span style={{display:'inline-block', background: tipoForm==='EMPRESA' ? '#0B3D91' : '#0E7A5A', color:'white', padding:'6px 14px', borderRadius:999, fontSize:12, fontWeight:800}}>{tipoForm==='EMPRESA' ? '🏢 A criar como EMPRESA' : '👤 A criar como PROFISSIONAL'}</span>
+                  <span style={{fontSize:11, color:'#666', marginLeft:8}}>Escolheste fora, já ficou travado aqui!</span>
                 </div>
 
                 <div><label className="text-[11px] font-bold">Nome *</label><input value={form.nome} onChange={e=>setForm({...form, nome:e.target.value})} className="w-full border rounded-lg px-3 py-2.5 text-[13px] mt-1" placeholder="Michaque Mungoi" /></div>
@@ -241,7 +259,7 @@ export default function EncontrarReal() {
 
               <div className="p-6 border-t flex gap-3">
                 <button onClick={()=>setMostrarForm(false)} className="flex-1 border py-3 rounded-full text-[13px]">Cancelar</button>
-                <button onClick={handleCadastro} disabled={carregando} className="flex-1 bg-[#0a66c2] text-white py-3 rounded-full text-[13px] font-bold">{carregando ? 'Gravando Real...' : 'CRIAR PERFIL REAL'}</button>
+                <button onClick={handleCadastro} disabled={carregando} className="flex-1 bg-[#0a66c2] text-white py-3 rounded-full text-[13px] font-bold">{carregando ? 'A criar...' : 'CRIAR PERFIL'}</button>
               </div>
             </div>
           </div>
