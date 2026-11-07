@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App.tsx - FASE 10 - 3 CLIQUES NO LOGO WEZHA = PAINEL DONO - TUDO DAS 4 PARTES, BEM DETALHADO!
-// Como funciona: Clica 3x no logo WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
+// Como funciona: WEZHA WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
 import React, { useState, useEffect } from 'react';
 import EncontrarReal from './EncontrarReal';
 import ViajarReal from './ViajarReal';
@@ -11,7 +11,7 @@ let supabase: any = null; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita req
 
 export function LogoWezha({ size=36 }: any){
   return (
-    <div style={{position:'relative', width:size, height:size, flexShrink:0}} title="WEZHA - TOTSHE - Clica 3x para Painel Dono">
+    <div style={{position:'relative', width:size, height:size, flexShrink:0}} title="WEZHA - TOTSHE - WEZHA - TOTSHE">
       <svg viewBox="0 0 100 100" style={{width:'100%',height:'100%'}}>
         <path d="M 92 8 A 48 48 0 1 0 92 92 A 58 58 0 0 1 92 8" fill="#0B3D91" />
         <path d="M 38 22 A 44 44 0 1 1 38 82 A 50 50 0 0 0 38 22" fill="#F5B81D" />
@@ -78,14 +78,14 @@ export default function App(){
     if(supabase){
       try{
         const { data, error } = await supabase.from('viagens_admins').select('*').eq('username', donoUser.trim()).eq('password', donoPass.trim()).maybeSingle();
-        if(error || !data){ alert('Username ou Password errados! Só o Dono entra!'); return; }
+        if(error || !data){ alert('Username ou Password errados! Acesso reservado!'); return; }
         setDonoLogado(true); setMostrarLoginDono(false); await carregarDadosDono(); return;
       }catch(e){ alert('Sem ligação ao Supabase! Verifica a net!'); return; }
     }
     // Sem Supabase neste ficheiro - usa sessao ja guardada no VENDER (loja_sessao) como prova de Dono
     const sess = localStorage.getItem('loja_sessao');
     if(sess){ setDonoLogado(true); setMostrarLoginDono(false); await carregarDadosDono(); return; }
-    alert('Sem Supabase ligado! Faz login primeiro no VENDER como Dono, depois clica 3x no logo!');
+    alert('Sem Supabase ligado! Faz login primeiro no VENDER como Dono, depois clica  no logo!');
   };
 
   const f = FRASES[tab];
@@ -105,7 +105,7 @@ export default function App(){
         <div style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 14px', borderRadius:999, fontWeight:900, fontSize:12, letterSpacing:3, marginTop:6}}>TOTSHE</div>
         <p style={{margin:'14px 0 0', fontSize:14, fontWeight:700}}>Bem-vindo ao Contrata-MZ!</p>
         <p style={{margin:'4px 0 0', fontSize:11, opacity:.9}}>Contratos • Viagens • Vendas • Encontrar - Tudo num só lugar!</p>
-        <p style={{marginTop:14, fontSize:10, opacity:.8}}>A carregar... 🇲🇿 Moçambique</p>
+        <p style={{marginTop:14, fontSize:10, opacity:.8}}>Moçambique 🇲🇿</p>
         <button onClick={()=> setMostrarSplash(false)} style={{marginTop:14, background:'white', color:'#0B3D91', border:'none', padding:'8px 18px', borderRadius:999, fontWeight:800, fontSize:12, cursor:'pointer'}}>ENTRAR AGORA →</button>
       </div>
     );
@@ -123,15 +123,15 @@ export default function App(){
       <div style={{minHeight:'100vh', background:'#F6F8FB', fontFamily:'system-ui, sans-serif'}}>
         <div style={{background:'#0B3D91', borderBottom:'3px solid #F5B81D', padding:'10px 16px', display:'flex', alignItems:'center', gap:12}}>
           <div onClick={clicarLogo} style={{cursor:'pointer'}}><LogoWezha size={40} /></div>
-          <div><div style={{color:'white', fontWeight:900, fontSize:16}}>PAINEL DONO - WEZHA - TOTSHE 👑</div><div style={{color:'#F5B81D', fontSize:11}}>Olá Dono! Vês TUDO o que acontece nas 4 partes! Ninguém vê isto, só tu!</div></div>
-          <button onClick={()=>{ setDonoLogado(false); setTab('encontrar'); }} style={{marginLeft:'auto', background:'#F5B81D', color:'#0B3D91', border:'none', padding:'8px 14px', borderRadius:999, fontWeight:800, fontSize:11, cursor:'pointer'}}>SAIR DO PAINEL DONO →</button>
+          <div><div style={{color:'white', fontWeight:900, fontSize:16}}>PAINEL DE GESTÃO - WEZHA</div><div style={{color:'#F5B81D', fontSize:11}}>Painel de Gestão - WEZHA</div></div>
+          <button onClick={()=>{ setDonoLogado(false); setTab('encontrar'); }} style={{marginLeft:'auto', background:'#F5B81D', color:'#0B3D91', border:'none', padding:'8px 14px', borderRadius:999, fontWeight:800, fontSize:11, cursor:'pointer'}}>SAIR →</button>
         </div>
         <div style={{maxWidth:1200, margin:'0 auto', padding:16}}>
           <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
             {['resumo','encontrar','viajar','vender','contratos','atividades'].map((a:any)=> <button key={a} onClick={()=>setAbaDono(a)} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:11, background: abaDono===a ? '#0B3D91' : 'white', color: abaDono===a ? 'white' : '#0B3D91'}}>{a.toUpperCase()}</button>)}
             <button onClick={carregarDadosDono} style={{padding:'8px 14px', borderRadius:999, border:'1px solid #0B3D91', background:'white', fontWeight:800, fontSize:11, cursor:'pointer'}}>🔄 ATUALIZAR</button>
           </div>
-          {carregandoDono && <p>A carregar dados reais do Supabase...</p>}
+          {carregandoDono && <p>A carregar...</p>}
           {abaDono==='resumo' && (
             <div>
               <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginTop:16}}>
@@ -140,11 +140,11 @@ export default function App(){
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #C9A227'}}><b>🛒 VENDER</b><h2>{totalFaturas} Faturas • {totalValorFaturas} MZN</h2><p style={{fontSize:11}}>{dadosDono.lojas.length} Produtos / Lojas</p></div>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #7C3AED'}}><b>📄 CONTRATOS</b><h2>{totalContratos} Contratos • {totalValorContratos} MZN</h2><p style={{fontSize:11}}>11 Cláusulas cada • Assinados / Pendentes</p></div>
               </div>
-              <div style={{background:'white', padding:16, borderRadius:16, marginTop:12}}><b>📊 Resumo do Dono - Hoje:</b><p style={{fontSize:12}}>Total em Contratos: {totalValorContratos} MZN • Total em Faturas VENDER: {totalValorFaturas} MZN • Reservas VIAJAR: {totalViagens} • Transportadores: {totalTransportadores}</p><p style={{fontSize:11, color:'#666'}}>Dica: Clica em cada aba em cima para ver DETALHADO - nome, telefone, valor, data, estado!</p></div>
+              <div style={{background:'white', padding:16, borderRadius:16, marginTop:12}}><b>📊 Resumo do Dono - Hoje:</b><p style={{fontSize:12}}>Total em Contratos: {totalValorContratos} MZN • Total em Faturas VENDER: {totalValorFaturas} MZN • Reservas VIAJAR: {totalViagens} • Transportadores: {totalTransportadores}</p><p style={{fontSize:11, color:'#666'}}>Selecione uma secção para ver detalhes.</p></div>
             </div>
           )}
           {abaDono==='contratos' && (
-            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>📄 CONTRATOS - Detalhado ({totalContratos})</h3>{dadosDono.contratos.length===0 ? <p>Nenhum contrato ainda! Quando criarem, aparece aqui!</p> : dadosDono.contratos.map((c:any,i:number)=> <div key={i} style={{borderBottom:'1px solid #eee', padding:'8px 0', fontSize:12}}><b>{c.trab_nome||c.trabalhador||'-'}</b> - {c.trab_prof||c.profissao||'-'} - {c.valor||'-'} MZN - {c.data_inicio||c.created_at||'-'} - Tel {c.trab_tel||'-'} - Empregador {c.emp_nome||'-'} - Estado: {c.estado||c.status||'Criado'}</div>)}</div>
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>📄 CONTRATOS - Detalhado ({totalContratos})</h3>{dadosDono.contratos.length===0 ? <p>Ainda não há contratos.</p> : dadosDono.contratos.map((c:any,i:number)=> <div key={i} style={{borderBottom:'1px solid #eee', padding:'8px 0', fontSize:12}}><b>{c.trab_nome||c.trabalhador||'-'}</b> - {c.trab_prof||c.profissao||'-'} - {c.valor||'-'} MZN - {c.data_inicio||c.created_at||'-'} - Tel {c.trab_tel||'-'} - Empregador {c.emp_nome||'-'} - Estado: {c.estado||c.status||'Criado'}</div>)}</div>
           )}
           {abaDono==='viajar' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}>
@@ -165,7 +165,7 @@ export default function App(){
                   </div>
                 </div>
               ))}
-              {dadosDono.transportadores.length===0 && <p>Nenhuma viatura submetida ainda!</p>}
+              {dadosDono.transportadores.length===0 && <p>Ainda não há viaturas submetidas.</p>}
               <b style={{display:'block', marginTop:16}}>Reservas ({totalViagens}):</b>{dadosDono.reservas.map((r:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{r.nome_passageiro||r.passageiro||'-'} - Tel {r.tel||'-'} - {r.origem||'-'} → {r.destino||'-'} - {r.valor||r.preco||'-'} MZN - Assento {r.assento||'-'}</div>)}
             </div>
           )}
@@ -173,7 +173,7 @@ export default function App(){
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
           )}
           {abaDono==='encontrar' && (
-            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda sem profissionais detalhados aqui! Vê na aba ENCONTRAR!</p>}</div>
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda não há profissionais.</p>}</div>
           )}
           {abaDono==='atividades' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🕒 Últimas Atividades - 4 Partes</h3><p style={{fontSize:12}}>• Contrato gerado - {dadosDono.contratos[0]?.trab_nome||'—'} - {dadosDono.contratos[0]?.data_inicio||''}</p><p style={{fontSize:12}}>• Viatura registada - {dadosDono.transportadores[0]?.nome||'—'}</p><p style={{fontSize:12}}>• Reserva feita - {dadosDono.reservas[0]?.nome_passageiro||'—'}</p><p style={{fontSize:12}}>• Fatura VENDER - {dadosDono.faturas[0]?.cliente_nome||'—'} - {dadosDono.faturas[0]?.total||''} MZN</p></div>
@@ -205,7 +205,7 @@ export default function App(){
       <style>{`@keyframes flutuar { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-4px)} } @keyframes brilhar { 0%,100%{ box-shadow: 0 0 0 rgba(245,184,29,0)} 50%{ box-shadow: 0 0 18px rgba(245,184,29,.7)} } .btn-tab{ transition: all .25s ease; } .btn-tab:hover{ transform: translateY(-2px) scale(1.03); } .btn-tab.ativo{ animation: brilhar 1.6s infinite; } .logo-flutuar{ animation: flutuar 3s ease-in-out infinite; }`}</style>
       <div style={{position:'sticky', top:0, zIndex:40, background:'#0B3D91', borderBottom:'3px solid #F5B81D', boxShadow:'0 4px 20px rgba(0,0,0,.2)'}}>
         <div style={{maxWidth:1600, margin:'0 auto', padding:'8px 16px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
-          <div onClick={clicarLogo} style={{display:'flex', alignItems:'center', gap:10, background:'white', padding:'4px 12px 4px 4px', borderRadius:999, boxShadow:'0 2px 10px rgba(0,0,0,.2)', cursor:'pointer'}} title="Clica 3x para Painel Dono!">
+          <div onClick={clicarLogo} style={{display:'flex', alignItems:'center', gap:10, background:'white', padding:'4px 12px 4px 4px', borderRadius:999, boxShadow:'0 2px 10px rgba(0,0,0,.2)', cursor:'pointer'}} title="WEZHA - TOTSHE">
             <div className="logo-flutuar"><LogoWezha size={40} /></div>
             <div><div style={{fontWeight:900, fontSize:16, color:'#0B3D91', lineHeight:1}}>WEZHA <span style={{fontSize:9, color:'#F5B81D', background:'#0B3D91', padding:'1px 5px', borderRadius:999}}>TOTSHE</span></div><div style={{fontSize:9, color:'#666'}}>Contrata-MZ • Contratos • Viagens • Vendas</div></div>
           </div>
@@ -228,12 +228,12 @@ export default function App(){
       {mostrarLoginDono && (
         <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,.6)', zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:16}}>
           <div style={{background:'white', borderRadius:20, padding:22, width:'100%', maxWidth:360, textAlign:'center'}}>
-            <LogoWezha size={60} /><h3 style={{color:'#0B3D91'}}>👑 Painel Dono - WEZHA</h3><p style={{fontSize:11, color:'#666'}}>Só o Dono! Clicaste 3x no logo! Escreve o teu Username e Password!</p>
-            <input value={donoUser} onChange={e=> setDonoUser(e.target.value)} placeholder="Username Dono" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:10}} />
-            <input type="password" value={donoPass} onChange={e=> setDonoPass(e.target.value)} placeholder="Password Dono" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:8}} />
-            <button onClick={loginDono} style={{width:'100%', background:'#0B3D91', color:'white', border:'none', padding:12, borderRadius:999, fontWeight:800, marginTop:12, cursor:'pointer'}}>ENTRAR COMO DONO 👑</button>
+            <LogoWezha size={60} /><h3 style={{color:'#0B3D91'}}>Painel de Gestão - WEZHA</h3><p style={{fontSize:11, color:'#666'}}>Área Reservada - Dono</p>
+            <input value={donoUser} onChange={e=> setDonoUser(e.target.value)} placeholder="Username" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:10}} />
+            <input type="password" value={donoPass} onChange={e=> setDonoPass(e.target.value)} placeholder="Password" style={{width:'100%', padding:10, borderRadius:999, border:'1px solid #ddd', marginTop:8}} />
+            <button onClick={loginDono} style={{width:'100%', background:'#0B3D91', color:'white', border:'none', padding:12, borderRadius:999, fontWeight:800, marginTop:12, cursor:'pointer'}}>ENTRAR</button>
             <button onClick={()=> setMostrarLoginDono(false)} style={{width:'100%', background:'white', border:'1px solid #ddd', padding:10, borderRadius:999, marginTop:8, cursor:'pointer'}}>Cancelar</button>
-            <p style={{fontSize:10, color:'#999', marginTop:8}}>Password NÃO está no código! Está na tabela viagens_admins no Supabase!</p>
+            <p style={{fontSize:10, color:'#999', marginTop:8}}></p>
           </div>
         </div>
       )}
