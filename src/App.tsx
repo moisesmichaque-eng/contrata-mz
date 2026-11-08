@@ -68,6 +68,7 @@ export default function App(){
       if(supabase){
         const tabelas:any = { contratos:'contratos', viagens:'viagens_motoristas', transportadores:'viagens_motoristas', reservas:'viagens_reservas', lojas:'lojas', faturas:'faturas_loja', profissionais:'tecnicos' };
         for(const k of Object.keys(tabelas)){ try{ const { data } = await supabase.from(tabelas[k]).select('*').limit(100); if(data) d[k]=data; }catch(e){} }
+        try{ const { data } = await supabase.from('viajar_viaturas').select('*').order('created_at',{ascending:false}).limit(200); if(data && data.length){ const seen=new Set((d.transportadores||[]).map((x:any)=>String(x.matricula||'').toUpperCase())); const novas=(data||[]).filter((x:any)=>{ const k=String(x.matricula||'').toUpperCase(); if(!k || seen.has(k)) return false; seen.add(k); return true; }); d.transportadores=[...(d.transportadores||[]), ...novas]; } }catch(e){}
         try{ const { data } = await supabase.from('viagens_viaturas').select('*').order('created_at',{ascending:false}).limit(200); if(data && data.length){ const seen=new Set((d.transportadores||[]).map((x:any)=>String(x.matricula||'').toUpperCase())); const novas=(data||[]).filter((x:any)=>{ const k=String(x.matricula||'').toUpperCase(); if(!k || seen.has(k)) return false; seen.add(k); return true; }); d.transportadores=[...(d.transportadores||[]), ...novas]; } }catch(e){}
         try{ const { data } = await supabase.from('viagens_transportadores').select('*').limit(100); if(data && data.length){ const seen=new Set((d.transportadores||[]).map((x:any)=>String(x.matricula||'').toUpperCase())); const novas=(data||[]).filter((x:any)=>{ const k=String(x.matricula||'').toUpperCase(); if(!k || seen.has(k)) return false; seen.add(k); return true; }); d.transportadores=[...(d.transportadores||[]), ...novas]; } }catch(e){}
       }
@@ -85,14 +86,13 @@ export default function App(){
     if(supabase){
       try{
         let ok=false; let ultimoErro:any=null;
-        // 1) viagens_viaturas - so status (coluna que existe de certeza)
-        try{ const r:any = await supabase.from('viagens_viaturas').update({ status: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); if(!r.error) ok=true; else ultimoErro=r.error; }catch(e){ ultimoErro=e; }
-        // 2) viagens_motoristas - so status
-        try{ const r:any = await supabase.from('viagens_motoristas').update({ status: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); if(!r.error) ok=true; else ultimoErro=r.error; }catch(e){ ultimoErro=e; }
-        // 3) tenta tambem estado, se a coluna existir (nao falha se nao existir)
-        try{ await supabase.from('viagens_viaturas').update({ estado: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); }catch(e){}
-        try{ await supabase.from('viagens_motoristas').update({ estado: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); }catch(e){}
-        if(!ok) throw new Error(ultimoErro?.message || 'Nenhuma tabela atualizou. Corre o SQL da tabela viagens_viaturas no Supabase.');
+        const tabelas = ['viagens_viaturas','viagens_motoristas','viajar_viaturas'];
+        for(const tab of tabelas){
+          try{ const r:any = await supabase.from(tab).update({ status: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); if(!r.error) ok=true; else ultimoErro=r.error; }catch(e){ ultimoErro=e; }
+          try{ await supabase.from(tab).update({ estado: novoEstado }).eq('matricula', String(transp.matricula||'').toUpperCase()); }catch(e){}
+        }
+        try{ const r:any = await supabase.from('viajar_viaturas').update({ status: novoEstado }).eq('id', transp.id); if(!r.error) ok=true; }catch(e){}
+        if(!ok) throw new Error(ultimoErro?.message || 'Nenhuma tabela atualizou.');
       }catch(e:any){ alert('Erro ao atualizar no Supabase: ' + (e?.message||e)); return; }
     }
     setDadosDono((prev:any)=> ({ ...prev, transportadores: prev.transportadores.map((x:any)=> x.id===transp.id ? { ...x, estado: novoEstado, status: novoEstado } : x) }));
@@ -211,25 +211,37 @@ export default function App(){
           <div style={{background:'white', borderRadius:20, padding:20, width:'100%', maxWidth:520, maxHeight:'85vh', overflow:'auto'}}>
             <div style={{display:'flex', justifyContent:'space-between'}}><h3>📄 Documentos - {docVer.matricula||docVer.nome}</h3><button onClick={()=> setDocVer(null)} style={{fontSize:20, border:'none', background:'white', cursor:'pointer'}}>×</button></div>
             <p style={{fontSize:12}}>Motorista: {docVer.nome_motorista||docVer.nome} - Tel {docVer.tel_motorista||docVer.tel} • Dono: {docVer.nome_dono||'-'} - Tel {docVer.tel_dono||'-'}</p>
-            {[
-              {k:'carta', titulo:'🪪 Carta de Condução'},
-              {k:'livrete', titulo:'📘 Livrete'},
-              {k:'seguro', titulo:'🛡️ Seguro'},
-              {k:'bi', titulo:'🪪 BI Motorista'},
-              {k:'licenca', titulo:'📄 Licença de Transporte'},
-              {k:'fotoViatura', titulo:'🚐 Foto Viatura'},
-            ].map((d:any)=>{ const raw = docVer.docs?.[d.k] || docVer[d.k] || docVer[d.k==='bi'?'bi_motorista':d.k]; const file = typeof raw==='object' ? (raw.file||'') : (typeof raw==='string' ? raw : ''); const numero = typeof raw==='object' ? (raw.numero||'') : (docVer.docs_nums?.[d.k]||''); const nomeFile = typeof raw==='object' ? (raw.nome||'') : ''; return (
-              <div key={d.k} style={{border:'1px solid #eee', borderRadius:12, padding:10, marginTop:8}}>
-                <b style={{fontSize:12}}>{d.titulo}:</b>
-                {numero && <p style={{fontSize:11}}>Número: {numero}</p>}
-                {nomeFile && <p style={{fontSize:11}}>Ficheiro: {nomeFile}</p>}
-                {!file && <p style={{fontSize:11}}>— Não enviado —</p>}
-                {file && file.startsWith('http') && <a href={file} target="_blank" rel="noreferrer" style={{fontSize:11, color:'#0B3D91'}}>Abrir documento →</a>}
-                {file && file.startsWith('data:image') && <img src={file} style={{maxWidth:'100%', borderRadius:8, marginTop:6}} alt={d.titulo} />}
-                {file && file.startsWith('data:application') && <a href={file} download={nomeFile||d.k} style={{fontSize:11, color:'#0B3D91'}}>Descarregar documento →</a>}
-                {file && !file.startsWith('data:') && !file.startsWith('http') && <p style={{fontSize:11}}>FILE: {file}</p>}
-              </div>
-            ); })}
+            {(()=>{
+              let docsObj:any = {};
+              try{ docsObj = typeof docVer.docs==='string' ? JSON.parse(docVer.docs) : (docVer.docs||{}); }catch(e){ docsObj={}; }
+              let numsObj:any = {};
+              try{ numsObj = typeof docVer.docs_nums==='string' ? JSON.parse(docVer.docs_nums) : (docVer.docs_nums||docVer.docsNums||{}); }catch(e){ numsObj={}; }
+              const getDoc = (k:string)=>{
+                const raw = docsObj[k] || docVer[k] || (k==='bi' ? docVer.bi_motorista : null);
+                if(!raw) return {file:'', numero: numsObj[k]||'', nome:''};
+                if(typeof raw==='string') return {file: raw, numero: numsObj[k]||'', nome: raw.length>60 ? 'ficheiro enviado' : raw};
+                return {file: String(raw.file||''), numero: String(raw.numero||numsObj[k]||''), nome: String(raw.nome||'')};
+              };
+              const lista = [
+                {k:'carta', titulo:'🪪 Carta de Condução'},
+                {k:'livrete', titulo:'📘 Livrete'},
+                {k:'seguro', titulo:'🛡️ Seguro'},
+                {k:'bi', titulo:'🪪 BI Motorista'},
+                {k:'licenca', titulo:'📄 Licença de Transporte'},
+                {k:'fotoViatura', titulo:'🚐 Foto Viatura'},
+              ];
+              return lista.map((d:any)=>{ const {file, numero, nome} = getDoc(d.k); const isImg = typeof file==='string' && file.startsWith('data:image'); const isPdf = typeof file==='string' && (file.startsWith('data:application') || file.endsWith('.pdf')); return (
+                <div key={d.k} style={{border:'1px solid #eee', borderRadius:12, padding:10, marginTop:8}}>
+                  <b style={{fontSize:12}}>{d.titulo}:</b>
+                  {numero && <p style={{fontSize:11}}>Número: {numero}</p>}
+                  {nome && <p style={{fontSize:11}}>Ficheiro: {nome}</p>}
+                  {!file && <p style={{fontSize:11}}>— Não enviado —</p>}
+                  {file && isImg && <img src={file} style={{maxWidth:'100%', borderRadius:8, marginTop:6}} alt={d.titulo} />}
+                  {file && !isImg && <a href={file} target="_blank" rel="noreferrer" style={{fontSize:11, color:'#0B3D91'}}>Abrir documento →</a>}
+                  {file && isPdf && <p style={{fontSize:11}}>PDF enviado - clica Abrir para ver.</p>}
+                </div>
+              ); });
+            })()}
             <div style={{display:'flex', gap:6, marginTop:12}}><button onClick={()=>{ aprovarViatura(docVer,'APROVADA'); setDocVer(null); }} style={{flex:1, background:'#0E7A5A', color:'white', border:'none', padding:10, borderRadius:999, fontWeight:800, cursor:'pointer'}}>✅ APROVAR</button><button onClick={()=>{ aprovarViatura(docVer,'REJEITADA'); setDocVer(null); }} style={{flex:1, background:'#DC2626', color:'white', border:'none', padding:10, borderRadius:999, fontWeight:800, cursor:'pointer'}}>❌ REJEITAR</button></div>
           </div>
         </div>
