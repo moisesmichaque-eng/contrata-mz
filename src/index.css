@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* PASSO 2 - BASE RESPONSIVA - WEZHA - nao muda nenhuma tela, so a base */
+/* Telefone / Tablete / Computador usam a mesma pagina */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+body {
+  -webkit-text-size-adjust: 100%;
+}
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+* {
+  box-sizing: border-box;
+}
