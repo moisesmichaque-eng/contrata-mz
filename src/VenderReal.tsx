@@ -45,24 +45,31 @@ export default function VenderFixIVATabs(){
   const [mostrarLogin, setMostrarLogin] = useState<'cadastro'|'login'>('cadastro');
   const [formLojaLogin, setFormLojaLogin] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'', distrito:'', ramo:'', logoData:''}); // REAL: loja nova comeca vazia, sem dados da loja anterior
 
+  const normTel = (s:any)=> String(s||'').replace(/\D/g,'').replace(/^258/,'');
   const criarContaLoja = async () => {
     if(!formLojaLogin.nomeLoja || !formLojaLogin.tel || !formLojaLogin.password){ alert('Nome, Telefone e Password'); return; }
+    const telNorm = normTel(formLojaLogin.tel); if(telNorm.length<9){ alert('Telefone inválido - escreve 9 dígitos, ex: 841234567'); return; }
+    try{ const {data:existe} = await supabase.from('lojas').select('conta_id,username').eq('username', telNorm).limit(1); if(existe && existe.length>0){ alert('Esta conta JÁ EXISTE no servidor. Faz LOGIN com este telefone e esta password, não cries outra.'); setMostrarLogin('login'); return; } }catch(e){}
     const conta_id = `conta_${Date.now()}`;
-    const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData };
+    const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: telNorm, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData };
     try{
       const { error } = await supabase.from('lojas').insert([novaLoja]);
-      if(error){ console.log(error); }
-      localStorage.setItem('loja_sessao', JSON.stringify(novaLoja));
-      setLojaLogada(novaLoja);
-      setPerfilEdit({nomeLoja:novaLoja.nome_loja||'', nuit:novaLoja.nuit||'', endereco:novaLoja.endereco||'', provincia:novaLoja.provincia||'', distrito:novaLoja.cidade||'', ramo:novaLoja.ramo||'', tel:novaLoja.username||'', password:'', novaPassword:'', logoData:novaLoja.logoData||'', funcionarios: []});
-      carregarTudo(novaLoja.conta_id);
+      if(error){ alert('Conta NÃO foi criada no servidor: '+error.message+'\n\nNão entres. Corrige no Supabase (tabela lojas / RLS) e tenta outra vez.'); return; }
+      const {data:conf} = await supabase.from('lojas').select('*').eq('username', telNorm).limit(1); if(!conf || conf.length===0){ alert('Conta NÃO ficou no servidor. Verifica a tabela lojas no Supabase.'); return; }
+      localStorage.setItem('loja_sessao', JSON.stringify(conf[0]));
+      setLojaLogada(conf[0]);
+      setPerfilEdit({nomeLoja:conf[0].nome_loja||'', nuit:conf[0].nuit||'', endereco:conf[0].endereco||'', provincia:conf[0].provincia||'', distrito:conf[0].cidade||'', ramo:conf[0].ramo||'', tel:conf[0].username||'', password:'', novaPassword:'', logoData:conf[0].logoData||'', funcionarios: []});
+      carregarTudo(conf[0].conta_id);
     }catch(e:any){ alert(e.message); }
   };
 
   const fazerLoginLoja = async () => {
     if(!formLojaLogin.tel || !formLojaLogin.password){ alert('Telefone e Password'); return; }
-    const { data, error } = await supabase.from('lojas').select('*').eq('username', formLojaLogin.tel).eq('password', formLojaLogin.password).limit(1);
-    if(error || !data || data.length===0){ alert('Loja não encontrada - verifica telefone e password ou cria conta'); return; }
+    const telNorm = normTel(formLojaLogin.tel);
+    let data:any[]|null=null, error:any=null;
+    for(const tentativa of [telNorm, String(formLojaLogin.tel).trim(), '258'+telNorm]){ const r:any = await supabase.from('lojas').select('*').eq('username', tentativa).eq('password', formLojaLogin.password).limit(1); if(!r.error && r.data && r.data.length>0){ data=r.data; error=null; break; } if(r.error) error=r.error; }
+    if(error){ alert('Erro no servidor ao fazer login: '+error.message); return; }
+    if(!data || data.length===0){ alert('Loja não encontrada no servidor. Verifica Telefone (9 dígitos) e Password. Se nunca criaste conta NESTE servidor, cria 1 vez só - depois entra sempre com LOGIN, em qualquer telefone.'); return; }
     const loja = data[0];
     localStorage.setItem('loja_sessao', JSON.stringify(loja));
     setLojaLogada(loja);
