@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App.tsx - FASE 10 - 3 CLIQUES NO LOGO WEZHA = PAINEL DONO - TUDO DAS 4 PARTES, BEM DETALHADO!
-// Como funciona: WEZHA WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
+// Como funciona: Clica 3x no logo WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
 import React, { useState, useEffect } from 'react';
 import EncontrarReal from './EncontrarReal';
 import ViajarReal from './ViajarReal';
@@ -130,7 +130,7 @@ export default function App(){
         <div className="logo-girar" style={{background:'white', padding:18, borderRadius:'50%', boxShadow:'0 0 40px rgba(255,255,255,.6)'}}><LogoWezha size={110} /></div>
         <h1 style={{margin:'20px 0 0', fontSize:32, fontWeight:900, letterSpacing:2}}>WEZHA</h1>
         <div style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 14px', borderRadius:999, fontWeight:900, fontSize:12, letterSpacing:3, marginTop:6}}>TOTSHE</div>
-        <p style={{margin:'14px 0 0', fontSize:14, fontWeight:700}}>Bem-vindo ao Contrata-MZ!</p>
+        <p style={{margin:'14px 0 0', fontSize:14, fontWeight:700}}>Bem-vindo à WEZHA TOTSHE!</p>
         <p style={{margin:'4px 0 0', fontSize:11, opacity:.9}}>Contratos • Viagens • Vendas • Encontrar - Tudo num só lugar!</p>
         <p style={{marginTop:14, fontSize:10, opacity:.8}}>Moçambique 🇲🇿</p>
         <button onClick={()=> setMostrarSplash(false)} style={{marginTop:14, background:'white', color:'#0B3D91', border:'none', padding:'8px 18px', borderRadius:999, fontWeight:800, fontSize:12, cursor:'pointer'}}>ENTRAR AGORA →</button>
@@ -257,7 +257,7 @@ export default function App(){
         <div style={{maxWidth:1600, margin:'0 auto', padding:'8px 16px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
           <div onClick={clicarLogo} style={{display:'flex', alignItems:'center', gap:10, background:'white', padding:'4px 12px 4px 4px', borderRadius:999, boxShadow:'0 2px 10px rgba(0,0,0,.2)', cursor:'pointer'}} title="WEZHA - TOTSHE">
             <div className="logo-flutuar"><LogoWezha size={32} /></div>
-            <div><div style={{fontWeight:900, fontSize:16, color:'#0B3D91', lineHeight:1}}>WEZHA <span style={{fontSize:9, color:'#F5B81D', background:'#0B3D91', padding:'1px 5px', borderRadius:999}}>TOTSHE</span></div><div style={{fontSize:9, color:'#666'}}>Contrata-MZ • Contratos • Viagens • Vendas</div></div>
+            <div><div style={{fontWeight:900, fontSize:16, color:'#0B3D91', lineHeight:1}}>WEZHA <span style={{fontSize:9, color:'#F5B81D', background:'#0B3D91', padding:'1px 5px', borderRadius:999}}>TOTSHE</span></div><div style={{fontSize:9, color:'#666'}}>WEZHA TOTSHE • Contratos • Viagens • Vendas</div></div>
           </div>
           <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>{tabs.map((t:any)=> <button key={t.id} onClick={()=>setTab(t.id)} className={`btn-tab ${tab===t.id?'ativo':''}`} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:11, background: tab===t.id ? t.cor : 'white', color: tab===t.id ? 'white' : '#0B3D91'}}>{t.label}</button>)}</div>
           <div style={{marginLeft:'auto', color:'white', fontSize:11, fontWeight:700}}>🇲🇿 Moçambique • Maputo • Matola • Xai-Xai</div>
@@ -273,7 +273,7 @@ export default function App(){
       <div style={{maxWidth:1600, margin:'0 auto', padding:'0 16px 30px'}}>
         {tab==='encontrar' && <EncontrarReal />}{tab==='viajar' && <ViajarReal />}{tab==='vender' && <VenderReal />}{tab==='contratos' && <ContratosReal />}
       </div>
-      <div style={{textAlign:'center', padding:'16px', color:'#0B3D91', fontSize:11}}><div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}><LogoWezha size={24} /><b>WEZHA - TOTSHE</b> • Contrata-MZ • Feito em Moçambique 🇲🇿</div><p>Protege o teu trabalho! Sem contrato, sem prova! Com contrato, estás protegido!</p></div>
+      <div style={{textAlign:'center', padding:'16px', color:'#0B3D91', fontSize:11}}><div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8}}><LogoWezha size={24} /><b>WEZHA TOTSHE</b> • Feito em Moçambique 🇲🇿</div><p>Protege o teu trabalho! Sem contrato, sem prova! Com contrato, estás protegido!</p></div>
 
       {mostrarLoginDono && (
         <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,.6)', zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:16}}>
