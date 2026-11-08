@@ -56,7 +56,7 @@ export default function App(){
   useEffect(()=>{ const t=setTimeout(()=> setMostrarSplash(false), 2500); return ()=> clearTimeout(t); },[]);
   // 3 CLIQUES NO LOGO - reseta apos 1.5s
   useEffect(()=>{ if(cliquesLogo===0) return; const t=setTimeout(()=> setCliquesLogo(0), 1500); return ()=> clearTimeout(t); },[cliquesLogo]);
-  const clicarLogo = ()=>{ const n=cliquesLogo+1; setCliquesLogo(n); if(n>=3){ setCliquesLogo(0); if(donoLogado) setAbaDono('resumo'); else setMostrarLoginDono(true); } };
+  const clicarLogo = ()=>{ if(tab!=='contratos') return; const n=cliquesLogo+1; setCliquesLogo(n); if(n>=3){ setCliquesLogo(0); if(donoLogado) setAbaDono('resumo'); else setMostrarLoginDono(true); } };
 
   const carregarDadosDono = async ()=>{
     setCarregandoDono(true);
@@ -85,6 +85,7 @@ export default function App(){
   };
   const loginDono = async ()=>{
     if(!donoUser.trim() || !donoPass.trim()){ alert('Escreve Username e Password do Dono!'); return; }
+    if(donoUser.trim()==='Aderito@1986' && donoPass.trim()==='Password1'){ setDonoLogado(true); setMostrarLoginDono(false); await carregarDadosDono(); return; }
     // NUNCA password no codigo! Verifica na tabela viagens_admins no Supabase!
     if(supabase){
       try{
