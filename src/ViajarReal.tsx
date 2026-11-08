@@ -47,10 +47,12 @@ export default function ViajarReal(){
         return;
       }
     }catch(e){}
+    // LOGIN: se nao existe no servidor, NAO cria - diz que nao existe
+    if(mostrarLoginPass==='login'){ alert('Conta passageiro NÃO EXISTE no servidor com o telefone '+telOK+'.\n\nSe é a 1ª vez, clica REGISTAR. Se já criaste, verifica o telefone.'); return; }
     const p={nome, tel:telOK, conta_id:'pass_'+telOK+'_'+Date.now(), data:new Date().toLocaleString('pt-MZ')};
-    let guardado=false;
-    try{ const {error} = await supabase.from('viagens_passageiros').insert([{conta_id:p.conta_id, nome:p.nome, username:telOK, tel:telOK, criado:p.data}]); if(!error) guardado=true; }catch(e){}
-    if(!guardado){ alert('Atenção: tabela viagens_passageiros ainda não existe no Supabase! Vou guardar neste telefone, mas cria a tabela com o SQL em baixo para funcionar noutro telefone.'); }
+    let erroPass:any=null;
+    try{ const {error} = await supabase.from('viagens_passageiros').insert([{conta_id:p.conta_id, nome:p.nome, username:telOK, tel:telOK, criado:p.data}]); erroPass=error; }catch(e:any){ erroPass=e; }
+    if(erroPass){ alert('Conta NÃO foi criada no servidor: '+String(erroPass.message||erroPass)+'\n\nNão entres. Cria a tabela viagens_passageiros no Supabase (SQL em baixo) e tenta outra vez.'); return; }
     salvarContaPassLocal(p); setPassLogado(p); localStorage.setItem('viajar_passageiro_sessao', JSON.stringify(p));
     setNomePass(p.nome); setTelPass(p.tel); setAba('passageiro');
     alert('Bem-vindo '+p.nome+'!');
@@ -178,9 +180,10 @@ export default function ViajarReal(){
     if(localExiste){ alert('Ja tens conta com este numero neste telefone! Clica em Ja tenho conta - Entrar.'); setMostrarLoginTrans('login'); return; }
     try{ const {data:ex} = await supabase.from('viagens_transportadores').select('*').eq('username', telN).limit(1); if(ex && ex.length>0){ alert('Ja existe conta com este numero no servidor! Clica em Ja tenho conta - Entrar.'); setMostrarLoginTrans('login'); return; } }catch(e){}
     const nova = {...formTrans, nome, tel:telN, password:pass, conta_id:`trans_${telN}_${Date.now()}`, criado:new Date().toLocaleString('pt-MZ')};
-    let guardadoTrans=false;
-    try{ const {error} = await supabase.from('viagens_transportadores').insert([{conta_id:nova.conta_id, nome:nova.nome, username:telN, tel:telN, password:pass, nuit:nova.nuit, endereco:nova.endereco, provincia:nova.provincia, cidade:nova.distrito, email:nova.email, criado:nova.criado}]); if(!error) guardadoTrans=true; }catch(e){}
-    if(!guardadoTrans){ alert('Atenção: tabela viagens_transportadores ainda não existe no Supabase! Vou guardar neste telefone, mas cria a tabela com o SQL em baixo.'); }
+    let erroTrans:any=null;
+    try{ const {error} = await supabase.from('viagens_transportadores').insert([{conta_id:nova.conta_id, nome:nova.nome, username:telN, tel:telN, password:pass, nuit:nova.nuit, endereco:nova.endereco, provincia:nova.provincia, cidade:nova.distrito, email:nova.email, criado:nova.criado}]); erroTrans=error; }catch(e:any){ erroTrans=e; }
+    if(erroTrans){ alert('Conta NÃO foi criada no servidor: '+String(erroTrans.message||erroTrans)+'\n\nNão entres. Cria a tabela viagens_transportadores no Supabase (SQL em baixo) e tenta outra vez.'); return; }
+    const {data:confT} = await supabase.from('viagens_transportadores').select('*').eq('username', telN).limit(1); if(!confT || confT.length===0){ alert('Conta NÃO ficou no servidor. Verifica a tabela viagens_transportadores.'); return; }
     salvarContaTransLocal(nova);
     localStorage.setItem('viajar_transportador_sessao', JSON.stringify(nova)); setTransLogado(nova); setPapel('transportador');
     alert('Conta transportador REAL criada! Numero: '+telN+' - Agora preenche documentos e submete viatura.');
@@ -189,13 +192,15 @@ export default function ViajarReal(){
     const telN=normalizarTel(formTrans.tel); const pass=(formTrans.password||'').trim();
     if(!telN || !pass){ alert('Escreve Telefone e Password'); return; }
     if(telN.length!==9){ alert('Telefone invalido! Escreve 9 digitos: ex: 84 123 4567'); return; }
-    try{ const {data} = await supabase.from('viagens_transportadores').select('*').eq('username', telN).eq('password', pass).limit(1); if(data && data.length>0){ const r=data[0]; const conta={nome:r.nome, tel:telN, password:pass, nuit:r.nuit||'', endereco:r.endereco||'', provincia:r.provincia||'', distrito:r.cidade||'', email:r.email||'', conta_id:r.conta_id}; salvarContaTransLocal(conta); localStorage.setItem('viajar_transportador_sessao', JSON.stringify(conta)); setTransLogado(conta); setPapel('transportador'); alert('Bem-vindo '+conta.nome+'! (conta real do servidor)'); return; } }catch(e){}
+    const {data, error} = await supabase.from('viagens_transportadores').select('*').eq('username', telN).eq('password', pass).limit(1);
+    if(error){ alert('Erro no servidor ao fazer login: '+error.message+'\n\nNão entres com conta local. Corrige a tabela viagens_transportadores e tenta outra vez.'); return; }
+    if(data && data.length>0){ const r=data[0]; const conta={nome:r.nome, tel:telN, password:pass, nuit:r.nuit||'', endereco:r.endereco||'', provincia:r.provincia||'', distrito:r.cidade||'', email:r.email||'', conta_id:r.conta_id}; salvarContaTransLocal(conta); localStorage.setItem('viajar_transportador_sessao', JSON.stringify(conta)); setTransLogado(conta); setPapel('transportador'); alert('Bem-vindo '+conta.nome+'! (conta real do servidor)'); return; }
+    // Servidor diz: nao existe. Se neste telefone houver conta local antiga, tenta migrar 1 vez para o servidor.
     const local=getContasTrans().find((c:any)=>normalizarTel(c.tel)===telN && String(c.password).trim()===pass);
-    if(local){ localStorage.setItem('viajar_transportador_sessao', JSON.stringify(local)); setTransLogado(local); setPapel('transportador'); alert('Bem-vindo '+local.nome+'!'); return; }
-    try{ const s=JSON.parse(localStorage.getItem('viajar_transportador_sessao')||'null'); if(s && normalizarTel(s.tel)===telN && String(s.password).trim()===pass){ salvarContaTransLocal(s); setTransLogado(s); setPapel('transportador'); alert('Bem-vindo '+s.nome+'! Conta recuperada!'); return; } }catch(e){}
+    if(local){ const {error:errMig} = await supabase.from('viagens_transportadores').insert([{conta_id:local.conta_id||`trans_${telN}_${Date.now()}`, nome:local.nome, username:telN, tel:telN, password:pass, nuit:local.nuit||'', endereco:local.endereco||'', provincia:local.provincia||'', cidade:local.distrito||'', email:local.email||'', criado:local.criado||new Date().toLocaleString('pt-MZ')}]); if(!errMig){ localStorage.setItem('viajar_transportador_sessao', JSON.stringify(local)); setTransLogado(local); setPapel('transportador'); alert('Bem-vindo '+local.nome+'! Conta antiga deste telefone foi migrada para o servidor.'); return; } alert('Esta conta só existe NESTE telefone. Não foi possível migrar: '+errMig.message); return; }
     const existeTel=getContasTrans().find((c:any)=>normalizarTel(c.tel)===telN);
-    if(existeTel){ alert('Telefone encontrado, mas Password errada!'); return; }
-    alert('Nenhuma conta com o numero '+telN+' neste telefone nem no servidor. Verifica se escreveste o mesmo numero com que criaste a conta.');
+    if(existeTel){ alert('Telefone encontrado neste telefone, mas Password errada no servidor! Usa a password com que criaste a conta no servidor.'); return; }
+    alert('Nenhuma conta com o numero '+telN+' no servidor. Se nunca criaste conta, clica REGISTAR 1 vez só. Depois entra sempre com LOGIN, em qualquer telefone.');
   };
   const submeterViatura = async () => {
     if(!formViat.matricula || !formViat.marca || !formViat.modelo){ alert('Matricula, Marca e Modelo'); return; }
