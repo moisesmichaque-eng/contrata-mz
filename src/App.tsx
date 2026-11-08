@@ -7,7 +7,10 @@ import ViajarReal from './ViajarReal';
 import VenderReal from './VenderReal';
 import ContratosReal from './ContratosReal';
 // Supabase - se existir no teu projeto, usa. Se nao, o painel usa localStorage + contagem real!
-let supabase: any = null; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
+import { createClient } from '@supabase/supabase-js';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bkwkulxuprpboozaehfh.supabase.co';
+const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.[STRIPPED 127 bytes].XXXX';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 export function LogoWezha({ size=36 }: any){
   const [tentativa, setTentativa] = React.useState(0);
@@ -63,8 +66,9 @@ export default function App(){
     let d:any = { contratos:[], viagens:[], transportadores:[], reservas:[], lojas:[], faturas:[], profissionais:[] };
     try{
       if(supabase){
-        const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', faturas:'faturas_loja', profissionais:'profissionais' };
+        const tabelas:any = { contratos:'contratos', viagens:'viagens_motoristas', transportadores:'viagens_motoristas', reservas:'viagens_reservas', lojas:'lojas', faturas:'faturas_loja', profissionais:'tecnicos' };
         for(const k of Object.keys(tabelas)){ try{ const { data } = await supabase.from(tabelas[k]).select('*').limit(100); if(data) d[k]=data; }catch(e){} }
+        try{ const { data } = await supabase.from('viagens_transportadores').select('*').limit(100); if(data && data.length && d.transportadores.length===0) d.transportadores=data; }catch(e){}
       }
     }catch(e){}
     // Fallback real local - o que esta guardado no telefone
@@ -78,7 +82,7 @@ export default function App(){
   const aprovarViatura = async (transp:any, novoEstado:string)=>{
     if(!confirm(novoEstado==='APROVADA' ? `Aprovar viatura ${transp.matricula||transp.nome}? O transportador vai poder aparecer para passageiros!` : `Rejeitar viatura ${transp.matricula||transp.nome}?`)) return;
     if(supabase){
-      try{ const { error } = await supabase.from('viagens_transportadores').update({ estado: novoEstado, status: novoEstado, aprovado_em: new Date().toISOString() }).eq('id', transp.id); if(error) throw error; }catch(e){ alert('Erro ao atualizar no Supabase!'); return; }
+      try{ let ok=false; try{ const r1:any = await supabase.from('viagens_motoristas').update({ estado: novoEstado, status: novoEstado, aprovado_em: new Date().toISOString() }).eq('matricula', String(transp.matricula||'').toUpperCase()); if(!r1.error) ok=true; }catch(e){} try{ const r2:any = await supabase.from('viagens_transportadores').update({ estado: novoEstado, status: novoEstado, aprovado_em: new Date().toISOString() }).eq('id', transp.id); if(!r2.error) ok=true; }catch(e){} if(!ok) throw new Error('no-update'); }catch(e){ alert('Erro ao atualizar no Supabase!'); return; }
     }
     setDadosDono((prev:any)=> ({ ...prev, transportadores: prev.transportadores.map((x:any)=> x.id===transp.id ? { ...x, estado: novoEstado, status: novoEstado } : x) }));
     alert(novoEstado==='APROVADA' ? '✅ Viatura APROVADA! Já aparece para passageiros!' : '❌ Viatura REJEITADA!');
