@@ -139,7 +139,7 @@ export default function ContratosReal(){
   });
 
   const [textoEdit, setTextoEdit] = useState<any>({});
-  const textoComEdicoes = (c:any) => textoComEdicoes(c).map((txt:string,i:number)=> textoEdit[i]!==undefined ? textoEdit[i] : txt);
+  const textoComEdicoes = (c:any) => textoClausulas(c).map((txt:string,i:number)=> textoEdit[i]!==undefined ? textoEdit[i] : txt);
   const carregarReais = async () => {
     setCarregando(true);
     const sessao = localStorage.getItem('loja_sessao');
@@ -180,7 +180,7 @@ export default function ContratosReal(){
 
   const lerFicheiro = (file:any, cb:any) => { const r=new FileReader(); r.onload=()=>cb(String(r.result)); r.readAsDataURL(file); };
   const previewTexto = () => {
-    const c:any = { emp_nome:form.empNome, emp_bi:form.empBI, emp_nuit:form.empNUIT, empNUIT:form.empNUIT, emp_tel:form.empTel, emp_end:form.empEnd, trab_nome:form.trabNome, trab_bi:form.trabBI, trab_nuit:form.trabNUIT, trabNUIT:form.trabNUIT, trab_tel:form.trabTel, trab_end:form.trabEnd, trab_prof:form.trabProf, tarefas: [...tarefasSel, ...(campoExtra.trim()? [`EXTRA: ${campoExtra.trim()}`]:[])], horario_inicio:form.horarioInicio, horario_fim:form.horarioFim, dias:form.dias, data_inicio:form.dataInicio, local_trab:form.localTrab, aloj_transp:form.alojTransp, alojTransp:form.alojTransp, aloj_transp:form.alojTransp, alojTransp:form.alojTransp, valor:form.valor, dia_pag:form.diaPag, forma_pag:form.formaPag, prazo:form.prazo, alimentacao:form.alimentacao };
+    const c:any = { emp_nome:form.empNome, emp_bi:form.empBI, emp_nuit:form.empNUIT, empNUIT:form.empNUIT, emp_tel:form.empTel, emp_end:form.empEnd, trab_nome:form.trabNome, trab_bi:form.trabBI, trab_nuit:form.trabNUIT, trabNUIT:form.trabNUIT, trab_tel:form.trabTel, trab_end:form.trabEnd, trab_prof:form.trabProf, tarefas: [...tarefasSel, ...(campoExtra.trim()? [`EXTRA: ${campoExtra.trim()}`]:[])], horario_inicio:form.horarioInicio, horario_fim:form.horarioFim, dias:form.dias, data_inicio:form.dataInicio, local_trab:form.localTrab, aloj_transp:form.alojTransp, alojTransp:form.alojTransp, valor:form.valor, dia_pag:form.diaPag, forma_pag:form.formaPag, prazo:form.prazo, alimentacao:form.alimentacao };
     return textoComEdicoes(c);
   };
 
