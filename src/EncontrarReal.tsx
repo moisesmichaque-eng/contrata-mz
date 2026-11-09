@@ -160,34 +160,21 @@ export default function EncontrarReal() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] text-black p-4 font-sans">
+    <div className="min-h-screen bg-[#f8f9fb] text-black p-2 sm:p-4 font-sans overflow-x-hidden w-full">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-          <div style={{borderRadius:16, overflow:'hidden', background:'linear-gradient(90deg,#0B3D91,#134E9E)', color:'white', padding:0}}>
-            <div style={{padding:'14px 16px'}}>
-              <h1 style={{margin:0, fontSize:22, fontWeight:900}}>Encontra o teu profissional perto de ti! 🛠️</h1>
-              <p style={{margin:'6px 0 0', fontSize:13, opacity:.92}}>Precisas de um Carpinteiro? Um Serralheiro? Um Eletricista? Um Pedreiro? Estão aqui, em Maputo, Matola, Boane, Xai-Xai - verificados, com fotos e contrato! {lista.length} profissionais à tua espera!</p>
-              <div style={{display:'flex', gap:6, marginTop:10, flexWrap:'wrap'}}>
-                <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🪵 Carpinteiro - Faz a tua porta!</span>
-                <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>⚡ Eletricista - Luz segura!</span>
-                <span style={{background:'#F5B81D', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🔥 Serralheiro - Grade forte!</span>
-                <span style={{background:'white', color:'#0B3D91', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:800}}>🧱 Pedreiro - Casa firme!</span>
-              </div>
-            </div>
-          </div>
-          
-          
-          <div className="flex gap-3 mt-4 flex-wrap">
-            <button onClick={() => { setTipoForm('PROFISSIONAL'); setMostrarForm(true); }} className="bg-[#0a66c2] text-white px-5 py-2.5 rounded-full text-[13px] font-bold">REGISTAR-ME - PROFISSIONAL</button>
-            <button onClick={() => { setTipoForm('EMPRESA'); setMostrarForm(true); }} className="bg-white text-[#0a66c2] border-2 border-[#0a66c2] px-5 py-2.5 rounded-full text-[13px] font-bold">CADASTRAR-ME - EMPRESA</button>
-            <button onClick={carregarReais} className="bg-gray-100 px-4 py-2.5 rounded-full text-[12px] ml-auto">🔄 Atualizar</button>
+        <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-6 mb-4 sm:mb-6 w-full min-w-0">
+          {/* CAIXA AZUL REMOVIDA - era a circulada na foto */}
+          <div className="flex gap-2 sm:gap-3 mt-4 flex-wrap flex-col sm:flex-row">
+            <button onClick={() => { setTipoForm('PROFISSIONAL'); setMostrarForm(true); }} className="bg-[#0a66c2] text-white px-4 sm:px-5 py-2.5 rounded-full text-[12px] sm:text-[13px] font-bold w-full sm:w-auto text-center">REGISTAR-ME - PROFISSIONAL</button>
+            <button onClick={() => { setTipoForm('EMPRESA'); setMostrarForm(true); }} className="bg-white text-[#0a66c2] border-2 border-[#0a66c2] px-4 sm:px-5 py-2.5 rounded-full text-[12px] sm:text-[13px] font-bold w-full sm:w-auto text-center">CADASTRAR-ME - EMPRESA</button>
+            <button onClick={carregarReais} className="bg-gray-100 px-4 py-2.5 rounded-full text-[12px] w-full sm:w-auto sm:ml-auto text-center">🔄 Atualizar</button>
           </div>
 
-          <div style={{background:'#FFF7E6', borderRadius:14, padding:14, marginTop:18}}>
+          <div style={{background:'#FFF7E6', borderRadius:14, padding:12, marginTop:18, maxWidth:'100%', overflow:'hidden'}}>
             <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center'}}>
-              <div style={{flex:1, minWidth:220}}>
+              <div style={{flex:'1 1 100%', minWidth:0, maxWidth:'100%'}}>
                 <label style={{fontSize:11, fontWeight:800}}>O que precisas? - Estás à procura de...?</label>
-                <input value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && carregarReais()} placeholder="Ex: Serralheiro, Pedreiro, Eletricista, Doméstica..." style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'10px 14px', fontSize:13, marginTop:4}} />
+                <input value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && carregarReais()} placeholder="Ex: Serralheiro, Pedreiro, Eletricista..." style={{width:'100%', maxWidth:'100%', boxSizing:'border-box', border:'1px solid #ddd', borderRadius:999, padding:'10px 12px', fontSize:'clamp(11px,3.5vw,13px)', marginTop:4}} />
               </div>
               <div>
                 <label style={{fontSize:11, fontWeight:800}}>Mostrar só:</label>
@@ -195,12 +182,12 @@ export default function EncontrarReal() {
                   {(['TODOS','PROFISSIONAL','EMPRESA'] as const).map((f:any)=> <button key={f} onClick={()=> setFiltroTipo(f)} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:12, background: filtroTipo===f ? '#0B3D91' : '#fff', color: filtroTipo===f ? 'white' : '#333', boxShadow:'0 1px 3px rgba(0,0,0,.1)'}}>{f==='TODOS' ? 'Todos' : f==='PROFISSIONAL' ? '👤 Profissional' : '🏢 Empresa'}</button>)}
                 </div>
               </div>
-              <button onClick={carregarReais} style={{background:'black', color:'white', padding:'11px 20px', borderRadius:999, fontWeight:800, fontSize:13, border:'none', cursor:'pointer', marginTop:18}}>PESQUISAR</button>
+              <button onClick={carregarReais} style={{background:'black', color:'white', padding:'11px 16px', borderRadius:999, fontWeight:800, fontSize:'clamp(11px,3.5vw,13px)', border:'none', cursor:'pointer', marginTop:12, width:'100%', maxWidth:220}}>PESQUISAR</button>
             </div>
             <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:12, alignItems:'end'}}>
               <div style={{flex:1, minWidth:130}}>
                 <label style={{fontSize:11, fontWeight:800}}>📍 País - Onde estás?</label>
-                <select value={filtroPais} onChange={e=> setFiltroPais(e.target.value)} style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 10px', fontSize:12, marginTop:4, background:'white'}}>
+                <select value={filtroPais} onChange={e=> setFiltroPais(e.target.value)} style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 10px', fontSize:'clamp(11px,3.5vw,12px)', marginTop:4, background:'white'}}>
                   <option value="">Todos os países</option>
                   <option value="Moçambique">Moçambique</option>
                   <option value="África do Sul">África do Sul</option>
@@ -228,7 +215,7 @@ export default function EncontrarReal() {
               </div>
               <div style={{flex:1, minWidth:140}}>
                 <label style={{fontSize:11, fontWeight:800}}>📌 Distrito / Zona - Perto de ti!</label>
-                <input value={filtroDistrito} onChange={e=> setFiltroDistrito(e.target.value)} placeholder="Ex: Xai-Xai, Matola, KaMpfumo..." style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 12px', fontSize:12, marginTop:4}} />
+                <input value={filtroDistrito} onChange={e=> setFiltroDistrito(e.target.value)} placeholder="Ex: Matola, KaMpfumo, etc..." style={{width:'100%', border:'1px solid #ddd', borderRadius:999, padding:'9px 12px', fontSize:12, marginTop:4}} />
               </div>
               <button onClick={()=>{ setFiltroPais(''); setFiltroProvincia(''); setFiltroDistrito(''); }} style={{background:'white', border:'1px solid #ddd', padding:'9px 14px', borderRadius:999, fontSize:11, fontWeight:800, cursor:'pointer'}}>Limpar perto de mim</button>
             </div>
@@ -240,24 +227,24 @@ export default function EncontrarReal() {
         </div>
 
         {carregando ? <div className="text-center py-20">Carregando reais...</div> : listaFiltrada.length === 0 ? (
-          <div className="bg-white rounded-xl border p-12 text-center">
+          <div className="bg-white rounded-xl border p-6 sm:p-12 text-center">
             <div className="text-5xl mb-4">🔍</div>
             <h3 className="font-bold">Nenhum profissional real</h3>
             <p className="text-[12px] text-gray-500 mt-2">ZERO MOCK confirmado - Clica REGISTAR-ME para criar primeiro perfil real</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full min-w-0">
             {listaFiltrada.map(p => (
-              <div key={p.id} className="bg-white rounded-xl border p-5 hover:shadow-md">
+              <div key={p.id} className="bg-white rounded-xl border p-3 sm:p-5 hover:shadow-md w-full min-w-0 overflow-hidden">
                 <div className="flex gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#0a66c2] text-white flex items-center justify-center font-bold">{p.nome?.charAt(0)?.toUpperCase()}</div>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-[#0a66c2] text-white flex items-center justify-center font-bold text-[14px] sm:text-base">{p.nome?.charAt(0)?.toUpperCase()}</div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-[14px]">{p.nome}</h4>
+                    <h4 className="font-bold text-[13px] sm:text-[14px] break-words leading-tight">{p.nome && p.nome.length>28 ? p.nome.slice(0,28)+'…' : p.nome}</h4>
                     <p className="text-[12px] text-[#0a66c2]">{p.profissao} {p.empresa ? `- ${p.empresa}` : ''}</p>
-                    <p className="text-[11px] text-gray-500">{p.zona} - {p.provincia} - {p.pais || 'Moçambique'}</p>
+                    <p className="text-[11px] text-gray-500 truncate" title={`${p.zona} - ${p.provincia}`}>{(p.zona||'').length>20 ? (p.zona||'').slice(0,20)+'... etc' : p.zona} - {p.provincia}</p>
                   </div>
                 </div>
-                <p className="text-[12px] text-gray-600 mt-3 line-clamp-2">{p.descricao || 'Sem descrição'}</p>
+                <p className="text-[12px] text-gray-600 mt-3 line-clamp-2 break-words">{p.descricao || 'Sem descrição'}</p>
                 <div className="flex items-center gap-2 mt-3 text-[11px] text-gray-500">
                   <span>📧 {p.email}</span>
                   <span>• {p.tipo}</span>
@@ -284,7 +271,7 @@ export default function EncontrarReal() {
                 <button onClick={() => setMostrarForm(false)} className="text-2xl px-2">×</button>
               </div>
 
-              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-auto">
+              <div className="p-3 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-h-[75vh] overflow-auto w-full">
                 <div className="md:col-span-2">
                   <span style={{display:'inline-block', background: tipoForm==='EMPRESA' ? '#0B3D91' : '#0E7A5A', color:'white', padding:'6px 14px', borderRadius:999, fontSize:12, fontWeight:800}}>{tipoForm==='EMPRESA' ? '🏢 A criar como EMPRESA' : '👤 A criar como PROFISSIONAL'}</span>
                   <span style={{fontSize:11, color:'#666', marginLeft:8}}>Escolheste fora, já ficou travado aqui!</span>
