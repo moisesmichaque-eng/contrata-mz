@@ -7,6 +7,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 export default function VenderFixIVATabs(){
   const [lojaLogada, setLojaLogada] = useState<any>(null);
+  const [perfilSalvo, setPerfilSalvo] = useState(false);
   const [negocioTab, setNegocioTab] = useState<'painel'|'faturar'|'vender'|'stock'|'clientes'|'fornecedores'|'caixa'|'relatorios'>('painel');
   const [stockProdutos, setStockProdutos] = useState<any[]>([]);
   const [faturas, setFaturas] = useState<any[]>([]);
@@ -203,7 +204,7 @@ export default function VenderFixIVATabs(){
   };
   const salvarFaturaDuplaFuncao = async (isDivida:boolean) => {
     if(produtosFat.length===0){ alert('Adicione produtos'); return; }
-    if(!telFat && !nomeFat){ alert('Telefone ou nome'); return; }
+    // Sem telefone e sem nome, baixa na mesma como Cliente Balcao - só não partilha
     const subtotalBruto = produtosFat.reduce((s,p)=>s+p.preco*p.qtd,0);
     const descontoItens = produtosFat.reduce((s,p)=>s+p.preco*p.qtd*p.desc/100,0);
     const subtotalLiquido = subtotalBruto - descontoItens;
@@ -247,14 +248,18 @@ export default function VenderFixIVATabs(){
     txt(360,722,9,false,`Status: ${isDivida?'DIVIDA':'PAGO'}`);
     // Faixa amarela Factura Nº
     L.push(`1 0.8 0.08 rg 40 690 515 20 re f`);
+    L.push(`0 0 0 rg`); // volta a preto - senão tudo fica amarelo
     txt(48,697,11,true,`Factura No: ${numeroFatura}`);
     // Tabela - títulos
     const yTab = 665;
+    L.push(`0.11 0.18 0.29 rg`);
     txt(40,yTab,9,true,'DESCRICAO'); txt(295,yTab,9,true,'QTD'); txt(335,yTab,9,true,'PRECO'); txt(405,yTab,9,true,'DESC%'); txt(460,yTab,9,true,'SUBTOTAL');
+    L.push(`0 0 0 rg`);
     L.push(`0.9 0.9 0.9 RG 0.5 w 40 ${yTab-6} m 555 ${yTab-6} l S`);
     let y = yTab - 20;
     produtosFat.forEach((pr:any)=>{
       const sub = (pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0);
+      L.push(`0.11 0.18 0.29 rg`);
       txt(40,y,9,false,String(pr.nome||'').slice(0,38));
       txt(295,y,9,false,String(pr.qtd));
       txt(335,y,9,false,`${Number(pr.preco).toFixed(0)}MT`);
@@ -262,13 +267,16 @@ export default function VenderFixIVATabs(){
       txt(460,y,9,false,`${sub}MT`);
       y -= 16;
     });
+    L.push(`0 0 0 rg`);
     y -= 6;
     txt(360,y,10,false,`Subtotal: ${subtotalLiquido.toFixed(0)}MT`); y-=15;
     txt(360,y,10,false,`Desconto: -${descontoItens.toFixed(0)}MT`); y-=15;
     txt(360,y,10,false,`Subtotal liq.: ${subtotalLiquido.toFixed(0)}MT`); y-=15;
     txt(360,y,10,false,`IVA (${ivaPerc}%): ${ivaValor.toFixed(0)}MT`); y-=18;
+    L.push(`0.11 0.18 0.29 rg`);
     txt(360,y,13,true,`TOTAL: ${total.toFixed(0)}MT`);
     // Rodapé
+    L.push(`0 0 0 rg`);
     txt(40,70,8,false,`Documento emitido por ${lojaNome} - ${lojaLogada.nuit} - +${lojaLogada.username} | Sistema ContrataMZ + VENDER | ${new Date().toLocaleString('pt-MZ')}`);
     const content = L.join('\n');
     const objs:string[] = [];
@@ -306,10 +314,10 @@ export default function VenderFixIVATabs(){
   };
 
   const salvarPerfilLoja = async () => {
-    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito };
+    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito, ramo: perfilEdit.ramo };
     if(perfilEdit.novaPassword) update.password = perfilEdit.novaPassword;
     const { error } = await supabase.from('lojas').update(update).eq('conta_id', lojaLogada.conta_id);
-    if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, logoData: perfilEdit.logoData, funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); alert('Perfil atualizado'); }
+    if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, logoData: perfilEdit.logoData, funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); setPerfilSalvo(true); alert('✅ Perfil Guardado - Atualizado! Fatura e relatório já vão mostrar o novo nome, logo e dados.'); }
   };
 
 
@@ -510,12 +518,12 @@ export default function VenderFixIVATabs(){
             <h3 className="font-black text-[13px]">PAINEL DA LOJA - Perfil do proprietário - Alterar password, logo, funcionários - Mesmo stock</h3>
             <div className="grid md:grid-cols-2 gap-4 mt-4">
               <div className="space-y-3">
-                <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilEdit.nomeLoja} onChange={e=>setPerfilEdit({...perfilEdit, nomeLoja:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div>
+                <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilEdit.nomeLoja} onChange={e=>{ setPerfilSalvo(false); setPerfilEdit({...perfilEdit, nomeLoja:e.target.value}); }} className="w-full border rounded px-3 py-2 text-[12px]" /></div>
                 <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">NUIT</label><input value={perfilEdit.nuit} onChange={e=>setPerfilEdit({...perfilEdit, nuit:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[10px] font-bold">PROVINCIA</label><input value={perfilEdit.provincia} onChange={e=>setPerfilEdit({...perfilEdit, provincia:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div></div>
                 <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">DISTRITO</label><input value={perfilEdit.distrito} onChange={e=>setPerfilEdit({...perfilEdit, distrito:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[10px] font-bold">RAMO</label><input value={perfilEdit.ramo} onChange={e=>setPerfilEdit({...perfilEdit, ramo:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div></div>
                 <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">PASSWORD ATUAL</label><input type="password" value={perfilEdit.password} onChange={e=>setPerfilEdit({...perfilEdit, password:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="••••" /></div><div><label className="text-[10px] font-bold">NOVA PASSWORD</label><input type="password" value={perfilEdit.novaPassword} onChange={e=>setPerfilEdit({...perfilEdit, novaPassword:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nova" /></div></div>
-                <div><label className="text-[10px] font-bold">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{ const file=e.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>setPerfilEdit({...perfilEdit, logoData: reader.result as any}); reader.readAsDataURL(file); }} className="w-full border rounded px-3 py-2 text-[11px] mt-1" />{perfilEdit.logoData && <img src={perfilEdit.logoData} className="w-16 h-16 mt-2 rounded border" />}</div>
-                <button onClick={salvarPerfilLoja} className="w-full bg-[#1e2f4a] text-white py-2.5 rounded-full text-[12px] font-bold">Salvar Perfil - 100% Supabase</button>
+                <div><label className="text-[10px] font-bold">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{ const file=e.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{ setPerfilSalvo(false); setPerfilEdit({...perfilEdit, logoData: reader.result as any}); }; reader.readAsDataURL(file); }} className="w-full border rounded px-3 py-2 text-[11px] mt-1" />{perfilEdit.logoData && <img src={perfilEdit.logoData} className="w-16 h-16 mt-2 rounded border" />}</div>
+                <button onClick={salvarPerfilLoja} className={`w-full ${perfilSalvo?'bg-green-600':'bg-[#1e2f4a]'} text-white py-2.5 rounded-full text-[12px] font-bold`}>{perfilSalvo ? '✅ Perfil Guardado - Atualizado' : 'Salvar Perfil - 100% Supabase'}</button> - 100% Supabase</button>
               </div>
               <div className="border rounded-xl p-4"><h4 className="font-bold text-[12px]">Funcionários - 2 funcionários que vendem no caixa mas tiram do mesmo stock</h4><div className="mt-3 space-y-2"><input value={novoFunc.nome} onChange={e=>setNovoFunc({...novoFunc, nome:e.target.value})} placeholder="Nome funcionário" className="w-full border rounded px-3 py-2 text-[11px]" /><div className="grid grid-cols-2 gap-2"><input value={novoFunc.tel} onChange={e=>setNovoFunc({...novoFunc, tel:e.target.value})} placeholder="Telefone" className="border rounded px-3 py-2 text-[11px]" /><input value={novoFunc.password} onChange={e=>setNovoFunc({...novoFunc, password:e.target.value})} placeholder="Password" type="password" className="border rounded px-3 py-2 text-[11px]" /></div><select value={novoFunc.cargo} onChange={e=>setNovoFunc({...novoFunc, cargo:e.target.value})} className="w-full border rounded px-3 py-2 text-[11px]"><option>Vendedor Caixa</option><option>Gerente</option><option>Armazém</option></select><button onClick={()=>{ if(!novoFunc.nome||!novoFunc.tel) return; const lista=[...perfilEdit.funcionarios, {...novoFunc, id:Date.now()}]; setPerfilEdit({...perfilEdit, funcionarios: lista}); setNovoFunc({nome:'', tel:'', password:'', cargo:'Vendedor Caixa'}); }} className="w-full bg-[#facc15] text-black py-2 rounded-full text-[11px] font-bold">+ Adicionar Funcionário</button></div><div className="mt-4 space-y-1">{perfilEdit.funcionarios.map((f:any)=><div key={f.id} className="flex justify-between text-[11px] border-b py-1"><span>{f.nome} - {f.cargo}</span><span>{f.tel}</span></div>)}</div></div>
             </div>
