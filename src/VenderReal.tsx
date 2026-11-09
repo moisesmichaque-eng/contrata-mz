@@ -65,6 +65,7 @@ export default function VenderFixIVATabs(){
     const { data, error } = await supabase.from('lojas').select('*').eq('username', formLojaLogin.tel).eq('password', formLojaLogin.password).limit(1);
     if(error || !data || data.length===0){ alert('Loja não encontrada - verifica telefone e password ou cria conta'); return; }
     const loja = data[0];
+    try{ const ant=JSON.parse(localStorage.getItem('loja_sessao')||'{}'); if(!loja.ramo && ant.ramo) loja.ramo=ant.ramo; if(!loja.logoData && ant.logoData) loja.logoData=ant.logoData; if(!loja.funcionarios && ant.funcionarios) loja.funcionarios=ant.funcionarios; }catch(e){}
     localStorage.setItem('loja_sessao', JSON.stringify(loja));
     setLojaLogada(loja);
     setPerfilEdit({nomeLoja:loja.nome_loja||'', nuit:loja.nuit||'', endereco:loja.endereco||'', provincia:loja.provincia||'', distrito:loja.cidade||'', ramo:loja.ramo||'', tel:loja.username||'', password:'', novaPassword:'', logoData:loja.logoData||'', funcionarios: loja.funcionarios||[]});
@@ -279,20 +280,49 @@ export default function VenderFixIVATabs(){
     L.push(`0 0 0 rg`);
     txt(40,70,8,false,`Documento emitido por ${lojaNome} - ${lojaLogada.nuit} - +${lojaLogada.username} | Sistema ContrataMZ + VENDER | ${new Date().toLocaleString('pt-MZ')}`);
     const content = L.join('\n');
+    // LOGO no PDF: tenta embutir a foto do logo (JPEG). Se não houver logo ou não for JPEG, usa só o nome.
+    let logoBytes:Uint8Array|null=null; let logoW=0; let logoH=0;
+    try{
+      const ld:String = (perfilEdit.logoData||lojaLogada?.logoData||'') as any;
+      if(ld && String(ld).startsWith('data:image')){
+        const img:any = await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>rej(new Error('logo')); im.src=String(ld); });
+        logoW=img.naturalWidth||100; logoH=img.naturalHeight||100;
+        const cv=document.createElement('canvas'); const maxL=200; const sc=Math.min(1, maxL/Math.max(logoW,logoH)); cv.width=Math.max(1,Math.round(logoW*sc)); cv.height=Math.max(1,Math.round(logoH*sc));
+        const ctx=cv.getContext('2d'); if(ctx){ ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height); ctx.drawImage(img,0,0,cv.width,cv.height); logoW=cv.width; logoH=cv.height;
+          const jpg=String(cv.toDataURL('image/jpeg',0.85)).split(',')[1]||'';
+          const bin=atob(jpg); logoBytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) logoBytes[i]=bin.charCodeAt(i);
+        }
+      }
+    }catch(e){ logoBytes=null; }
+    const temLogo = !!logoBytes;
+    // Desloca o cabeçalho para a direita se houver logo, para não tapar
+    // (o conteúdo L já foi criado com x=40 - vamos desenhar o logo por cima à esquerda e manter o texto, o logo fica num quadrado 48x48)
+    if(temLogo){ L.unshift(`q 48 0 0 48 40 748 cm /Im1 Do Q`); }
     const objs:string[] = [];
     objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
     objs[2]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
-    objs[3]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>';
+    objs[3]= temLogo ? '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> /XObject << /Im1 7 0 R >> >> /Contents 6 0 R >>' : '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>';
     objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
     objs[5]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
     objs[6]=`<< /Length ${content.length} >>\nstream\n${content}\nendstream`;
+    const totalObjs = temLogo ? 7 : 6;
+    if(temLogo){ objs[7]=`<< /Type /XObject /Subtype /Image /Width ${logoW} /Height ${logoH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes!.length} >>`; }
     let pdfStr='%PDF-1.4\n'; const offs:number[]=[0];
     for(let i=1;i<=6;i++){ offs[i]=pdfStr.length; pdfStr+=`${i} 0 obj\n${objs[i]}\nendobj\n`; }
-    const xrefPos=pdfStr.length;
-    pdfStr+='xref\n0 7\n0000000000 65535 f \n';
-    for(let i=1;i<=6;i++){ pdfStr+=String(offs[i]).padStart(10,'0')+' 00000 n \n'; }
-    pdfStr+=`trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
-    const bytes=new Uint8Array(pdfStr.length); for(let i=0;i<pdfStr.length;i++) bytes[i]=pdfStr.charCodeAt(i)&0xFF;
+    let imgOffset=0;
+    if(temLogo){ imgOffset=pdfStr.length; pdfStr+=`7 0 obj\n${objs[7]}\nstream\n`; }
+    const headLen=pdfStr.length;
+    const xrefPos = temLogo ? headLen + logoBytes!.length + 11 : pdfStr.length;
+    // Monta bytes: cabeçalho + imagem binária + resto
+    let tail=`\nendstream\nendobj\n`;
+    tail+=`xref\n0 ${totalObjs+1}\n0000000000 65535 f \n`;
+    for(let i=1;i<=6;i++){ tail+=String(offs[i]).padStart(10,'0')+' 00000 n \n'; }
+    if(temLogo){ tail+=String(imgOffset).padStart(10,'0')+' 00000 n \n'; }
+    tail+=`trailer\n<< /Size ${totalObjs+1} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+    const headBytes=new Uint8Array(headLen); for(let i=0;i<headLen;i++) headBytes[i]=pdfStr.charCodeAt(i)&0xFF;
+    const tailBytes=new Uint8Array(tail.length); for(let i=0;i<tail.length;i++) tailBytes[i]=tail.charCodeAt(i)&0xFF;
+    const bytes=new Uint8Array(headBytes.length + (temLogo?logoBytes!.length:0) + tailBytes.length);
+    bytes.set(headBytes,0); if(temLogo) bytes.set(logoBytes!,headBytes.length); bytes.set(tailBytes, headBytes.length + (temLogo?logoBytes!.length:0));
     const blobPdfReal=new Blob([bytes],{type:'application/pdf'});
     // 1) Download direto - sempre, com ou sem telefone
     const urlPdf=URL.createObjectURL(blobPdfReal);
@@ -314,10 +344,11 @@ export default function VenderFixIVATabs(){
   };
 
   const salvarPerfilLoja = async () => {
-    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito, ramo: perfilEdit.ramo };
+    // Só colunas que existem em 'lojas': nome_loja, nuit, provincia, cidade, password. ramo/logo/funcionarios ficam SÓ no telefone (localStorage), senão dá erro 'Could not find ramo column' e não guarda nada.
+    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito };
     if(perfilEdit.novaPassword) update.password = perfilEdit.novaPassword;
     const { error } = await supabase.from('lojas').update(update).eq('conta_id', lojaLogada.conta_id);
-    if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, logoData: perfilEdit.logoData, funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); setPerfilSalvo(true); alert('✅ Perfil Guardado - Atualizado! Fatura e relatório já vão mostrar o novo nome, logo e dados.'); }
+    if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, ramo: perfilEdit.ramo || lojaLogada?.ramo || '', logoData: perfilEdit.logoData || lojaLogada?.logoData || '', funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); setPerfilSalvo(true); alert('✅ Perfil Guardado - Atualizado! Fatura e relatório já vão mostrar o novo nome, logo e dados.'); }
   };
 
 
@@ -520,7 +551,7 @@ export default function VenderFixIVATabs(){
               <div className="space-y-3">
                 <div><label className="text-[10px] font-bold">NOME DA LOJA</label><input value={perfilEdit.nomeLoja} onChange={e=>{ setPerfilSalvo(false); setPerfilEdit({...perfilEdit, nomeLoja:e.target.value}); }} className="w-full border rounded px-3 py-2 text-[12px]" /></div>
                 <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">NUIT</label><input value={perfilEdit.nuit} onChange={e=>setPerfilEdit({...perfilEdit, nuit:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[10px] font-bold">PROVINCIA</label><input value={perfilEdit.provincia} onChange={e=>setPerfilEdit({...perfilEdit, provincia:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div></div>
-                <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">DISTRITO</label><input value={perfilEdit.distrito} onChange={e=>setPerfilEdit({...perfilEdit, distrito:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[10px] font-bold">RAMO</label><input value={perfilEdit.ramo} onChange={e=>setPerfilEdit({...perfilEdit, ramo:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div></div>
+                <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">DISTRITO</label><input value={perfilEdit.distrito} onChange={e=>setPerfilEdit({...perfilEdit, distrito:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[10px] font-bold">RAMO - do registo, não muda aqui</label><input value={perfilEdit.ramo} readOnly title="Ramo do registo - não muda aqui" placeholder="Ramo do registo" className="w-full border rounded px-3 py-2 text-[12px] bg-gray-100 text-gray-600 cursor-not-allowed" /></div></div>
                 <div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] font-bold">PASSWORD ATUAL</label><input type="password" value={perfilEdit.password} onChange={e=>setPerfilEdit({...perfilEdit, password:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="••••" /></div><div><label className="text-[10px] font-bold">NOVA PASSWORD</label><input type="password" value={perfilEdit.novaPassword} onChange={e=>setPerfilEdit({...perfilEdit, novaPassword:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nova" /></div></div>
                 <div><label className="text-[10px] font-bold">LOGOTIPO - Vai aparecer em facturas</label><input type="file" accept="image/*" onChange={e=>{ const file=e.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{ setPerfilSalvo(false); setPerfilEdit({...perfilEdit, logoData: reader.result as any}); }; reader.readAsDataURL(file); }} className="w-full border rounded px-3 py-2 text-[11px] mt-1" />{perfilEdit.logoData && <img src={perfilEdit.logoData} className="w-16 h-16 mt-2 rounded border" />}</div>
                 <button onClick={salvarPerfilLoja} className={`w-full ${perfilSalvo?'bg-green-600':'bg-[#1e2f4a]'} text-white py-2.5 rounded-full text-[12px] font-bold`}>{perfilSalvo ? '✅ Perfil Guardado - Atualizado' : 'Salvar Perfil - 100% Supabase'}</button>
