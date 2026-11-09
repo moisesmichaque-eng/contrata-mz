@@ -18,3 +18,23 @@ img, video {
 * {
   box-sizing: border-box;
 }
+
+/* V13 - PASSO 4 - COMPACTO TELEFONE - WEZHA */
+/* So no telefone (ate 640px). No computador nao muda nada. */
+@media (max-width: 640px) {
+  /* Menos espaco em volta, frases mais proximas */
+  .min-h-screen { padding: 8px !important; }
+  .p-6 { padding: 12px !important; }
+  .p-4 { padding: 10px !important; }
+  .gap-3 { gap: 8px !important; }
+  .gap-2 { gap: 6px !important; }
+  .mt-4 { margin-top: 10px !important; }
+  .mb-6 { margin-bottom: 12px !important; }
+  .space-y-4 > * + * { margin-top: 10px !important; }
+  /* Tudo em 1 coluna no telefone - nao aperta 2 colunas lado a lado */
+  .grid-cols-2 { grid-template-columns: 1fr !important; }
+  /* Hero "Precisas viajar?" mais pequeno e mais junto no telefone */
+  h1, h2 { line-height: 1.15 !important; }
+  /* Botoes do topo nao partem, cabem no telefone */
+  .rounded-full { white-space: normal !important; }
+}
