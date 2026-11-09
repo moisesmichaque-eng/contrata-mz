@@ -221,11 +221,87 @@ export default function VenderFixIVATabs(){
       if(prod){ const novaVenda = prod.vendaHoje + item.qtd; const novoFinalLoja = prod.stockInicialLoja + prod.recepcao - novaVenda; await supabase.from('produtos_loja').update({ venda_hoje: novaVenda, stock_loja: novoFinalLoja }).eq('id', prod.id); }
     }
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}</title><style>@page{size:A4;margin:15mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;padding:0;margin:0;font-size:11px;color:#000;background:#fff}.a4{width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.loja{display:flex;gap:12px}.logo{width:64px;height:64px;min-width:64px;border-radius:50%;background:#1e2f4a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;overflow:hidden}.logo img{width:100%;height:100%;object-fit:cover}.loja b{font-size:16px}.loja .meta{font-size:11px;line-height:1.5}.cliente{font-size:11px;line-height:1.6;text-align:left;white-space:nowrap}.cliente b{font-weight:700}.amarelo{background:#facc15;padding:8px 10px;font-weight:900;text-align:left;margin:14px 0;font-size:12px}.amarelo span{font-weight:900}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#f1f5f9;text-align:left;padding:8px 6px;font-size:10px;border-bottom:1px solid #e5e7eb}td{padding:8px 6px;font-size:11px;border-bottom:1px solid #eee;vertical-align:top}th:nth-child(1),td:nth-child(1){width:44%;text-align:left}th:nth-child(2),td:nth-child(2){width:10%;text-align:center}th:nth-child(3),td:nth-child(3){width:16%;text-align:right;white-space:nowrap}th:nth-child(4),td:nth-child(4){width:10%;text-align:center}th:nth-child(5),td:nth-child(5){width:20%;text-align:right;white-space:nowrap}.tot{text-align:right;margin-top:12px;line-height:1.8;font-size:11px}.tot b{background:#facc15;padding:6px 12px;display:inline-block;font-size:13px}.rodape{margin-top:28px;font-size:9px;color:#555;border-top:1px solid #ddd;padding-top:8px}</style></head><body><div class="a4"><div class="top"><div class="loja"><div class="logo">${perfilEdit.logoData ? `<img src="${perfilEdit.logoData}" />` : (lojaLogada?.nome_loja?.charAt(0)||'A')}</div><div><b>${lojaLogada.nome_loja}</b><div class="meta">NUIT: ${lojaLogada.nuit} | Tel: +${lojaLogada.username}<br/>${lojaLogada.ramo||perfilEdit.ramo||'Mecanica e Auto Pecas'}<br/>${lojaLogada.endereco||lojaLogada.cidade||'Maputo'}${lojaLogada.provincia ? ' - '+lojaLogada.provincia : ''}</div></div></div><div class="cliente">Cliente: <b>${nomeClienteFatura}</b><br/>Tel: <b>${telFat||'-'}</b><br/>NUIT: <b>${nuitFat||'-'}</b><br/>Data: <b>${new Date().toLocaleDateString('pt-MZ')}</b><br/>Factura: <b>${numeroFatura}</b><br/>Turno: <b>${caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite'}</b><br/>Status: <b>${isDivida?'DIVIDA':'PAGO'}</b></div></div><div class="amarelo">Factura Nº: <span>${numeroFatura}</span></div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}</td><td>${p.qtd}</td><td>${Number(p.preco).toFixed(0)}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="tot">Subtotal: ${subtotalLiquido.toFixed(0)}MT<br/>Desconto: -${descontoItens.toFixed(0)}MT<br/>Subtotal liq.: ${subtotalLiquido.toFixed(0)}MT<br/>IVA (${ivaPerc}%): ${ivaValor.toFixed(0)}MT<br/><b>TOTAL: ${total.toFixed(0)}MT</b></div><div class="rodape">Documento emitido por ${lojaLogada.nome_loja} - ${lojaLogada.nuit} - +${lojaLogada.username} | Sistema ContrataMZ + VENDER | ${new Date().toLocaleString('pt-MZ')}</div></div></body></html>`;
-    // A4 DIRETO PARA DOWNLOAD - 1 ficheiro só. Sem A5 WhatsApp, sem CSV auto, sem abrir WhatsApp.
+    // FATURA PDF REAL A4 - 1 ficheiro só. PDF a sério (não HTML com nome .pdf), abre no Edge/Chrome.
+    // Tabela como no Excel: DESCRICAO | QTD | PRECO | DESC% | SUBTOTAL. Sem acentos no PDF para não partir a codificação.
     const nomeFicheiro = `Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`;
-    const blobA4 = new Blob([html], {type:'text/html'});
-    const urlA4 = URL.createObjectURL(blobA4);
-    const aA4 = document.createElement('a'); aA4.href=urlA4; aA4.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aA4); aA4.click(); document.body.removeChild(aA4); setTimeout(()=>URL.revokeObjectURL(urlA4),2000);
+    const semAcento = (s:any)=> String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7E]/g,' ');
+    const escPdf = (s:any)=> semAcento(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+    const L:any[] = [];
+    const txt = (x:number,y:number,size:number,bold:boolean,str:string)=>{ L.push(`BT /${bold?'F2':'F1'} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${escPdf(str)}) Tj ET`); };
+    const lojaNome = semAcento(lojaLogada.nome_loja||'');
+    const lojaRamo = semAcento(lojaLogada.ramo||perfilEdit.ramo||'');
+    const lojaEnd = semAcento((lojaLogada.endereco||lojaLogada.cidade||'Maputo') + (lojaLogada.provincia ? ' - '+lojaLogada.provincia : ''));
+    const dataHoje = new Date().toLocaleDateString('pt-MZ');
+    const turnoTxt = caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite';
+    // Cabeçalho loja (esquerda) + cliente (direita)
+    txt(40,800,14,true,lojaNome);
+    txt(40,784,9,false,`NUIT: ${lojaLogada.nuit} | Tel: +${lojaLogada.username}`);
+    txt(40,771,9,false,lojaRamo);
+    txt(40,758,9,false,lojaEnd);
+    txt(360,800,9,false,`Cliente: ${semAcento(nomeClienteFatura)}`);
+    txt(360,787,9,false,`Tel: ${telFat||'-'}`);
+    txt(360,774,9,false,`NUIT: ${nuitFat||'-'}`);
+    txt(360,761,9,false,`Data: ${dataHoje}`);
+    txt(360,748,9,false,`Factura: ${numeroFatura}`);
+    txt(360,735,9,false,`Turno: ${turnoTxt}`);
+    txt(360,722,9,false,`Status: ${isDivida?'DIVIDA':'PAGO'}`);
+    // Faixa amarela Factura Nº
+    L.push(`1 0.8 0.08 rg 40 690 515 20 re f`);
+    txt(48,697,11,true,`Factura No: ${numeroFatura}`);
+    // Tabela - títulos
+    const yTab = 665;
+    txt(40,yTab,9,true,'DESCRICAO'); txt(295,yTab,9,true,'QTD'); txt(335,yTab,9,true,'PRECO'); txt(405,yTab,9,true,'DESC%'); txt(460,yTab,9,true,'SUBTOTAL');
+    L.push(`0.9 0.9 0.9 RG 0.5 w 40 ${yTab-6} m 555 ${yTab-6} l S`);
+    let y = yTab - 20;
+    produtosFat.forEach((pr:any)=>{
+      const sub = (pr.preco*pr.qtd*(1-pr.desc/100)).toFixed(0);
+      txt(40,y,9,false,String(pr.nome||'').slice(0,38));
+      txt(295,y,9,false,String(pr.qtd));
+      txt(335,y,9,false,`${Number(pr.preco).toFixed(0)}MT`);
+      txt(405,y,9,false,`${pr.desc}%`);
+      txt(460,y,9,false,`${sub}MT`);
+      y -= 16;
+    });
+    y -= 6;
+    txt(360,y,10,false,`Subtotal: ${subtotalLiquido.toFixed(0)}MT`); y-=15;
+    txt(360,y,10,false,`Desconto: -${descontoItens.toFixed(0)}MT`); y-=15;
+    txt(360,y,10,false,`Subtotal liq.: ${subtotalLiquido.toFixed(0)}MT`); y-=15;
+    txt(360,y,10,false,`IVA (${ivaPerc}%): ${ivaValor.toFixed(0)}MT`); y-=18;
+    txt(360,y,13,true,`TOTAL: ${total.toFixed(0)}MT`);
+    // Rodapé
+    txt(40,70,8,false,`Documento emitido por ${lojaNome} - ${lojaLogada.nuit} - +${lojaLogada.username} | Sistema ContrataMZ + VENDER | ${new Date().toLocaleString('pt-MZ')}`);
+    const content = L.join('\n');
+    const objs:string[] = [];
+    objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
+    objs[2]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+    objs[3]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>';
+    objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+    objs[5]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
+    objs[6]=`<< /Length ${content.length} >>\nstream\n${content}\nendstream`;
+    let pdfStr='%PDF-1.4\n'; const offs:number[]=[0];
+    for(let i=1;i<=6;i++){ offs[i]=pdfStr.length; pdfStr+=`${i} 0 obj\n${objs[i]}\nendobj\n`; }
+    const xrefPos=pdfStr.length;
+    pdfStr+='xref\n0 7\n0000000000 65535 f \n';
+    for(let i=1;i<=6;i++){ pdfStr+=String(offs[i]).padStart(10,'0')+' 00000 n \n'; }
+    pdfStr+=`trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+    const bytes=new Uint8Array(pdfStr.length); for(let i=0;i<pdfStr.length;i++) bytes[i]=pdfStr.charCodeAt(i)&0xFF;
+    const blobPdfReal=new Blob([bytes],{type:'application/pdf'});
+    // 1) Download direto - sempre, com ou sem telefone
+    const urlPdf=URL.createObjectURL(blobPdfReal);
+    const aPdf=document.createElement('a'); aPdf.href=urlPdf; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf); setTimeout(()=>URL.revokeObjectURL(urlPdf),3000);
+    // 2) Partilha - só se houver telefone. Mesma fatura que foi para Download, não resumida.
+    const numLimpo=String(telFat||'').replace(/\D/g,'');
+    if(numLimpo){
+      const ficheiroPdf=new File([blobPdfReal], `${nomeFicheiro}.pdf`, {type:'application/pdf'});
+      const podePartilhar = (navigator as any).share && (navigator as any).canShare && (navigator as any).canShare({files:[ficheiroPdf]});
+      if(podePartilhar){
+        try{ await (navigator as any).share({files:[ficheiroPdf], title:nomeFicheiro, text:`Fatura ${numeroFatura} - ${lojaNome} - Total ${total.toFixed(0)}MT`}); }catch(e:any){ /* utilizador cancelou partilha - PDF já está no Download */ }
+      } else {
+        // Navegador não permite anexar ficheiro ao WhatsApp automaticamente - abre conversa e o vendedor anexa o PDF que já baixou
+        const numWa = numLimpo.startsWith('258')?numLimpo:`258${numLimpo}`;
+        window.open(`https://wa.me/${numWa}?text=${encodeURIComponent(`Fatura ${numeroFatura} - ${lojaNome} - Total ${total.toFixed(0)}MT - PDF completo na pasta Download, segue em anexo.`)}`, '_blank');
+      }
+    }
     alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - Ficheiro: Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
   };
 
