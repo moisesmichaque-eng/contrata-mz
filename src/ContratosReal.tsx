@@ -334,11 +334,14 @@ export default function ContratosReal(){
   return (
     <div className="min-h-screen bg-[#f8f9fb] p-4 font-sans">
       <div className="max-w-6xl mx-auto">
-        <!-- Página livre: sem Meus Contratos -->
+        <div className="bg-white rounded-xl border p-6 mb-4">
+          <h1 className="text-2xl font-bold text-[#1e2f4a]">CONTRATOS - Página livre - 10 CLÁUSULAS - Dados sem número, Cláusula 1 = Objeto</h1>
+          <p className="text-[11px] text-gray-500 mt-1">Página livre - sem credenciais. Faz o contrato, baixa o PDF e partilha no WhatsApp.</p>
+          {/* Página livre: sem Meus Contratos */}
           <p className="text-[10px] text-gray-400 mt-2">Dica: Seleciona um profissional no ENCONTRAR e clica GERAR CONTRATO que já preenche automaticamente com dados reais</p>
         </div>
 
-        {mostrarForm &&{mostrarForm && (
+        {mostrarForm && (
           <div className="mt-4">
             <div className="bg-white rounded-2xl w-full max-w-6xl">
               <div className="p-4 border-b">
@@ -347,7 +350,7 @@ export default function ContratosReal(){
                 <div className="flex gap-1 mt-3 flex-wrap">
                   {PROFISSOES.map(p=> <button key={p} onClick={()=>{ setForm({...form, trabProf:p, tarefas: MODELO_TAREFAS[p]||MODELO_TAREFAS["Outros/Particular"]}); setTarefasSel(MODELO_TAREFAS[p]||MODELO_TAREFAS["Outros/Particular"]); }} className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold ${form.trabProf===p?'bg-[#c9a227] text-white':'bg-gray-100'}`}>{p.toUpperCase()}</button>)}
                 </div>
-                <!-- Logo vem dos Anexos (Cláusula 9) - sem barra no topo -->
+                {/* Logo vem dos Anexos (Cláusula 9) - sem barra no topo */}
               </div>
               <div className="grid md:grid-cols-3 gap-3 p-3">
                 {/* COL 1 - Edita sua escolha */}
