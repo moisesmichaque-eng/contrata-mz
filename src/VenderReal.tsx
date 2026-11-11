@@ -417,8 +417,6 @@ export default function VenderFixIVATabs(){
                   <div className="mt-2 text-[6px] text-gray-500">Dupla funcao: PDF baixa automatico com nome Fatura DD-MM-AAAA - Nome - PAGO/DIVIDA + WhatsApp direto - Numero fatura por data dia de hoje</div>
                 </div>
               </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
