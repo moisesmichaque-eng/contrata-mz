@@ -247,7 +247,6 @@ export default function VenderFixIVATabs(){
     content += `(${esc(titulo)}) Tj T* T* `;
     linhas.forEach((l:string)=>{ const partes = l.match(/.{1,95}/g) || [l]; partes.forEach((p:string)=>{ content += `(${esc(p)}) Tj T* `; }); });
     content += 'ET';
-    const logoBin = d.logoJpeg ? (()=>{ try{ return atob(d.logoJpeg); }catch(e){ return ''; } })() : '';
     const objs:string[] = [];
     objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
     objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
@@ -265,6 +264,7 @@ export default function VenderFixIVATabs(){
   };
   // V27 - PDF REAL da fatura com TABELA (09/11): logotipo em texto, faixa amarela fina, tabela DESCRICAO|QTD|PRECO|DESC%|SUBTOTAL
   const gerarPdfFatura = (d:any) => {
+    const logoBin = d.logoJpeg ? (()=>{ try{ return atob(d.logoJpeg); }catch(e){ return ''; } })() : '';
     const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
     const esc = (s:any)=> limpa(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
     const txt = (f:string, sz:number, x:number, y:number, t:any)=> `0 0 0 rg BT /${f} ${sz} Tf 1 0 0 1 ${x} ${y} Tm (${esc(t)}) Tj ET `;
@@ -369,10 +369,12 @@ export default function VenderFixIVATabs(){
   };
   // BOTAO FATURAS (ao lado de PRODUTOS): desce logo para Faturas Recentes - Anular, sem sair de Faturar
   const irParaFaturas = () => { setNegocioTab('faturar'); setTimeout(()=>{ document.getElementById('faturas-recentes')?.scrollIntoView({behavior:'smooth', block:'start'}); }, 120); };
-  const [salvandoFatura, setSalvandoFatura] = useState(false);
+  const [salvandoPago, setSalvandoPago] = useState(false);
+  const [salvandoDivida, setSalvandoDivida] = useState(false);
   const salvarFaturaDuplaFuncao = async (isDivida:boolean) => {
-    if(salvandoFatura) return;
-    setSalvandoFatura(true);
+    const setSalvando = isDivida ? setSalvandoDivida : setSalvandoPago;
+    if(isDivida ? salvandoDivida : salvandoPago) return;
+    setSalvando(true);
     try{
     if(produtosFat.length===0){ alert('Adicione produtos'); return; }
     // V28 - SEM CONDICAO: fatura baixa SEMPRE, mesmo sem telefone/nome do cliente. Cliente vazio = Cliente Balcao. Se houver numero WhatsApp, tambem envia para esse numero.
@@ -426,7 +428,7 @@ export default function VenderFixIVATabs(){
       }
     }
     alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - Ficheiro: Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
-    }catch(e:any){ alert('Erro a gerar fatura: '+(e?.message||e)); } finally { setSalvandoFatura(false); }
+    }catch(e:any){ alert('Erro a gerar fatura: '+(e?.message||e)); } finally { setSalvando(false); }
   };
 
   const salvarPerfilLoja = async () => {
@@ -587,8 +589,8 @@ export default function VenderFixIVATabs(){
                     <button onClick={()=>setIvaTipo('5')} className={`text-[7px] px-3 py-1 rounded-full border ${ivaTipo==='5'?'bg-blue-600 text-white':'bg-white'}`}>Com IVA 5%</button>
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <button disabled={salvandoFatura} onClick={()=>salvarFaturaDuplaFuncao(false)} className="flex-1 h-10 bg-[#16a34a] text-white rounded-[8px] text-[9px] font-black disabled:opacity-60">{salvandoFatura?'A gerar fatura... espera':`Enviar via WhatsApp para ${telFat||'+258 84 123 4567'} - ${produtosFat.length} itens - Baixa Stock Auto - PAGO - TOTAL ${totalFat.toFixed(0)} MT IVA ${ivaTipo}%`}</button>
-                    <button disabled={salvandoFatura} onClick={()=>salvarFaturaDuplaFuncao(true)} className="px-4 h-10 bg-[#facc15] border-2 border-black text-black rounded-[8px] text-[8px] font-black disabled:opacity-60">{salvandoFatura?'A gerar...':'DIVIDAS - FIADO - '+produtosFat.length+' itens'}</button>
+                    <button disabled={salvandoPago} onClick={()=>salvarFaturaDuplaFuncao(false)} className="flex-1 h-10 bg-[#16a34a] text-white rounded-[8px] text-[9px] font-black disabled:opacity-60">{salvandoPago?'A gerar fatura... espera':`Enviar via WhatsApp para ${telFat||'+258 84 123 4567'} - ${produtosFat.length} itens - Baixa Stock Auto - PAGO - TOTAL ${totalFat.toFixed(0)} MT IVA ${ivaTipo}%`}</button>
+                    <button disabled={salvandoDivida} onClick={()=>salvarFaturaDuplaFuncao(true)} className="px-4 h-10 bg-[#facc15] border-2 border-black text-black rounded-[8px] text-[8px] font-black disabled:opacity-60">{salvandoDivida?'A gerar...':'DIVIDAS - FIADO - '+produtosFat.length+' itens'}</button>
                   </div>
                   <div className="mt-2 text-[6px] text-gray-500">Dupla funcao: PDF baixa automatico com nome Fatura DD-MM-AAAA - Nome - PAGO/DIVIDA + WhatsApp direto - Numero fatura por data dia de hoje</div>
                 </div>
@@ -664,8 +666,8 @@ export default function VenderFixIVATabs(){
                   <div className="mt-2"><div className="text-[8px] font-bold">NOME / EMPRESA</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Nome do cliente" className="w-full mt-1 h-8 border rounded px-2 text-[10px] bg-white" /></div>
                   <div className="font-black text-[14px] mt-3">TOTAL: {totalFat.toFixed(0)} MT</div>
                   <div className="text-[8px] text-gray-500">IVA {ivaTipo}% incluido - Subtotal {liqFat.toFixed(0)} + IVA {ivaVal.toFixed(0)}</div>
-                  <button disabled={salvandoFatura} onClick={()=>salvarFaturaDuplaFuncao(false)} className="w-full mt-3 bg-[#16a34a] text-white py-2.5 rounded-[8px] text-[10px] font-black disabled:opacity-60">{salvandoFatura?'A gerar fatura...':'Confirmar venda - Baixar stock'}</button>
-                  <button disabled={salvandoFatura} onClick={()=>salvarFaturaDuplaFuncao(true)} className="w-full mt-2 bg-[#facc15] border-2 border-black text-black py-2 rounded-[8px] text-[9px] font-black disabled:opacity-60">{salvandoFatura?'A gerar...':'DIVIDA - FIADO - Baixar stock'}</button>
+                  <button disabled={salvandoPago} onClick={()=>salvarFaturaDuplaFuncao(false)} className="w-full mt-3 bg-[#16a34a] text-white py-2.5 rounded-[8px] text-[10px] font-black disabled:opacity-60">{salvandoPago?'A gerar fatura...':'Confirmar venda - Baixar stock'}</button>
+                  <button disabled={salvandoDivida} onClick={()=>salvarFaturaDuplaFuncao(true)} className="w-full mt-2 bg-[#facc15] border-2 border-black text-black py-2 rounded-[8px] text-[9px] font-black disabled:opacity-60">{salvandoDivida?'A gerar...':'DIVIDA - FIADO - Baixar stock'}</button>
                 </div>
               </div>
             </div>
