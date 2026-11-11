@@ -229,14 +229,19 @@ export default function VenderFixIVATabs(){
   const gerarPdfFatura = (d:any) => {
     const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
     const esc = (s:any)=> limpa(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-    const txt = (f:string, sz:number, x:number, y:number, t:any)=> `BT /${f} ${sz} Tf 1 0 0 1 ${x} ${y} Tm (${esc(t)}) Tj ET `;
+    const txt = (f:string, sz:number, x:number, y:number, t:any)=> `0 0 0 rg BT /${f} ${sz} Tf 1 0 0 1 ${x} ${y} Tm (${esc(t)}) Tj ET `;
     const rect = (x:number, y:number, w:number, h:number, r:number, g:number, b:number, fill:boolean)=> `${r} ${g} ${b} ${fill?'rg':'RG'} ${x} ${y} ${w} ${h} re ${fill?'f':'S'} `;
     const linha = (x1:number, y1:number, x2:number, y2:number)=> `0.5 0.5 0.5 RG ${x1} ${y1} m ${x2} ${y2} l S `;
     let c = '';
-    // Cabecalho loja
-    c += txt('F2', 15, 40, 800, d.loja);
-    c += txt('F1', 9, 40, 786, 'NUIT: ' + d.nuit + ' | Tel: +' + d.telLoja);
-    c += txt('F1', 9, 40, 774, d.endereco);
+    // Cabecalho loja - LOGO embutido no PDF (igual ao preview): foto JPEG ou circulo azul com a letra
+    if(d.logoJpeg){
+      c += `q 60 0 0 60 40 765 cm /Im1 Do Q `;
+    } else {
+      c += `0.12 0.18 0.29 rg 40 765 60 60 re f 1 1 1 rg BT /F2 26 Tf 1 0 0 1 60 785 Tm (${esc(String(d.loja||'A').charAt(0))}) Tj ET `;
+    }
+    c += txt('F2', 15, 110, 800, d.loja);
+    c += txt('F1', 9, 110, 786, 'NUIT: ' + d.nuit + ' | Tel: +' + d.telLoja);
+    c += txt('F1', 9, 110, 774, d.endereco);
     // Cliente (direita)
     c += txt('F1', 9, 330, 800, 'Cliente: ' + d.cliente);
     c += txt('F1', 9, 330, 788, 'Tel: ' + d.telCliente);
@@ -269,29 +274,40 @@ export default function VenderFixIVATabs(){
       c += linha(x0, y-3, xF, y-3);
     });
     // Grelha vertical da tabela
-    [x0, xQ-4, xP-4, xD-4, xS-4, xF].forEach((x:number)=>{ c += linha(x, yTop+2, x, y-3); });
+    [x0, xQ-4, xP-4, xD-4, xS-4, xF].forEach((x:number)=>{ c += linha(x, yTop+2, x, y-3); }); // grelha vertical ate ao fim dos totais
     c += linha(x0, yTop+2, xF, yTop+2);
-    // Totais
-    let yt = y - 22;
-    c += txt('F1', 10, 360, yt, 'Subtotal: ' + Number(d.subtotal).toFixed(0) + 'MT'); yt -= 14;
-    c += txt('F1', 10, 360, yt, 'Desconto: -' + Number(d.desconto).toFixed(0) + 'MT'); yt -= 14;
-    c += txt('F1', 10, 360, yt, 'Subtotal liq.: ' + Number(d.subtotalLiq).toFixed(0) + 'MT'); yt -= 14;
-    c += txt('F1', 10, 360, yt, 'IVA (' + d.ivaPerc + '%): ' + Number(d.ivaValor).toFixed(0) + 'MT'); yt -= 16;
-    c += txt('F2', 13, 360, yt, 'TOTAL: ' + Number(d.total).toFixed(0) + 'MT');
+    // Totais DENTRO da tabela, na ultima coluna (onde o dono circulou a verde) - nao fora em letra clara
+    const linhasTot = [
+      { label: 'Subtotal', valor: Number(d.subtotal).toFixed(0) + 'MT', bold: false },
+      { label: 'Desconto', valor: '-' + Number(d.desconto).toFixed(0) + 'MT', bold: false },
+      { label: 'Subtotal liq.', valor: Number(d.subtotalLiq).toFixed(0) + 'MT', bold: false },
+      { label: 'IVA (' + d.ivaPerc + '%)', valor: Number(d.ivaValor).toFixed(0) + 'MT', bold: false },
+      { label: 'TOTAL', valor: Number(d.total).toFixed(0) + 'MT', bold: true },
+    ];
+    linhasTot.forEach((lt:any, idx:number)=>{
+      y -= 15;
+      if(idx===linhasTot.length-1){ c += rect(x0, y-3, xF-x0, 15, 0.98, 0.8, 0.08, true); }
+      c += txt(lt.bold?'F2':'F1', lt.bold?11:9, x0+4, y, lt.label);
+      c += txt(lt.bold?'F2':'F1', lt.bold?11:9, xS, y, lt.valor);
+      c += linha(x0, y-3, xF, y-3);
+    });
+    y -= 3;
     const objs:string[] = [];
     objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
     objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
-    objs[3] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
+    objs[3] = d.logoJpeg ? '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> /XObject << /Im1 7 0 R >> >> /Contents 5 0 R >>' : '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
     objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
     objs[5] = `<< /Length ${c.length} >>\nstream\n${c}\nendstream`;
     objs[6] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
+    const totalObjs = d.logoJpeg ? 7 : 6;
+    if(d.logoJpeg){ objs[7] = `<< /Type /XObject /Subtype /Image /Width ${d.logoW||120} /Height ${d.logoH||120} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${d.logoJpeg.length} >>\nstream\n${d.logoJpeg}\nendstream`; }
     let pdf = '%PDF-1.4\n';
     const offsets:number[] = [0];
-    for(let i=1;i<=6;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
+    for(let i=1;i<=totalObjs;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
     const xrefPos = pdf.length;
-    pdf += 'xref\n0 7\n0000000000 65535 f \n';
-    for(let i=1;i<=6;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
-    pdf += 'trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF';
+    pdf += `xref\n0 ${totalObjs+1}\n0000000000 65535 f \n`;
+    for(let i=1;i<=totalObjs;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
+    pdf += `trailer\n<< /Size ${totalObjs+1} /Root 1 0 R >>\nstartxref\n` + xrefPos + '\n%%EOF';
     return new Blob([pdf], {type:'application/pdf'});
   };
   // ANULAR FATURA - volta stock, tira de tudo (Caixa, Clientes, Relatorios)
@@ -337,7 +353,18 @@ export default function VenderFixIVATabs(){
     // COM numero -> baixa o PDF + abre a partilha do ficheiro (escolhes WhatsApp e o cliente).
     // SEM numero -> apenas baixa o PDF, nao abre WhatsApp nem partilha.
     const nomeFicheiro = `Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`;
-    const pdfBlob = gerarPdfFatura({ loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
+    // V29 - LOGO + DADOS ATUALIZADOS: converte o logo atual (perfil) para JPEG e usa os dados atuais da loja
+    const logoAtual = perfilEdit.logoData || lojaLogada.logoData || '';
+    let logoJpeg = '', logoW = 120, logoH = 120;
+    if(logoAtual){
+      try{
+        const imgLogo = new Image();
+        await new Promise((res, rej)=>{ imgLogo.onload=res; imgLogo.onerror=rej; imgLogo.src=logoAtual; });
+        const cv = document.createElement('canvas'); const lado = Math.min(imgLogo.naturalWidth||120, imgLogo.naturalHeight||120, 300);
+        cv.width=lado; cv.height=lado; const ctx=cv.getContext('2d'); if(ctx){ ctx.drawImage(imgLogo, 0, 0, lado, lado); const dj = cv.toDataURL('image/jpeg', 0.85); logoJpeg = dj.split(',')[1]||''; logoW=lado; logoH=lado; }
+      }catch(e){}
+    }
+    const pdfBlob = gerarPdfFatura({ logoJpeg, logoW, logoH, loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
     const urlPdf = URL.createObjectURL(pdfBlob);
     const aPdf = document.createElement('a'); aPdf.href=urlPdf; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf);
     setTimeout(()=>URL.revokeObjectURL(urlPdf), 10000);
@@ -357,7 +384,7 @@ export default function VenderFixIVATabs(){
   };
 
   const salvarPerfilLoja = async () => {
-    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito };
+    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito, logoData: perfilEdit.logoData }; // V29 - logo e dados gravam no Supabase, todos os documentos saem atualizados
     if(perfilEdit.novaPassword) update.password = perfilEdit.novaPassword;
     const { error } = await supabase.from('lojas').update(update).eq('conta_id', lojaLogada.conta_id);
     if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, logoData: perfilEdit.logoData, funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); alert('Perfil atualizado'); }
@@ -485,7 +512,7 @@ export default function VenderFixIVATabs(){
                   <div className="mt-2 flex gap-2">
                     <div className="flex-1 relative"><span className="absolute left-2 top-2 text-[10px]">🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="w-full h-8 border rounded-full pl-7 pr-3 text-[10px] bg-[#f8fafc]" /></div><button onClick={()=>{ setBuscaFat(''); setMostrarProdutosCheio(true); }} className="bg-[#facc15] text-black text-[10px] font-black px-4 h-8 rounded-full border border-black whitespace-nowrap">🛒 PRODUTOS</button><button onClick={()=>setMostrarClienteFat(!mostrarClienteFat)} className="bg-red-600 text-white text-[10px] font-black px-4 h-8 rounded-full whitespace-nowrap">👤 CLIENTE {mostrarClienteFat?'▲':'▼'}</button><button onClick={irParaFaturas} className="bg-[#1e2f4a] text-white text-[10px] font-black px-4 h-8 rounded-full whitespace-nowrap">🧾 FATURAS ↓</button>
                   </div>
-                  <div className="mt-2 flex gap-1 flex-wrap">{stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,8).map(p=><button key={p.id} onClick={()=>adicionarAoFaturar(p)} className="text-[7px] bg-black text-white px-2 py-1 rounded-full border"> {p.nome} - {p.precoUnit}MT - Stock:{p.stockFinalLoja} </button>)}</div>
+                  <div className="mt-2 flex gap-1 flex-wrap">{stockProdutos.filter(p=>!buscaFat || p.nome.toLowerCase().includes(buscaFat.toLowerCase())).slice(0,8).map(p=><button key={p.id} onClick={()=>adicionarAoFaturar(p)} className="text-[7px] bg-[#1e3a8a] text-white px-2 py-1 rounded-full border border-[#1e3a8a]"> {p.nome} - {p.precoUnit}MT - Stock:{p.stockFinalLoja} </button>)}</div>
                 </div>
                 <div className="mt-3 bg-[#f0fdf4] border border-green-200 rounded-[10px] p-3">
                   <div className="flex justify-between"><div className="font-black text-[10px]">ITENS - {produtosFat.length} produtos no carrinho</div><button onClick={()=>setProdutosFat([])} className="text-[7px] bg-red-500 text-white px-3 py-0.5 rounded-full">Limpar</button></div>
@@ -580,7 +607,7 @@ export default function VenderFixIVATabs(){
                     {produtosFat.map((p:any)=><div key={p.id} className="flex justify-between border-b pb-1 text-[10px]"><span>{p.nome} - CIMPOR v3</span><span className="font-bold">{(p.preco*p.qtd).toFixed(0)} MT</span></div>)}
                     {produtosFat.length===0 && <div className="text-[10px] text-gray-400 py-2">Saco de Cimento 50kg - CIMPOR v3 - 2550 MT<br/>Bloco 15cm - 40x20 x20 - 840 MT<br/><span className="text-[8px]">Adiciona no Faturar ou no Stock para aparecer aqui - mesmo carrinho</span></div>}
                   </div>
-                  <div className="mt-3 flex gap-1 flex-wrap">{stockProdutos.slice(0,4).map(p=><button key={p.id} onClick={()=>adicionarAoFaturar(p)} className="text-[8px] bg-black text-white px-2 py-1 rounded-full">{p.nome} - {p.precoUnit}MT</button>)}</div>
+                  <div className="mt-3 flex gap-1 flex-wrap">{stockProdutos.slice(0,4).map(p=><button key={p.id} onClick={()=>adicionarAoFaturar(p)} className="text-[8px] bg-[#1e3a8a] text-white px-2 py-1 rounded-full">{p.nome} - {p.precoUnit}MT</button>)}</div>
                 </div>
                 <div className="bg-[#f0fdf4] border border-green-200 rounded-[10px] p-4">
                   <div className="font-bold text-[10px]">Finalizar venda</div>
