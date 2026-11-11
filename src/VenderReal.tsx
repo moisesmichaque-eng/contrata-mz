@@ -35,10 +35,12 @@ export default function VenderFixIVATabs(){
 
   const [mostrarLogin, setMostrarLogin] = useState<'cadastro'|'login'>('cadastro');
   const [passoCadastro, setPassoCadastro] = useState(1);
+  const [passoFaturar, setPassoFaturar] = useState(1);
+  const [turnoFat, setTurnoFat] = useState('TM - Manhã');
   const [formLojaLogin, setFormLojaLogin] = useState({nomeLoja:'', tel:'+258840532899', password:'', nuit:'400123456', endereco:'Av. Guerra Popular, Matola', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construcao', logoData:''});
 
   const criarContaLoja = async () => {
-    if(!formLojaLogin.nomeLoja || !formLojaLogin.tel || !formLojaLogin.password){ alert('Nome, Telefone e Password'); return; }
+    if(!formLojaLogin.nomeLoja || !formLojaLogin.tel || !formLojaLogin.password){ alert('Para criar a conta, preenche so Nome, Telefone e Password. O resto e opcional.'); return; }
     const conta_id = `conta_${Date.now()}`;
     const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData };
     try{
@@ -183,13 +185,13 @@ export default function VenderFixIVATabs(){
           </div>
           {mostrarLogin==='cadastro' ? (
             <div className="mt-4 space-y-3 w-full min-w-0 overflow-x-hidden">
-              <div className="flex gap-1"><button onClick={()=>setPassoCadastro(1)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoCadastro===1?'bg-[#facc15] text-black':'bg-white/10 text-white'}`}>1 Loja</button><button onClick={()=>{ if(!formLojaLogin.nomeLoja||!formLojaLogin.tel||!formLojaLogin.password){ alert('Preenche Nome, Telefone e Password'); return; } setPassoCadastro(2); }} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoCadastro===2?'bg-[#facc15] text-black':'bg-white/10 text-white'}`}>2 Local + Logo</button></div>
+              <div className="flex gap-1"><button onClick={()=>setPassoCadastro(1)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoCadastro===1?'bg-[#facc15] text-black':'bg-white/10 text-white'}`}>1 Loja</button><button onClick={()=>setPassoCadastro(2)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoCadastro===2?'bg-[#facc15] text-black':'bg-white/10 text-white'}`}>2 Local + Logo</button></div>
               {passoCadastro===1 && (<div className="space-y-2 w-full min-w-0">
                 <div className="w-full min-w-0"><label className="text-[11px] font-bold text-white">Nome da loja *</label><input value={formLojaLogin.nomeLoja} onChange={e=>setFormLojaLogin({...formLojaLogin, nomeLoja:e.target.value})} placeholder="Ex: Ferragem Central Matola" className="w-full min-w-0 mt-1 h-10 border rounded px-3 text-[13px] bg-white" /></div>
                 <div className="w-full min-w-0"><label className="text-[11px] font-bold text-white">Telefone / WhatsApp *</label><input value={formLojaLogin.tel} onChange={e=>setFormLojaLogin({...formLojaLogin, tel:e.target.value})} placeholder="+258..." className="w-full min-w-0 mt-1 h-10 border rounded px-3 text-[13px] bg-white" /></div>
                 <div className="w-full min-w-0"><label className="text-[11px] font-bold text-white">Password *</label><input type="password" value={formLojaLogin.password} onChange={e=>setFormLojaLogin({...formLojaLogin, password:e.target.value})} placeholder="****" className="w-full min-w-0 mt-1 h-10 border rounded px-3 text-[13px] bg-white" /></div>
                 <div className="w-full min-w-0"><label className="text-[11px] font-bold text-white">NUIT</label><input value={formLojaLogin.nuit} onChange={e=>setFormLojaLogin({...formLojaLogin, nuit:e.target.value})} placeholder="NUIT da loja" className="w-full min-w-0 mt-1 h-10 border rounded px-3 text-[13px] bg-white" /></div>
-                <button onClick={()=>{ if(!formLojaLogin.nomeLoja||!formLojaLogin.tel||!formLojaLogin.password){ alert('Preenche Nome, Telefone e Password'); return; } setPassoCadastro(2); }} className="w-full mt-2 bg-[#facc15] text-black py-3 rounded-full text-[13px] font-bold">Seguinte →</button>
+                <button onClick={()=>setPassoCadastro(2)} className="w-full mt-2 bg-[#facc15] text-black py-3 rounded-full text-[13px] font-bold">Seguinte →</button>
               </div>)}
               {passoCadastro===2 && (<div className="space-y-2 w-full min-w-0">
                 <div className="w-full min-w-0"><label className="text-[11px] font-bold text-white">Endereço</label><input value={formLojaLogin.endereco} onChange={e=>setFormLojaLogin({...formLojaLogin, endereco:e.target.value})} placeholder="Av. Guerra Popular, Matola" className="w-full min-w-0 mt-1 h-10 border rounded px-3 text-[13px] bg-white" /></div>
@@ -244,8 +246,9 @@ export default function VenderFixIVATabs(){
 
         
         {negocioTab==='faturar' && (
-          <div className="mt-3">
-            <div className="grid grid-cols-12 gap-3">
+          <div className="mt-3 w-full min-w-0 overflow-x-hidden">
+            <div className="bg-white border rounded-[12px] p-3"><div className="font-black text-[13px]">Faturar</div><div className="text-[11px] text-gray-500">Cada passo abre sozinho - nao precisas preencher o passo anterior. Campos vazios ficam em branco.</div><div className="flex gap-1 mt-2"><button onClick={()=>setPassoFaturar(1)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoFaturar===1?'bg-[#0a66c2] text-white':'bg-gray-100'}`}>1 Cliente</button><button onClick={()=>setPassoFaturar(2)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoFaturar===2?'bg-[#0a66c2] text-white':'bg-gray-100'}`}>2 Produtos</button></div><div className="flex gap-1 mt-2"><button onClick={()=>setTurnoFat('TM - Manhã')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TM - Manhã'?'bg-[#facc15]':'bg-gray-100'}`}>TM Manhã</button><button onClick={()=>setTurnoFat('TT - Tarde')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TT - Tarde'?'bg-[#facc15]':'bg-gray-100'}`}>TT Tarde</button><button onClick={()=>setTurnoFat('TN - Noite')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TN - Noite'?'bg-[#facc15]':'bg-gray-100'}`}>TN Noite</button></div></div>
+            <div className={passoFaturar===1 ? "block" : "hidden"}><div className="grid grid-cols-1 gap-3 mt-3">
               <div className="col-span-8 bg-white border rounded-[12px] p-4 shadow-sm">
                 <div className="flex justify-between items-center">
                   <div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-[#facc15] rounded-full"></span> FATURAR - com logotipo</div>
@@ -288,7 +291,7 @@ export default function VenderFixIVATabs(){
                     <div><div className="text-[7px] font-bold text-[#64748b]">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white" /></div>
                   </div>
                 </div>
-                <div className="mt-3 bg-white border rounded-[10px] p-3">
+                </div></div><div className={passoFaturar===2 ? "block" : "hidden"}><div className="grid grid-cols-1 gap-3 mt-3"><div className="bg-white border rounded-[12px] p-3"><div className="mt-3 bg-white border rounded-[10px] p-3">
                   <div className="flex justify-between"><div className="font-black text-[9px]">Produtos e Servicos - do Stock - IVA no fim - Clique para adicionar ao ITENS</div><span className="text-[7px] bg-[#f8fafc] border px-2 py-0.5 rounded-full">{stockProdutos.length} produtos</span></div>
                   <div className="mt-2 flex gap-2">
                     <div className="flex-1 relative"><span className="absolute left-2 top-2 text-[10px]">🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="w-full h-8 border rounded-full pl-7 pr-3 text-[10px] bg-[#f8fafc]" /></div>
@@ -355,7 +358,7 @@ export default function VenderFixIVATabs(){
           </div>
         )}
 
-        {negocioTab==='stock' && (
+        </div></div>{negocioTab==='stock' && (
           <div className="bg-white rounded-[10px] border p-4">
             <div className="font-black text-[11px]">TABELA COMPLETA 11 COLUNAS 06:10 FORCA DIFF - {filtrados.length} itens - Alerta abaixo 50 - STOCK DIARIO - FIFO - NEGOCIO - FIX</div>
             <div className="flex flex-wrap gap-2 mt-3 items-center"><input type="date" value={dataStockDiario} onChange={e=>setDataStockDiario(e.target.value)} className="border rounded-full px-3 py-1 text-[10px]" /><input value={filtroRapidoStock} onChange={e=>setFiltroRapidoStock(e.target.value)} placeholder="Filtro rápido" className="border rounded-full px-3 py-1 text-[9px] w-56" /><select value={armazemAtivo} onChange={e=>setArmazemAtivo(e.target.value)} className="border rounded-full px-2 py-1 text-[8px]"><option>Todos</option><option>Matola - Principal</option></select></div>
