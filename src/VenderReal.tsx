@@ -36,6 +36,7 @@ export default function VenderFixIVATabs(){
   const [mostrarLogin, setMostrarLogin] = useState<'cadastro'|'login'>('cadastro');
   const [passoCadastro, setPassoCadastro] = useState(1);
   const [passoFaturar, setPassoFaturar] = useState(1);
+  const [mostrarPreviewFat, setMostrarPreviewFat] = useState(false);
   const [turnoFat, setTurnoFat] = useState('TM - Manhã');
   const [formLojaLogin, setFormLojaLogin] = useState({nomeLoja:'', tel:'+258840532899', password:'', nuit:'400123456', endereco:'Av. Guerra Popular, Matola', provincia:'Maputo Cidade', distrito:'KaMpfumo', ramo:'Ferragem e Material de Construcao', logoData:''});
 
@@ -245,13 +246,14 @@ export default function VenderFixIVATabs(){
         </div>
 
         
-        {negocioTab==='faturar' && (
-          <div className="mt-3 w-full min-w-0 overflow-x-hidden">
+        <style>{`@media (max-width:1023px){ .vender-faturar-phone{ zoom:0.82; } .vender-faturar-phone input,.vender-faturar-phone select,.vender-faturar-phone button{ max-width:100%; } }`}</style>
+          {negocioTab==='faturar' && (
+          <div className="mt-3 w-full min-w-0 overflow-x-hidden vender-faturar-phone">
             <div className="bg-white border rounded-[12px] p-3"><div className="font-black text-[13px]">Faturar</div><div className="text-[11px] text-gray-500">Cada passo abre sozinho - nao precisas preencher o passo anterior. Campos vazios ficam em branco.</div><div className="flex gap-1 mt-2"><button onClick={()=>setPassoFaturar(1)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoFaturar===1?'bg-[#0a66c2] text-white':'bg-gray-100'}`}>1 Cliente</button><button onClick={()=>setPassoFaturar(2)} className={`flex-1 py-2 rounded-full text-[11px] font-bold ${passoFaturar===2?'bg-[#0a66c2] text-white':'bg-gray-100'}`}>2 Produtos</button></div><div className="flex gap-1 mt-2"><button onClick={()=>setTurnoFat('TM - Manhã')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TM - Manhã'?'bg-[#facc15]':'bg-gray-100'}`}>TM Manhã</button><button onClick={()=>setTurnoFat('TT - Tarde')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TT - Tarde'?'bg-[#facc15]':'bg-gray-100'}`}>TT Tarde</button><button onClick={()=>setTurnoFat('TN - Noite')} className={`flex-1 py-1.5 rounded-full text-[11px] font-bold ${turnoFat==='TN - Noite'?'bg-[#facc15]':'bg-gray-100'}`}>TN Noite</button></div></div>
-            <div className={passoFaturar===1 ? "block" : "hidden"}><div className="grid grid-cols-1 gap-3 mt-3">
-              <div className="col-span-8 bg-white border rounded-[12px] p-4 shadow-sm">
+            <div className={passoFaturar===1 ? "block" : "hidden"}><div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mt-3">
+              <div className="col-span-1 lg:col-span-8 bg-white border rounded-[12px] p-4 shadow-sm">
                 <div className="flex justify-between items-center">
-                  <div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-[#facc15] rounded-full"></span> FATURAR - com logotipo</div>
+                  <div className="font-black text-[11px] flex items-center gap-2"><span className="w-2 h-2 bg-[#facc15] rounded-full"></span> Faturar</div>
                   <div className="flex gap-1">
                     <span className="text-[7px] border px-2 py-1 rounded-full bg-white">Formato A5</span>
                     <span className="text-[7px] bg-[#dbeafe] border border-blue-200 px-2 py-1 rounded-full">NUIT na fatura</span>
@@ -260,7 +262,7 @@ export default function VenderFixIVATabs(){
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[10px] p-3">
-                    <div className="text-[8px] font-black text-[#92400e] uppercase">CLIENTE - TELEFONE DINAMICO WHATSAPP</div>
+                    <div className="text-[8px] font-black text-[#92400e] uppercase">Cliente</div>
                     <select value={nomeFat} onChange={e=>{ const val=e.target.value; setNomeFat(val.split(' - ')[0]||''); const telMatch=val.match(/\d{9,}/); if(telMatch) setTelFat(telMatch[0]); }} className="mt-2 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white font-bold">
                       <option value="">Joao Manhique - Obra Zimpeto - 258828756432</option>
                       <option value="Joao Manhique - Obra Zimpeto - 258828756432">Joao Manhique - Obra Zimpeto - 258828756432</option>
@@ -284,15 +286,15 @@ export default function VenderFixIVATabs(){
                   </div>
                 </div>
                 <div className="mt-3 bg-[#f8fafc] border rounded-[10px] p-3">
-                  <div className="flex justify-between"><div className="font-black text-[9px]">Dados do comprador - ultra rapido</div><span className="text-[7px] bg-[#dcfce7] text-green-700 border border-green-200 px-2 py-0.5 rounded-full">Rapido e ativo</span></div>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
+                  <div className="flex justify-between"><div className="font-black text-[9px]">Dados do comprador</div><span className="text-[7px] bg-[#dcfce7] text-green-700 border border-green-200 px-2 py-0.5 rounded-full">Rapido e ativo</span></div>
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div><div className="text-[7px] font-bold text-[#64748b]">TELEFONE / WHATSAPP *</div><input value={telFat} onChange={e=>setTelFat(e.target.value)} placeholder="+258 84 123 4567" className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white" /></div>
                     <div><div className="text-[7px] font-bold text-[#64748b]">NOME / EMPRESA (opcional)</div><input value={nomeFat} onChange={e=>setNomeFat(e.target.value)} placeholder="Micheque Mungoi" className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white" /></div>
                     <div><div className="text-[7px] font-bold text-[#64748b]">NUIT (opcional)</div><input value={nuitFat} onChange={e=>setNuitFat(e.target.value)} placeholder="400123456" className="mt-1 w-full h-8 border rounded-[6px] px-2 text-[10px] bg-white" /></div>
                   </div>
                 </div>
-                </div></div><div className={passoFaturar===2 ? "block" : "hidden"}><div className="grid grid-cols-1 gap-3 mt-3"><div className="bg-white border rounded-[12px] p-3"><div className="mt-3 bg-white border rounded-[10px] p-3">
-                  <div className="flex justify-between"><div className="font-black text-[9px]">Produtos e Servicos - do Stock - IVA no fim - Clique para adicionar ao ITENS</div><span className="text-[7px] bg-[#f8fafc] border px-2 py-0.5 rounded-full">{stockProdutos.length} produtos</span></div>
+                </div></div><div className={passoFaturar===2 ? "block" : "hidden"}><div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mt-3"><div className="bg-white border rounded-[12px] p-3"><div className="mt-3 bg-white border rounded-[10px] p-3">
+                  <div className="flex justify-between"><div className="font-black text-[9px]">Produtos - do Stock - clica para adicionar</div><span className="text-[7px] bg-[#f8fafc] border px-2 py-0.5 rounded-full">{stockProdutos.length} produtos</span></div>
                   <div className="mt-2 flex gap-2">
                     <div className="flex-1 relative"><span className="absolute left-2 top-2 text-[10px]">🔍</span><input value={buscaFat} onChange={e=>setBuscaFat(e.target.value)} placeholder="Digite 'Cimento' - busca no stock" className="w-full h-8 border rounded-full pl-7 pr-3 text-[10px] bg-[#f8fafc]" /></div>
                   </div>
@@ -329,9 +331,11 @@ export default function VenderFixIVATabs(){
                   <div className="mt-2 text-[6px] text-gray-500">Dupla funcao: PDF baixa automatico com nome Fatura DD-MM-AAAA - Nome - PAGO/DIVIDA + WhatsApp direto - Numero fatura por data dia de hoje</div>
                 </div>
               </div>
-              <div className="col-span-4">
+              <div className="col-span-1 lg:col-span-4">
+                <button onClick={()=>setMostrarPreviewFat(!mostrarPreviewFat)} className="w-full lg:hidden bg-[#facc15] text-black py-2.5 rounded-full text-[12px] font-bold mb-2">{mostrarPreviewFat ? 'Ocultar pré-visualização ▲' : 'Ver pré-visualização ▼'}</button>
+                <div className={mostrarPreviewFat ? "block" : "hidden lg:block"}>
                 <div className="bg-white border rounded-[12px] p-3 sticky top-3 shadow-sm">
-                  <div className="flex justify-between"><div className="font-black text-[9px]">PRE-VISUALIZACAO A5 - Fatura - IVA {ivaTipo}% - TOTAL {totalFat.toFixed(0)} MT</div><div className="w-2 h-2 bg-[#facc15] rounded-full"></div></div>
+                  <div className="flex justify-between"><div className="font-black text-[9px]">Pré-visualização - Fatura - IVA {ivaTipo}% - TOTAL {totalFat.toFixed(0)} MT</div><div className="w-2 h-2 bg-[#facc15] rounded-full"></div></div>
                   <div className="mt-3 border-2 border-[#fde68a] bg-[#fffbeb] rounded-[8px] p-3">
                     <div className="flex gap-2">
                       <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-[8px] font-black overflow-hidden">{perfilEdit.logoData ? <img src={perfilEdit.logoData} className="w-full h-full object-cover" /> : (lojaLogada?.nome_loja?.charAt(0)||'A')}</div>
@@ -353,6 +357,7 @@ export default function VenderFixIVATabs(){
                     <button onClick={()=>salvarFaturaDuplaFuncao(false)} className="w-full mt-3 bg-[#facc15] text-black py-1.5 rounded-full text-[7px] font-bold border">Descarregar PDF - Fatura {faturas.length+1}/{new Date().toLocaleDateString('pt-MZ').replace(/\//g,'-')} - {nomeFat||'Cliente'}</button>
                   </div>
                 </div>
+              </div>
               </div>
             </div>
           </div>
