@@ -234,7 +234,7 @@ export default function VenderFixIVATabs(){
     const linha = (x1:number, y1:number, x2:number, y2:number)=> `0.5 0.5 0.5 RG ${x1} ${y1} m ${x2} ${y2} l S `;
     let c = '';
     // Cabecalho loja - LOGO embutido no PDF (igual ao preview): foto JPEG ou circulo azul com a letra
-    if(d.logoJpeg){
+    if(logoBin){
       c += `q 60 0 0 60 40 765 cm /Im1 Do Q `;
     } else {
       c += `0.12 0.18 0.29 rg 40 765 60 60 re f 1 1 1 rg BT /F2 26 Tf 1 0 0 1 60 785 Tm (${esc(String(d.loja||'A').charAt(0))}) Tj ET `;
@@ -295,12 +295,13 @@ export default function VenderFixIVATabs(){
     const objs:string[] = [];
     objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
     objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
-    objs[3] = d.logoJpeg ? '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> /XObject << /Im1 7 0 R >> >> /Contents 5 0 R >>' : '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
+    objs[3] = logoBin ? '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> /XObject << /Im1 7 0 R >> >> /Contents 5 0 R >>' : '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
     objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
     objs[5] = `<< /Length ${c.length} >>\nstream\n${c}\nendstream`;
     objs[6] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
-    const totalObjs = d.logoJpeg ? 7 : 6;
-    if(d.logoJpeg){ objs[7] = `<< /Type /XObject /Subtype /Image /Width ${d.logoW||120} /Height ${d.logoH||120} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${d.logoJpeg.length} >>\nstream\n${d.logoJpeg}\nendstream`; }
+    const totalObjs = logoBin ? 7 : 6;
+    const logoBin = d.logoJpeg ? (()=>{ try{ return atob(d.logoJpeg); }catch(e){ return ''; } })() : '';
+    if(logoBin){ objs[7] = `<< /Type /XObject /Subtype /Image /Width ${d.logoW||120} /Height ${d.logoH||120} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBin.length} >>\nstream\n${logoBin}\nendstream`; }
     let pdf = '%PDF-1.4\n';
     const offsets:number[] = [0];
     for(let i=1;i<=totalObjs;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
@@ -308,7 +309,9 @@ export default function VenderFixIVATabs(){
     pdf += `xref\n0 ${totalObjs+1}\n0000000000 65535 f \n`;
     for(let i=1;i<=totalObjs;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
     pdf += `trailer\n<< /Size ${totalObjs+1} /Root 1 0 R >>\nstartxref\n` + xrefPos + '\n%%EOF';
-    return new Blob([pdf], {type:'application/pdf'});
+    const bytes = new Uint8Array(pdf.length); for(let bi=0; bi<pdf.length; bi++) bytes[bi] = pdf.charCodeAt(bi) & 0xFF;
+    return new Blob([bytes], {type:'application/pdf'});
+    // V30 - retorno ja feito acima em bytes
   };
   // ANULAR FATURA - volta stock, tira de tudo (Caixa, Clientes, Relatorios)
   const anularFatura = async (fat:any) => {
@@ -384,9 +387,11 @@ export default function VenderFixIVATabs(){
   };
 
   const salvarPerfilLoja = async () => {
-    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito, logoData: perfilEdit.logoData }; // V29 - logo e dados gravam no Supabase, todos os documentos saem atualizados
+    const update:any = { nome_loja: perfilEdit.nomeLoja, nuit: perfilEdit.nuit, provincia: perfilEdit.provincia, cidade: perfilEdit.distrito }; // V30 - dados gravam sempre; logo vai separado abaixo para nao travar se a coluna ainda nao existir
     if(perfilEdit.novaPassword) update.password = perfilEdit.novaPassword;
     const { error } = await supabase.from('lojas').update(update).eq('conta_id', lojaLogada.conta_id);
+    // V30 - tenta gravar o logo no Supabase; se a coluna 'logoData' ainda nao existir, ignora sem erro (o logo fica guardado na sessao e sai na fatura na mesma)
+    try{ const r:any = await supabase.from('lojas').update({ logoData: perfilEdit.logoData }).eq('conta_id', lojaLogada.conta_id); if(r?.error) console.log('logoData ainda sem coluna no Supabase - corre o SQL do V30'); }catch(e){}
     if(error) alert(error.message); else { const novaSessao = {...lojaLogada, ...update, logoData: perfilEdit.logoData, funcionarios: perfilEdit.funcionarios}; setLojaLogada(novaSessao); localStorage.setItem('loja_sessao', JSON.stringify(novaSessao)); alert('Perfil atualizado'); }
   };
 
