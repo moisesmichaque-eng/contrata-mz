@@ -197,6 +197,75 @@ export default function VenderFixIVATabs(){
     pdf += 'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF';
     return new Blob([pdf], {type:'application/pdf'});
   };
+  // V27 - PDF REAL da fatura com TABELA (09/11): logotipo em texto, faixa amarela fina, tabela DESCRICAO|QTD|PRECO|DESC%|SUBTOTAL
+  const gerarPdfFatura = (d:any) => {
+    const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
+    const esc = (s:any)=> limpa(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+    const txt = (f:string, sz:number, x:number, y:number, t:any)=> `BT /${f} ${sz} Tf 1 0 0 1 ${x} ${y} Tm (${esc(t)}) Tj ET `;
+    const rect = (x:number, y:number, w:number, h:number, r:number, g:number, b:number, fill:boolean)=> `${r} ${g} ${b} ${fill?'rg':'RG'} ${x} ${y} ${w} ${h} re ${fill?'f':'S'} `;
+    const linha = (x1:number, y1:number, x2:number, y2:number)=> `0.5 0.5 0.5 RG ${x1} ${y1} m ${x2} ${y2} l S `;
+    let c = '';
+    // Cabecalho loja
+    c += txt('F2', 15, 40, 800, d.loja);
+    c += txt('F1', 9, 40, 786, 'NUIT: ' + d.nuit + ' | Tel: +' + d.telLoja);
+    c += txt('F1', 9, 40, 774, d.endereco);
+    // Cliente (direita)
+    c += txt('F1', 9, 330, 800, 'Cliente: ' + d.cliente);
+    c += txt('F1', 9, 330, 788, 'Tel: ' + d.telCliente);
+    c += txt('F1', 9, 330, 776, 'NUIT: ' + d.nuitCliente);
+    c += txt('F1', 9, 330, 764, 'Data: ' + d.data);
+    c += txt('F1', 9, 330, 752, 'Fatura No: ' + d.numero);
+    c += txt('F1', 9, 330, 740, 'Turno: ' + d.turno);
+    c += txt('F1', 9, 330, 728, 'Status: ' + d.status);
+    c += txt('F1', 9, 330, 716, 'Vendido por: Dono');
+    // Faixa amarela FINA
+    c += rect(40, 696, 515, 14, 0.98, 0.8, 0.08, true);
+    c += txt('F2', 11, 40, 700, 'Factura No: ' + d.numero);
+    // Tabela - cabecalho
+    const x0=40, xQ=330, xP=380, xD=440, xS=490, xF=555;
+    const yTop=680;
+    c += rect(x0, yTop-12, xF-x0, 14, 0.94, 0.96, 0.98, true);
+    c += txt('F2', 9, x0+4, yTop-8, 'DESCRICAO');
+    c += txt('F2', 9, xQ, yTop-8, 'QTD');
+    c += txt('F2', 9, xP, yTop-8, 'PRECO');
+    c += txt('F2', 9, xD, yTop-8, 'DESC%');
+    c += txt('F2', 9, xS, yTop-8, 'SUBTOTAL');
+    let y = yTop - 14;
+    d.itens.forEach((it:any)=>{
+      y -= 14;
+      c += txt('F1', 9, x0+4, y, (it.nome + (it.codigo ? ' - ' + it.codigo : '')).slice(0, 48));
+      c += txt('F1', 9, xQ, y, String(it.qtd));
+      c += txt('F1', 9, xP, y, Number(it.preco).toFixed(0) + 'MT');
+      c += txt('F1', 9, xD, y, Number(it.desc||0) + '%');
+      c += txt('F1', 9, xS, y, Number(it.sub).toFixed(0) + 'MT');
+      c += linha(x0, y-3, xF, y-3);
+    });
+    // Grelha vertical da tabela
+    [x0, xQ-4, xP-4, xD-4, xS-4, xF].forEach((x:number)=>{ c += linha(x, yTop+2, x, y-3); });
+    c += linha(x0, yTop+2, xF, yTop+2);
+    // Totais
+    let yt = y - 22;
+    c += txt('F1', 10, 360, yt, 'Subtotal: ' + Number(d.subtotal).toFixed(0) + 'MT'); yt -= 14;
+    c += txt('F1', 10, 360, yt, 'Desconto: -' + Number(d.desconto).toFixed(0) + 'MT'); yt -= 14;
+    c += txt('F1', 10, 360, yt, 'Subtotal liq.: ' + Number(d.subtotalLiq).toFixed(0) + 'MT'); yt -= 14;
+    c += txt('F1', 10, 360, yt, 'IVA (' + d.ivaPerc + '%): ' + Number(d.ivaValor).toFixed(0) + 'MT'); yt -= 16;
+    c += txt('F2', 13, 360, yt, 'TOTAL: ' + Number(d.total).toFixed(0) + 'MT');
+    const objs:string[] = [];
+    objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+    objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+    objs[3] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
+    objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+    objs[5] = `<< /Length ${c.length} >>\nstream\n${c}\nendstream`;
+    objs[6] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
+    let pdf = '%PDF-1.4\n';
+    const offsets:number[] = [0];
+    for(let i=1;i<=6;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
+    const xrefPos = pdf.length;
+    pdf += 'xref\n0 7\n0000000000 65535 f \n';
+    for(let i=1;i<=6;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
+    pdf += 'trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF';
+    return new Blob([pdf], {type:'application/pdf'});
+  };
   // ANULAR FATURA - volta stock, tira de tudo (Caixa, Clientes, Relatorios)
   const anularFatura = async (fat:any) => {
     if(!confirm(`Anular ${fat.numero_fatura || 'fatura'} - ${fat.cliente} - ${fat.total}MT ? O stock vai voltar!`)) return;
@@ -236,25 +305,26 @@ export default function VenderFixIVATabs(){
       if(prod){ const novaVenda = prod.vendaHoje + item.qtd; const novoFinalLoja = prod.stockInicialLoja + prod.recepcao - novaVenda; await supabase.from('produtos_loja').update({ venda_hoje: novaVenda, stock_loja: novoFinalLoja }).eq('id', prod.id); }
     }
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}</title><style>body{font-family:Arial;padding:20px;font-size:11px;max-width:700px;margin:auto} .top{display:flex;justify-content:space-between} .logo{width:60px;height:60px;border-radius:50%;background:#1e2f4a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;overflow:hidden} .logo img{width:100%;height:100%;object-fit:cover} .amarelo{background:#facc15;padding:3px 10px;font-weight:900;text-align:center;margin:6px 0;font-size:12px} table{width:100%;border-collapse:collapse;margin-top:8px} th,td{border:1px solid #ddd;padding:6px;font-size:10px} th{background:#f1f5f9;text-align:left} .tot{text-align:right;margin-top:10px;line-height:1.7} .tot b{font-size:13px}</style></head><body><div class="top"><div style="display:flex;gap:12px"><div class="logo">${perfilEdit.logoData ? `<img src="${perfilEdit.logoData}" />` : (lojaLogada?.nome_loja?.charAt(0)||'A')}</div><div><b style="font-size:14px">${lojaLogada.nome_loja}</b><br/>NUIT: ${lojaLogada.nuit} | Tel: +${lojaLogada.username}<br/>${lojaLogada.endereco||'Maputo'} - ${lojaLogada.cidade||''}</div></div><div>Cliente: ${nomeClienteFatura}<br/>Tel: ${telFat}<br/>NUIT: ${nuitFat||'-'}<br/>Data: ${new Date().toLocaleDateString('pt-MZ')}<br/>Fatura No: ${numeroFatura}<br/>Turno: ${caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite'}<br/>Status: ${isDivida?'DIVIDA':'PAGO'}<br/>Vendido por: Dono</div></div><div class="amarelo">Factura No: ${numeroFatura}</div><table><thead><tr><th>DESCRICAO</th><th>QTD</th><th>PRECO</th><th>DESC%</th><th>SUBTOTAL</th></tr></thead><tbody>${produtosFat.map(p=>`<tr><td>${p.nome}${p.codigo?` - ${p.codigo}`:''}</td><td>${p.qtd}</td><td>${p.preco}MT</td><td>${p.desc}%</td><td>${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT</td></tr>`).join('')}</tbody></table><div class="tot">Subtotal: ${subtotalLiquido.toFixed(0)}MT<br/>Desconto: -${descontoItens.toFixed(0)}MT<br/>Subtotal liq.: ${subtotalLiquido.toFixed(0)}MT<br/>IVA (${ivaPerc}%): ${ivaValor.toFixed(0)}MT<br/><b>TOTAL: ${total.toFixed(0)}MT</b></div></body></html>`;
-    // BAIXAR - SO PDF (sem Excel, como combinado ontem): PDF baixa automatico + WhatsApp partilha o PDF
-    // V26 - CORRECAO 3+4: a fatura baixa/partilha-se como PDF com TABELA (09/11), nunca texto corrido.
-    // Abre a fatura bonita e manda imprimir/guardar como PDF. Depois partilha o FICHEIRO PDF, nao texto.
+    // V27 - 1 problema: fatura em PDF REAL, partilhavel direto para o numero do cliente.
+    // COM numero -> baixa o PDF + abre a partilha do ficheiro (escolhes WhatsApp e o cliente).
+    // SEM numero -> apenas baixa o PDF, nao abre WhatsApp nem partilha.
     const nomeFicheiro = `Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`;
-    const blobHtml = new Blob([html], {type:'text/html'});
-    const urlHtml = URL.createObjectURL(blobHtml);
-    const winPdf = window.open(urlHtml, '_blank');
-    if(winPdf){ setTimeout(()=>{ try{ winPdf.print(); }catch(e){} }, 600); }
-    const aPdf = document.createElement('a'); aPdf.href=urlHtml; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf);
-    setTimeout(()=>URL.revokeObjectURL(urlHtml), 10000);
-    const partilharPdf = async () => {
-      try{
-        const f = new File([blobHtml], `${nomeFicheiro}.pdf`, {type:'application/pdf'});
-        if((navigator as any).canShare && (navigator as any).canShare({files:[f]})){ await (navigator as any).share({files:[f], title:`Fatura ${numeroFatura}`, text:`Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT`}); return true; }
-      }catch(e){}
-      return false;
-    };
-    const num = telFat.replace(/\D/g,'');
-    partilharPdf().then((ok)=>{ if(!ok && num){ window.open(`https://wa.me/${num.startsWith('258')?num:`258${num}`}?text=${encodeURIComponent(`Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'}. O PDF da fatura foi aberto/baixado - anexa o PDF aqui, por favor.`)}`, '_blank'); } });
+    const pdfBlob = gerarPdfFatura({ loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
+    const urlPdf = URL.createObjectURL(pdfBlob);
+    const aPdf = document.createElement('a'); aPdf.href=urlPdf; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf);
+    setTimeout(()=>URL.revokeObjectURL(urlPdf), 10000);
+    // Numero do cliente: so digitos; 9 digitos (84...) -> 258 na frente; ja com 258 fica como esta.
+    const numBruto = telFat.replace(/\D/g,'');
+    const num = numBruto.length===9 ? '258'+numBruto : numBruto;
+    if(num){
+      const ficheiroPdf = new File([pdfBlob], `${nomeFicheiro}.pdf`, {type:'application/pdf'});
+      const podePartilhar = (navigator as any).canShare && (navigator as any).canShare({files:[ficheiroPdf]});
+      if(podePartilhar){
+        try{ await (navigator as any).share({ files:[ficheiroPdf], title:`Fatura ${numeroFatura}`, text:`Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'}` }); }catch(e){}
+      } else {
+        window.open(`https://wa.me/${num}?text=${encodeURIComponent(`Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'}. O PDF da fatura ja baixou - anexa o PDF aqui, por favor.`)}`, '_blank');
+      }
+    }
     alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - Ficheiro: Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
   };
 
