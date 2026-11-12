@@ -918,11 +918,13 @@ export default function VenderFixIVATabs(){
             });
           });
           // Se não há faturas, mostra 1 linha por produto do Stock (sem vendas) para não ficar vazio com mock
+          // FIX RELATORIO - faturas guardam data como 11/11/2026, o filtro <input type="date"> da 2026-11-11. Sem normalizar, a comparacao de texto exclui tudo.
+          const normalizarDataRel = (d:any) => { const str = String(d||''); if(/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0,10); const m = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); return str.slice(0,10); };
           const linhasFiltradas = linhas.filter((r:any)=>{
             if(relFiltroProduto!=='Todos' && r.nome!==relFiltroProduto) return false;
             if(relFiltroGrupo!=='Todos' && r.grupo!==relFiltroGrupo) return false;
-            if(relDataInicio && r.data < relDataInicio) return false;
-            if(relDataFim && r.data > relDataFim) return false;
+            if(relDataInicio && normalizarDataRel(r.data) < relDataInicio) return false;
+            if(relDataFim && normalizarDataRel(r.data) > relDataFim) return false;
             return true;
           });
           const totSt = linhasFiltradas.reduce((s:any,r:any)=>s+r.stInicial,0);
@@ -934,13 +936,14 @@ export default function VenderFixIVATabs(){
           const produtosUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.nome))];
           const gruposUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.cat || 'Geral'))];
           const gerarPDF = () => {
-            const linhasTxt = linhasFiltradas.map((r:any)=> `${r.data} | ${r.nome} | ST ${r.stInicial} | REC ${r.recepcao} | VENDAS ${r.vendas} | ${r.cliente} | QTD ${r.quanti} | ${r.valor}MT | DIVIDA ${r.valorDivida}MT | TOTAL ${r.total}MT`).join('\n');
-            const conteudo = `RELATORIO - ${lojaLogada?.nome_loja || ''}\nDATA: ${relDataInicio||'...'} a ${relDataFim||'...'}\nPRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}\n\n${linhasTxt}\n\nTOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} QTD ${totQtd} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT`;
             const nomeRel = `Relatorio-${relDataInicio||'inicio'}-a-${relDataFim||'fim'}`;
-            // PDF - HTML download automatico, sem Save
-            const htmlRel = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${nomeRel}</title><style>body{font-family:Arial;padding:20px;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:10px}th{background:#1e2f4a;color:#fff}</style></head><body><h2>RELATORIO - ${lojaLogada?.nome_loja||''}</h2><p>DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}</p><table><thead><tr><th>DATA</th><th>PRODUTO</th><th>ST INICIAL</th><th>RECEPCAO</th><th>VENDAS</th><th>CLIENTE</th><th>QTD</th><th>VALOR</th><th>DIVIDA</th><th>TOTAL</th></tr></thead><tbody>${linhasFiltradas.map((r:any)=>`<tr><td>${r.data}</td><td>${r.nome}</td><td>${r.stInicial}</td><td>${r.recepcao}</td><td>${r.vendas}</td><td>${r.cliente}</td><td>${r.quanti}</td><td>${r.valor}MT</td><td>${r.valorDivida}MT</td><td>${r.total}MT</td></tr>`).join('')}</tbody></table><h3>TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} QTD ${totQtd} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT</h3></body></html>`;
-            const linhasPdfRel = [`RELATORIO - ${lojaLogada?.nome_loja||''}`, `DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}`, ``, ...linhasFiltradas.map((r:any)=>`${r.data} | ${r.nome} | ST ${r.stInicial} | REC ${r.recepcao} | VENDAS ${r.vendas} | ${r.cliente} | QTD ${r.quanti} | ${r.valor}MT | DIVIDA ${r.valorDivida}MT | TOTAL ${r.total}MT`), ``, `TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} QTD ${totQtd} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT`];
-            const bPdf = criarPdfBlob(`Relatorio ${nomeRel}`, linhasPdfRel); const uPdf = URL.createObjectURL(bPdf); const aPdf = document.createElement('a'); aPdf.href=uPdf; aPdf.download=`${nomeRel}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf); setTimeout(()=>URL.revokeObjectURL(uPdf),2000);
+            const logoRel = perfilEdit.logoData || (lojaLogada as any)?.logoData || '';
+            const cabecalhoRel = `<div style="display:flex;gap:12px;align-items:center;border-bottom:3px solid #1e2f4a;padding-bottom:10px;margin-bottom:10px">${logoRel?`<img src="${logoRel}" style="width:64px;height:64px;object-fit:cover;border-radius:50%;border:2px solid #1e2f4a" />`:''}<div><h2 style="margin:0;font-size:18px">${lojaLogada?.nome_loja||'WEZHA TOTSHE'}</h2><div style="font-size:11px;color:#444">NUIT: ${lojaLogada?.nuit||'-'} | Tel: ${lojaLogada?.username||'-'} | ${lojaLogada?.endereco||''} ${lojaLogada?.cidade||''} - ${lojaLogada?.provincia||''}</div><div style="font-size:11px;color:#444">Ramo: ${lojaLogada?.ramo||''}</div></div></div>`;
+            // FIX RELATORIO - antes a tabela htmlRel era construida mas nunca usada; o PDF saia do criarPdfBlob (so texto). Agora o PDF E a tabela com logo.
+            const htmlRel = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${nomeRel}</title><style>body{font-family:Arial;padding:20px;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:10px}th{background:#1e2f4a;color:#fff}</style></head><body>${cabecalhoRel}<h3 style="margin:6px 0">RELATORIO - ${lojaLogada?.nome_loja||''}</h3><p>DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}</p><table><thead><tr><th>DATA</th><th>PRODUTO</th><th>ST INICIAL</th><th>RECEPCAO</th><th>VENDAS</th><th>CLIENTE</th><th>QTD</th><th>VALOR</th><th>DIVIDA</th><th>TOTAL</th></tr></thead><tbody>${linhasFiltradas.map((r:any)=>`<tr><td>${r.data}</td><td>${r.nome}</td><td>${r.stInicial}</td><td>${r.recepcao}</td><td>${r.vendas}</td><td>${r.cliente}</td><td>${r.quanti}</td><td>${r.valor}MT</td><td>${r.valorDivida}MT</td><td>${r.total}MT</td></tr>`).join('')}</tbody></table><h3>TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} QTD ${totQtd} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT</h3><p style="font-size:10px;color:#888">Gerado em ${new Date().toLocaleString('pt-MZ')} - ${lojaLogada?.nome_loja||''}</p><script>window.onload=function(){window.print()}</script></body></html>`;
+            const wRel:any = window.open('', '_blank');
+            if(!wRel){ alert('O navegador bloqueou. Permite popups para baixar o PDF.'); return; }
+            wRel.document.write(htmlRel); wRel.document.close();
             // WhatsApp no mesmo clique - partilha o PDF (so PDF, sem Excel)
             const textoW = `RELATORIO ${lojaLogada?.nome_loja||''} - ${relDataInicio||'...'} a ${relDataFim||'...'} - ${linhasFiltradas.length} linhas - TOTAL ${totTotal}MT - DIVIDA ${totDivida}MT - PDF baixado!`;
             window.open(`https://wa.me/${String(lojaLogada?.username||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(textoW)}`, '_blank');
@@ -975,7 +978,7 @@ export default function VenderFixIVATabs(){
                   <thead><tr className="bg-[#1e2f4a] text-white"><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-center bg-blue-600">VALOR DIVIDA</th><th className="p-2 text-center bg-yellow-400 text-black">TOTAL C/DIVIDAS</th></tr></thead>
                   <tbody>
                     {linhasFiltradas.length===0 ? (
-                      <tr><td colSpan={10} className="p-4 text-center">Nenhuma venda com este filtro - Stock tem {stockProdutos.length} produto(s) reais: {(stockProdutos||[]).map((p:any)=>p.nome).join(', ') || 'nenhum'} - Faturas: {faturas.length} - Limpa o filtro para ver tudo.</td></tr>
+                      <tr><td colSpan={10} className="p-4 text-center">Nenhuma venda com este filtro - Faturas: {faturas.length} - Limpa o filtro para ver tudo.</td></tr>
                     ) : linhasFiltradas.map((r:any,idx:number)=>(
                       <tr key={idx} className="border-b"><td className="p-2">{r.data}</td><td className="p-2 font-bold">{r.nome}</td><td className="p-2 text-center bg-blue-50">{r.stInicial}</td><td className="p-2 text-center">{r.recepcao}</td><td className="p-2 text-center font-bold">{r.vendas}</td><td className="p-2">{r.cliente}</td><td className="p-2 text-center font-bold">{r.quanti}</td><td className="p-2 text-center">{r.valor}MT</td><td className="p-2 text-center bg-blue-100">{r.valorDivida}MT</td><td className="p-2 text-center bg-yellow-100 font-bold">{r.total}MT</td></tr>
                     ))}
