@@ -53,22 +53,22 @@ export function LogoWezha({ size = 36 }: any) {
 export default function App() {
   // A app abre logo no VENDER, que e a parte que estas a apresentar
   const [aba, setAba] = useState<Aba>('vender');
-  // SPLASH - o logo gira 2,2s e depois o site abre
+  // SPLASH - combinacao B: amarelo em cima, azul em baixo. O logo gira 2,2s e depois o site abre
   const [mostrarSplash, setMostrarSplash] = useState(true);
   useEffect(() => { const t = setTimeout(() => setMostrarSplash(false), 2500); return () => clearTimeout(t); }, []);
 
   const botao = (id: Aba, label: string, ativo: string) =>
     (<button key={id} onClick={() => setAba(id)} className={`px-4 sm:px-6 py-2.5 rounded-full text-[12px] sm:text-[13px] font-black whitespace-nowrap ${aba === id ? ativo : 'bg-gray-100 text-gray-700'}`}>{label}</button>);
 
-  // ECRÃ DE ENTRADA - logotipo no circulo a girar
+  // ECRÃ DE ENTRADA - combinacao B: amarelo em cima, azul em baixo. Texto azul escuro para se ler no amarelo.
   if (mostrarSplash) {
     return (
-      <div style={{ minHeight: '100vh', background: '#1e2f4a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', padding: 20, textAlign: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #F5B81D 0%, #F5B81D 45%, #0B3D91 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#0B3D91', padding: 20, textAlign: 'center' }}>
         <style>{`@keyframes girar { 0%{ transform: rotate(0deg) scale(1)} 50%{ transform: rotate(180deg) scale(1.08)} 100%{ transform: rotate(360deg) scale(1)} } .logo-girar{ animation: girar 2.2s ease-in-out; }`}</style>
         <div className="logo-girar" style={{ background: 'white', padding: 18, borderRadius: '50%', boxShadow: '0 0 40px rgba(255,255,255,.6)' }}><LogoWezha size={110} /></div>
-        <h1 style={{ marginTop: 16, fontSize: 28, fontWeight: 900, letterSpacing: 2 }}>WEZHA <span style={{ background: '#facc15', color: '#1e2f4a', padding: '2px 10px', borderRadius: 999, fontSize: 16 }}>TOTSHE</span></h1>
-        <p style={{ fontSize: 12, opacity: 0.9, marginTop: 6 }}>Encontrar • Vender • Contratos</p>
-        <button onClick={() => setMostrarSplash(false)} style={{ marginTop: 14, background: 'white', color: '#1e2f4a', border: 'none', padding: '8px 18px', borderRadius: 999, fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>ENTRAR AGORA →</button>
+        <h1 style={{ marginTop: 16, fontSize: 28, fontWeight: 900, letterSpacing: 2 }}>WEZHA <span style={{ background: 'white', color: '#0B3D91', padding: '2px 10px', borderRadius: 999, fontSize: 16 }}>TOTSHE</span></h1>
+        <p style={{ fontSize: 12, opacity: 0.9, marginTop: 6, fontWeight: 700 }}>Encontrar • Vender • Contratos</p>
+        <button onClick={() => setMostrarSplash(false)} style={{ marginTop: 14, background: 'white', color: '#0B3D91', border: 'none', padding: '8px 18px', borderRadius: 999, fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>ENTRAR AGORA →</button>
       </div>
     );
   }
@@ -76,8 +76,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f0f2f5] font-sans">
       <style>{`@keyframes flutuar { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-4px)} } .logo-flutuar{ animation: flutuar 3s ease-in-out infinite; }`}</style>
-      {/* TOPO - WEZHA TOTSHE */}
-      <div className="bg-[#1e2f4a] text-white sticky top-0 z-40">
+      {/* TOPO - WEZHA TOTSHE - cabecalho AZUL (antes era preto/azul escuro) */}
+      <div className="bg-[#0B3D91] text-white sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="logo-flutuar"><LogoWezha size={36} /></div>
