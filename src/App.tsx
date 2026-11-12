@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EncontrarReal from './EncontrarReal';
 import VenderReal from './VenderReal';
 import ViajarReal from './ViajarReal';
@@ -25,20 +25,62 @@ const VIAJAR_ATIVO = MOSTRAR_VIAJAR || viajarPreview;
 
 type Aba = 'encontrar' | 'vender' | 'contratos' | 'viajar';
 
+// LOGOTIPO WEZHA - nunca mais some:
+// 1) tenta o PNG transparente, 2) o PNG normal, 3) o JPG.
+// Se nenhum ficheiro existir, desenha o logo em SVG.
+export function LogoWezha({ size = 36 }: any) {
+  const [tentativa, setTentativa] = useState(0);
+  const fontes = ['/logo-wezha-transparente.png', '/logo-wezha.png', '/logo-wezha.jpg', '/logo_wezha.jpg'];
+  if (tentativa >= fontes.length) {
+    return (
+      <div style={{ width: size, height: size, flexShrink: 0, background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 3 }}>
+        <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
+          <path d="M 92 8 A 48 48 0 1 0 92 92 A 58 58 0 0 1 92 8" fill="#0B3D91" />
+          <path d="M 38 22 A 44 44 0 1 1 38 82 A 50 50 0 0 0 38 22" fill="#F5B81D" />
+          <circle cx="50" cy="50" r="32" fill="white" />
+          <text x="50" y="55" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#0B3D91" fontFamily="Georgia, serif">WEZHA</text>
+        </svg>
+      </div>
+    );
+  }
+  return (
+    <div style={{ width: size, height: size, flexShrink: 0, background: 'white', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 3, boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} title="WEZHA - TOTSHE">
+      <img src={fontes[tentativa]} alt="WEZHA" onError={() => setTentativa(tentativa + 1)} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'contain', background: 'white', display: 'block' }} />
+    </div>
+  );
+}
+
 export default function App() {
   // A app abre logo no VENDER, que e a parte que estas a apresentar
   const [aba, setAba] = useState<Aba>('vender');
+  // SPLASH - o logo gira 2,2s e depois o site abre
+  const [mostrarSplash, setMostrarSplash] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setMostrarSplash(false), 2500); return () => clearTimeout(t); }, []);
 
   const botao = (id: Aba, label: string, ativo: string) =>
     (<button key={id} onClick={() => setAba(id)} className={`px-4 sm:px-6 py-2.5 rounded-full text-[12px] sm:text-[13px] font-black whitespace-nowrap ${aba === id ? ativo : 'bg-gray-100 text-gray-700'}`}>{label}</button>);
 
+  // ECRÃ DE ENTRADA - logotipo no circulo a girar
+  if (mostrarSplash) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#1e2f4a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', padding: 20, textAlign: 'center' }}>
+        <style>{`@keyframes girar { 0%{ transform: rotate(0deg) scale(1)} 50%{ transform: rotate(180deg) scale(1.08)} 100%{ transform: rotate(360deg) scale(1)} } .logo-girar{ animation: girar 2.2s ease-in-out; }`}</style>
+        <div className="logo-girar" style={{ background: 'white', padding: 18, borderRadius: '50%', boxShadow: '0 0 40px rgba(255,255,255,.6)' }}><LogoWezha size={110} /></div>
+        <h1 style={{ marginTop: 16, fontSize: 28, fontWeight: 900, letterSpacing: 2 }}>WEZHA <span style={{ background: '#facc15', color: '#1e2f4a', padding: '2px 10px', borderRadius: 999, fontSize: 16 }}>TOTSHE</span></h1>
+        <p style={{ fontSize: 12, opacity: 0.9, marginTop: 6 }}>Encontrar • Vender • Contratos</p>
+        <button onClick={() => setMostrarSplash(false)} style={{ marginTop: 14, background: 'white', color: '#1e2f4a', border: 'none', padding: '8px 18px', borderRadius: 999, fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>ENTRAR AGORA →</button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f0f2f5] font-sans">
+      <style>{`@keyframes flutuar { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-4px)} } .logo-flutuar{ animation: flutuar 3s ease-in-out infinite; }`}</style>
       {/* TOPO - WEZHA TOTSHE */}
       <div className="bg-[#1e2f4a] text-white sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-[#facc15] rounded-full flex items-center justify-center text-black font-black text-[16px]">W</div>
+            <div className="logo-flutuar"><LogoWezha size={36} /></div>
             <div>
               <div className="font-black text-[14px] sm:text-[16px] leading-none">WEZHA TOTSHE</div>
               <div className="text-[9px] sm:text-[10px] text-gray-300">Encontrar • Vender • Contratos</div>
