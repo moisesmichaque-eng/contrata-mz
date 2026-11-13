@@ -24,6 +24,7 @@ export default function VenderFixIVATabs(){
   const [relFiltroFecho, setRelFiltroFecho] = useState('Todos');
   const [relFiltroFechoId, setRelFiltroFechoId] = useState('');
   const [fechos, setFechos] = useState<any[]>([]);
+const hojePT = new Date().toLocaleDateString('pt-MZ');
   const [fechoAberto, setFechoAberto] = useState<any>(null);
   const [fornecedores, setFornecedores] = useState<any[]>([]); // REAL: carregado por loja (conta_id) - loja nova nao ve fornecedores da outra
   const [formForn, setFormForn] = useState({nome:'', tel:'', produto:'', nota:''});
