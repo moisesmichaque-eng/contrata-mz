@@ -1062,22 +1062,46 @@ const hojeISO = new Date().toISOString().slice(0,10);
               });
             });
           });
-          // V42 CORRIDO - ST INICIAL de cada linha = ST FINAL da linha anterior do mesmo produto.
-          // Antes, os 3 dias mostravam o mesmo ST INICIAL porque vinha do campo fixo stock_inicial_loja. A RECEPCAO do periodo conta 1x (na 1a linha).
+          // V44 CORRIDO POR PERIODO - o relatorio puxa da tabela do Stock.
+          // Cada Fecho guarda o stock inicial/final do produto (stockSnap). Faturas de um fecho fechado encadeiam DENTRO desse fecho, da abertura dele ate ao final dele.
+          // Faturas do periodo aberto (sem fecho) encadeiam da abertura atual do Stock. Assim o final mais recente bate com a tabela do Stock e nao mistura periodos.
           const ordemRel = (d:any) => { const s = String(d||''); const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); return s.slice(0,10); };
           linhas.sort((a:any,b:any)=> ordemRel(a.data) < ordemRel(b.data) ? -1 : ordemRel(a.data) > ordemRel(b.data) ? 1 : 0);
-          const corridoRel: any = {};
+          const fechoDaFaturaRel = (fid:any) => (fechos||[]).find((f:any)=> (f.faturaIds||[]).includes(fid));
+          const snapFechoRel = (f:any, nomeProd:string) => (f?.stock||[]).find((s:any)=> s.nome===nomeProd);
+          const gruposRel: any = {};
           linhas.forEach((r:any)=>{
-            const chave = r.nome;
-            if(corridoRel[chave] === undefined){
-              corridoRel[chave] = r.stFinalLoja;
+            const f = fechoDaFaturaRel(r.fatId);
+            const chave = f ? `fecho-${f.id}-${r.nome}` : `aberto-${r.nome}`;
+            if(!gruposRel[chave]) gruposRel[chave] = [];
+            gruposRel[chave].push(r);
+          });
+          Object.values(gruposRel).forEach((grupo:any)=>{
+            const f = fechoDaFaturaRel(grupo[0].fatId);
+            const snap = f ? snapFechoRel(f, grupo[0].nome) : null;
+            const prodStockRel = (stockProdutos||[]).find((s:any)=> s.nome===grupo[0].nome);
+            const armFecho = snap ? Number(snap.finalArm||0) : Number(prodStockRel?.stockFinalArmazem||0);
+            let recepcaoPeriodo = 0;
+            if(snap){
+              const vendasGrupo = grupo.reduce((s:number, r:any)=> s + Number(r.vendas||0), 0);
+              recepcaoPeriodo = Number(snap.finalLoja||0) - Number(snap.inicialLoja||0) + vendasGrupo;
             } else {
-              r.stInicial = corridoRel[chave];
-              r.recepcao = 0;
-              r.stFinalLoja = r.stInicial - r.vendas;
-              r.stFinalArmLoja = r.stFinalLoja + Number((stockProdutos||[]).find((s:any)=> s.nome===r.nome)?.stockFinalArmazem||0);
-              corridoRel[chave] = r.stFinalLoja;
+              recepcaoPeriodo = Number(prodStockRel?.recepcao||0);
             }
+            let corrido = 0;
+            grupo.forEach((r:any, idx:number)=>{
+              if(idx===0){
+                if(snap) r.stInicial = Number(snap.inicialLoja||0);
+                r.recepcao = recepcaoPeriodo;
+                r.stFinalLoja = r.stInicial + r.recepcao - r.vendas;
+              } else {
+                r.stInicial = corrido;
+                r.recepcao = 0;
+                r.stFinalLoja = r.stInicial - r.vendas;
+              }
+              r.stFinalArmLoja = r.stFinalLoja + armFecho;
+              corrido = r.stFinalLoja;
+            });
           });
           linhas.sort((a:any,b:any)=> ordemRel(a.data) > ordemRel(b.data) ? -1 : ordemRel(a.data) < ordemRel(b.data) ? 1 : 0);
           // Se não há faturas, mostra 1 linha por produto do Stock (sem vendas) para não ficar vazio com mock
