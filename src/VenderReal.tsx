@@ -1036,16 +1036,21 @@ const hojeISO = new Date().toISOString().slice(0,10);
               const qtd = Number(it.qtd || it.quantidade || 1);
               const preco = Number(it.preco || it.precoUnit || prodStock?.precoUnit || 0);
               const valor = qtd * preco;
+              const stIni = prodStock ? Number(prodStock.stockInicialLoja||0) : 0;
+              const recep = prodStock ? Number(prodStock.recepcao||0) : 0;
+              const stFinLoja = stIni + recep - qtd;
+              const stFinArmLoja = stFinLoja + Number(prodStock?.stockFinalArmazem||0);
               linhas.push({
                 data: dataFat,
                 fatId: fat.id,
                 nome: nomeProd,
                 grupo: prodStock?.cat || it.cat || 'Geral',
-                stInicial: prodStock ? Number(prodStock.stockInicialLoja||0) : 0,
-                recepcao: prodStock ? Number(prodStock.recepcao||0) : 0,
-                vendas: prodStock ? Number(prodStock.vendaHoje||0) : qtd,
+                stInicial: stIni,
+                recepcao: recep,
+                vendas: qtd,
                 cliente: fat.cliente || fat.tel || '-',
-                quanti: qtd,
+                stFinalLoja: stFinLoja,
+                stFinalArmLoja: stFinArmLoja,
                 valor,
                 valorDivida: fat.is_divida ? valor : 0,
                 total: valor,
@@ -1066,7 +1071,8 @@ const hojeISO = new Date().toISOString().slice(0,10);
           const totSt = linhasFiltradas.reduce((s:any,r:any)=>s+r.stInicial,0);
           const totRec = linhasFiltradas.reduce((s:any,r:any)=>s+r.recepcao,0);
           const totVendas = linhasFiltradas.reduce((s:any,r:any)=>s+r.vendas,0);
-          const totQtd = linhasFiltradas.reduce((s:any,r:any)=>s+r.quanti,0);
+          const totStFinalLoja = linhasFiltradas.reduce((s:any,r:any)=>s+r.stFinalLoja,0);
+          const totStFinalArmLoja = linhasFiltradas.reduce((s:any,r:any)=>s+r.stFinalArmLoja,0);
           const totDivida = linhasFiltradas.reduce((s:any,r:any)=>s+r.valorDivida,0);
           const totTotal = linhasFiltradas.reduce((s:any,r:any)=>s+r.total,0);
           const produtosUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.nome))];
@@ -1076,7 +1082,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
             const logoRel = perfilEdit.logoData || (lojaLogada as any)?.logoData || '';
             const cabecalhoRel = `<div style="display:flex;gap:12px;align-items:center;border-bottom:3px solid #1e2f4a;padding-bottom:10px;margin-bottom:10px">${logoRel?`<img src="${logoRel}" style="width:64px;height:64px;object-fit:cover;border-radius:50%;border:2px solid #1e2f4a" />`:''}<div><h2 style="margin:0;font-size:18px">${lojaLogada?.nome_loja||'WEZHA TOTSHE'}</h2><div style="font-size:11px;color:#444">NUIT: ${lojaLogada?.nuit||'-'} | Tel: ${lojaLogada?.username||'-'} | ${lojaLogada?.endereco||''} ${lojaLogada?.cidade||''} - ${lojaLogada?.provincia||''}</div><div style="font-size:11px;color:#444">Ramo: ${lojaLogada?.ramo||''}</div></div></div>`;
             // FIX RELATORIO - antes a tabela htmlRel era construida mas nunca usada; o PDF saia do criarPdfBlob (so texto). Agora o PDF E a tabela com logo.
-            const htmlRel = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${nomeRel}</title><style>body{font-family:Arial;padding:20px;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:10px}th{background:#1e2f4a;color:#fff}</style></head><body>${cabecalhoRel}<h3 style="margin:6px 0">RELATORIO - ${lojaLogada?.nome_loja||''}</h3><p>DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}</p><table><thead><tr><th>DATA</th><th>PRODUTO</th><th>ST INICIAL</th><th>RECEPCAO</th><th>VENDAS</th><th>CLIENTE</th><th>QTD</th><th>VALOR</th><th>DIVIDA</th><th>TOTAL</th></tr></thead><tbody>${linhasFiltradas.map((r:any)=>`<tr><td>${r.data}</td><td>${r.nome}</td><td>${r.stInicial}</td><td>${r.recepcao}</td><td>${r.vendas}</td><td>${r.cliente}</td><td>${r.quanti}</td><td>${r.valor}MT</td><td>${r.valorDivida}MT</td><td>${r.total}MT</td></tr>`).join('')}</tbody></table><h3>TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} QTD ${totQtd} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT</h3><p style="font-size:10px;color:#888">Gerado em ${new Date().toLocaleString('pt-MZ')} - ${lojaLogada?.nome_loja||''}</p><script>window.onload=function(){window.print()}</script></body></html>`;
+            const htmlRel = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${nomeRel}</title><style>body{font-family:Arial;padding:20px;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:10px}th{background:#1e2f4a;color:#fff}</style></head><body>${cabecalhoRel}<h3 style="margin:6px 0">RELATORIO - ${lojaLogada?.nome_loja||''}</h3><p>DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}</p><table><thead><tr><th>DATA</th><th>PRODUTO</th><th>ST INICIAL</th><th>RECEPCAO</th><th>VENDAS</th><th>CLIENTE</th><th>ST FINAL LOJA</th><th>ST FINAL ARMAZÉM + LOJA</th><th>VALOR</th><th>DIVIDA</th><th>TOTAL</th></tr></thead><tbody>${linhasFiltradas.map((r:any)=>`<tr><td>${r.data}</td><td>${r.nome}</td><td>${r.stInicial}</td><td>${r.recepcao}</td><td>${r.vendas}</td><td>${r.cliente}</td><td>${r.stFinalLoja}</td><td>${r.stFinalArmLoja}</td><td>${r.valor}MT</td><td>${r.valorDivida}MT</td><td>${r.total}MT</td></tr>`).join('')}</tbody></table><h3>TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} ST FINAL LOJA ${totStFinalLoja} ST FINAL ARMAZÉM + LOJA ${totStFinalArmLoja} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT</h3><p style="font-size:10px;color:#888">Gerado em ${new Date().toLocaleString('pt-MZ')} - ${lojaLogada?.nome_loja||''}</p><script>window.onload=function(){window.print()}</script></body></html>`;
             const wRel:any = window.open('', '_blank');
             if(!wRel){ alert('O navegador bloqueou. Permite popups para baixar o PDF.'); return; }
             wRel.document.write(htmlRel); wRel.document.close();
@@ -1092,7 +1098,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
           <div className="mt-3 space-y-3">
             <div className="bg-white border rounded-[12px] p-4">
               <div className="flex items-center gap-2 mb-1"><span className="text-[14px]">📊</span><span className="font-black text-[12px]">RELATORIO SIMPLES - Por Produto / Dia - REAL (Stock + Faturas)</span></div>
-              <div className="text-[8px] text-[#64748b] mb-3">Tabela REAL: cada linha = 1 produto de 1 fatura. ST INICIAL e RECEPCAO vêm do Stock. CLIENTE, QUANTI, VALOR, DIVIDA vêm das Faturas. Sem mock.</div>
+              <div className="text-[8px] text-[#64748b] mb-3">Tabela REAL: cada linha = 1 produto de 1 fatura. ST INICIAL e RECEPCAO vêm do Stock. CLIENTE, VENDAS, VALOR, DIVIDA vêm das Faturas. ST FINAL LOJA = ST INICIAL + RECEPCAO - VENDAS. ST FINAL ARMAZÉM + LOJA = ST FINAL LOJA + armazém. Sem mock.</div>
               <div className="grid grid-cols-4 gap-3">
                 <div><div className="text-[8px] font-bold">PRODUTO</div><select value={relFiltroProduto} onChange={e=>setRelFiltroProduto(e.target.value)} className="w-full mt-1 h-8 border rounded px-2 text-[10px] bg-white"><option>Todos</option>{produtosUnicos.map((n:any)=><option key={n}>{n}</option>)}</select></div>
                 <div><div className="text-[8px] font-bold">GRUPO</div><select value={relFiltroGrupo} onChange={e=>setRelFiltroGrupo(e.target.value)} className="w-full mt-1 h-8 border rounded px-2 text-[10px] bg-white"><option>Todos</option>{gruposUnicos.map((g:any)=><option key={g}>{g}</option>)}</select></div>
@@ -1112,18 +1118,18 @@ const hojeISO = new Date().toISOString().slice(0,10);
               <div className="text-[9px] text-gray-500 mt-2">Stock: {stockProdutos.length} produtos reais | Faturas: {faturas.length} reais | Linhas: {linhasFiltradas.length} {relAplicado ? '(filtro aplicado)' : ''}</div>
             </div>
             <div className="bg-white border rounded-[12px] p-4">
-              <div className="font-black text-[11px] mb-3">TABELA - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | QUANTI | VALOR | TOTAL - REAL</div>
+              <div className="font-black text-[11px] mb-3">TABELA - DATA | PRODUTO | ST INICIAL | RECEPCAO | VENDAS | CLIENTE | ST FINAL LOJA | ST FINAL ARMAZÉM + LOJA | VALOR | TOTAL - REAL</div>
               <div className="overflow-x-auto border rounded-[8px]">
                 <table className="w-full text-[9px] min-w-[1100px]">
-                  <thead><tr className="bg-[#1e2f4a] text-white"><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">QUANTI</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-center bg-blue-600">VALOR DIVIDA</th><th className="p-2 text-center bg-yellow-400 text-black">TOTAL C/DIVIDAS</th></tr></thead>
+                  <thead><tr className="bg-[#1e2f4a] text-white"><th className="p-2 text-left">DATA</th><th className="p-2 text-left">NOME PRODUTO</th><th className="p-2 text-center">ST INICIAL</th><th className="p-2 text-center">RECEPCAO</th><th className="p-2 text-center">VENDAS</th><th className="p-2 text-left">CLIENTE</th><th className="p-2 text-center">ST FINAL LOJA</th><th className="p-2 text-center">ST FINAL ARMAZÉM + LOJA</th><th className="p-2 text-center">VALOR</th><th className="p-2 text-center bg-blue-600">VALOR DIVIDA</th><th className="p-2 text-center bg-yellow-400 text-black">TOTAL C/DIVIDAS</th></tr></thead>
                   <tbody>
                     {linhasFiltradas.length===0 ? (
-                      <tr><td colSpan={10} className="p-4 text-center">Nenhuma venda com este filtro - Faturas: {faturas.length} - Limpa o filtro para ver tudo.</td></tr>
+                      <tr><td colSpan={11} className="p-4 text-center">Nenhuma venda com este filtro - Faturas: {faturas.length} - Limpa o filtro para ver tudo.</td></tr>
                     ) : linhasFiltradas.map((r:any,idx:number)=>(
-                      <tr key={idx} className="border-b"><td className="p-2">{r.data}</td><td className="p-2 font-bold">{r.nome}</td><td className="p-2 text-center bg-blue-50">{r.stInicial}</td><td className="p-2 text-center">{r.recepcao}</td><td className="p-2 text-center font-bold">{r.vendas}</td><td className="p-2">{r.cliente}</td><td className="p-2 text-center font-bold">{r.quanti}</td><td className="p-2 text-center">{r.valor}MT</td><td className="p-2 text-center bg-blue-100">{r.valorDivida}MT</td><td className="p-2 text-center bg-yellow-100 font-bold">{r.total}MT</td></tr>
+                      <tr key={idx} className="border-b"><td className="p-2">{r.data}</td><td className="p-2 font-bold">{r.nome}</td><td className="p-2 text-center bg-blue-50">{r.stInicial}</td><td className="p-2 text-center">{r.recepcao}</td><td className="p-2 text-center font-bold">{r.vendas}</td><td className="p-2">{r.cliente}</td><td className="p-2 text-center font-bold">{r.stFinalLoja}</td><td className="p-2 text-center font-bold">{r.stFinalArmLoja}</td><td className="p-2 text-center">{r.valor}MT</td><td className="p-2 text-center bg-blue-100">{r.valorDivida}MT</td><td className="p-2 text-center bg-yellow-100 font-bold">{r.total}MT</td></tr>
                     ))}
                   </tbody>
-                  <tfoot><tr className="bg-[#facc15] font-black text-[9px]"><td className="p-2" colSpan={2}>TOTAIS GERAIS REAIS: ST {totSt} REC {totRec} VENDAS {totVendas}</td><td className="p-2 text-center">{totSt}</td><td className="p-2 text-center">{totRec}</td><td className="p-2 text-center">{totVendas}</td><td className="p-2"></td><td className="p-2 text-center">{totQtd}</td><td className="p-2"></td><td className="p-2 text-center bg-blue-200">{totDivida}MT</td><td className="p-2 text-center bg-yellow-300">{totTotal}MT</td></tr></tfoot>
+                  <tfoot><tr className="bg-[#facc15] font-black text-[9px]"><td className="p-2" colSpan={2}>TOTAIS GERAIS REAIS: ST {totSt} REC {totRec} VENDAS {totVendas}</td><td className="p-2 text-center">{totSt}</td><td className="p-2 text-center">{totRec}</td><td className="p-2 text-center">{totVendas}</td><td className="p-2"></td><td className="p-2 text-center">{totStFinalLoja}</td><td className="p-2 text-center">{totStFinalArmLoja}</td><td className="p-2"></td><td className="p-2 text-center bg-blue-200">{totDivida}MT</td><td className="p-2 text-center bg-yellow-300">{totTotal}MT</td></tr></tfoot>
                 </table>
               </div>
             </div>
