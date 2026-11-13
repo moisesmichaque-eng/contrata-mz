@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bkwkulxuprpboozaehfh.supabase.co';
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.[STRIPPED 127 bytes].XXXX';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+export { supabase };
 
 export default function VenderFixIVATabs(){
   const [lojaLogada, setLojaLogada] = useState<any>(null);

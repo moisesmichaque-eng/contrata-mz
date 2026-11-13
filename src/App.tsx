@@ -2,12 +2,25 @@
 // App.tsx - FASE 10 - 3 CLIQUES NO LOGO WEZHA = PAINEL DONO - TUDO DAS 4 PARTES, BEM DETALHADO!
 // Como funciona: WEZHA WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import EncontrarReal from './EncontrarReal';
 import ViajarReal from './ViajarReal';
 import VenderReal from './VenderReal';
 import ContratosReal from './ContratosReal';
 // Supabase - se existir no teu projeto, usa. Se nao, o painel usa localStorage + contagem real!
-let supabase: any = null; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
+let supabase: any = null;
+// Supabase SO para colaboradores: usa o MESMO cliente do Vender (passo 1: export { supabase }; no VenderReal.tsx).
+// Se o Vender ainda nao tiver essa linha, tenta as variaveis de ambiente do projeto.
+let supabaseColab: any = null;
+const getSupabaseColab = async () => {
+  if(supabaseColab) return supabaseColab;
+  try{ const mod:any = await import('./VenderReal'); if(mod && mod.supabase) supabaseColab = mod.supabase; }catch(e){}
+  if(!supabaseColab){
+    const env:any = (import.meta as any).env || {};
+    if(env.VITE_SUPABASE_ANON_KEY){ supabaseColab = createClient(env.VITE_SUPABASE_URL || 'https://bkwkulxuprpboozaehfh.supabase.co', env.VITE_SUPABASE_ANON_KEY); }
+  }
+  return supabaseColab;
+}; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
 
 export function LogoWezha({ size=36 }: any){
   const [tentativa, setTentativa] = React.useState(0);
@@ -47,9 +60,36 @@ export default function App(){
   const [mostrarLoginDono, setMostrarLoginDono] = useState(false);
   const [donoLogado, setDonoLogado] = useState(false);
   const [donoUser, setDonoUser] = useState(''); const [donoPass, setDonoPass] = useState('');
-  const [abaDono, setAbaDono] = useState<'resumo'|'encontrar'|'viajar'|'vender'|'contratos'|'atividades'>('resumo');
+  const [abaDono, setAbaDono] = useState<'resumo'|'encontrar'|'viajar'|'vender'|'contratos'|'atividades'|'colaboradores'>('resumo');
   const [dadosDono, setDadosDono] = useState<any>({ contratos:[], viagens:[], transportadores:[], reservas:[], lojas:[], faturas:[], profissionais:[] });
   const [carregandoDono, setCarregandoDono] = useState(false);
+  // COLABORADORES - contas criadas pelo dono, aqui no painel do SITE (V39)
+  const [colaboradores, setColaboradores] = useState<any[]>([]);
+  const [registosColab, setRegistosColab] = useState<any[]>([]);
+  const [comissoesColab, setComissoesColab] = useState<any[]>([]);
+  const [formColab, setFormColab] = useState({nome:'', tel:'', senha:'', percentagem:'10'});
+  const carregarColaboradores = async () => {
+    const sb = await getSupabaseColab(); if(!sb){ alert('Supabase nao ligado neste painel. Junta a linha export { supabase }; no VenderReal.tsx (passo 1) e publica de novo.'); return; }
+    try{ const { data } = await sb.from('colaboradores').select('*').order('created_at',{ascending:false}); setColaboradores((data as any)||[]); }catch(e){ setColaboradores([]); }
+    try{ const { data } = await sb.from('loja_registo').select('*').order('created_at',{ascending:false}); setRegistosColab((data as any)||[]); }catch(e){ setRegistosColab([]); }
+    try{ const { data } = await sb.from('comissoes').select('*').order('created_at',{ascending:false}); setComissoesColab((data as any)||[]); }catch(e){ setComissoesColab([]); }
+  };
+  const criarColaborador = async () => {
+    const nome = (formColab.nome||'').trim(); const tel = String(formColab.tel||'').replace(/\D/g,'').replace(/^258/,''); const senha = (formColab.senha||'').trim(); let perc = Number(formColab.percentagem); if(isNaN(perc)) perc = 10; if(perc<0) perc=0; if(perc>100) perc=100;
+    if(!nome || !senha){ alert('Nome e Palavra-passe do colaborador sao obrigatorios.'); return; }
+    if(tel.length!==9){ alert('Telefone do colaborador tem de ter 9 digitos (ex: 84 123 4567).'); return; }
+    const sb = await getSupabaseColab(); if(!sb){ alert('Supabase nao ligado neste painel. Junta a linha export { supabase }; no VenderReal.tsx (passo 1) e publica de novo.'); return; }
+    const { error } = await sb.from('colaboradores').insert([{ nome, tel, senha, percentagem: perc, ativo: true }]);
+    if(error){ alert('Nao consegui criar: '+error.message+' - Corre o SQL das 3 tabelas (colaboradores) no Supabase.'); return; }
+    setFormColab({nome:'', tel:'', senha:'', percentagem:'10'}); carregarColaboradores(); alert('Conta de colaborador criada! '+nome+' entra com Telefone '+tel+' e a palavra-passe que meteste.');
+  };
+  const alternarColaborador = async (c:any) => {
+    const novo = !c.ativo; if(!confirm((novo?'ATIVAR':'DESATIVAR')+' o colaborador '+c.nome+'?')) return;
+    const sb = await getSupabaseColab(); if(!sb){ alert('Supabase nao ligado neste painel.'); return; }
+    const { error } = await sb.from('colaboradores').update({ ativo: novo }).eq('id', c.id);
+    if(error){ alert('Erro: '+error.message); return; }
+    carregarColaboradores();
+  };
   const [docVer, setDocVer] = useState<any>(null);
   const [filtroAprovacao, setFiltroAprovacao] = useState<'todos'|'pendente'|'aprovada'|'rejeitada'>('pendente');
 
@@ -101,9 +141,10 @@ export default function App(){
   };
 
   const f = FRASES[tab];
+  const MOSTRAR_VIAJAR = typeof window!=='undefined' && new URLSearchParams(window.location.search).get('viajar')==='mostrar';
   const tabs:any = [
     { id:'encontrar', label:'🔍 ENCONTRAR', cor:'#0B3D91' },
-    { id:'viajar', label:'🚌 VIAJAR', cor:'#0E7A5A' },
+    ...(MOSTRAR_VIAJAR ? [{ id:'viajar', label:'🚌 VIAJAR', cor:'#0E7A5A' }] : []),
     { id:'vender', label:'🛒 VENDER', cor:'#C9A227' },
     { id:'contratos', label:'📄 CONTRATOS', cor:'#7C3AED' },
   ];
@@ -138,9 +179,9 @@ export default function App(){
           <div><div style={{color:'white', fontWeight:900, fontSize:16}}>PAINEL DE GESTÃO - WEZHA</div><div style={{color:'#F5B81D', fontSize:11}}>Painel de Gestão - WEZHA</div></div>
           <button onClick={()=>{ setDonoLogado(false); setTab('encontrar'); }} style={{marginLeft:'auto', background:'#F5B81D', color:'#0B3D91', border:'none', padding:'8px 14px', borderRadius:999, fontWeight:800, fontSize:11, cursor:'pointer'}}>SAIR →</button>
         </div>
-        <div style={{maxWidth:1800, margin:'0 auto', padding:12}}>
+        <div style={{maxWidth:'100%', margin:'0 auto', padding:8}}>
           <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
-            {['resumo','encontrar','viajar','vender','contratos','atividades'].map((a:any)=> <button key={a} onClick={()=>setAbaDono(a)} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:11, background: abaDono===a ? '#0B3D91' : 'white', color: abaDono===a ? 'white' : '#0B3D91'}}>{a.toUpperCase()}</button>)}
+            {['resumo','encontrar', ...(MOSTRAR_VIAJAR?['viajar']:[]), 'vender','contratos','atividades','colaboradores'].map((a:any)=> <button key={a} onClick={()=>{ setAbaDono(a); if(a==='colaboradores') carregarColaboradores(); }} style={{padding:'8px 14px', borderRadius:999, border:'none', cursor:'pointer', fontWeight:800, fontSize:11, background: abaDono===a ? '#0B3D91' : 'white', color: abaDono===a ? 'white' : '#0B3D91'}}>{a.toUpperCase()}</button>)}
             <button onClick={carregarDadosDono} style={{padding:'8px 14px', borderRadius:999, border:'1px solid #0B3D91', background:'white', fontWeight:800, fontSize:11, cursor:'pointer'}}>🔄 ATUALIZAR</button>
           </div>
           {carregandoDono && <p>A carregar...</p>}
@@ -187,6 +228,20 @@ export default function App(){
           {abaDono==='encontrar' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda não há profissionais.</p>}</div>
           )}
+          {abaDono==='colaboradores' && (
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8}}><h3 style={{margin:0}}>👥 COLABORADORES - Quem regista lojas para ti</h3><button onClick={carregarColaboradores} style={{padding:'8px 14px', borderRadius:999, border:'none', background:'#0B3D91', color:'white', fontWeight:800, fontSize:11, cursor:'pointer'}}>🔄 ATUALIZAR</button></div>
+              <p style={{fontSize:11, color:'#666'}}>Crias a conta aqui. O colaborador entra com Telefone + Palavra-passe e so ve o botao Registar Loja. A loja que ele registar fica ligada a ele, e a comissao dele e a percentagem que meteres aqui.</p>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:10}}>
+                <div><div style={{fontSize:10, fontWeight:800}}>NOME DO COLABORADOR *</div><input value={formColab.nome} onChange={e=>setFormColab({...formColab, nome:e.target.value})} placeholder="Ex: Joao" style={{width:'100%', marginTop:4, height:34, border:'1px solid #ddd', borderRadius:8, padding:'0 10px', fontSize:12}} /></div>
+                <div><div style={{fontSize:10, fontWeight:800}}>TELEFONE (login dele) *</div><input value={formColab.tel} onChange={e=>setFormColab({...formColab, tel:e.target.value})} placeholder="84 123 4567" style={{width:'100%', marginTop:4, height:34, border:'1px solid #ddd', borderRadius:8, padding:'0 10px', fontSize:12}} /></div>
+                <div><div style={{fontSize:10, fontWeight:800}}>PALAVRA-PASSE DELE *</div><input type="password" value={formColab.senha} onChange={e=>setFormColab({...formColab, senha:e.target.value})} placeholder="***" style={{width:'100%', marginTop:4, height:34, border:'1px solid #ddd', borderRadius:8, padding:'0 10px', fontSize:12}} /></div>
+                <div><div style={{fontSize:10, fontWeight:800}}>PERCENTAGEM DELE (%) *</div><input type="number" min="0" max="100" value={formColab.percentagem} onChange={e=>setFormColab({...formColab, percentagem:e.target.value})} placeholder="10" style={{width:'100%', marginTop:4, height:34, border:'1px solid #ddd', borderRadius:8, padding:'0 10px', fontSize:12}} /></div>
+              </div>
+              <button onClick={criarColaborador} style={{width:'100%', marginTop:12, background:'#7C3AED', color:'white', padding:12, border:'none', borderRadius:999, fontWeight:900, fontSize:12, cursor:'pointer'}}>➕ Criar conta de colaborador</button>
+              <div style={{marginTop:14, display:'flex', flexDirection:'column', gap:8}}>{colaboradores.length===0 ? (<p style={{fontSize:11, color:'#666', textAlign:'center'}}>Nenhum colaborador ainda. Corre o SQL das 3 tabelas no Supabase e cria o primeiro aqui.</p>) : colaboradores.map((c:any)=>{ const lojasC = registosColab.filter((r:any)=>String(r.colaborador_id)===String(c.id)); const comsC = comissoesColab.filter((x:any)=>String(x.colaborador_id)===String(c.id)); const totCom = comsC.reduce((s:any,x:any)=>s+Number(x.comissao||0),0); const porPagar = comsC.filter((x:any)=>!x.paga).reduce((s:any,x:any)=>s+Number(x.comissao||0),0); return (<div key={c.id} style={{border:'1px solid #ddd', borderRadius:12, padding:10, opacity: c.ativo?1:0.6}}><div style={{display:'flex', justifyContent:'space-between', gap:8, flexWrap:'wrap'}}><div><div style={{fontWeight:800, fontSize:13}}>{c.nome} {!c.ativo && <span style={{fontSize:9, background:'#666', color:'white', padding:'2px 8px', borderRadius:999}}>INATIVO</span>}</div><div style={{fontSize:10, color:'#666'}}>Tel: {c.tel} | Percentagem: {c.percentagem}%</div><div style={{fontSize:10, marginTop:2}}>Lojas registadas: <b>{lojasC.length}</b> | Comissoes: <b>{totCom} MT</b> | Por pagar a ele: <b style={{color:'red'}}>{porPagar} MT</b></div></div><button onClick={()=>alternarColaborador(c)} style={{padding:'8px 14px', height:34, borderRadius:999, border:'none', background: c.ativo?'#F5B81D':'#16A34A', color: c.ativo?'black':'white', fontWeight:800, fontSize:11, cursor:'pointer'}}>{c.ativo?'Desativar':'Ativar'}</button></div></div>); })}</div>
+            </div>
+          )}
           {abaDono==='atividades' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🕒 Últimas Atividades - 4 Partes</h3><p style={{fontSize:12}}>• Contrato gerado - {dadosDono.contratos[0]?.trab_nome||'—'} - {dadosDono.contratos[0]?.data_inicio||''}</p><p style={{fontSize:12}}>• Viatura registada - {dadosDono.transportadores[0]?.nome||'—'}</p><p style={{fontSize:12}}>• Reserva feita - {dadosDono.reservas[0]?.nome_passageiro||'—'}</p><p style={{fontSize:12}}>• Fatura VENDER - {dadosDono.faturas[0]?.cliente_nome||'—'} - {dadosDono.faturas[0]?.total||''} MZN</p></div>
           )}
@@ -216,7 +271,7 @@ export default function App(){
     <div style={{minHeight:'100vh', background:'linear-gradient(180deg,#EAF0F9 0%, #F6F8FB 30%, #FFF7E0 100%)', fontFamily:'system-ui, sans-serif'}}>
       <style>{`@keyframes flutuar { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-4px)} } @keyframes brilhar { 0%,100%{ box-shadow: 0 0 0 rgba(245,184,29,0)} 50%{ box-shadow: 0 0 18px rgba(245,184,29,.7)} } .btn-tab{ transition: all .25s ease; } .btn-tab:hover{ transform: translateY(-2px) scale(1.03); } .btn-tab.ativo{ animation: brilhar 1.6s infinite; } .logo-flutuar{ animation: flutuar 3s ease-in-out infinite; }`}</style>
       <div style={{position:'sticky', top:0, zIndex:40, background:'#0B3D91', borderBottom:'3px solid #F5B81D', boxShadow:'0 4px 20px rgba(0,0,0,.2)'}}>
-        <div style={{maxWidth:1800, margin:'0 auto', padding:'8px 12px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+        <div style={{maxWidth:'100%', margin:'0 auto', padding:'8px 8px', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
           <div onClick={clicarLogo} style={{display:'flex', alignItems:'center', gap:10, background:'white', padding:'4px 12px 4px 4px', borderRadius:999, boxShadow:'0 2px 10px rgba(0,0,0,.2)', cursor:'pointer'}} title="WEZHA - TOTSHE">
             <div className="logo-flutuar"><LogoWezha size={32} /></div>
             <div><div style={{fontWeight:900, fontSize:16, color:'#0B3D91', lineHeight:1}}>WEZHA <span style={{fontSize:9, color:'#F5B81D', background:'#0B3D91', padding:'1px 5px', borderRadius:999}}>TOTSHE</span></div><div style={{fontSize:9, color:'#666'}}>Contrata-MZ • Contratos • Viagens • Vendas</div></div>
@@ -225,14 +280,14 @@ export default function App(){
           <div style={{marginLeft:'auto', color:'white', fontSize:11, fontWeight:700}}>🇲🇿 Moçambique • Maputo • Matola • Xai-Xai</div>
         </div>
       </div>
-      <div style={{maxWidth:1800, margin:'16px auto', padding:'0 12px'}}>
+      <div style={{maxWidth:'100%', margin:'16px auto', padding:'0 8px'}}>
         <div style={{background:'linear-gradient(90deg,#0B3D91,#134E9E)', borderRadius:16, padding:'20px 22px', color:'white', boxShadow:'0 8px 24px rgba(11,61,145,.25)', position:'relative', overflow:'hidden'}}>
           <div style={{position:'absolute', right:10, top:0, fontSize:60, opacity:.15}}>🇲🇿</div>
           <h1 style={{margin:0, fontSize:20, fontWeight:900}}>{f.titulo}</h1><p style={{margin:'6px 0 0', fontSize:12, opacity:.9}}>{f.sub}</p>
           {/* BACKSTAGE - badges escondidos, não visíveis: Verifica BI e NUIT | Fotos e M-Pesa comprovado | 11 Cláusulas - Lei 23/2007 */}
         </div>
       </div>
-      <div style={{maxWidth:1800, margin:'0 auto', padding:'0 12px 30px'}}>
+      <div style={{maxWidth:'100%', margin:'0 auto', padding:'0 8px 30px'}}>
         {tab==='encontrar' && <EncontrarReal />}{tab==='viajar' && <ViajarReal />}{tab==='vender' && <VenderReal />}{tab==='contratos' && <ContratosReal />}
       </div>
       <div style={{textAlign:'center', padding:'16px', color:'#0B3D91', fontSize:11}}><div onClick={clicarLogo} style={{display:'flex', justifyContent:'center', alignItems:'center', gap:8, cursor:'pointer'}} title="Clica 3x para entrar como Dono"><LogoWezha size={24} /><b>WEZHA - TOTSHE</b> • Contrata-MZ • Feito em Moçambique 🇲🇿</div><p>Protege o teu trabalho! Sem contrato, sem prova! Com contrato, estás protegido!</p></div>
