@@ -4,7 +4,7 @@
 // 1) PDF com 11 CLAUSULAS COMPLETAS (texto legal)
 // 2) ASSINATURA REAL - desenhar com dedo/mouse + nome + BI + data (nao so checkbox)
 // 3) CONTA REAL - sem conta_Date.now() - sem login nao cria nem ve contratos
-// 4) WHATSAPP - trabalhador + dono +258823832513 ao criar
+// 4) WHATSAPP - contratado + dono +258823832513 ao criar
 // 5) VALIDACAO - BI 13 digitos, Tel 9 digitos (82-89), Valor > 0, Data inicio
 // 6) SEGURANCA - sem login lista = [] (nao mostra contratos dos outros)
 // 7) EDITAR / APAGAR / PESQUISAR
@@ -28,8 +28,8 @@ const CLAUSULAS = [
   { id:5, titulo:"Alimentacao e alojamento", short:"Beneficios" },
   { id:6, titulo:"Folgas e ferias", short:"Descanso legal" },
   { id:7, titulo:"Periodo experimental", short:"Teste inicial" },
-  { id:8, titulo:"Deveres do trabalhador", short:"Obrigações" },
-  { id:9, titulo:"Deveres do empregador", short:"Obrigações" },
+  { id:8, titulo:"Deveres do contratado", short:"Obrigações" },
+  { id:9, titulo:"Deveres do contratante", short:"Obrigações" },
   { id:10, titulo:"Rescisão e multas", short:"Fim do contrato" },
   { id:11, titulo:"Disposições finais", short:"Assinaturas" },
 ];
@@ -59,16 +59,16 @@ const TIPOS_ANEXO = ["Foto BI Contratante","Foto BI Contratado","Foto do local",
 function textoClausulas(c:any){
   const tarefas = Array.isArray(c.tarefas)? c.tarefas.join(', ') : (c.tarefas||'');
   return [
-    `DADOS DAS PARTES (sem numero - nao conta como clausula): Empregador: ${c.emp_nome} - BI: ${c.emp_bi||'-'} - NUIT (opcional): ${c.emp_nuit||c.empNUIT||'-'} - Tel: ${c.emp_tel} - End: ${c.emp_end||'-'}. Trabalhador: ${c.trab_nome} - BI: ${c.trab_bi||'-'} - NUIT (opcional): ${c.trab_nuit||c.trabNUIT||'-'} - Tel: ${c.trab_tel} - End: ${c.trab_end||'-'} - Profissao: ${c.trab_prof}. Ambas as partes declaram que os dados acima sao verdadeiros e assumem responsabilidade legal pela veracidade dos mesmos.`,
-    `CLAUSULA 1 - OBJETO E TAREFAS: O trabalhador compromete-se a realizar as seguintes tarefas: ${tarefas}. Qualquer tarefa fora desta lista so sera feita com acordo escrito das duas partes, com ajuste de valor e prazo.`,
-    `CLAUSULA 2 - HORARIO E LOCAL: Horario: ${c.horario_inicio} as ${c.horario_fim} - Dias: ${c.dias} - Data de inicio: ${c.data_inicio||'-'} - Local de trabalho: ${c.local_trab||c.emp_end||'-'} (casa do empregador se vazio). Alojamento e transporte: ${c.aloj_transp||c.alojTransp||'Se o trabalho for longe, o empregador garante transporte ou alojamento, ou paga subsidio de transporte.'}. Atrasos superiores a 30 minutos sem aviso devem ser comunicados por telefone/WhatsApp. Horas extra so com acordo previo.`,
-    `CLAUSULA 3 - SALARIO E PAGAMENTO: Valor total: ${c.valor} MZN - Dia de pagamento: dia ${c.dia_pag} - Forma: ${c.forma_pag} - Prazo: ${c.prazo}. O pagamento sera feito na forma combinada, com recibo / comprovativo M-Pesa / e-Mola. Em caso de atraso superior a 5 dias, o trabalhador pode suspender o trabalho ate receber, sem perda de direito ao valor.`,
-    `CLAUSULA 4 - ALIMENTACAO E ALOJAMENTO: ${c.alimentacao||'Conforme combinado'}. Se o empregador fornecer alimentacao, a mesma deve ser digna e em condicoes de higiene. Se nao fornecer, o trabalhador organiza a sua propria alimentacao, sem desconto no salario, salvo acordo escrito.`,
-    `CLAUSULA 5 - FOLGAS E FERIAS: O trabalhador tem direito a 1 dia de folga por semana, salvo acordo diferente. Feriados nacionais sao pagos. Ferias: apos 12 meses de trabalho continuo, o trabalhador tem direito a 30 dias de ferias pagas, ou compensacao proporcional se o contrato for menor.`,
+    `DADOS DAS PARTES (sem numero - nao conta como clausula): Contratante: ${c.emp_nome} - BI: ${c.emp_bi||'-'} - NUIT (opcional): ${c.emp_nuit||c.empNUIT||'-'} - Tel: ${c.emp_tel}. Contratado: ${c.trab_nome} - BI: ${c.trab_bi||'-'} - NUIT (opcional): ${c.trab_nuit||c.trabNUIT||'-'} - Tel: ${c.trab_tel} - Profissao: ${c.trab_prof}. Ambas as partes declaram que os dados acima sao verdadeiros e assumem responsabilidade legal pela veracidade dos mesmos.`,
+    `CLAUSULA 1 - OBJETO E TAREFAS: O contratado compromete-se a realizar as seguintes tarefas: ${tarefas}. Qualquer tarefa fora desta lista so sera feita com acordo escrito das duas partes, com ajuste de valor e prazo.`,
+    `CLAUSULA 2 - HORARIO E LOCAL: Horario: ${c.horario_inicio} as ${c.horario_fim} - Dias: ${c.dias} - Data de inicio: ${c.data_inicio||'-'} - Local de trabalho: ${c.local_trab||c.emp_end||'-'} (casa do contratante se vazio). Alojamento e transporte: ${c.aloj_transp||c.alojTransp||'Se o trabalho for longe, o contratante garante transporte ou alojamento, ou paga subsidio de transporte.'}. Atrasos superiores a 30 minutos sem aviso devem ser comunicados por telefone/WhatsApp. Horas extra so com acordo previo.`,
+    `CLAUSULA 3 - SALARIO E PAGAMENTO: Valor total: ${c.valor} MZN - Dia de pagamento: dia ${c.dia_pag} - Forma: ${c.forma_pag} - Prazo: ${c.prazo}. O pagamento sera feito na forma combinada, com recibo / comprovativo M-Pesa / e-Mola. Em caso de atraso superior a 5 dias, o contratado pode suspender o trabalho ate receber, sem perda de direito ao valor.`,
+    `CLAUSULA 4 - ALIMENTACAO E ALOJAMENTO: ${c.alimentacao||'Conforme combinado'}. Se o contratante fornecer alimentacao, a mesma deve ser digna e em condicoes de higiene. Se nao fornecer, o contratado organiza a sua propria alimentacao, sem desconto no salario, salvo acordo escrito.`,
+    `CLAUSULA 5 - FOLGAS E FERIAS: O contratado tem direito a 1 dia de folga por semana, salvo acordo diferente. Feriados nacionais sao pagos. Ferias: apos 12 meses de trabalho continuo, o contratado tem direito a 30 dias de ferias pagas, ou compensacao proporcional se o contrato for menor.`,
     `CLAUSULA 6 - PERIODO EXPERIMENTAL: Os primeiros 15 dias sao periodo experimental. Durante este periodo, qualquer das partes pode terminar o contrato sem multa, pagando apenas os dias ja trabalhados. Apos este periodo, aplicam-se as regras da Clausula 9.`,
     `CLAUSULA 7 - DEVERES DO TRABALHADOR: Cumprir horario, executar tarefas com qualidade, cuidar das ferramentas e materiais, manter o local limpo, respeitar as regras de seguranca, nao faltar sem aviso, nao desviar material, guardar sigilo sobre informacoes da casa / obra.`,
-    `CLAUSULA 8 - DEVERES DO EMPREGADOR: Pagar no dia combinado, fornecer material e ferramentas necessarias, garantir condicoes de seguranca e higiene, tratar o trabalhador com respeito e dignidade, nao exigir tarefas perigosas sem protecao, fornecer recibo de cada pagamento.`,
-    `CLAUSULA 9 - RESCISAO E MULTAS: Se o empregador rescindir sem justa causa, paga os dias trabalhados + 7 dias de aviso. Se o trabalhador abandonar sem aviso, perde o valor dos ultimos 3 dias. Em caso de roubo, dano intencional ou violencia, o contrato termina de imediato e o caso pode ser levado as autoridades. Qualquer rescisao deve ser comunicada por escrito / WhatsApp com motivo.`,
+    `CLAUSULA 8 - DEVERES DO CONTRATANTE: Pagar no dia combinado, fornecer material e ferramentas necessarias, garantir condicoes de seguranca e higiene, tratar o contratado com respeito e dignidade, nao exigir tarefas perigosas sem protecao, fornecer recibo de cada pagamento.`,
+    `CLAUSULA 9 - RESCISAO E MULTAS: Se o contratante rescindir sem justa causa, paga os dias trabalhados + 7 dias de aviso. Se o contratado abandonar sem aviso, perde o valor dos ultimos 3 dias. Em caso de roubo, dano intencional ou violencia, o contrato termina de imediato e o caso pode ser levado as autoridades. Qualquer rescisao deve ser comunicada por escrito / WhatsApp com motivo.`,
     `CLAUSULA 10 - DISPOSICOES FINAIS: Este contrato foi lido e aceite pelas duas partes, com assinaturas reais (desenho) abaixo. Em caso de conflito, as partes tentam resolver por conversa. Se nao resolverem, recorrem a Inspeccao do Trabalho / Tribunal competente em Mocambique. Este contrato tem 2 vias - uma para cada parte. Assinado em ${c.local_trab||'Mocambique'} em ${new Date().toLocaleDateString('pt-MZ')}.`
   ];
 }
@@ -135,7 +135,7 @@ export default function ContratosReal(){
     tarefas: MODELO_TAREFAS["Pedreiro"],
     horarioInicio:'06:00', horarioFim:'17:00', dias:'Segunda a Sabado', dataInicio:'', localTrab:'',
     valor:'', diaPag:'05', formaPag:'M-Pesa', prazo:'30 dias',
-    alimentacao:'Sim - almoço fornecido no local', alojTransp:'Se o trabalho for longe, o empregador garante transporte ou alojamento, ou paga subsidio de transporte.',
+    alimentacao:'Sim - almoço fornecido no local', alojTransp:'Se o trabalho for longe, o contratante garante transporte ou alojamento, ou paga subsidio de transporte.',
   });
 
   const [textoEdit, setTextoEdit] = useState<any>({});
@@ -209,16 +209,16 @@ export default function ContratosReal(){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `Contrato ${c.trab_prof} - ID ${id} - ${c.trab_nome} - ASSINADO.html`; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=> URL.revokeObjectURL(url), 2000);
     // FASE 7: SEM EXCEL! Contrato só em PDF! Removido o download CSV!
-    // 3) WHATSAPP AUTOMATICO para o CONTRATADO (numero do trabalhador) - conforme!
+    // 3) WHATSAPP AUTOMATICO para o CONTRATADO (numero do contratado) - conforme!
     const msg = `Ola ${c.trab_nome}, segue em anexo o contrato ${c.trab_prof} - ${c.valor} MZN. Confirma por favor se estas de acordo.`;
     setTimeout(()=> window.open(`https://wa.me/258${normTel(c.trab_tel)}?text=${encodeURIComponent(msg)}`, '_blank'), 700);
   };
 
   const gerarLinkDistancia = async () => {
     if(!contaId){ alert('⚠️ Sem conta! Faz login na tua Loja no VENDER primeiro. Sem login nao podes enviar link!'); return; }
-    if(!sigEmp){ alert('⚠️ Primeiro assina a TUA parte (Empregador) com o dedo! Depois envias o link!'); return; }
-    if(!isTelMZ(form.trabTel)){ alert('⚠️ Tel do Trabalhador invalido! Tem de ser 9 digitos!'); return; }
-    // Cria contrato como PENDENTE - falta assinatura do Trabalhador
+    if(!sigEmp){ alert('⚠️ Primeiro assina a TUA parte (Contratante) com o dedo! Depois envias o link!'); return; }
+    if(!isTelMZ(form.trabTel)){ alert('⚠️ Tel do Contratado invalido! Tem de ser 9 digitos!'); return; }
+    // Cria contrato como PENDENTE - falta assinatura do Contratado
     const novo:any = {
       conta_id: contaId, // FASE 7: Sem conta falsa! Se nao houver conta, bloqueia antes!
       emp_nome: form.empNome, emp_bi: form.empBI, emp_nuit: form.empNUIT, empNUIT: form.empNUIT, emp_tel: normTel(form.empTel), emp_end: form.empEnd,
@@ -228,7 +228,7 @@ export default function ContratosReal(){
       clausulas: CLAUSULAS, anexos: anexos, logotipo: logoTipo,
       assinatura_contratante: { concordo:true, data: new Date().toLocaleString('pt-MZ'), assinatura: sigEmp },
       assinatura_contratado: { concordo:false, data: '', assinatura: '' },
-      status: 'PENDENTE - Falta Trabalhador'
+      status: 'PENDENTE - Falta Contratado'
     };
     const { data, error } = await supabase.from('contratos').insert([novo]).select().single();
     if(error){ alert('Erro: '+error.message); return; }
@@ -239,7 +239,7 @@ export default function ContratosReal(){
     setLinkAssinatura(linkFinal);
     const msg = `Ola ${form.trabNome}, segue em anexo o contrato ${form.trabProf} - ${form.valor} MZN. Confirma por favor se estas de acordo: ${linkFinal}`;
     window.open(`https://wa.me/258${normTel(form.trabTel)}?text=${encodeURIComponent(msg)}`, '_blank');
-    alert('✅ Link gerado! WhatsApp aberto para o Trabalhador! Quando ele assinar, o contrato fica ASSINADO!');
+    alert('✅ Link gerado! WhatsApp aberto para o Contratado! Quando ele assinar, o contrato fica ASSINADO!');
     carregarReais();
   };
   const confirmarAssinaturaDistancia = async () => {
@@ -248,22 +248,22 @@ export default function ContratosReal(){
     if(!id){ alert('Sem contrato para assinar!'); return; }
     const { error } = await supabase.from('contratos').update({ assinatura_contratado: { concordo:true, data: new Date().toLocaleString('pt-MZ'), assinatura: sigTrab }, status: 'ASSINADO' }).eq('id', id);
     if(error){ alert('Erro: '+error.message); return; }
-    alert('✅ Assinatura confirmada! Contrato ASSINADO pelos 2! O Empregador vai receber WhatsApp!');
+    alert('✅ Assinatura confirmada! Contrato ASSINADO pelos 2! O Contratante vai receber WhatsApp!');
     const msgEmp = `✅ ${assinaturaDistancia.trab_nome} assinou o CONTRATO ${assinaturaDistancia.trab_prof} - ID ${String(id).substring(0,8)}! Contrato ASSINADO pelos 2! Baixa o PDF!`;
     window.open(`https://wa.me/258${normTel(assinaturaDistancia.emp_tel)}?text=${encodeURIComponent(msgEmp)}`, '_blank');
     setAssinaturaDistancia(null);
   };
   const validar = () => {
     if(!contaId) return 'Sem conta! Faz login na tua Loja no VENDER primeiro. Sem login nao podes criar contrato.';
-    if(!form.empNome.trim() || !form.trabNome.trim()) return 'Preenche Empregador e Trabalhador.';
-    if(!isTelMZ(form.empTel)) return 'Tel Empregador invalido! Tem de ser 9 digitos a comecar por 82-89. Ex: 841234567';
-    if(!isTelMZ(form.trabTel)) return 'Tel Trabalhador invalido! Tem de ser 9 digitos a comecar por 82-89.';
-    if(form.empBI && !isBI(form.empBI)) return 'BI/NUIT Empregador: BI tem de ter 13 digitos. Se e NUIT, deixa vazio ou usa 9 digitos.';
-    if(form.trabBI && !isBI(form.trabBI)) return 'BI Trabalhador invalido! Tem de ter 13 digitos. Ex: 1101012345678';
+    if(!form.empNome.trim() || !form.trabNome.trim()) return 'Preenche Contratante e Contratado.';
+    if(!isTelMZ(form.empTel)) return 'Tel Contratante invalido! Tem de ser 9 digitos a comecar por 82-89. Ex: 841234567';
+    if(!isTelMZ(form.trabTel)) return 'Tel Contratado invalido! Tem de ser 9 digitos a comecar por 82-89.';
+    if(form.empBI && !isBI(form.empBI)) return 'BI/NUIT Contratante: BI tem de ter 13 digitos. Se e NUIT, deixa vazio ou usa 9 digitos.';
+    if(form.trabBI && !isBI(form.trabBI)) return 'BI Contratado invalido! Tem de ter 13 digitos. Ex: 1101012345678';
     if(!form.valor || Number(form.valor) <= 0) return 'Valor tem de ser maior que 0. Ex: 7500';
     if(!form.dataInicio) return 'Escolhe a Data de Inicio.';
-    if(!sigEmp) return 'Falta ASSINATURA do Empregador - desenha com o dedo!';
-    if(!sigTrab) return 'Falta ASSINATURA do Trabalhador - desenha com o dedo!';
+    if(!sigEmp) return 'Falta ASSINATURA do Contratante - desenha com o dedo!';
+    if(!sigTrab) return 'Falta ASSINATURA do Contratado - desenha com o dedo!';
     return null;
   };
 
@@ -291,12 +291,12 @@ export default function ContratosReal(){
     if(editId){ res = await supabase.from('contratos').update(novo).eq('id', editId).eq('conta_id', contaId); }
     else { res = await supabase.from('contratos').insert([novo]); }
     if(res.error){ if(String(res.error.message||'').includes('conta_id')) alert('⚠️ Falta correr o SQL CONTRATOS-SQL-CORRIGIR-CONTA_ID.sql no Supabase!'); else alert('Erro: '+res.error.message); setCarregando(false); return; }
-    // WHATSAPP - Trabalhador + Dono - em 1 clique
-    const msgTrab = `Ola ${form.trabNome}! Novo CONTRATO ${form.trabProf} - ${form.valor} MZN - Inicio ${form.dataInicio} - Local ${form.localTrab} - Empregador ${form.empNome} (${form.empTel}). Ja esta ASSINADO com as 2 assinaturas! Vou enviar o PDF.`;
-    const msgDono = `Novo CONTRATO criado! ${form.trabProf} - ${form.trabNome} (${form.trabTel}) - Empregador ${form.empNome} - Valor ${form.valor} MZN - Inicio ${form.dataInicio}.`;
+    // WHATSAPP - Contratado + Dono - em 1 clique
+    const msgTrab = `Ola ${form.trabNome}! Novo CONTRATO ${form.trabProf} - ${form.valor} MZN - Inicio ${form.dataInicio} - Local ${form.localTrab} - Contratante ${form.empNome} (${form.empTel}). Ja esta ASSINADO com as 2 assinaturas! Vou enviar o PDF.`;
+    const msgDono = `Novo CONTRATO criado! ${form.trabProf} - ${form.trabNome} (${form.trabTel}) - Contratante ${form.empNome} - Valor ${form.valor} MZN - Inicio ${form.dataInicio}.`;
     window.open(`https://wa.me/258${normTel(form.trabTel)}?text=${encodeURIComponent(msgTrab)}`, '_blank');
     setTimeout(()=> window.open(`https://wa.me/${DONO_WPP}?text=${encodeURIComponent(msgDono)}`, '_blank'), 600);
-    alert('✅ CONTRATO REAL CRIADO! Salvo no Supabase + WhatsApp aberto para Trabalhador e Dono!');
+    alert('✅ CONTRATO REAL CRIADO! Salvo no Supabase + WhatsApp aberto para Contratado e Dono!');
     setEditId(null); setSigEmp(''); setSigTrab(''); carregarReais();
     setCarregando(false);
   };
@@ -362,18 +362,16 @@ export default function ContratosReal(){
                   <div className="mt-3">
                     {clausulaAtiva===1 && (
                       <div className="grid grid-cols-2 gap-2">
-                        <div><label className="text-[11px] font-bold">Empregador Nome *</label><input value={form.empNome} onChange={e=>setForm({...form, empNome:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nome real" /></div>
-                        <div><label className="text-[11px] font-bold">BI Empregador (13 digitos)</label><input value={form.empBI} onChange={e=>setForm({...form, empBI:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="1101012345678" /></div>
-                        <div><label className="text-[11px] font-bold">NUIT Empregador (opcional)</label><input value={form.empNUIT} onChange={e=>setForm({...form, empNUIT:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="NUIT - opcional" /></div>                         <div><label className="text-[11px] font-bold">Tel Empregador * (9 digitos)</label><input value={form.empTel} onChange={e=>setForm({...form, empTel:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="841234567" /></div>
-                        <div><label className="text-[11px] font-bold">End Empregador</label><input value={form.empEnd} onChange={e=>setForm({...form, empEnd:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div>
-                        <div><label className="text-[11px] font-bold">Trabalhador Nome *</label><input value={form.trabNome} onChange={e=>setForm({...form, trabNome:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nome real" /></div>
-                        <div><label className="text-[11px] font-bold">BI Trabalhador * (13 digitos)</label><input value={form.trabBI} onChange={e=>setForm({...form, trabBI:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="1101012345678" /></div>
-                        <div><label className="text-[11px] font-bold">NUIT Trabalhador (opcional)</label><input value={form.trabNUIT} onChange={e=>setForm({...form, trabNUIT:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="NUIT - opcional" /></div>                         <div><label className="text-[11px] font-bold">Tel Trabalhador *</label><input value={form.trabTel} onChange={e=>setForm({...form, trabTel:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="841234567" /></div>
-                        <div className="col-span-2"><label className="text-[11px] font-bold">End Trabalhador</label><input value={form.trabEnd} onChange={e=>setForm({...form, trabEnd:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div>
+                        <div><label className="text-[11px] font-bold">Contratante Nome *</label><input value={form.empNome} onChange={e=>setForm({...form, empNome:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nome real" /></div>
+                        <div><label className="text-[11px] font-bold">BI Contratante (13 digitos)</label><input value={form.empBI} onChange={e=>setForm({...form, empBI:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="1101012345678" /></div>
+                        <div><label className="text-[11px] font-bold">NUIT Contratante (opcional)</label><input value={form.empNUIT} onChange={e=>setForm({...form, empNUIT:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="NUIT - opcional" /></div>                         <div><label className="text-[11px] font-bold">Tel Contratante * (9 digitos)</label><input value={form.empTel} onChange={e=>setForm({...form, empTel:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="841234567" /></div>
+                        <div><label className="text-[11px] font-bold">Contratado Nome *</label><input value={form.trabNome} onChange={e=>setForm({...form, trabNome:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Nome real" /></div>
+                        <div><label className="text-[11px] font-bold">BI Contratado * (13 digitos)</label><input value={form.trabBI} onChange={e=>setForm({...form, trabBI:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="1101012345678" /></div>
+                        <div><label className="text-[11px] font-bold">NUIT Contratado (opcional)</label><input value={form.trabNUIT} onChange={e=>setForm({...form, trabNUIT:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="NUIT - opcional" /></div>                         <div><label className="text-[11px] font-bold">Tel Contratado *</label><input value={form.trabTel} onChange={e=>setForm({...form, trabTel:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="841234567" /></div>
                       </div>
                     )}
                     {clausulaAtiva===2 && (<div><p className="font-bold text-[12px]">Objeto e tarefas - {form.trabProf} - {tarefasSel.length} tarefas selecionadas - TICK PARA SELECIONAR</p><p className="text-[10px] text-gray-500">Clica no TICK para pôr no contrato. Clica no X para tirar! Só as selecionadas vão para o preview e para o PDF!</p><div className="mt-2 space-y-1 max-h-[280px] overflow-auto border rounded-lg p-2 bg-gray-50">{(MODELO_TAREFAS[form.trabProf]||[]).map((task:string)=> (<button key={task} onClick={()=>toggleTarefa(task)} className={tarefasSel.includes(task) ? 'w-full text-left px-3 py-2 rounded-lg text-[11px] flex gap-2 items-start bg-[#1e2f4a] text-white' : 'w-full text-left px-3 py-2 rounded-lg text-[11px] flex gap-2 items-start bg-white border'}><span className={tarefasSel.includes(task) ? 'w-4 h-4 flex items-center justify-center rounded border text-[10px] shrink-0 bg-[#c9a227] text-white border-yellow-500' : 'w-4 h-4 flex items-center justify-center rounded border text-[10px] shrink-0 bg-white'}>{tarefasSel.includes(task) ? '✓' : ''}</span><span>{task}</span></button>))}</div><div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-2"><p className="font-bold text-[11px]">Tarefas selecionadas ({tarefasSel.length}) - aparecem no preview do contrato:</p><div className="flex flex-wrap gap-1 mt-2">{tarefasSel.map((task:string)=> <span key={task} className="bg-[#1e2f4a] text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">{task}<button onClick={()=>toggleTarefa(task)} className="bg-red-500 text-white w-4 h-4 rounded-full text-[9px] flex items-center justify-center">X</button></span>)}{tarefasSel.length===0 && <span className="text-[11px] text-gray-500">Nenhuma tarefa selecionada - clica nas de cima!</span>}</div></div><div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-2"><label className="text-[11px] font-bold">Campo extra - Mais descrição a precisar *</label><textarea value={campoExtra} onChange={e=>setCampoExtra(e.target.value)} placeholder="Ex: Detalhes extras do serviço, material especial, observações importantes..." className="w-full border rounded px-3 py-2 text-[12px] mt-1" rows={2} /><p className="text-[10px] text-gray-500">Campo opcional - se escreveres, aparece no contrato como EXTRA!</p></div></div>)}
-                    {clausulaAtiva===3 && (<div className="grid grid-cols-2 gap-2"><div><label className="text-[11px] font-bold">Horário Início</label><input value={form.horarioInicio} onChange={e=>setForm({...form, horarioInicio:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Horário Fim</label><input value={form.horarioFim} onChange={e=>setForm({...form, horarioFim:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Dias</label><input value={form.dias} onChange={e=>setForm({...form, dias:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data Início *</label><input type="date" value={form.dataInicio} onChange={e=>setForm({...form, dataInicio:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div className="col-span-2"><label className="text-[11px] font-bold">Local Trabalho - puxa endereço do empregador, mas podes editar</label><input value={form.localTrab} onChange={e=>setForm({...form, localTrab:e.target.value})} placeholder={form.empEnd?`Ex: Casa do empregador - ${form.empEnd}`:'Ex: Casa do empregador'} className="w-full border rounded px-3 py-2 text-[12px]" />{form.empEnd && form.localTrab!==form.empEnd && (<button onClick={()=>setForm({...form, localTrab: form.empEnd})} className="mt-1 bg-yellow-100 border px-2 py-1 rounded-full text-[11px]">Usar endereço do empregador: {form.empEnd}</button>)}<p className="text-[10px] text-gray-500 mt-1">Se deixares vazio, no contrato vai a casa do empregador: {form.empEnd||'-'}</p></div><div className="col-span-2"><label className="text-[11px] font-bold">Alojamento e transporte</label><input value={form.alojTransp} onChange={e=>setForm({...form, alojTransp:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Ex: Empregador garante transporte ou alojamento" /></div></div>)}
+                    {clausulaAtiva===3 && (<div className="grid grid-cols-2 gap-2"><div><label className="text-[11px] font-bold">Horário Início</label><input value={form.horarioInicio} onChange={e=>setForm({...form, horarioInicio:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Horário Fim</label><input value={form.horarioFim} onChange={e=>setForm({...form, horarioFim:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Dias</label><input value={form.dias} onChange={e=>setForm({...form, dias:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div><label className="text-[11px] font-bold">Data Início *</label><input type="date" value={form.dataInicio} onChange={e=>setForm({...form, dataInicio:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div><div className="col-span-2"><label className="text-[11px] font-bold">Local Trabalho - puxa endereço do contratante, mas podes editar</label><input value={form.localTrab} onChange={e=>setForm({...form, localTrab:e.target.value})} placeholder={form.empEnd?`Ex: Casa do contratante - ${form.empEnd}`:'Ex: Casa do contratante'} className="w-full border rounded px-3 py-2 text-[12px]" />{form.empEnd && form.localTrab!==form.empEnd && (<button onClick={()=>setForm({...form, localTrab: form.empEnd})} className="mt-1 bg-yellow-100 border px-2 py-1 rounded-full text-[11px]">Usar endereço do contratante: {form.empEnd}</button>)}<p className="text-[10px] text-gray-500 mt-1">Se deixares vazio, no contrato vai a casa do contratante: {form.empEnd||'-'}</p></div><div className="col-span-2"><label className="text-[11px] font-bold">Alojamento e transporte</label><input value={form.alojTransp} onChange={e=>setForm({...form, alojTransp:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="Ex: Contratante garante transporte ou alojamento" /></div></div>)}
                     {clausulaAtiva===4 && (<div className="grid grid-cols-2 gap-2"><div><label className="text-[11px] font-bold">Valor Salário (MZN) *</label><input value={form.valor} onChange={e=>setForm({...form, valor:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="7500" /></div><div><label className="text-[11px] font-bold">Dia Pagamento *</label><input value={form.diaPag} onChange={e=>setForm({...form, diaPag:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" placeholder="05" /></div><div><label className="text-[11px] font-bold">Forma Pagamento *</label><select value={form.formaPag} onChange={e=>setForm({...form, formaPag:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]"><option>M-Pesa</option><option>Emola</option><option>Banco</option><option>Numerário</option></select></div><div><label className="text-[11px] font-bold">Prazo Contrato *</label><input value={form.prazo} onChange={e=>setForm({...form, prazo:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div></div>)}
                     {clausulaAtiva===5 && (<div><label className="text-[11px] font-bold">Alimentação e alojamento</label><input value={form.alimentacao} onChange={e=>setForm({...form, alimentacao:e.target.value})} className="w-full border rounded px-3 py-2 text-[12px]" /></div>)}
                     {clausulaAtiva>=6 && clausulaAtiva<=9 && (<div className="text-[12px] bg-green-50 border border-green-200 rounded p-3"><b>{clausulaAtiva===1?'Dados das partes':`Cláusula ${clausulaAtiva-1} - ${CLAUSULAS[clausulaAtiva-1]?.titulo}`} - EDITAVEL ✅</b><p className="text-[10px] text-gray-500 mt-1">Texto ja preenchido - podes editar. O que escreveres vai para o Preview e para o PDF.</p><textarea value={textoEdit[clausulaAtiva-1]!==undefined?textoEdit[clausulaAtiva-1]:previewTexto()[clausulaAtiva-1]} onChange={e=>setTextoEdit({...textoEdit, [clausulaAtiva-1]: e.target.value})} className="w-full border rounded px-3 py-2 text-[12px] mt-2 bg-white" rows={6} /></div>)}
@@ -401,16 +399,16 @@ export default function ContratosReal(){
                         {modoAssinatura==='distancia' && (
                           <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-xl p-3">
                             <p className="font-bold text-[12px]">📱 À DISTÂNCIA - Como funciona:</p>
-                            <p className="text-[11px] mt-1">1. Tu (Empregador) assinas a tua parte aqui em baixo!<br/>2. Clicas <b>Gerar Link + Enviar WhatsApp</b>!<br/>3. O Trabalhador, lá longe, clica no link, vê o contrato e desenha a assinatura dele no telefone dele!<br/>4. Quando ele assinar, o contrato fica <b>ASSINADO</b> e tu recebes WhatsApp!</p>
+                            <p className="text-[11px] mt-1">1. Tu (Contratante) assinas a tua parte aqui em baixo!<br/>2. Clicas <b>Gerar Link + Enviar WhatsApp</b>!<br/>3. O Contratado, lá longe, clica no link, vê o contrato e desenha a assinatura dele no telefone dele!<br/>4. Quando ele assinar, o contrato fica <b>ASSINADO</b> e tu recebes WhatsApp!</p>
                             {assinaturaDistancia ? (
-                              <div className="mt-3 bg-white border rounded-xl p-3"><p className="font-bold text-[12px]">📄 Assinar este contrato - {assinaturaDistancia.trab_prof} - {assinaturaDistancia.trab_nome}</p><p className="text-[11px]">Empregador: {assinaturaDistancia.emp_nome} - Valor: {assinaturaDistancia.valor} MZN - Inicio: {assinaturaDistancia.data_inicio}</p><p className="text-[11px]">Empregador já assinou ✅ - Falta a tua assinatura!</p><div className="mt-2"><AssinaturaPad label="TRABALHADOR - Desenha a tua assinatura aqui!" nome={assinaturaDistancia.trab_nome} onChange={setSigTrab} /></div><button onClick={confirmarAssinaturaDistancia} className="w-full bg-green-600 text-white py-3 rounded-full text-[12px] font-bold mt-3">✅ CONFIRMAR MINHA ASSINATURA - ASSINAR CONTRATO!</button></div>
+                              <div className="mt-3 bg-white border rounded-xl p-3"><p className="font-bold text-[12px]">📄 Assinar este contrato - {assinaturaDistancia.trab_prof} - {assinaturaDistancia.trab_nome}</p><p className="text-[11px]">Contratante: {assinaturaDistancia.emp_nome} - Valor: {assinaturaDistancia.valor} MZN - Inicio: {assinaturaDistancia.data_inicio}</p><p className="text-[11px]">Contratante já assinou ✅ - Falta a tua assinatura!</p><div className="mt-2"><AssinaturaPad label="CONTRATADO - Desenha a tua assinatura aqui!" nome={assinaturaDistancia.trab_nome} onChange={setSigTrab} /></div><button onClick={confirmarAssinaturaDistancia} className="w-full bg-green-600 text-white py-3 rounded-full text-[12px] font-bold mt-3">✅ CONFIRMAR MINHA ASSINATURA - ASSINAR CONTRATO!</button></div>
                             ) : (
                               <div className="mt-3">
                                 <AssinaturaPad label="EMPREGADOR - Assina a tua parte aqui!" nome={form.empNome} onChange={setSigEmp} />
-                                <p className="text-[11px] mt-2">Trabalhador: <b>{form.trabNome||'-'} - {form.trabTel||'-'}</b> - Vai receber o link no WhatsApp!</p>
+                                <p className="text-[11px] mt-2">Contratado: <b>{form.trabNome||'-'} - {form.trabTel||'-'}</b> - Vai receber o link no WhatsApp!</p>
                                 <button onClick={gerarLinkDistancia} className="w-full bg-[#c9a227] text-white py-3 rounded-full text-[12px] font-bold mt-2">📱 GERAR LINK + ENVIAR WHATSAPP PARA O TRABALHADOR!</button>
                                 {linkAssinatura && <div className="mt-2 bg-white border rounded-lg p-2"><p className="text-[11px] font-bold">Link gerado - Copia e envia:</p><p className="text-[10px] break-all">{linkAssinatura}</p><button onClick={()=>{ navigator.clipboard.writeText(linkAssinatura); alert('Link copiado!'); }} className="text-[11px] bg-gray-100 border px-3 py-1 rounded-full mt-1">📋 Copiar Link</button></div>}
-                                <p className="text-[10px] text-gray-500 mt-2">Status: <b>PENDENTE - Falta Trabalhador</b> - Quando ele assinar, fica ASSINADO!</p>
+                                <p className="text-[10px] text-gray-500 mt-2">Status: <b>PENDENTE - Falta Contratado</b> - Quando ele assinar, fica ASSINADO!</p>
                               </div>
                             )}
                           </div>
@@ -426,7 +424,7 @@ export default function ContratosReal(){
                   <div className="mt-2 text-[11px] leading-relaxed max-h-[520px] overflow-auto border rounded-lg p-3 bg-white shadow-inner">
                     {(anexos['Logo Tipo / Empresa']?.data || logoTipo) ? <div style={{display:'flex',alignItems:'center',gap:10}}><img src={anexos['Logo Tipo / Empresa']?.data || logoTipo} style={{maxHeight:70,maxWidth:180}} alt="logo" /><div><b style={{fontSize:13}}>CONTRATO {form.trabProf.toUpperCase()}</b><p style={{fontSize:10,margin:0,color:'#666'}}>{form.empNome||''} - {form.trabNome||''}</p></div></div> : <div style={{fontSize:10,color:'#999'}}>— Sem logo — Logo fica no topo superior esquerdo!</div>}
                     <p className="font-bold text-center text-[13px] mt-1 border-b pb-2">CONTRATO {form.trabProf.toUpperCase()} - 10 CLÁUSULAS</p>
-                    <p className="mt-2"><b>DADOS (sem número):</b> {form.empNome||'[Empregador]'} BI {form.empBI||'-'} - NUIT {form.empNUIT||'-'} - {form.trabNome||'[Trabalhador]'} BI {form.trabBI||'-'} - NUIT {form.trabNUIT||'-'} - Tel {form.trabTel||'-'}</p>
+                    <p className="mt-2"><b>DADOS (sem número):</b> {form.empNome||'[Contratante]'} BI {form.empBI||'-'} - NUIT {form.empNUIT||'-'} - {form.trabNome||'[Contratado]'} BI {form.trabBI||'-'} - NUIT {form.trabNUIT||'-'} - Tel {form.trabTel||'-'}</p>
                     <p className="mt-2"><b>1. TAREFAS ({tarefasSel.length}):</b></p>
                     <ol className="ml-4 list-decimal">{tarefasSel.map((task:string,i:number)=> <li key={i} className="mt-1 bg-yellow-50 px-1 rounded">{task}</li>)}{campoExtra.trim() && <li className="mt-1 bg-yellow-100 px-1 rounded"><b>EXTRA:</b> {campoExtra}</li>}{tarefasSel.length===0 && <li>Nenhuma tarefa - seleciona em cima!</li>}</ol>
                     <p className="mt-2"><b>2. HORÁRIO:</b> {form.horarioInicio} às {form.horarioFim} - {form.dias} - {form.dataInicio||'-'} - {form.localTrab||'-'}</p>
@@ -435,11 +433,11 @@ export default function ContratosReal(){
                     <p className="mt-2"><b>5. FOLGAS:</b> Domingo e feriados nacionais. 12 dias férias após 1 ano completo. Se trabalhar domingo, paga dobrado.</p>
                     <p className="mt-2"><b>6. PERÍODO EXPERIMENTAL:</b> 15 dias - qualquer parte pode terminar sem multa, pagando dias trabalhados.</p>
                     <p className="mt-2"><b>7. DEVERES DO TRABALHADOR:</b> Cumprir horário, executar com qualidade, cuidar de ferramentas, manter local limpo.</p>
-                    <p className="mt-2"><b>8. DEVERES DO EMPREGADOR:</b> Pagar no dia, fornecer material, garantir segurança, tratar com respeito.</p>
+                    <p className="mt-2"><b>8. DEVERES DO CONTRATANTE:</b> Pagar no dia, fornecer material, garantir segurança, tratar com respeito.</p>
                     <p className="mt-2"><b>9. ANEXOS - EM BAIXO:</b> {Object.keys(anexos).filter(k=>!k.includes('Logo')).length} ficheiros - {Object.keys(anexos).filter(k=>!k.includes('Logo')).join(', ')||'Sem anexos'}</p><div className="mt-2 border-t pt-2"><b>📎 Documentos em baixo:</b>{Object.keys(anexos).filter(k=>!k.includes('Logo')).map(k=> <p key={k}>📎 {k}: {anexos[k].nome}</p>)}{Object.keys(anexos).filter(k=>!k.includes('Logo')).length===0 && <p>Sem documentos - Logo vai para o topo, não para aqui!</p>}</div>
-                    <p className="mt-2"><b>10. ASSINATURAS:</b> Empregador {sigEmp?'✅':'⚠️'} | Trabalhador {sigTrab?'✅':'⚠️'}</p>
+                    <p className="mt-2"><b>10. ASSINATURAS:</b> Contratante {sigEmp?'✅':'⚠️'} | Contratado {sigTrab?'✅':'⚠️'}</p>
                     <div className="mt-3 border-t pt-2"><b>ANEXOS:</b>{Object.keys(anexos).length===0 ? <span> Sem anexos</span> : Object.keys(anexos).map(k=> <p key={k}>📎 {k}: {anexos[k].nome}</p>)}</div>
-                    <div className="mt-3"><b>ASSINATURAS:</b><p>Empregador: {sigEmp?'✅ Desenhada':'⚠️ Falta'}</p><p>Trabalhador: {sigTrab?'✅ Desenhada':'⚠️ Falta'}</p></div>
+                    <div className="mt-3"><b>ASSINATURAS:</b><p>Contratante: {sigEmp?'✅ Desenhada':'⚠️ Falta'}</p><p>Contratado: {sigTrab?'✅ Desenhada':'⚠️ Falta'}</p></div>
                   </div>
                   <button onClick={()=>{ const c:any={ emp_nome:form.empNome, emp_bi:form.empBI, emp_nuit:form.empNUIT, empNUIT:form.empNUIT, emp_tel:form.empTel, emp_end:form.empEnd, trab_nome:form.trabNome, trab_bi:form.trabBI, trab_nuit:form.trabNUIT, trabNUIT:form.trabNUIT, trab_tel:form.trabTel, trab_end:form.trabEnd, trab_prof:form.trabProf, tarefas: [...tarefasSel, ...(campoExtra.trim()? [`EXTRA: ${campoExtra.trim()}`]:[])], horario_inicio:form.horarioInicio, horario_fim:form.horarioFim, dias:form.dias, data_inicio:form.dataInicio, local_trab:form.localTrab, valor:form.valor, dia_pag:form.diaPag, forma_pag:form.formaPag, prazo:form.prazo, alimentacao:form.alimentacao, anexos:anexos, logotipo:logoTipo, assinatura_contratante:{assinatura:sigEmp}, assinatura_contratado:{assinatura:sigTrab} }; baixarContratoFaturar(c); }} className="w-full bg-[#c9a227] text-white py-2.5 rounded-full text-[12px] font-bold mt-3">PDF FINAL</button>
                 </div>
@@ -454,14 +452,14 @@ export default function ContratosReal(){
             <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-auto p-6">
               <div className="flex justify-between"><h3 className="font-bold">Contrato {contratoVer.trab_prof} - {contratoVer.trab_nome} - 10 Cláusulas</h3><button onClick={()=>setContratoVer(null)} className="text-2xl">×</button></div>
               <div className="mt-4 space-y-3 text-[12px]">
-                <p><b>Empregador:</b> {contratoVer.emp_nome} - {contratoVer.emp_tel} - BI {contratoVer.emp_bi}</p>
-                <p><b>Trabalhador:</b> {contratoVer.trab_nome} - {contratoVer.trab_tel} - {contratoVer.trab_prof}</p>
+                <p><b>Contratante:</b> {contratoVer.emp_nome} - {contratoVer.emp_tel} - BI {contratoVer.emp_bi}</p>
+                <p><b>Contratado:</b> {contratoVer.trab_nome} - {contratoVer.trab_tel} - {contratoVer.trab_prof}</p>
                 <p><b>Tarefas:</b> {Array.isArray(contratoVer.tarefas)?contratoVer.tarefas.join(', '):contratoVer.tarefas}</p>
                 <p><b>Horário:</b> {contratoVer.horario_inicio} às {contratoVer.horario_fim} - {contratoVer.dias} - Início {contratoVer.data_inicio} - Local {contratoVer.local_trab}</p>
                 <p><b>Pagamento:</b> {contratoVer.valor} MZN - Dia {contratoVer.dia_pag} - {contratoVer.forma_pag} - Prazo {contratoVer.prazo}</p>
                 <p><b>Alimentação:</b> {contratoVer.alimentacao}</p>
                 <div className="bg-gray-50 p-3 rounded-lg"><b>11 Cláusulas Completas:</b>{textoClausulas(contratoVer).map((t,i)=><p key={i} className="mt-2">{t}</p>)}</div>
-                <div><b>Assinaturas:</b><div className="flex gap-4 mt-2">{contratoVer.assinatura_contratante?.assinatura && <div><img src={contratoVer.assinatura_contratante.assinatura} style={{maxWidth:180,border:'1px solid #ddd'}}/><p>Empregador - {contratoVer.assinatura_contratante?.data}</p></div>}{contratoVer.assinatura_contratado?.assinatura && <div><img src={contratoVer.assinatura_contratado.assinatura} style={{maxWidth:180,border:'1px solid #ddd'}}/><p>Trabalhador - {contratoVer.assinatura_contratado?.data}</p></div>}</div></div>
+                <div><b>Assinaturas:</b><div className="flex gap-4 mt-2">{contratoVer.assinatura_contratante?.assinatura && <div><img src={contratoVer.assinatura_contratante.assinatura} style={{maxWidth:180,border:'1px solid #ddd'}}/><p>Contratante - {contratoVer.assinatura_contratante?.data}</p></div>}{contratoVer.assinatura_contratado?.assinatura && <div><img src={contratoVer.assinatura_contratado.assinatura} style={{maxWidth:180,border:'1px solid #ddd'}}/><p>Contratado - {contratoVer.assinatura_contratado?.data}</p></div>}</div></div>
               </div>
               <div className="flex gap-2 mt-4"><button onClick={()=>baixarContratoFaturar(contratoVer)} className="flex-1 bg-[#1e2f4a] text-white py-2 rounded-full text-[12px] font-bold">GERAR PDF 11 CLÁUSULAS + WHATSAPP</button><button onClick={()=>setContratoVer(null)} className="flex-1 border py-2 rounded-full text-[12px]">Fechar</button></div>
             </div>
