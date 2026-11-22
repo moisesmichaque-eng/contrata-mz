@@ -1,3 +1,8 @@
+// App.tsx - V40 = V39 (colaboradores + margens) + JUNCAO da correcao do ramo FIX/V4/V5
+// CORRECAO: o painel NAO tem chave propria. Reutiliza a ligacao do VenderReal (a mesma que os colaboradores ja usam e funciona).
+// Antes: supabase=null para sempre -> painel nunca lia o Supabase. Agora: getSupabasePainel() resolve a ligacao do Vender.
+// Tabelas: Encontrar le 'tecnicos' (antes 'profissionais'); Reservas juntam 'viagens_passageiros'.
+// Mantido: colaboradores, transportadores<-viagens_transportadores (o Aprovar grava ai), margens, 3 cliques no logo com Contratos aberto.
 // @ts-nocheck
 // App.tsx - FASE 10 - 3 CLIQUES NO LOGO WEZHA = PAINEL DONO - TUDO DAS 4 PARTES, BEM DETALHADO!
 // Como funciona: WEZHA WEZHA (em menos de 1.5s) -> Abre Login Dono -> Painel Dono com TUDO!
@@ -21,6 +26,8 @@ const getSupabaseColab = async () => {
   }
   return supabaseColab;
 }; // FASE 11 CORRIGIDO: Sem require! Vite nao aceita require! Supabase ligado via login VENDER / localStorage!
+// PAINEL DONO - usa a MESMA ligacao do Vender (sem chave duplicada, sem chave cortada)
+const getSupabasePainel = async () => { if(supabase) return supabase; const sb = await getSupabaseColab(); if(sb) supabase = sb; return supabase; };
 
 export function LogoWezha({ size=36 }: any){
   const [tentativa, setTentativa] = React.useState(0);
@@ -100,11 +107,13 @@ export default function App(){
 
   const carregarDadosDono = async ()=>{
     setCarregandoDono(true);
+    supabase = await getSupabasePainel();
     let d:any = { contratos:[], viagens:[], transportadores:[], reservas:[], lojas:[], faturas:[], profissionais:[] };
     try{
       if(supabase){
-        const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', faturas:'faturas_loja', profissionais:'profissionais' };
+        const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', faturas:'faturas_loja', profissionais:'tecnicos' };
         for(const k of Object.keys(tabelas)){ try{ const { data } = await supabase.from(tabelas[k]).select('*').limit(100); if(data) d[k]=data; }catch(e){} }
+        try{ const { data: pas } = await supabase.from('viagens_passageiros').select('*').limit(100); if(pas && pas.length){ const ids = new Set([...d.reservas, ...d.viagens].map((x:any)=>x.id)); const novos = pas.filter((x:any)=> !ids.has(x.id)); d.reservas = [...d.reservas, ...novos]; d.viagens = [...d.viagens, ...novos]; } }catch(e){}
       }
     }catch(e){}
     // Fallback real local - o que esta guardado no telefone
@@ -117,6 +126,7 @@ export default function App(){
 
   const aprovarViatura = async (transp:any, novoEstado:string)=>{
     if(!confirm(novoEstado==='APROVADA' ? `Aprovar viatura ${transp.matricula||transp.nome}? O transportador vai poder aparecer para passageiros!` : `Rejeitar viatura ${transp.matricula||transp.nome}?`)) return;
+    supabase = await getSupabasePainel();
     if(supabase){
       try{ const { error } = await supabase.from('viagens_transportadores').update({ estado: novoEstado, status: novoEstado, aprovado_em: new Date().toISOString() }).eq('id', transp.id); if(error) throw error; }catch(e){ alert('Erro ao atualizar no Supabase!'); return; }
     }
@@ -127,6 +137,7 @@ export default function App(){
     if(!donoUser.trim() || !donoPass.trim()){ alert('Escreve Username e Password do Dono!'); return; }
     if(donoUser.trim()==='Aderito@1986' && donoPass.trim()==='Password1'){ setDonoLogado(true); setMostrarLoginDono(false); await carregarDadosDono(); return; }
     // NUNCA password no codigo! Verifica na tabela viagens_admins no Supabase!
+    supabase = await getSupabasePainel();
     if(supabase){
       try{
         const { data, error } = await supabase.from('viagens_admins').select('*').eq('username', donoUser.trim()).eq('password', donoPass.trim()).maybeSingle();
