@@ -1,4 +1,4 @@
-// VenderReal.tsx - V52 = V51 + FASE 1: campo Email real, activacao por codigo, login por telefone OU email.
+// VenderReal.tsx - V54 = V53 + ecra de activacao fala do link ou codigo (o Supabase sem SMTP proprio so manda link). V53 = V52 + correccao: codigo aceite nos 3 tipos + link do email activa a conta. V52 = V51 + FASE 1: campo Email real, activacao por codigo, login por telefone OU email.
 // VenderReal.tsx - V51 = V50 + envia email ao criar/reparar conta (a tabela 'lojas' exige email).
 
 import React, { useState, useEffect } from 'react';
@@ -82,7 +82,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
       if(estado==='pendente'){
         const { error: errOtp } = await supabase.auth.signInWithOtp({ email: emailReal });
         if(errOtp){ alert('Conta criada mas nao foi possivel enviar o codigo. Erro: '+errOtp.message+' Carrega em Reenviar codigo.'); }
-        else alert('Enviámos um codigo de 6 numeros para '+emailReal+'. Escreve-o aqui para activar a conta.');
+        else alert('Enviámos um email para '+emailReal+'. Abre o email e carrega no link para activar a conta. Se o email trouxer um codigo, escreve-o aqui.');
         setCodigoActivacao('');
         setActivacao({ conta_id, email: emailReal, nomeLoja: novaLoja.nome_loja });
         return;
@@ -97,8 +97,10 @@ const hojeISO = new Date().toISOString().slice(0,10);
   // V52 FASE 1 - ACTIVACAO POR CODIGO: confirma o codigo do email e activa a conta.
   const confirmarActivacao = async () => {
     if(!activacao || !codigoActivacao.trim()){ alert('Escreve o codigo de 6 numeros'); return; }
-    const { error } = await supabase.auth.verifyOtp({ email: activacao.email, token: codigoActivacao.trim(), type: 'email' });
-    if(error){ alert('Codigo errado ou expirado. Tenta de novo ou carrega em Reenviar codigo.'); return; }
+    const codigo = codigoActivacao.trim();
+    let ok = false;
+    for(const tipo of ['email','signup','magiclink']){ const { error } = await supabase.auth.verifyOtp({ email: activacao.email, token: codigo, type: tipo as any }); if(!error){ ok = true; break; } }
+    if(!ok){ alert('Codigo errado ou expirado. Tenta de novo ou carrega em Reenviar codigo.'); return; }
     const { error: errUp } = await supabase.from('lojas').update({ estado: 'activa' }).eq('conta_id', activacao.conta_id);
     if(errUp){ alert('Codigo certo mas nao foi possivel activar. Erro: '+errUp.message); return; }
     const { data } = await supabase.from('lojas').select('*').eq('conta_id', activacao.conta_id).limit(1);
@@ -140,7 +142,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const loja = data[0];
     if((loja as any).bloqueada){ alert('Conta bloqueada pelo dono da aplicação. Fala com o dono da aplicação para desbloquear.'); return; }
     if((loja as any).estado==='pendente'){
-      if(loja.email){ setCodigoActivacao(''); setActivacao({ conta_id: loja.conta_id, email: loja.email, nomeLoja: loja.nome_loja }); await supabase.auth.signInWithOtp({ email: loja.email }); alert('A tua conta ainda nao esta activada. Enviámos um codigo novo para '+loja.email+'. Escreve-o aqui.'); return; }
+      if(loja.email){ setCodigoActivacao(''); setActivacao({ conta_id: loja.conta_id, email: loja.email, nomeLoja: loja.nome_loja }); await supabase.auth.signInWithOtp({ email: loja.email }); alert('A tua conta ainda nao esta activada. Enviámos um email novo para '+loja.email+'. Carrega no link do email ou escreve o codigo aqui.'); return; }
       await supabase.from('lojas').update({ estado: 'activa' }).eq('conta_id', loja.conta_id);
     }
     localStorage.setItem('loja_sessao', JSON.stringify(loja));
@@ -436,6 +438,20 @@ const hojeISO = new Date().toISOString().slice(0,10);
   useEffect(()=>{
     const sessao = localStorage.getItem('loja_sessao');
     if(sessao){ try{ const l=JSON.parse(sessao); setLojaLogada(l); carregarTudo(l.conta_id); repararContaLoja(l); setPerfilEdit({nomeLoja:l.nome_loja||'', nuit:l.nuit||'', endereco:l.endereco||'', provincia:l.provincia||'', distrito:l.cidade||'', ramo:l.ramo||'', tel:l.username||'', password:'', novaPassword:'', logoData:l.logoData||'', funcionarios: l.funcionarios||[]}); }catch(e){} }
+    // V53 - LINK DO EMAIL: se a pessoa carregou no link do email, o Supabase abre sessao; activa a conta pendente desse email e entra.
+    const { data: listenerAuth } = supabase.auth.onAuthStateChange(async (evento, session)=>{
+      if(evento!=='SIGNED_IN' || !session?.user?.email) return;
+      const { data } = await supabase.from('lojas').select('*').eq('email', session.user.email).eq('estado', 'pendente').limit(1);
+      const loja = data?.[0]; if(!loja) return;
+      await supabase.from('lojas').update({ estado: 'activa' }).eq('conta_id', loja.conta_id);
+      const lojaActiva = { ...loja, estado: 'activa' };
+      localStorage.setItem('loja_sessao', JSON.stringify(lojaActiva));
+      setLojaLogada(lojaActiva);
+      setPerfilEdit({nomeLoja:loja.nome_loja||'', nuit:loja.nuit||'', endereco:loja.endereco||'', provincia:loja.provincia||'', distrito:loja.cidade||'', ramo:loja.ramo||'', tel:loja.username||'', password:'', novaPassword:'', logoData:loja.logoData||'', funcionarios: loja.funcionarios||[]});
+      alert('Conta activada pelo link do email! Bem-vindo a '+loja.nome_loja);
+      carregarTudo(loja.conta_id);
+    });
+    return ()=>{ try{ listenerAuth.subscription.unsubscribe(); }catch(e){} };
   },[]);
   useEffect(()=>{ if(lojaLogada?.conta_id){ try{ const v=JSON.parse(localStorage.getItem(`loja_fornecedores_${lojaLogada.conta_id}`)||'[]'); setFornecedores(v); }catch(e){ setFornecedores([]); } try{ const f=JSON.parse(localStorage.getItem(`loja_fechos_${lojaLogada.conta_id}`)||'[]'); setFechos(f); }catch(e){ setFechos([]); } } },[lojaLogada?.conta_id]);
 
@@ -865,8 +881,8 @@ const hojeISO = new Date().toISOString().slice(0,10);
           </div>
           {activacao ? (
             <div className="mt-6 space-y-3">
-              <div className="text-center"><div className="text-[13px] font-black text-white">Activa a tua conta</div><div className="text-[11px] text-white/80 mt-1">Enviámos um codigo de 6 numeros para<br/><b>{activacao.email}</b></div></div>
-              <div><label className="text-[8px] font-bold text-white">CODIGO DE ACTIVACAO *</label><input value={codigoActivacao} onChange={e=>setCodigoActivacao(e.target.value)} placeholder="000000" className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white text-center font-black" /></div>
+              <div className="text-center"><div className="text-[13px] font-black text-white">Activa a tua conta</div><div className="text-[11px] text-white/80 mt-1">Enviámos um email para<br/><b>{activacao.email}</b><br/>Abre o email e carrega no link para activar.<br/>Se o email trouxer um codigo, escreve-o aqui.</div></div>
+              <div><label className="text-[8px] font-bold text-white">CODIGO DE ACTIVACAO - So se o email trouxer codigo</label><input value={codigoActivacao} onChange={e=>setCodigoActivacao(e.target.value)} placeholder="000000" className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white text-center font-black" /></div>
               <button onClick={confirmarActivacao} className="w-full mt-4 bg-[#16a34a] text-white py-3 rounded-full text-[11px] font-black">Confirmar codigo - Activar conta</button>
               <button onClick={reenviarCodigo} className="w-full mt-2 bg-white/10 text-white py-2 rounded-full text-[10px]">Nao recebi - Reenviar codigo</button>
               <button onClick={()=>setActivacao(null)} className="w-full mt-2 bg-white/10 text-white py-2 rounded-full text-[10px]">Voltar</button>
