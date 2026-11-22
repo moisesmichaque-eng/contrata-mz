@@ -71,12 +71,25 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData };
     try{
       const { error } = await supabase.from('lojas').insert([novaLoja]);
-      if(error){ console.log(error); }
+      if(error){ alert('ATENCAO: a conta foi criada SO neste telefone e NAO ficou guardada no Supabase.\nErro: '+error.message+'\nNao facas logout. Quando abrires o site outra vez, ele tenta enviar de novo. Fala com o dono da app.'); }
       localStorage.setItem('loja_sessao', JSON.stringify(novaLoja));
       setLojaLogada(novaLoja);
       setPerfilEdit({nomeLoja:novaLoja.nome_loja||'', nuit:novaLoja.nuit||'', endereco:novaLoja.endereco||'', provincia:novaLoja.provincia||'', distrito:novaLoja.cidade||'', ramo:novaLoja.ramo||'', tel:novaLoja.username||'', password:'', novaPassword:'', logoData:novaLoja.logoData||'', funcionarios: []});
       carregarTudo(novaLoja.conta_id);
     }catch(e:any){ alert(e.message); }
+  };
+
+  // V50 - AUTO-REPARACAO: se a conta existe no telefone mas nao no Supabase, volta a envia-la.
+  // Isto recupera as contas criadas antes da correcao, quando cada dono abrir o site no telefone dele.
+  const repararContaLoja = async (loja:any) => {
+    if(!loja || !loja.conta_id) return;
+    try{
+      const { data } = await supabase.from('lojas').select('conta_id').eq('conta_id', loja.conta_id).limit(1);
+      if(data && data.length>0) return;
+      const contaParaGravar:any = { conta_id: loja.conta_id, nome_loja: loja.nome_loja||'', username: loja.username||'', password: loja.password||'', nuit: loja.nuit||'', endereco: loja.endereco||'', provincia: loja.provincia||'', cidade: loja.cidade||'', ramo: loja.ramo||'', logoData: loja.logoData||'', bloqueada: loja.bloqueada||false };
+      const { error } = await supabase.from('lojas').insert([contaParaGravar]);
+      if(error){ alert('A tua conta ainda nao esta guardada no Supabase. Erro: '+error.message+' Nao facas logout ate resolveres. Fala com o dono da app.'); }
+    }catch(e:any){ /* sem internet: tenta na proxima abertura */ }
   };
 
   const fazerLoginLoja = async () => {
@@ -377,7 +390,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
 
   useEffect(()=>{
     const sessao = localStorage.getItem('loja_sessao');
-    if(sessao){ try{ const l=JSON.parse(sessao); setLojaLogada(l); carregarTudo(l.conta_id); setPerfilEdit({nomeLoja:l.nome_loja||'', nuit:l.nuit||'', endereco:l.endereco||'', provincia:l.provincia||'', distrito:l.cidade||'', ramo:l.ramo||'', tel:l.username||'', password:'', novaPassword:'', logoData:l.logoData||'', funcionarios: l.funcionarios||[]}); }catch(e){} }
+    if(sessao){ try{ const l=JSON.parse(sessao); setLojaLogada(l); carregarTudo(l.conta_id); repararContaLoja(l); setPerfilEdit({nomeLoja:l.nome_loja||'', nuit:l.nuit||'', endereco:l.endereco||'', provincia:l.provincia||'', distrito:l.cidade||'', ramo:l.ramo||'', tel:l.username||'', password:'', novaPassword:'', logoData:l.logoData||'', funcionarios: l.funcionarios||[]}); }catch(e){} }
   },[]);
   useEffect(()=>{ if(lojaLogada?.conta_id){ try{ const v=JSON.parse(localStorage.getItem(`loja_fornecedores_${lojaLogada.conta_id}`)||'[]'); setFornecedores(v); }catch(e){ setFornecedores([]); } try{ const f=JSON.parse(localStorage.getItem(`loja_fechos_${lojaLogada.conta_id}`)||'[]'); setFechos(f); }catch(e){ setFechos([]); } } },[lojaLogada?.conta_id]);
 
@@ -752,19 +765,32 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const urlPdf = URL.createObjectURL(pdfBlob);
     const aPdf = document.createElement('a'); aPdf.href=urlPdf; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf);
     setTimeout(()=>URL.revokeObjectURL(urlPdf), 10000);
-    // V48 - DOIS DOCUMENTOS: o recibo A4 grande (em cima) + o TALAO PEQUENO (este e que vai para o WhatsApp, no lugar do texto).
-    const talaoBlob = gerarBilhetePdf({ loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
-    const urlTalao = URL.createObjectURL(talaoBlob);
-    const aTalao = document.createElement('a'); aTalao.href=urlTalao; aTalao.download=`Talao-${numeroFatura}-${nomeClienteFatura}.pdf`; document.body.appendChild(aTalao); aTalao.click(); document.body.removeChild(aTalao);
-    setTimeout(()=>URL.revokeObjectURL(urlTalao), 10000);
+    // V49 - TALAO vai DIRETO como mensagem do WhatsApp (e pequeno, cabe no texto). So o A4 baixa como PDF.
+    const linhasTalao = [
+      lojaLogada.nome_loja,
+      `NUIT: ${lojaLogada.nuit||'-'} | Tel: +${lojaLogada.username||''}`,
+      `FATURA No: ${numeroFatura}`,
+      `Data: ${new Date().toLocaleDateString('pt-MZ')} | ${caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite'}`,
+      `Cliente: ${nomeClienteFatura} | Tel: ${telFat}`,
+      `Status: ${isDivida?'DIVIDA':'PAGO'}`,
+      '------------------------------',
+      ...produtosFat.map((p:any)=> `${p.nome}${p.codigo?` - ${p.codigo}`:''} x${p.qtd} = ${(p.preco*p.qtd*(1-p.desc/100)).toFixed(0)}MT`),
+      '------------------------------',
+      `Subtotal: ${subtotalLiquido.toFixed(0)}MT`,
+      `Desconto: -${descontoItens.toFixed(0)}MT`,
+      `IVA (${ivaPerc}%): ${ivaValor.toFixed(0)}MT`,
+      `TOTAL: ${total.toFixed(0)}MT`,
+      'Obrigado pela preferencia!',
+    ];
+    const textoTalao = linhasTalao.join('\n');
     // Numero do cliente: so digitos; 9 digitos (84...) -> 258 na frente; ja com 258 fica como esta.
     const numBruto = telFat.replace(/\D/g,'');
     const num = numBruto.length===9 ? '258'+numBruto : numBruto;
     if(num){
-      // V48 - SEM TEXTO: o texto foi trocado pelo TALAO PEQUENO (ja baixou em cima). O WhatsApp abre vazio, anexas o talao.
-      window.open(`https://wa.me/${num}`, '_blank');
+      // V49 - O talao vai ESCRITO na conversa (ja vem pronto, e so carregar enviar). O A4 baixa como PDF.
+      window.open(`https://wa.me/${num}?text=${encodeURIComponent(textoTalao)}`, '_blank');
     }
-    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - PDFs baixados (Recibo A4 + Talao)${num ? ' + WhatsApp aberto no cliente (anexa o TALAO)' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
+    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - Recibo A4 baixado${num ? ' + Talao enviado no WhatsApp' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
     }catch(e:any){ alert('Erro a gerar fatura: '+(e?.message||e)); } finally { setSalvando(false); }
   };
 

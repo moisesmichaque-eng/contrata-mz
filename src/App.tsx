@@ -1,3 +1,4 @@
+// App.tsx - V41 = V40 + painel le as CONTAS de loja da tabela 'lojas' (antes contava produtos como lojas).
 // App.tsx - V40 = V39 (colaboradores + margens) + JUNCAO da correcao do ramo FIX/V4/V5
 // CORRECAO: o painel NAO tem chave propria. Reutiliza a ligacao do VenderReal (a mesma que os colaboradores ja usam e funciona).
 // Antes: supabase=null para sempre -> painel nunca lia o Supabase. Agora: getSupabasePainel() resolve a ligacao do Vender.
@@ -111,7 +112,7 @@ export default function App(){
     let d:any = { contratos:[], viagens:[], transportadores:[], reservas:[], lojas:[], faturas:[], profissionais:[] };
     try{
       if(supabase){
-        const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', faturas:'faturas_loja', profissionais:'tecnicos' };
+        const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', lojas_contas:'lojas', faturas:'faturas_loja', profissionais:'tecnicos' };
         for(const k of Object.keys(tabelas)){ try{ const { data } = await supabase.from(tabelas[k]).select('*').limit(100); if(data) d[k]=data; }catch(e){} }
         try{ const { data: pas } = await supabase.from('viagens_passageiros').select('*').limit(100); if(pas && pas.length){ const ids = new Set([...d.reservas, ...d.viagens].map((x:any)=>x.id)); const novos = pas.filter((x:any)=> !ids.has(x.id)); d.reservas = [...d.reservas, ...novos]; d.viagens = [...d.viagens, ...novos]; } }catch(e){}
       }
@@ -201,7 +202,7 @@ export default function App(){
               <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginTop:16}}>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #0B3D91'}}><b>🔍 ENCONTRAR</b><h2>{dadosDono.profissionais.length} Profissionais</h2><p style={{fontSize:11}}>Cadastrados, com BI / NUIT, fotos, M-Pesa</p></div>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #0E7A5A'}}><b>🚌 VIAJAR</b><h2>{totalViagens} Reservas</h2><p style={{fontSize:11}}>{totalTransportadores} Transportadores • {dadosDono.transportadores.length} Viaturas</p></div>
-                <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #C9A227'}}><b>🛒 VENDER</b><h2>{totalFaturas} Faturas • {totalValorFaturas} MZN</h2><p style={{fontSize:11}}>{dadosDono.lojas.length} Produtos / Lojas</p></div>
+                <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #C9A227'}}><b>🛒 VENDER</b><h2>{totalFaturas} Faturas • {totalValorFaturas} MZN</h2><p style={{fontSize:11}}>{dadosDono.lojas_contas?.length||0} Contas de loja • {dadosDono.lojas.length} Produtos</p></div>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #7C3AED'}}><b>📄 CONTRATOS</b><h2>{totalContratos} Contratos • {totalValorContratos} MZN</h2><p style={{fontSize:11}}>11 Cláusulas cada • Assinados / Pendentes</p></div>
               </div>
               <div style={{background:'white', padding:16, borderRadius:16, marginTop:12}}><b>📊 Resumo do Dono - Hoje:</b><p style={{fontSize:12}}>Total em Contratos: {totalValorContratos} MZN • Total em Faturas VENDER: {totalValorFaturas} MZN • Reservas VIAJAR: {totalViagens} • Transportadores: {totalTransportadores}</p><p style={{fontSize:11, color:'#666'}}>Selecione uma secção para ver detalhes.</p></div>
@@ -234,7 +235,7 @@ export default function App(){
             </div>
           )}
           {abaDono==='vender' && (
-            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Contas de loja ({(dadosDono.lojas_contas||[]).length}):</b>{(dadosDono.lojas_contas||[]).map((l:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{l.nome_loja||'-'} - {l.username||'-'} - {l.conta_id||''}</div>)}<b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
           )}
           {abaDono==='encontrar' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda não há profissionais.</p>}</div>
