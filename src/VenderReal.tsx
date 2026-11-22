@@ -1,3 +1,5 @@
+// VenderReal.tsx - V52 = V51 + FASE 1: campo Email real, activacao por codigo, login por telefone OU email.
+// VenderReal.tsx - V51 = V50 + envia email ao criar/reparar conta (a tabela 'lojas' exige email).
 
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
@@ -63,20 +65,58 @@ const hojeISO = new Date().toISOString().slice(0,10);
   const [perfilEdit, setPerfilEdit] = useState({nomeLoja:'', nuit:'', endereco:'', provincia:'', distrito:'', ramo:'', tel:'', password:'', novaPassword:'', logoData:'', funcionarios: [] as any[]});
 
   const [mostrarLogin, setMostrarLogin] = useState<'cadastro'|'login'>('cadastro');
-  const [formLojaLogin, setFormLojaLogin] = useState({nomeLoja:'', tel:'', password:'', nuit:'', endereco:'', provincia:'', distrito:'', ramo:'', logoData:''}); // REAL: loja nova comeca vazia, sem dados da loja anterior
+  const [formLojaLogin, setFormLojaLogin] = useState({nomeLoja:'', tel:'', password:'', email:'', nuit:'', endereco:'', provincia:'', distrito:'', ramo:'', logoData:''});
+  const [activacao, setActivacao] = useState<any>(null);
+  const [codigoActivacao, setCodigoActivacao] = useState(''); // REAL: loja nova comeca vazia, sem dados da loja anterior
 
   const criarContaLoja = async () => {
     if(!formLojaLogin.nomeLoja || !formLojaLogin.tel || !formLojaLogin.password){ alert('Nome, Telefone e Password'); return; }
+    const emailReal = (formLojaLogin.email||'').trim();
+    if(emailReal && !emailReal.includes('@')){ alert('Escreve um email valido ou deixa o campo Email vazio'); return; }
     const conta_id = `conta_${Date.now()}`;
-    const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData };
+    const estado = emailReal ? 'pendente' : 'activa';
+    const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData, email: emailReal || null, estado };
     try{
       const { error } = await supabase.from('lojas').insert([novaLoja]);
-      if(error){ alert('ATENCAO: a conta foi criada SO neste telefone e NAO ficou guardada no Supabase.\nErro: '+error.message+'\nNao facas logout. Quando abrires o site outra vez, ele tenta enviar de novo. Fala com o dono da app.'); }
+      if(error){ alert('ATENCAO: a conta foi criada SO neste telefone e NAO ficou guardada no Supabase.\nErro: '+error.message+'\nNao facas logout. Quando abrires o site outra vez, ele tenta enviar de novo. Fala com o dono da app.'); return; }
+      if(estado==='pendente'){
+        const { error: errOtp } = await supabase.auth.signInWithOtp({ email: emailReal });
+        if(errOtp){ alert('Conta criada mas nao foi possivel enviar o codigo. Erro: '+errOtp.message+' Carrega em Reenviar codigo.'); }
+        else alert('Enviámos um codigo de 6 numeros para '+emailReal+'. Escreve-o aqui para activar a conta.');
+        setCodigoActivacao('');
+        setActivacao({ conta_id, email: emailReal, nomeLoja: novaLoja.nome_loja });
+        return;
+      }
       localStorage.setItem('loja_sessao', JSON.stringify(novaLoja));
       setLojaLogada(novaLoja);
       setPerfilEdit({nomeLoja:novaLoja.nome_loja||'', nuit:novaLoja.nuit||'', endereco:novaLoja.endereco||'', provincia:novaLoja.provincia||'', distrito:novaLoja.cidade||'', ramo:novaLoja.ramo||'', tel:novaLoja.username||'', password:'', novaPassword:'', logoData:novaLoja.logoData||'', funcionarios: []});
       carregarTudo(novaLoja.conta_id);
     }catch(e:any){ alert(e.message); }
+  };
+
+  // V52 FASE 1 - ACTIVACAO POR CODIGO: confirma o codigo do email e activa a conta.
+  const confirmarActivacao = async () => {
+    if(!activacao || !codigoActivacao.trim()){ alert('Escreve o codigo de 6 numeros'); return; }
+    const { error } = await supabase.auth.verifyOtp({ email: activacao.email, token: codigoActivacao.trim(), type: 'email' });
+    if(error){ alert('Codigo errado ou expirado. Tenta de novo ou carrega em Reenviar codigo.'); return; }
+    const { error: errUp } = await supabase.from('lojas').update({ estado: 'activa' }).eq('conta_id', activacao.conta_id);
+    if(errUp){ alert('Codigo certo mas nao foi possivel activar. Erro: '+errUp.message); return; }
+    const { data } = await supabase.from('lojas').select('*').eq('conta_id', activacao.conta_id).limit(1);
+    const loja = data?.[0];
+    if(!loja){ alert('Conta activada! Faz login para entrar.'); setActivacao(null); setMostrarLogin('login'); return; }
+    localStorage.setItem('loja_sessao', JSON.stringify(loja));
+    setLojaLogada(loja);
+    setPerfilEdit({nomeLoja:loja.nome_loja||'', nuit:loja.nuit||'', endereco:loja.endereco||'', provincia:loja.provincia||'', distrito:loja.cidade||'', ramo:loja.ramo||'', tel:loja.username||'', password:'', novaPassword:'', logoData:loja.logoData||'', funcionarios: loja.funcionarios||[]});
+    setActivacao(null);
+    alert('Conta activada! Bem-vindo a '+loja.nome_loja);
+    carregarTudo(loja.conta_id);
+  };
+
+  const reenviarCodigo = async () => {
+    if(!activacao?.email){ alert('Sem email para reenviar'); return; }
+    const { error } = await supabase.auth.signInWithOtp({ email: activacao.email });
+    if(error){ alert('Nao foi possivel reenviar. Erro: '+error.message); return; }
+    alert('Codigo novo enviado para '+activacao.email);
   };
 
   // V50 - AUTO-REPARACAO: se a conta existe no telefone mas nao no Supabase, volta a envia-la.
@@ -86,18 +126,23 @@ const hojeISO = new Date().toISOString().slice(0,10);
     try{
       const { data } = await supabase.from('lojas').select('conta_id').eq('conta_id', loja.conta_id).limit(1);
       if(data && data.length>0) return;
-      const contaParaGravar:any = { conta_id: loja.conta_id, nome_loja: loja.nome_loja||'', username: loja.username||'', password: loja.password||'', nuit: loja.nuit||'', endereco: loja.endereco||'', provincia: loja.provincia||'', cidade: loja.cidade||'', ramo: loja.ramo||'', logoData: loja.logoData||'', bloqueada: loja.bloqueada||false };
+      const contaParaGravar:any = { conta_id: loja.conta_id, nome_loja: loja.nome_loja||'', username: loja.username||'', password: loja.password||'', nuit: loja.nuit||'', endereco: loja.endereco||'', provincia: loja.provincia||'', cidade: loja.cidade||'', ramo: loja.ramo||'', logoData: loja.logoData||'', bloqueada: loja.bloqueada||false, email: loja.email || null, estado: loja.estado || 'activa' };
       const { error } = await supabase.from('lojas').insert([contaParaGravar]);
       if(error){ alert('A tua conta ainda nao esta guardada no Supabase. Erro: '+error.message+' Nao facas logout ate resolveres. Fala com o dono da app.'); }
     }catch(e:any){ /* sem internet: tenta na proxima abertura */ }
   };
 
   const fazerLoginLoja = async () => {
-    if(!formLojaLogin.tel || !formLojaLogin.password){ alert('Telefone e Password'); return; }
-    const { data, error } = await supabase.from('lojas').select('*').eq('username', formLojaLogin.tel).eq('password', formLojaLogin.password).limit(1);
-    if(error || !data || data.length===0){ alert('Loja não encontrada - verifica telefone e password ou cria conta'); return; }
+    if(!formLojaLogin.tel || !formLojaLogin.password){ alert('Telefone ou Email e Password'); return; }
+    let { data, error } = await supabase.from('lojas').select('*').eq('username', formLojaLogin.tel).eq('password', formLojaLogin.password).limit(1);
+    if(!data || data.length===0){ const r2 = await supabase.from('lojas').select('*').eq('email', formLojaLogin.tel).eq('password', formLojaLogin.password).limit(1); data = r2.data; error = r2.error; }
+    if(error || !data || data.length===0){ alert('Loja não encontrada - verifica telefone/email e password ou cria conta'); return; }
     const loja = data[0];
     if((loja as any).bloqueada){ alert('Conta bloqueada pelo dono da aplicação. Fala com o dono da aplicação para desbloquear.'); return; }
+    if((loja as any).estado==='pendente'){
+      if(loja.email){ setCodigoActivacao(''); setActivacao({ conta_id: loja.conta_id, email: loja.email, nomeLoja: loja.nome_loja }); await supabase.auth.signInWithOtp({ email: loja.email }); alert('A tua conta ainda nao esta activada. Enviámos um codigo novo para '+loja.email+'. Escreve-o aqui.'); return; }
+      await supabase.from('lojas').update({ estado: 'activa' }).eq('conta_id', loja.conta_id);
+    }
     localStorage.setItem('loja_sessao', JSON.stringify(loja));
     setLojaLogada(loja);
     setPerfilEdit({nomeLoja:loja.nome_loja||'', nuit:loja.nuit||'', endereco:loja.endereco||'', provincia:loja.provincia||'', distrito:loja.cidade||'', ramo:loja.ramo||'', tel:loja.username||'', password:'', novaPassword:'', logoData:loja.logoData||'', funcionarios: loja.funcionarios||[]});
@@ -818,11 +863,20 @@ const hojeISO = new Date().toISOString().slice(0,10);
             </div>
             <div className="mt-2 text-center"><button onClick={()=>setMostrarAdmin(true)} className="text-[9px] text-[#facc15] font-bold underline">🔐 Dono da Aplicação - Gerir todas as lojas</button></div>
           </div>
-          {mostrarLogin==='cadastro' ? (
+          {activacao ? (
+            <div className="mt-6 space-y-3">
+              <div className="text-center"><div className="text-[13px] font-black text-white">Activa a tua conta</div><div className="text-[11px] text-white/80 mt-1">Enviámos um codigo de 6 numeros para<br/><b>{activacao.email}</b></div></div>
+              <div><label className="text-[8px] font-bold text-white">CODIGO DE ACTIVACAO *</label><input value={codigoActivacao} onChange={e=>setCodigoActivacao(e.target.value)} placeholder="000000" className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white text-center font-black" /></div>
+              <button onClick={confirmarActivacao} className="w-full mt-4 bg-[#16a34a] text-white py-3 rounded-full text-[11px] font-black">Confirmar codigo - Activar conta</button>
+              <button onClick={reenviarCodigo} className="w-full mt-2 bg-white/10 text-white py-2 rounded-full text-[10px]">Nao recebi - Reenviar codigo</button>
+              <button onClick={()=>setActivacao(null)} className="w-full mt-2 bg-white/10 text-white py-2 rounded-full text-[10px]">Voltar</button>
+            </div>
+          ) : mostrarLogin==='cadastro' ? (
             <div className="mt-6 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="text-[8px] font-bold text-white">NOME DA LOJA / EMPRESA *</label><input value={formLojaLogin.nomeLoja} onChange={e=>setFormLojaLogin({...formLojaLogin, nomeLoja:e.target.value})} placeholder="Ex: Ferragem Central Matola" className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
                 <div><label className="text-[8px] font-bold text-white">TELEFONE / WHATSAPP *</label><input value={formLojaLogin.tel} onChange={e=>setFormLojaLogin({...formLojaLogin, tel:e.target.value})} placeholder="+258 ... " className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
+                <div><label className="text-[8px] font-bold text-white">EMAIL - Opcional, para activar com codigo</label><input value={formLojaLogin.email} onChange={e=>setFormLojaLogin({...formLojaLogin, email:e.target.value})} placeholder="exemplo@gmail.com" className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
                 <div><label className="text-[8px] font-bold text-white">PASSWORD *</label><input type="password" value={formLojaLogin.password} onChange={e=>setFormLojaLogin({...formLojaLogin, password:e.target.value})} placeholder="****" className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
                 <div><label className="text-[8px] font-bold text-white">NUIT</label><input value={formLojaLogin.nuit} onChange={e=>setFormLojaLogin({...formLojaLogin, nuit:e.target.value})} placeholder="NUIT da loja" className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
                 <div className="col-span-2"><label className="text-[8px] font-bold text-white">ENDERECO COMPLETO</label><input value={formLojaLogin.endereco} onChange={e=>setFormLojaLogin({...formLojaLogin, endereco:e.target.value})} placeholder="Av. Guerra Popular, Matola" className="w-full mt-1 h-8 border rounded px-3 text-[11px] bg-white" /></div>
@@ -835,7 +889,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
             </div>
           ) : (
             <div className="mt-6 space-y-3">
-              <div><label className="text-[8px] font-bold text-white">TELEFONE / WHATSAPP *</label><input value={formLojaLogin.tel} onChange={e=>setFormLojaLogin({...formLojaLogin, tel:e.target.value})} className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white" placeholder="+258 ... " /></div>
+              <div><label className="text-[8px] font-bold text-white">TELEFONE OU EMAIL *</label><input value={formLojaLogin.tel} onChange={e=>setFormLojaLogin({...formLojaLogin, tel:e.target.value})} className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white" placeholder="+258 ... ou exemplo@gmail.com" /></div>
               <div><label className="text-[8px] font-bold text-white">PASSWORD *</label><input type="password" value={formLojaLogin.password} onChange={e=>setFormLojaLogin({...formLojaLogin, password:e.target.value})} className="w-full mt-1 h-10 border rounded px-3 text-[12px] bg-white" placeholder="****" /></div>
               <button onClick={fazerLoginLoja} className="w-full mt-4 bg-[#facc15] text-black py-3 rounded-full text-[11px] font-black">Entrar - Login</button>
               <button onClick={()=>setMostrarLogin('cadastro')} className="w-full mt-2 bg-white/10 text-white py-2 rounded-full text-[10px]">Ainda não tem conta? Criar conta</button>

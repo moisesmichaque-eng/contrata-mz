@@ -1,3 +1,7 @@
+// App.tsx - V45 = V44 + recuperacao de orfas com Email opcional e estado pendente/activa.
+// App.tsx - V44 = V43 + painel envia email ao recuperar/testar conta (tabela 'lojas' exige email).
+// App.tsx - V43 = V42 + botao TESTAR LIGACAO ao Supabase + contagem real de produtos.
+// O botao grava e apaga uma conta de teste em 'lojas' - prova ao vivo que nao e mock.
 // App.tsx - V42 = V41 + RECUPERACAO DE CONTAS ORFAS no painel do dono.
 // Lista os conta_id que tem produtos/faturas mas nao tem registo em 'lojas' e deixa criar o registo
 // com o conta_id ORIGINAL (os produtos/faturas antigos voltam a aparecer na conta).
@@ -131,13 +135,25 @@ export default function App(){
     setDadosDono(d); setCarregandoDono(false);
   };
 
+  // V43 - TESTE AO VIVO: grava uma conta de teste em 'lojas' e apaga-a logo a seguir.
+  // Se gravar, nao e mock e o caminho das contas esta aberto. Se falhar, o erro aparece na cara.
+  const testarLigacaoLojas = async ()=>{
+    supabase = await getSupabasePainel();
+    if(!supabase){ alert('Sem ligacao ao Supabase'); return; }
+    const testeId = 'teste_ligacao_' + Date.now();
+    const { error } = await supabase.from('lojas').insert([{ conta_id: testeId, nome_loja: 'TESTE LIGACAO', username: 'teste', password: 'teste', email: null, estado: 'activa' }]);
+    if(error){ alert('FALHOU. O Supabase recusou gravar. Erro: '+error.message+' Corre o SQL de correcao no Supabase.'); return; }
+    await supabase.from('lojas').delete().eq('conta_id', testeId);
+    alert('LIGACAO OK! O Supabase aceitou gravar e apagar uma conta de teste. Nao e mock - as contas vao ficar guardadas.');
+  };
+
   const recuperarContaOrfa = async (conta_id:string)=>{
     const f = formOrfas[conta_id]||{};
     if(!f.nome || !f.tel || !f.pass){ alert('Preenche Nome da loja, Telefone e Password'); return; }
     if(!confirm(`Criar conta ${f.nome} (${f.tel}) com conta_id ${conta_id}? Os produtos e faturas antigos desta conta voltam a aparecer nela.`)) return;
     supabase = await getSupabasePainel();
     if(!supabase){ alert('Sem ligacao ao Supabase'); return; }
-    const { error } = await supabase.from('lojas').insert([{ conta_id, nome_loja: f.nome, username: f.tel, password: f.pass }]);
+    const { error } = await supabase.from('lojas').insert([{ conta_id, nome_loja: f.nome, username: f.tel, password: f.pass, email: (f.email||'').trim() || null, estado: (f.email||'').trim() ? 'pendente' : 'activa' }]);
     if(error){ alert('Nao foi possivel criar a conta. Erro: '+error.message+' Se o erro falar de RLS ou politicas, corre o SQL de correcao no Supabase.'); return; }
     alert('Conta recuperada! Os produtos e faturas antigos desta conta voltam a aparecer.');
     setFormOrfas((prev:any)=>{ const n={...prev}; delete n[conta_id]; return n; });
@@ -223,7 +239,7 @@ export default function App(){
               <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginTop:16}}>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #0B3D91'}}><b>🔍 ENCONTRAR</b><h2>{dadosDono.profissionais.length} Profissionais</h2><p style={{fontSize:11}}>Cadastrados, com BI / NUIT, fotos, M-Pesa</p></div>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #0E7A5A'}}><b>🚌 VIAJAR</b><h2>{totalViagens} Reservas</h2><p style={{fontSize:11}}>{totalTransportadores} Transportadores • {dadosDono.transportadores.length} Viaturas</p></div>
-                <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #C9A227'}}><b>🛒 VENDER</b><h2>{totalFaturas} Faturas • {totalValorFaturas} MZN</h2><p style={{fontSize:11}}>{dadosDono.lojas_contas?.length||0} Contas de loja • {dadosDono.lojas.length} Produtos</p></div>
+                <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #C9A227'}}><b>🛒 VENDER</b><h2>{totalFaturas} Faturas • {totalValorFaturas} MZN</h2><p style={{fontSize:11}}>{dadosDono.lojas_contas?.length||0} Contas de loja • {(dadosDono.produtos_nomes?.length||dadosDono.lojas.length)} Produtos</p></div>
                 <div style={{background:'white', padding:16, borderRadius:16, borderLeft:'5px solid #7C3AED'}}><b>📄 CONTRATOS</b><h2>{totalContratos} Contratos • {totalValorContratos} MZN</h2><p style={{fontSize:11}}>11 Cláusulas cada • Assinados / Pendentes</p></div>
               </div>
               <div style={{background:'white', padding:16, borderRadius:16, marginTop:12}}><b>📊 Resumo do Dono - Hoje:</b><p style={{fontSize:12}}>Total em Contratos: {totalValorContratos} MZN • Total em Faturas VENDER: {totalValorFaturas} MZN • Reservas VIAJAR: {totalViagens} • Transportadores: {totalTransportadores}</p><p style={{fontSize:11, color:'#666'}}>Selecione uma secção para ver detalhes.</p></div>
@@ -256,7 +272,7 @@ export default function App(){
             </div>
           )}
           {abaDono==='vender' && (
-            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Contas de loja ({(dadosDono.lojas_contas||[]).length}):</b>{(dadosDono.lojas_contas||[]).map((l:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{l.nome_loja||'-'} - {l.username||'-'} - {l.conta_id||''}</div>)}<b>Contas orfas - tem produtos/faturas mas nao tem registo em lojas ({contasOrfas.length}):</b>{contasOrfas.length===0 ? <div style={{fontSize:12, padding:'4px 0'}}>Nenhuma. Todas as contas com produtos ja tem registo.</div> : contasOrfas.map((c:any)=>{ const prods=(dadosDono.produtos_nomes||[]).filter((p:any)=>p.conta_id===c); return (<div key={c} style={{fontSize:12, padding:'8px 0', borderBottom:'1px solid #eee'}}><div><b>{c}</b> - {prods.length} produtos - ex: {prods.slice(0,3).map((p:any)=>p.nome).join(', ')||'sem produtos, tem faturas'}</div><div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:6}}><input placeholder="Nome da loja" value={formOrfas[c]?.nome||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),nome:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Telefone (username)" value={formOrfas[c]?.tel||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),tel:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Password" value={formOrfas[c]?.pass||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),pass:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><button onClick={()=>recuperarContaOrfa(c)} style={{background:'#0B3D91', color:'white', border:'none', padding:'6px 12px', borderRadius:8, fontWeight:700}}>Criar conta com este conta_id</button></div></div>); })}<b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Contas de loja ({(dadosDono.lojas_contas||[]).length}):</b>{(dadosDono.lojas_contas||[]).map((l:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{l.nome_loja||'-'} - {l.username||'-'} - {l.conta_id||''}</div>)}<button onClick={testarLigacaoLojas} style={{background:'#0B3D91', color:'white', border:'none', padding:'8px 14px', borderRadius:8, fontWeight:700, marginBottom:10}}>Testar ligacao ao Supabase</button><b>Contas orfas - tem produtos/faturas mas nao tem registo em lojas ({contasOrfas.length}):</b>{contasOrfas.length===0 ? <div style={{fontSize:12, padding:'4px 0'}}>Nenhuma. Todas as contas com produtos ja tem registo.</div> : contasOrfas.map((c:any)=>{ const prods=(dadosDono.produtos_nomes||[]).filter((p:any)=>p.conta_id===c); return (<div key={c} style={{fontSize:12, padding:'8px 0', borderBottom:'1px solid #eee'}}><div><b>{c}</b> - {prods.length} produtos - ex: {prods.slice(0,3).map((p:any)=>p.nome).join(', ')||'sem produtos, tem faturas'}</div><div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:6}}><input placeholder="Nome da loja" value={formOrfas[c]?.nome||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),nome:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Telefone (username)" value={formOrfas[c]?.tel||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),tel:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Password" value={formOrfas[c]?.pass||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),pass:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Email (opcional)" value={formOrfas[c]?.email||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),email:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><button onClick={()=>recuperarContaOrfa(c)} style={{background:'#0B3D91', color:'white', border:'none', padding:'6px 12px', borderRadius:8, fontWeight:700}}>Criar conta com este conta_id</button></div></div>); })}<b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
           )}
           {abaDono==='encontrar' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda não há profissionais.</p>}</div>
