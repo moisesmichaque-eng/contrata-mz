@@ -603,90 +603,7 @@ const hojeISO = new Date().toISOString().slice(0,10);
     // V30 - retorno ja feito acima em bytes
   };
 
-  // V47 - RELATORIO em PDF REAL (paisagem A4, varias paginas): baixa SOZINHO, sem janela de imprimir.
-  const gerarPdfRelatorio = (d:any) => {
-    const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
-    const esc = (s:any)=> limpa(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-    const txt = (f:string, sz:number, x:number, y:number, t:any, cor:string='0 0 0')=> `${cor} rg BT /${f} ${sz} Tf 1 0 0 1 ${x} ${y} Tm (${esc(t)}) Tj ET `;
-    const linha = (x1:number, y1:number, x2:number, y2:number)=> `0.5 0.5 0.5 RG ${x1} ${y1} m ${x2} ${y2} l S `;
-    const rect = (x:number, y:number, w:number, h:number, r:number, g:number, b:number)=> `${r} ${g} ${b} rg ${x} ${y} ${w} ${h} re f `;
-    const cols = [
-      { x: 25, t: 'DATA', k: 'data' },
-      { x: 80, t: 'PRODUTO', k: 'nome' },
-      { x: 270, t: 'ST INICIAL', k: 'stInicial' },
-      { x: 312, t: 'RECEPCAO', k: 'recepcao' },
-      { x: 354, t: 'VENDAS', k: 'vendas' },
-      { x: 398, t: 'CLIENTE', k: 'cliente' },
-      { x: 518, t: 'ST FINAL LOJA', k: 'stFinalLoja' },
-      { x: 570, t: 'ST FINAL ARM+LOJA', k: 'stFinalArmLoja' },
-      { x: 638, t: 'VALOR', k: 'valor' },
-      { x: 690, t: 'DIVIDA', k: 'valorDivida' },
-      { x: 738, t: 'TOTAL', k: 'total' },
-    ];
-    const fmt = (r:any, c:any) => {
-      const v = r[c.k];
-      if(c.k==='nome') return String(v??'').slice(0, 34);
-      if(c.k==='cliente') return String(v??'').slice(0, 26);
-      if(c.k==='valor' || c.k==='valorDivida' || c.k==='total') return Number(v||0).toFixed(0) + 'MT';
-      return String(v??'');
-    };
-    const porPagina = 36;
-    const rows = d.linhas || [];
-    const paginas:any[] = [];
-    for(let i=0; i<rows.length; i+=porPagina) paginas.push(rows.slice(i, i+porPagina));
-    if(paginas.length===0) paginas.push([]);
-    const totalPag = paginas.length;
-    const conteudos:string[] = [];
-    paginas.forEach((pageRows:any, pi:number)=>{
-      let c = '';
-      let y = 560;
-      c += txt('F2', 13, 25, y, 'RELATORIO - ' + d.loja); y -= 15;
-      c += txt('F1', 8, 25, y, 'NUIT: ' + d.nuit + ' | Tel: ' + d.tel + ' | ' + d.endereco); y -= 12;
-      c += txt('F1', 8, 25, y, 'PERIODO: ' + d.periodo + ' | PRODUTO: ' + d.produto + ' | GRUPO: ' + d.grupo); y -= 12;
-      c += linha(25, y, 792, y); y -= 6;
-      c += rect(25, y-9, 767, 13, 0.12, 0.18, 0.29);
-      cols.forEach((col:any)=>{ c += txt('F2', 8, col.x, y-5, col.t, '1 1 1'); });
-      y -= 15;
-      pageRows.forEach((r:any)=>{
-        cols.forEach((col:any)=>{ c += txt('F1', 8, col.x, y, fmt(r, col)); });
-        c += linha(25, y-4, 792, y-4);
-        y -= 12;
-      });
-      if(pi===totalPag-1){
-        const tt = d.totais || {};
-        y -= 4;
-        c += txt('F2', 9, 25, y, 'TOTAIS: ST ' + (tt.totSt||0) + ' REC ' + (tt.totRec||0) + ' VENDAS ' + (tt.totVendas||0) + ' ST FINAL LOJA ' + (tt.totStFinalLoja||0) + ' ST FINAL ARM+LOJA ' + (tt.totStFinalArmLoja||0)); y -= 14;
-        c += txt('F2', 9, 25, y, 'DIVIDA ' + Number(tt.totDivida||0).toFixed(0) + 'MT | TOTAL ' + Number(tt.totTotal||0).toFixed(0) + 'MT');
-      }
-      c += txt('F1', 7, 25, 22, 'Pagina ' + (pi+1) + ' de ' + totalPag + ' | Gerado em ' + new Date().toLocaleString('pt-MZ') + ' - ' + d.loja);
-      conteudos.push(c);
-    });
-    const objs:string[] = [];
-    objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
-    const kids = paginas.map((_:any, i:number)=> (3+2*i) + ' 0 R').join(' ');
-    objs[2] = `<< /Type /Pages /Kids [${kids}] /Count ${totalPag} >>`;
-    const fontObj1 = 3 + 2*totalPag;
-    const fontObj2 = 4 + 2*totalPag;
-    paginas.forEach((_:any, i:number)=>{
-      const pageObj = 3 + 2*i;
-      const contObj = 4 + 2*i;
-      objs[pageObj] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 ${fontObj1} 0 R /F2 ${fontObj2} 0 R >> >> /Contents ${contObj} 0 R >>`;
-      objs[contObj] = `<< /Length ${conteudos[i].length} >>\nstream\n${conteudos[i]}\nendstream`;
-    });
-    objs[fontObj1] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
-    objs[fontObj2] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
-    const totalObjs = 4 + 2*totalPag;
-    let pdf = '%PDF-1.4\n';
-    const offsets:number[] = [0];
-    for(let i=1;i<=totalObjs;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
-    const xrefPos = pdf.length;
-    pdf += `xref\n0 ${totalObjs+1}\n0000000000 65535 f \n`;
-    for(let i=1;i<=totalObjs;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
-    pdf += `trailer\n<< /Size ${totalObjs+1} /Root 1 0 R >>\nstartxref\n` + xrefPos + '\n%%EOF';
-    const bytes = new Uint8Array(pdf.length); for(let bi=0; bi<pdf.length; bi++) bytes[bi] = pdf.charCodeAt(bi) & 0xFF;
-    return new Blob([bytes], {type:'application/pdf'});
-  };
-  // V47 - TALAO PEQUENO do recibo (o que vai para o cliente): pagina estreita, altura conforme os itens.
+  // V48 - TALAO PEQUENO (o que vai para o WhatsApp, no lugar do texto): pagina estreita, altura conforme os itens.
   const gerarBilhetePdf = (d:any) => {
     const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
     const esc = (s:any)=> limpa(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
@@ -831,19 +748,23 @@ const hojeISO = new Date().toISOString().slice(0,10);
         cv.width=lado; cv.height=lado; const ctx=cv.getContext('2d'); if(ctx){ ctx.drawImage(imgLogo, 0, 0, lado, lado); const dj = cv.toDataURL('image/jpeg', 0.85); logoJpeg = dj.split(',')[1]||''; logoW=lado; logoH=lado; }
       }catch(e){}
     }
-    const pdfBlob = gerarBilhetePdf({ logoJpeg, logoW, logoH, loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
+    const pdfBlob = gerarPdfFatura({ logoJpeg, logoW, logoH, loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
     const urlPdf = URL.createObjectURL(pdfBlob);
     const aPdf = document.createElement('a'); aPdf.href=urlPdf; aPdf.download=`${nomeFicheiro}.pdf`; document.body.appendChild(aPdf); aPdf.click(); document.body.removeChild(aPdf);
     setTimeout(()=>URL.revokeObjectURL(urlPdf), 10000);
+    // V48 - DOIS DOCUMENTOS: o recibo A4 grande (em cima) + o TALAO PEQUENO (este e que vai para o WhatsApp, no lugar do texto).
+    const talaoBlob = gerarBilhetePdf({ loja: lojaLogada.nome_loja, nuit: lojaLogada.nuit||'', telLoja: lojaLogada.username||'', endereco: (lojaLogada.endereco||'Maputo') + ' - ' + (lojaLogada.cidade||''), cliente: nomeClienteFatura, telCliente: telFat, nuitCliente: nuitFat||'-', numero: numeroFatura, turno: caixaTurno==='Manha'?'TM - Manha':caixaTurno==='Tarde'?'TT - Tarde':'TN - Noite', status: isDivida?'DIVIDA':'PAGO', data: new Date().toLocaleDateString('pt-MZ'), itens: produtosFat.map((p:any)=>({ nome: p.nome, codigo: p.codigo||'', qtd: p.qtd, preco: p.preco, desc: p.desc, sub: p.preco*p.qtd*(1-p.desc/100) })), subtotal: subtotalLiquido, desconto: descontoItens, subtotalLiq: subtotalLiquido, ivaPerc, ivaValor, total });
+    const urlTalao = URL.createObjectURL(talaoBlob);
+    const aTalao = document.createElement('a'); aTalao.href=urlTalao; aTalao.download=`Talao-${numeroFatura}-${nomeClienteFatura}.pdf`; document.body.appendChild(aTalao); aTalao.click(); document.body.removeChild(aTalao);
+    setTimeout(()=>URL.revokeObjectURL(urlTalao), 10000);
     // Numero do cliente: so digitos; 9 digitos (84...) -> 258 na frente; ja com 258 fica como esta.
     const numBruto = telFat.replace(/\D/g,'');
     const num = numBruto.length===9 ? '258'+numBruto : numBruto;
     if(num){
-      // V46 - SEM NUMEROS NO TEXTO: os valores vao DENTRO do recibo PDF (nao editavel). O texto e so a capa.
-      const textoFatura = `Segue o seu recibo em PDF - ${lojaLogada.nome_loja}. O recibo ja baixou, vou anexar aqui.`;
-      window.open(`https://wa.me/${num}?text=${encodeURIComponent(textoFatura)}`, '_blank');
+      // V48 - SEM TEXTO: o texto foi trocado pelo TALAO PEQUENO (ja baixou em cima). O WhatsApp abre vazio, anexas o talao.
+      window.open(`https://wa.me/${num}`, '_blank');
     }
-    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - PDF baixado${num ? ' + WhatsApp aberto no cliente (anexa o PDF)' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
+    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - PDFs baixados (Recibo A4 + Talao)${num ? ' + WhatsApp aberto no cliente (anexa o TALAO)' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
     }catch(e:any){ alert('Erro a gerar fatura: '+(e?.message||e)); } finally { setSalvando(false); }
   };
 
@@ -1251,17 +1172,19 @@ const hojeISO = new Date().toISOString().slice(0,10);
             setTimeout(()=>URL.revokeObjectURL(urlPeq), 10000);
           };
           const gerarPDF = () => {
-            // V47 - PDF GRANDE baixa SOZINHO (PDF real, sem janela de imprimir) + PEQUENINO + WhatsApp sem numeros.
             const nomeRel = `Relatorio-${relDataInicio||'inicio'}-a-${relDataFim||'fim'}`;
-            const blobRel = gerarPdfRelatorio({ loja: lojaLogada?.nome_loja||'', nuit: lojaLogada?.nuit||'', tel: lojaLogada?.username||'', endereco: `${lojaLogada?.endereco||''} ${lojaLogada?.cidade||''} - ${lojaLogada?.provincia||''}`, periodo: `${relDataInicio||'...'} a ${relDataFim||'...'}`, produto: relFiltroProduto, grupo: relFiltroGrupo, linhas: linhasFiltradas, totais: { totSt, totRec, totVendas, totStFinalLoja, totStFinalArmLoja, totDivida, totTotal } });
-            const urlRel = URL.createObjectURL(blobRel);
-            const aRel = document.createElement('a'); aRel.href=urlRel; aRel.download=`${nomeRel}.pdf`; document.body.appendChild(aRel); aRel.click(); document.body.removeChild(aRel);
-            setTimeout(()=>URL.revokeObjectURL(urlRel), 10000);
+            const logoRel = perfilEdit.logoData || (lojaLogada as any)?.logoData || '';
+            const cabecalhoRel = `<div style="display:flex;gap:12px;align-items:center;border-bottom:3px solid #1e2f4a;padding-bottom:10px;margin-bottom:10px">${logoRel?`<img src="${logoRel}" style="width:64px;height:64px;object-fit:cover;border-radius:50%;border:2px solid #1e2f4a" />`:''}<div><h2 style="margin:0;font-size:18px">${lojaLogada?.nome_loja||'WEZHA TOTSHE'}</h2><div style="font-size:11px;color:#444">NUIT: ${lojaLogada?.nuit||'-'} | Tel: ${lojaLogada?.username||'-'} | ${lojaLogada?.endereco||''} ${lojaLogada?.cidade||''} - ${lojaLogada?.provincia||''}</div><div style="font-size:11px;color:#444">Ramo: ${lojaLogada?.ramo||''}</div></div></div>`;
+            // FIX RELATORIO - antes a tabela htmlRel era construida mas nunca usada; o PDF saia do criarPdfBlob (so texto). Agora o PDF E a tabela com logo.
+            const htmlRel = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${nomeRel}</title><style>body{font-family:Arial;padding:20px;font-size:11px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:10px}th{background:#1e2f4a;color:#fff}</style></head><body>${cabecalhoRel}<h3 style="margin:6px 0">RELATORIO - ${lojaLogada?.nome_loja||''}</h3><p>DATA: ${relDataInicio||'...'} a ${relDataFim||'...'} | PRODUTO: ${relFiltroProduto} | GRUPO: ${relFiltroGrupo}</p><table><thead><tr><th>DATA</th><th>PRODUTO</th><th>ST INICIAL</th><th>RECEPCAO</th><th>VENDAS</th><th>CLIENTE</th><th>ST FINAL LOJA</th><th>ST FINAL ARMAZÉM + LOJA</th><th>VALOR</th><th>DIVIDA</th><th>TOTAL</th></tr></thead><tbody>${linhasFiltradas.map((r:any)=>`<tr><td>${r.data}</td><td>${r.nome}</td><td>${r.stInicial}</td><td>${r.recepcao}</td><td>${r.vendas}</td><td>${r.cliente}</td><td style="background:${r.stFinalLoja<10?'#fca5a5':r.stFinalLoja<50?'#fde047':'#ffffff'};font-weight:bold">${r.stFinalLoja}</td><td style="background:${r.stFinalArmLoja<10?'#fca5a5':r.stFinalArmLoja<50?'#fde047':'#ffffff'};font-weight:bold">${r.stFinalArmLoja}</td><td>${r.valor}MT</td><td>${r.valorDivida}MT</td><td>${r.total}MT</td></tr>`).join('')}</tbody></table><h3>TOTAIS: ST ${totSt} REC ${totRec} VENDAS ${totVendas} ST FINAL LOJA ${totStFinalLoja} ST FINAL ARMAZÉM + LOJA ${totStFinalArmLoja} DIVIDA ${totDivida}MT TOTAL ${totTotal}MT</h3><p style="font-size:10px;color:#888">Gerado em ${new Date().toLocaleString('pt-MZ')} - ${lojaLogada?.nome_loja||''}</p><script>window.onload=function(){window.print()}</script></body></html>`;
+            const wRel:any = window.open('', '_blank');
+            if(!wRel){ alert('O navegador bloqueou. Permite popups para baixar o PDF.'); return; }
+            wRel.document.write(htmlRel); wRel.document.close();
+            // V46 - DOIS DOCUMENTOS: o PDF grande (janela em cima) + o PEQUENINO (baixa sozinho aqui).
             baixarPequenino();
             const textoW = `Segue o relatorio em PDF - ${lojaLogada?.nome_loja||''}. O resumo e o relatorio ja baixaram, vou anexar aqui.`;
             window.open(`https://wa.me/${numDonoRel}?text=${encodeURIComponent(textoW)}`, '_blank');
           };
-
           const enviarWhats = () => {
             // V46 - tambem baixa o PEQUENINO; o texto nao leva numeros.
             baixarPequenino();
