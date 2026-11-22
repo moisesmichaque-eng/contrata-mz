@@ -269,7 +269,8 @@ const hojeISO = new Date().toISOString().slice(0,10);
     if(!p){ alert('Nenhum WhatsApp pendente.'); return; }
     const tel = normalizarTelMZ(p.tel);
     if(!tel){ alert('Esta venda nao tem telefone do cliente.'); return; }
-    const texto = `Olá ${p.cliente}! Obrigado pela compra na ${lojaLogada?.nomeLoja||'nossa loja'}. ${p.caixa} - ${p.data} ${p.hora}. Total: ${p.total.toFixed(0)} MT (${p.forma}). Itens: ${(p.itens||[]).map((x:any)=>`${x.nome} x${x.qtd}`).join(', ')}.`;
+    // V46 - SEM NUMEROS NO TEXTO: os valores vao DENTRO do recibo PDF (nao editavel).
+    const texto = `Olá ${p.cliente}! Obrigado pela compra na ${lojaLogada?.nomeLoja||'nossa loja'}. Segue o seu recibo em PDF - ja baixou, vou anexar aqui.`;
     window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(texto), '_blank');
     salvarVendasOffline(vendasOffline.map((v:any)=>v.id===p.id?{...v, whatsapp:'enviado'}:v));
   };
@@ -477,6 +478,31 @@ const hojeISO = new Date().toISOString().slice(0,10);
     objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
     objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
     objs[3] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>';
+    objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+    objs[5] = `<< /Length ${content.length} >>\nstream\n${content}\nendstream`;
+    let pdf = '%PDF-1.4\n';
+    const offsets:number[] = [0];
+    for(let i=1;i<=5;i++){ offsets[i]=pdf.length; pdf += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
+    const xrefPos = pdf.length;
+    pdf += 'xref\n0 6\n0000000000 65535 f \n';
+    for(let i=1;i<=5;i++){ pdf += String(offsets[i]).padStart(10,'0') + ' 00000 n \n'; }
+    pdf += 'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF';
+    return new Blob([pdf], {type:'application/pdf'});
+  };
+
+  // V46 - PEQUENINO: PDF pequeno em formato talao (80mm) com SO o resumo.
+  // Substitui o texto editavel no WhatsApp: os numeros vao DENTRO do PDF, ninguem edita.
+  const criarPdfPequenino = (titulo:string, linhas:string[]) => {
+    const limpa = (s:any)=> String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^ -~]/g,' ');
+    const esc = (s:string)=> s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7E\u00C0-\u00FF]/g,' ');
+    let content = 'BT /F1 10 Tf 10 240 Td 13 TL ';
+    content += `(${esc(titulo)}) Tj T* T* `;
+    linhas.forEach((l:string)=>{ const partes = l.match(/.{1,34}/g) || [l]; partes.forEach((p:string)=>{ content += `(${esc(p)}) Tj T* `; }); });
+    content += 'ET';
+    const objs:string[] = [];
+    objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+    objs[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+    objs[3] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 227 260] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>';
     objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
     objs[5] = `<< /Length ${content.length} >>\nstream\n${content}\nendstream`;
     let pdf = '%PDF-1.4\n';
@@ -713,9 +739,8 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const numBruto = telFat.replace(/\D/g,'');
     const num = numBruto.length===9 ? '258'+numBruto : numBruto;
     if(num){
-      // V45 - DIRETO, SEM SHARE: o PDF ja baixou em cima; abre a conversa do cliente no WhatsApp com a mensagem pronta.
-      // O link do WhatsApp so aceita texto - nenhum site consegue meter o PDF dentro da conversa. O PDF baixou, basta tocar no clip e anexar.
-      const textoFatura = `Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'} - O PDF ja baixou, vou anexar aqui.`;
+      // V46 - SEM NUMEROS NO TEXTO: os valores vao DENTRO do recibo PDF (nao editavel). O texto e so a capa.
+      const textoFatura = `Segue o seu recibo em PDF - ${lojaLogada.nome_loja}. O recibo ja baixou, vou anexar aqui.`;
       window.open(`https://wa.me/${num}?text=${encodeURIComponent(textoFatura)}`, '_blank');
     }
     alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - PDF baixado${num ? ' + WhatsApp aberto no cliente (anexa o PDF)' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
@@ -1117,6 +1142,14 @@ const hojeISO = new Date().toISOString().slice(0,10);
           const gruposUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.cat || 'Geral'))];
           // V45 - numero do dono = telefone da conta da loja (username). 9 digitos -> 258 na frente, senao a conversa abria no numero errado.
           const numDonoRel = (()=>{ const d = String(lojaLogada?.username||'').replace(/\D/g,''); return d.length===9 ? '258'+d : d; })();
+          // V46 - baixa o PEQUENINO (resumo: total vendido, divida, pago). Os 2 botoes do relatorio usam esta.
+          const baixarPequenino = () => {
+            const pagoRel = totTotal - totDivida;
+            const blobPeq = criarPdfPequenino(`RESUMO - ${lojaLogada?.nome_loja||''}`, [`PERIODO: ${relDataInicio||'...'} a ${relDataFim||'...'}`, `TOTAL VENDIDO: ${totTotal}MT`, `DIVIDA: ${totDivida}MT`, `PAGO: ${pagoRel}MT`]);
+            const urlPeq = URL.createObjectURL(blobPeq);
+            const aPeq = document.createElement('a'); aPeq.href=urlPeq; aPeq.download=`Resumo-${relDataInicio||'inicio'}-a-${relDataFim||'fim'}.pdf`; document.body.appendChild(aPeq); aPeq.click(); document.body.removeChild(aPeq);
+            setTimeout(()=>URL.revokeObjectURL(urlPeq), 10000);
+          };
           const gerarPDF = () => {
             const nomeRel = `Relatorio-${relDataInicio||'inicio'}-a-${relDataFim||'fim'}`;
             const logoRel = perfilEdit.logoData || (lojaLogada as any)?.logoData || '';
@@ -1126,12 +1159,15 @@ const hojeISO = new Date().toISOString().slice(0,10);
             const wRel:any = window.open('', '_blank');
             if(!wRel){ alert('O navegador bloqueou. Permite popups para baixar o PDF.'); return; }
             wRel.document.write(htmlRel); wRel.document.close();
-            // WhatsApp no mesmo clique - partilha o PDF (so PDF, sem Excel)
-            const textoW = `RELATORIO ${lojaLogada?.nome_loja||''} - ${relDataInicio||'...'} a ${relDataFim||'...'} - ${linhasFiltradas.length} linhas - TOTAL ${totTotal}MT - DIVIDA ${totDivida}MT - PDF baixado!`;
+            // V46 - DOIS DOCUMENTOS: o PDF grande (janela em cima) + o PEQUENINO (baixa sozinho aqui).
+            baixarPequenino();
+            const textoW = `Segue o relatorio em PDF - ${lojaLogada?.nome_loja||''}. O resumo e o relatorio ja baixaram, vou anexar aqui.`;
             window.open(`https://wa.me/${numDonoRel}?text=${encodeURIComponent(textoW)}`, '_blank');
           };
           const enviarWhats = () => {
-            const texto = `RELATORIO ${lojaLogada?.nome_loja||''} - ${relDataInicio||'...'} a ${relDataFim||'...'} - ${linhasFiltradas.length} linhas - TOTAL ${totTotal}MT - DIVIDA ${totDivida}MT`;
+            // V46 - tambem baixa o PEQUENINO; o texto nao leva numeros.
+            baixarPequenino();
+            const texto = `Segue o relatorio em PDF - ${lojaLogada?.nome_loja||''}. O resumo ja baixou, vou anexar aqui.`;
             window.open(`https://wa.me/${numDonoRel}?text=${encodeURIComponent(texto)}`, '_blank');
           };
           return (
