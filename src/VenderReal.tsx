@@ -713,21 +713,12 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const numBruto = telFat.replace(/\D/g,'');
     const num = numBruto.length===9 ? '258'+numBruto : numBruto;
     if(num){
-      // V34 - PARTILHA O PDF EM FICHEIRO, nao texto: 1) PDF grande em ficheiro -> 2) se falhar, bilhete pequeno em ficheiro -> 3) se falhar, abre WhatsApp no cliente com texto (o PDF ja baixou)
-      const textoFatura = `Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'}`;
-      const tentarPartilharFicheiro = async (file:File) => { try{ if(!(navigator as any).share) return false; if((navigator as any).canShare && !(navigator as any).canShare({files:[file]})) return false; await (navigator as any).share({ files:[file], title:`Fatura ${numeroFatura}`, text: textoFatura }); return true; }catch(e){ return false; } };
-      const ficheiroPdf = new File([pdfBlob], `${nomeFicheiro}.pdf`, {type:'application/pdf'});
-      let partilhado = await tentarPartilharFicheiro(ficheiroPdf);
-      if(!partilhado){
-        const bilheteBlob = gerarBilhetePdf({ loja: lojaLogada.nome_loja, numero: numeroFatura, data: new Date().toLocaleDateString('pt-MZ'), status: isDivida?'DIVIDA':'PAGO', cliente: nomeClienteFatura, itens: produtosFat.map((p:any)=>({ nome: p.nome, qtd: p.qtd, sub: p.preco*p.qtd*(1-p.desc/100) })), total });
-        const bilheteFile = new File([bilheteBlob], `Bilhete ${numeroFatura}.pdf`, {type:'application/pdf'});
-        partilhado = await tentarPartilharFicheiro(bilheteFile);
-      }
-      if(!partilhado){
-        window.open(`https://wa.me/${num}?text=${encodeURIComponent(textoFatura + '. O PDF da fatura ja baixou - anexa o PDF aqui, por favor.')}`, '_blank');
-      }
+      // V45 - DIRETO, SEM SHARE: o PDF ja baixou em cima; abre a conversa do cliente no WhatsApp com a mensagem pronta.
+      // O link do WhatsApp so aceita texto - nenhum site consegue meter o PDF dentro da conversa. O PDF baixou, basta tocar no clip e anexar.
+      const textoFatura = `Fatura ${numeroFatura} - ${nomeClienteFatura} - TOTAL ${total.toFixed(0)} MT - ${isDivida?'DIVIDA':'PAGO'} - O PDF ja baixou, vou anexar aqui.`;
+      window.open(`https://wa.me/${num}?text=${encodeURIComponent(textoFatura)}`, '_blank');
     }
-    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - Ficheiro: Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
+    alert(`✅ Fatura ${numeroFatura} - ${nomeClienteFatura} - ${isDivida?'DIVIDA':'PAGO'} - Total ${total.toFixed(0)} MT - PDF baixado${num ? ' + WhatsApp aberto no cliente (anexa o PDF)' : ''}`); setProdutosFat([]); setTelFat(''); setNomeFat(''); setNuitFat(''); carregarTudo(lojaLogada.conta_id);
     }catch(e:any){ alert('Erro a gerar fatura: '+(e?.message||e)); } finally { setSalvando(false); }
   };
 
@@ -1124,6 +1115,8 @@ const hojeISO = new Date().toISOString().slice(0,10);
           const totTotal = linhasFiltradas.reduce((s:any,r:any)=>s+r.total,0);
           const produtosUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.nome))];
           const gruposUnicos = [...new Set((stockProdutos||[]).map((p:any)=>p.cat || 'Geral'))];
+          // V45 - numero do dono = telefone da conta da loja (username). 9 digitos -> 258 na frente, senao a conversa abria no numero errado.
+          const numDonoRel = (()=>{ const d = String(lojaLogada?.username||'').replace(/\D/g,''); return d.length===9 ? '258'+d : d; })();
           const gerarPDF = () => {
             const nomeRel = `Relatorio-${relDataInicio||'inicio'}-a-${relDataFim||'fim'}`;
             const logoRel = perfilEdit.logoData || (lojaLogada as any)?.logoData || '';
@@ -1135,11 +1128,11 @@ const hojeISO = new Date().toISOString().slice(0,10);
             wRel.document.write(htmlRel); wRel.document.close();
             // WhatsApp no mesmo clique - partilha o PDF (so PDF, sem Excel)
             const textoW = `RELATORIO ${lojaLogada?.nome_loja||''} - ${relDataInicio||'...'} a ${relDataFim||'...'} - ${linhasFiltradas.length} linhas - TOTAL ${totTotal}MT - DIVIDA ${totDivida}MT - PDF baixado!`;
-            window.open(`https://wa.me/${String(lojaLogada?.username||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(textoW)}`, '_blank');
+            window.open(`https://wa.me/${numDonoRel}?text=${encodeURIComponent(textoW)}`, '_blank');
           };
           const enviarWhats = () => {
             const texto = `RELATORIO ${lojaLogada?.nome_loja||''} - ${relDataInicio||'...'} a ${relDataFim||'...'} - ${linhasFiltradas.length} linhas - TOTAL ${totTotal}MT - DIVIDA ${totDivida}MT`;
-            window.open(`https://wa.me/${String(lojaLogada?.username||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(texto)}`, '_blank');
+            window.open(`https://wa.me/${numDonoRel}?text=${encodeURIComponent(texto)}`, '_blank');
           };
           return (
           <div className="mt-3 space-y-3">
