@@ -1,3 +1,6 @@
+// App.tsx - V42 = V41 + RECUPERACAO DE CONTAS ORFAS no painel do dono.
+// Lista os conta_id que tem produtos/faturas mas nao tem registo em 'lojas' e deixa criar o registo
+// com o conta_id ORIGINAL (os produtos/faturas antigos voltam a aparecer na conta).
 // App.tsx - V41 = V40 + painel le as CONTAS de loja da tabela 'lojas' (antes contava produtos como lojas).
 // App.tsx - V40 = V39 (colaboradores + margens) + JUNCAO da correcao do ramo FIX/V4/V5
 // CORRECAO: o painel NAO tem chave propria. Reutiliza a ligacao do VenderReal (a mesma que os colaboradores ja usam e funciona).
@@ -69,6 +72,7 @@ export default function App(){
   const [donoLogado, setDonoLogado] = useState(false);
   const [donoUser, setDonoUser] = useState(''); const [donoPass, setDonoPass] = useState('');
   const [abaDono, setAbaDono] = useState<'resumo'|'encontrar'|'viajar'|'vender'|'contratos'|'atividades'|'colaboradores'>('resumo');
+  const [formOrfas, setFormOrfas] = useState<any>({});
   const [dadosDono, setDadosDono] = useState<any>({ contratos:[], viagens:[], transportadores:[], reservas:[], lojas:[], faturas:[], profissionais:[] });
   const [carregandoDono, setCarregandoDono] = useState(false);
   // COLABORADORES - contas criadas pelo dono, aqui no painel do SITE (V39)
@@ -115,6 +119,8 @@ export default function App(){
         const tabelas:any = { contratos:'contratos', viagens:'viagens_reservas', transportadores:'viagens_transportadores', reservas:'viagens_reservas', lojas:'produtos_loja', lojas_contas:'lojas', faturas:'faturas_loja', profissionais:'tecnicos' };
         for(const k of Object.keys(tabelas)){ try{ const { data } = await supabase.from(tabelas[k]).select('*').limit(100); if(data) d[k]=data; }catch(e){} }
         try{ const { data: pas } = await supabase.from('viagens_passageiros').select('*').limit(100); if(pas && pas.length){ const ids = new Set([...d.reservas, ...d.viagens].map((x:any)=>x.id)); const novos = pas.filter((x:any)=> !ids.has(x.id)); d.reservas = [...d.reservas, ...novos]; d.viagens = [...d.viagens, ...novos]; } }catch(e){}
+        try{ const { data: pn } = await supabase.from('produtos_loja').select('conta_id,nome').limit(1000); if(pn) d.produtos_nomes = pn; }catch(e){}
+        try{ const { data: fc } = await supabase.from('faturas_loja').select('conta_id').limit(1000); if(fc) d.faturas_contas = fc; }catch(e){}
       }
     }catch(e){}
     // Fallback real local - o que esta guardado no telefone
@@ -123,6 +129,19 @@ export default function App(){
       for(const k of keys){ const v = localStorage.getItem(k); if(v){ try{ const arr=JSON.parse(v); if(Array.isArray(arr) && d[k].length===0) d[k]=arr; }catch(e){} } }
     }catch(e){}
     setDadosDono(d); setCarregandoDono(false);
+  };
+
+  const recuperarContaOrfa = async (conta_id:string)=>{
+    const f = formOrfas[conta_id]||{};
+    if(!f.nome || !f.tel || !f.pass){ alert('Preenche Nome da loja, Telefone e Password'); return; }
+    if(!confirm(`Criar conta ${f.nome} (${f.tel}) com conta_id ${conta_id}? Os produtos e faturas antigos desta conta voltam a aparecer nela.`)) return;
+    supabase = await getSupabasePainel();
+    if(!supabase){ alert('Sem ligacao ao Supabase'); return; }
+    const { error } = await supabase.from('lojas').insert([{ conta_id, nome_loja: f.nome, username: f.tel, password: f.pass }]);
+    if(error){ alert('Nao foi possivel criar a conta. Erro: '+error.message+' Se o erro falar de RLS ou politicas, corre o SQL de correcao no Supabase.'); return; }
+    alert('Conta recuperada! Os produtos e faturas antigos desta conta voltam a aparecer.');
+    setFormOrfas((prev:any)=>{ const n={...prev}; delete n[conta_id]; return n; });
+    await carregarDadosDono();
   };
 
   const aprovarViatura = async (transp:any, novoEstado:string)=>{
@@ -181,7 +200,9 @@ export default function App(){
     const totalContratos = dadosDono.contratos.length;
     const totalViagens = dadosDono.reservas.length;
     const totalTransportadores = dadosDono.transportadores.length;
-    const totalFaturas = dadosDono.faturas.length;
+    const idsContasLojas = new Set((dadosDono.lojas_contas||[]).map((l:any)=>l.conta_id));
+  const contasOrfas = [...new Set([...(dadosDono.produtos_nomes||[]).map((x:any)=>x.conta_id), ...(dadosDono.faturas_contas||[]).map((x:any)=>x.conta_id)])].filter((c:any)=> c && !idsContasLojas.has(c));
+  const totalFaturas = dadosDono.faturas.length;
     const totalValorFaturas = dadosDono.faturas.reduce((s:any, x:any)=> s + (Number(x.total||x.valor||0)), 0);
     const totalValorContratos = dadosDono.contratos.reduce((s:any, x:any)=> s + (Number(x.valor||0)), 0);
     return (
@@ -235,7 +256,7 @@ export default function App(){
             </div>
           )}
           {abaDono==='vender' && (
-            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Contas de loja ({(dadosDono.lojas_contas||[]).length}):</b>{(dadosDono.lojas_contas||[]).map((l:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{l.nome_loja||'-'} - {l.username||'-'} - {l.conta_id||''}</div>)}<b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
+            <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🛒 VENDER - Detalhado</h3><b>Contas de loja ({(dadosDono.lojas_contas||[]).length}):</b>{(dadosDono.lojas_contas||[]).map((l:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{l.nome_loja||'-'} - {l.username||'-'} - {l.conta_id||''}</div>)}<b>Contas orfas - tem produtos/faturas mas nao tem registo em lojas ({contasOrfas.length}):</b>{contasOrfas.length===0 ? <div style={{fontSize:12, padding:'4px 0'}}>Nenhuma. Todas as contas com produtos ja tem registo.</div> : contasOrfas.map((c:any)=>{ const prods=(dadosDono.produtos_nomes||[]).filter((p:any)=>p.conta_id===c); return (<div key={c} style={{fontSize:12, padding:'8px 0', borderBottom:'1px solid #eee'}}><div><b>{c}</b> - {prods.length} produtos - ex: {prods.slice(0,3).map((p:any)=>p.nome).join(', ')||'sem produtos, tem faturas'}</div><div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:6}}><input placeholder="Nome da loja" value={formOrfas[c]?.nome||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),nome:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Telefone (username)" value={formOrfas[c]?.tel||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),tel:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><input placeholder="Password" value={formOrfas[c]?.pass||''} onChange={(e:any)=>setFormOrfas({...formOrfas,[c]:{...(formOrfas[c]||{}),pass:e.target.value}})} style={{padding:6, border:'1px solid #ccc', borderRadius:8}} /><button onClick={()=>recuperarContaOrfa(c)} style={{background:'#0B3D91', color:'white', border:'none', padding:'6px 12px', borderRadius:8, fontWeight:700}}>Criar conta com este conta_id</button></div></div>); })}<b>Faturas ({totalFaturas}) - Total {totalValorFaturas} MZN:</b>{dadosDono.faturas.map((f:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{f.numero_fatura||f.id?.substring(0,8)||'-'} - {f.cliente_nome||f.cliente||'-'} - {f.total||f.valor||'-'} MZN - {f.created_at||f.data||'-'} - {f.estado||''}</div>)}</div>
           )}
           {abaDono==='encontrar' && (
             <div style={{background:'white', padding:16, borderRadius:16, marginTop:16}}><h3>🔍 ENCONTRAR - Detalhado</h3>{dadosDono.profissionais.map((p:any,i:number)=> <div key={i} style={{fontSize:12, padding:'4px 0', borderBottom:'1px solid #eee'}}>{p.nome||'-'} - {p.profissao||p.area||'-'} - {p.local||p.distrito||'-'} - Tel {p.tel||p.whatsapp||'-'}</div>)} {dadosDono.profissionais.length===0 && <p>Ainda não há profissionais.</p>}</div>
