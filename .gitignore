@@ -3,3 +3,4 @@ dist
 package-lock.json
 .env
 src/vite-env.d.ts
+.vercel
