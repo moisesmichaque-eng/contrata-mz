@@ -1,4 +1,4 @@
-// VenderReal.tsx - V56.3 = V56.2 + FIX linha 89 (build): setActivacao com um so objecto, tel dentro do objecto para o WhatsApp continuar a funcionar: sem resto de codigo de 6, sem frase ESSE, sem texto Dono visivel. So LINK. V56 = V55 + SEM texto visivel do Dono (acesso escondido 3 cliques no N) + activacao SO por LINK (sem codigo de 6) + link tambem via WhatsApp. V55 = V54 + link so activa (nao entra sem password) + linhas ESSE no ecra. V54 = V53 + ecra de activacao fala do link ou codigo (o Supabase sem SMTP proprio so manda link). V53 = V52 + correccao: codigo aceite nos 3 tipos + link do email activa a conta. V52 = V51 + FASE 1: campo Email real, activacao por codigo, login por telefone OU email.
+// VenderReal.tsx - V56.4 = V56.3 + FIX cadastro: telefone ja com conta manda fazer LOGIN (antes vinha 'duplicate key' com mensagem a confundir) + mensagem de erro verdadeira (build): setActivacao com um so objecto, tel dentro do objecto para o WhatsApp continuar a funcionar: sem resto de codigo de 6, sem frase ESSE, sem texto Dono visivel. So LINK. V56 = V55 + SEM texto visivel do Dono (acesso escondido 3 cliques no N) + activacao SO por LINK (sem codigo de 6) + link tambem via WhatsApp. V55 = V54 + link so activa (nao entra sem password) + linhas ESSE no ecra. V54 = V53 + ecra de activacao fala do link ou codigo (o Supabase sem SMTP proprio so manda link). V53 = V52 + correccao: codigo aceite nos 3 tipos + link do email activa a conta. V52 = V51 + FASE 1: campo Email real, activacao por codigo, login por telefone OU email.
 // VenderReal.tsx - V51 = V50 + envia email ao criar/reparar conta (a tabela 'lojas' exige email).
 
 import React, { useState, useEffect } from 'react';
@@ -78,9 +78,14 @@ const hojeISO = new Date().toISOString().slice(0,10);
     const conta_id = `conta_${Date.now()}`;
     const estado = emailReal ? 'pendente' : 'activa';
     const novaLoja:any = { conta_id, nome_loja: formLojaLogin.nomeLoja, username: formLojaLogin.tel, password: formLojaLogin.password, nuit: formLojaLogin.nuit, endereco: formLojaLogin.endereco, provincia: formLojaLogin.provincia, cidade: formLojaLogin.distrito, ramo: formLojaLogin.ramo, logoData: formLojaLogin.logoData, email: emailReal || null, estado };
+    // V56.4 CORRECAO: o username E o TELEFONE. Se esse telefone ja tem conta,
+    // o Supabase devolvia "duplicate key" e a mensagem antiga confundia.
+    // Agora verifica primeiro e manda fazer LOGIN.
+    const { data: jaExiste } = await supabase.from('lojas').select('id').eq('username', formLojaLogin.tel).limit(1);
+    if(jaExiste && jaExiste.length>0){ alert('Este telefone ja tem conta. Nao precisas criar outra. Carrega em LOGIN e entra com este telefone e a tua password.'); setMostrarLogin('login'); return; }
     try{
       const { error } = await supabase.from('lojas').insert([novaLoja]);
-      if(error){ alert('ATENCAO: a conta foi criada SO neste telefone e NAO ficou guardada no Supabase.\nErro: '+error.message+'\nNao facas logout. Quando abrires o site outra vez, ele tenta enviar de novo. Duvidas? vendas@wezha-totshe.com'); return; }
+      if(error){ alert('Nao foi possivel guardar a conta no Supabase. Erro: '+error.message+' Tenta outra vez. Duvidas? vendas@wezha-totshe.com'); return; }
       if(estado==='pendente'){
         const { error: errOtp } = await supabase.auth.signInWithOtp({ email: emailReal });
         if(errOtp){ alert('Conta criada mas nao foi possivel enviar o LINK. Erro: '+errOtp.message+' Carrega em Reenviar LINK.'); }
